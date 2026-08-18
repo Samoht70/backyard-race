@@ -292,3 +292,137 @@ Deux réserves relevées à l'intégration, corrigées le 2026-08-19 :
 - Le rappel de documentation Bruno ne s'appliquait pas ici : pas de collection `bruno/`, et son
   message renvoyait à `app/Rest/`, c'est-à-dire à Lomkit, écarté en D-04. Le hook et son script
   sont supprimés.
+
+## D-24 — Direction artistique « Corral » : tokens Tailwind, aucune librairie ajoutée
+
+Arrêtée le 2026-08-19 avec le propriétaire du projet.
+
+L'interface est un **tableau de chronométrage**, pas un back-office : dans un Backyard Ultra
+le tour est l'unité, on referme la boucle dans l'heure ou on est sorti.
+
+- **Surfaces** — clair : blanc pur, encre presque noire à reflet bleu, pour tenir le plein
+  soleil. Sombre : ardoise bleu profond, **jamais de noir pur** (le noir pur fait halo sur du
+  texte fin à la frontale).
+- **Un seul accent, l'outremer**, choisi délibérément *hors* du jeu sémantique : les quatre
+  statuts consomment déjà le vert, le rouge, l'ambre et l'ardoise.
+- **Une seule famille variable, Archivo**, trois voix par son axe de largeur (Expanded Black
+  pour les nombres, largeur normale pour le texte, Expanded capitales pour les micro-libellés).
+  **Auto-hébergée** depuis `resources/fonts/` via le fournisseur `local()` du plugin Vite :
+  les fournisseurs distants ne servent que l'axe de graisse, et l'événement se déroule dans un
+  champ sur une connexion dégradée. Aucune requête tierce ne subsiste.
+- **Élément signature : la bande de tour comme plaque typographique.** Pas de jauge, pas de
+  barre, pas d'horloge — voir D-25. Le numéro de tour et le nombre de coureurs restants sont
+  posés en corps d'affichage, en chiffres tabulaires.
+- **La note d'anniversaire** est un unique séparateur en rangée de points façon guirlande,
+  d'un seul ton en paliers d'opacité — aucun token supplémentaire, aucune collision sémantique.
+- **Aucune librairie de composants ajoutée** : les 22 dossiers shadcn-vue déjà présents
+  suffisent. Aucune primitive n'a eu besoin d'être ajoutée.
+- **Notation oklch**, pour viser AA au lieu de le deviner. La palette vit dans **trois**
+  endroits : `:root`, `.dark`, et le `<style>` anti-flash de `resources/views/app.blade.php`
+  que Blade ne peut pas lire depuis le CSS. Un test affirme que les trois concordent.
+- **AA est vérifié par un test, pas par la revue** : `tests/Unit/DesignSystem/PaletteContrastTest.php`
+  analyse les tokens, convertit oklch → sRGB et contrôle 65 couples dans les deux thèmes, plus
+  la présence de chaque token dans les deux (un token absent de `.dark` se figerait en silence
+  sur sa valeur claire). Aucune dépendance, aucune étape de CI en plus.
+- **Cibles tactiles** : 44 px de plancher, 72 px pour la validation d'une boucle. Pas de token —
+  l'intention vit dans les variantes nommées d'`ActionButton`.
+- Les tokens `--chart-1..5` sont **supprimés** : D-16 exclut tout graphique.
+
+Mesuré sur un viewport réel de 375 px : aucun débordement horizontal, aucune cible sous 44 px.
+La lisibilité en niveaux de gris est portée par le **pictogramme et le libellé**, pas par la
+couleur — les quatre encres doivent rester dans la bande AA, qui est trop étroite pour que la
+clarté suffise à les distinguer.
+
+## D-25 — Pas de compte à rebours, et pas de barre de progression
+
+Arrêté le 2026-08-19. D-15 excluait déjà le « compte à rebours intégré », BR-04 et BR-13 le
+répètent. Le propriétaire a confirmé : **un chronomètre physique s'en charge**.
+
+Étendu à la demande : **aucune barre de progression**, sous aucune forme. L'élément signature
+de la direction artistique a donc été réancré sur la typographie, et le lime haute visibilité —
+qui n'existait que pour cette barre — est sorti de la palette.
+
+Conséquences : **aucune horloge côté client** nulle part, donc aucune dérive avec l'heure
+serveur et aucun écran qui s'anime pendant quinze heures de nuit. Les horaires sont affichés
+comme des faits fixes venus du serveur.
+
+Seule exception, assumée : le **filet de chargement d'Inertia** en haut de l'écran, fourni par
+le starter kit. Ce n'est pas un élément de mise en page mais le seul retour visuel quand le
+réseau traîne, et le cas limite « jamais un écran figé » de BR-02 le réclame. Il est repeint en
+couleur de marque.
+
+## D-26 — Contrat de statut coureur : quatre statuts d'affichage, déclarés deux fois et vérifiés
+
+Arrêté le 2026-08-19, après lecture des stories aval.
+
+Les quatre statuts de BR-02 (en course, éliminé, abandon, terminé) sont un **jeu de
+présentation, pas une colonne** :
+
+- BR-08 ne modélise que deux états du participant ;
+- BR-10 et BR-11 aboutissent **tous deux** à `eliminated`, distingués par le seul motif —
+  « L'abandon et l'élimination automatique aboutissent au même statut mais pas au même motif » ;
+- le `finished` de BR-20 est le statut de l'**événement**, pas du coureur.
+
+Donc `App\Enums\RunnerStatus` est un enum **dérivé**, jamais persisté, et **strictement de
+données** : pas de `canTransitionTo()`, pas de transitions — le cycle de vie appartient à
+BR-08 → BR-11. La dérivation `RunnerStatus::for(Participant)` est à écrire **dans BR-08** :
+aucun modèle `Participant` n'existe encore. **BR-08 ne doit pas redéclarer un jeu concurrent.**
+
+Le motif de sortie (`Timeout` / `Withdrawal`) reste à BR-10/BR-11.
+
+### Pourquoi la carte est dupliquée côté TS
+
+Deux faits techniques ferment la discussion :
+
+- **Tailwind 4 ne génère que les classes présentes dans les sources analysées.** Une chaîne de
+  classe arrivant du PHP à l'exécution ne produit aucun CSS — les puces s'afficheraient nues.
+  Un fichier généré *gitignoré* ne serait pas analysé non plus.
+- **Une icône Lucide est un composant Vue**, importé statiquement pour être secoué à l'arbre.
+
+La répartition ne duplique donc **aucun fait** : PHP porte le jeu de valeurs et la clé de
+libellé, TypeScript porte l'icône et les classes de couleur. Un statut nouveau touche deux
+fichiers — ce n'est pas littéralement « un seul endroit », et aucune option ne l'est. Ce qui est
+acquis, c'est que la divergence **échoue en CI dans les deux sens** :
+
+- `tests/Unit/Enums/RunnerStatusParityTest.php` épingle les deux jeux de valeurs ;
+- `satisfies Record<RunnerStatus, …>` fait rejeter une carte incomplète par `vue-tsc`.
+
+Les deux ont été **vérifiés en les cassant volontairement**. Ne pas « corriger » cette
+duplication : le générateur Artisan est rejeté sur D-20 (une commande, un mode `--check` et une
+étape de CI pour maintenir quatre lignes qui ne changeront plus).
+
+Deux écarts délibérés aux skills maison, à ne pas rectifier :
+
+- **pas de `color()` ni d'`icon()` sur l'enum** — aucun consommateur PHP n'existe (tout est
+  Inertia + Vue), ce serait une troisième déclaration morte ;
+- **`label()` en `match` à clés littérales** plutôt qu'en clé interpolée : le collecteur de
+  Larastan n'inspecte que les littéraux, l'interpolation rendrait les clés invisibles à la
+  vérification.
+
+## D-27 — Traductions : groupes `lang/fr/`, livrés par un prop Inertia
+
+Arrêté le 2026-08-19. Le projet n'avait aucun fichier de traduction alors que D-14 impose
+l'interface en français « via les fichiers de traduction ».
+
+**Fichiers groupés `lang/fr/*.php`** — et non un `lang/fr.json` à clés plates — pour garder la
+porte ouverte à `lang/en/`.
+
+Le front ne pouvant pas importer du PHP, le dictionnaire est **résolu sur la locale courante et
+livré par un prop Inertia partagé** (`translations`, aplati en clés pointées par `Arr::dot`),
+lu par un `t()` de dix lignes dans `resources/js/lib/i18n.ts`. Passer à `lang/en/` ne touchera
+aucun fichier front. Aucun paquet npm, aucun runtime i18n.
+
+Les groupes partagés avec le front sont **une liste explicite** (`ui`, `race`) : les groupes que
+seul PHP rend — `validation`, mails — restent dehors, sinon chaque réponse embarquerait tous les
+messages du framework.
+
+**`checkMissingTranslations: true`** est activé dans `phpstan.neon` : une ligne, aucune étape de
+CI en plus, et toutes les clés `__()` littérales deviennent vérifiées par l'analyse statique
+déjà en place. Elle a immédiatement attrapé les deux toasts anglais hérités du starter kit,
+désormais en clés françaises.
+
+Réserve assumée : **aucune vérification statique des clés côté TS** — une faute de frappe
+affiche la clé brute. C'est le prix du choix multi-locale, et il est faible.
+
+**Hors périmètre de BR-02** : les écrans hérités du starter kit (auth, réglages, 2FA, passkeys)
+restent en anglais. Voir la question ouverte dans [QUESTIONS.md](QUESTIONS.md).
