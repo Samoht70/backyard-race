@@ -56,7 +56,7 @@ const rootComponent = computed(() => {
         <span class="flex shrink-0 items-center gap-2">
             <span class="font-display text-sm tabular-nums">
                 {{ laps }}
-                <span class="text-label text-muted-foreground uppercase">{{
+                <span class="sr-only">{{
                     t('race.runner.laps_completed')
                 }}</span>
             </span>

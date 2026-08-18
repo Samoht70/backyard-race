@@ -22,7 +22,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const actionButtonVariants = cva(
-    'inline-flex w-full touch-manipulation items-center justify-center gap-2 rounded-lg font-display font-black tracking-wide uppercase transition-[background-color,transform] outline-none select-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50',
+    'inline-flex w-full touch-manipulation items-center justify-center gap-2 rounded-lg font-display font-black tracking-wide uppercase transition-[background-color,transform] outline-none select-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-[0.98] disabled:pointer-events-none aria-disabled:opacity-50',
     {
         variants: {
             size: {
@@ -51,6 +51,7 @@ const classes = computed(() =>
         type="button"
         :class="classes"
         :disabled="disabled || loading"
+        :aria-disabled="disabled || undefined"
         :aria-busy="loading"
     >
         <Spinner v-if="loading" class="size-5 shrink-0" />

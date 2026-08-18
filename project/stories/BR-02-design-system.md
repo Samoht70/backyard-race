@@ -82,4 +82,4 @@ déclaré à un seul endroit.
 - [x] **T3** — Construire le layout mobile-first commun et sa navigation `3 pts`
 - [x] **T4** — Créer les composants récurrents : carte coureur, badge de statut, bouton d'action large, compteur, entête de tour `3 pts`
 - [x] **T5** — Créer les états de chargement, vide et erreur réutilisables `1 pt`
-- [ ] **T6** — Vérifier contrastes et cibles tactiles, corriger les écarts `1 pt`
+- [x] **T6** — Vérifier contrastes et cibles tactiles, corriger les écarts `1 pt`
