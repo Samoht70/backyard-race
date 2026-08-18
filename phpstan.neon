@@ -1,6 +1,7 @@
 includes:
     - vendor/larastan/larastan/extension.neon
     - vendor/nesbot/carbon/extension.neon
+    - vendor/xefi/phpstan-xefi-rules/extension.neon
 
 parameters:
     paths:
@@ -11,3 +12,8 @@ parameters:
         - routes/
 
     level: 7
+
+    ignoreErrors:
+        -
+            identifier: xefi.maxLinePerMethod
+            path: database/migrations/*
