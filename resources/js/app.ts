@@ -7,6 +7,18 @@ import { initializeFlashToast } from '@/lib/flashToast';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
+function brandColor(): string {
+    if (typeof window === 'undefined') {
+        return '#2f43c8';
+    }
+
+    const token = getComputedStyle(document.documentElement)
+        .getPropertyValue('--primary')
+        .trim();
+
+    return token === '' ? '#2f43c8' : token;
+}
+
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
     layout: (name) => {
@@ -22,7 +34,8 @@ createInertiaApp({
         }
     },
     progress: {
-        color: '#4B5563',
+        color: brandColor(),
+        delay: 100,
     },
 });
 

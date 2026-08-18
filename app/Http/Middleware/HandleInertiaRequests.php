@@ -3,10 +3,20 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Lang;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
 {
+    /**
+     * Translation groups delivered to the Inertia front-end, flattened to
+     * dotted keys. Groups rendered only by PHP (validation, mail) stay out:
+     * shipping them would put every framework message in every response.
+     */
+    private const SHARED_TRANSLATION_GROUPS = ['ui', 'race'];
+
     /**
      * The root template that's loaded on the first page visit.
      *
@@ -42,6 +52,25 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'translations' => $this->translations(),
         ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function translations(): array
+    {
+        $locale = app()->getLocale();
+
+        $groups = [];
+
+        foreach (self::SHARED_TRANSLATION_GROUPS as $group) {
+            if (File::exists(lang_path("{$locale}/{$group}.php"))) {
+                $groups[$group] = Lang::get($group);
+            }
+        }
+
+        return Arr::dot($groups);
     }
 }
