@@ -80,6 +80,6 @@ déclaré à un seul endroit.
 - [x] **T1** — Arrêter la direction artistique avec le skill frontend-design, la valider avec le propriétaire du projet `3 pts`
 - [x] **T2** — Traduire la palette et la typographie en tokens Tailwind, clair et sombre `2 pts`
 - [x] **T3** — Construire le layout mobile-first commun et sa navigation `3 pts`
-- [ ] **T4** — Créer les composants récurrents : carte coureur, badge de statut, bouton d'action large, compteur, entête de tour `3 pts`
+- [x] **T4** — Créer les composants récurrents : carte coureur, badge de statut, bouton d'action large, compteur, entête de tour `3 pts`
 - [ ] **T5** — Créer les états de chargement, vide et erreur réutilisables `1 pt`
 - [ ] **T6** — Vérifier contrastes et cibles tactiles, corriger les écarts `1 pt`
