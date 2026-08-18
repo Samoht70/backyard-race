@@ -3,7 +3,7 @@ import { wayfinder } from '@laravel/vite-plugin-wayfinder';
 import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
 import laravel from 'laravel-vite-plugin';
-import { bunny } from 'laravel-vite-plugin/fonts';
+import { local } from 'laravel-vite-plugin/fonts';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
@@ -12,8 +12,25 @@ export default defineConfig({
             input: ['resources/css/app.css', 'resources/js/app.ts'],
             refresh: true,
             fonts: [
-                bunny('Instrument Sans', {
-                    weights: [400, 500, 600],
+                local('Archivo', {
+                    alias: 'archivo',
+                    variable: '--font-archivo',
+                    display: 'swap',
+                    preload: true,
+                    fallbacks: [
+                        'ui-sans-serif',
+                        'system-ui',
+                        'sans-serif',
+                        'Apple Color Emoji',
+                        'Segoe UI Emoji',
+                    ],
+                    variants: [
+                        {
+                            src: 'resources/fonts/Archivo[wdth,wght].woff2',
+                            weight: '100 900',
+                            style: 'normal',
+                        },
+                    ],
                 }),
             ],
         }),

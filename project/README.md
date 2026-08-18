@@ -27,7 +27,7 @@ Quand une story passe à `Terminé`, on met à jour la ligne du board **et** l'e
 | ID | Story | Pts | Statut |
 |----|-------|-----|--------|
 | [BR-01](stories/BR-01-roles-permissions.md) | Rôles, permissions et policies | 8 | À faire |
-| [BR-02](stories/BR-02-design-system.md) | Direction artistique et design system mobile-first | 13 | À faire |
+| [BR-02](stories/BR-02-design-system.md) | Direction artistique et design system mobile-first | 13 | ✅ Terminé |
 | [BR-03](stories/BR-03-evenement.md) | Événement : modèle, statuts et configuration | 8 | À faire |
 | [BR-04](stories/BR-04-horaires-boucles.md) | Horaires des boucles calculés automatiquement | 5 | À faire |
 | [BR-05](stories/BR-05-inscription.md) | Inscription d'un participant | 8 | À faire |
@@ -90,7 +90,7 @@ Quand une story passe à `Terminé`, on met à jour la ligne du board **et** l'e
 | [BR-31](stories/BR-31-domaine-https-supervision.md) | Domaine, HTTPS et supervision | 5 | À faire |
 | [BR-32](stories/BR-32-deploiement-dokploy.md) | Déploiement depuis Dokploy et branche develop | 3 | À faire |
 
-**Total : 33 stories · 236 pts · 9 pts livrés**
+**Total : 33 stories · 236 pts · 22 pts livrés**
 
 ## Ordre conseillé
 
