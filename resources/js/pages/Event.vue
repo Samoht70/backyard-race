@@ -1,18 +1,21 @@
 <script setup lang="ts">
-import { Head } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import EventStatusBadge from '@/components/event/EventStatusBadge.vue';
 import EventSummary from '@/components/event/EventSummary.vue';
 import FestoonDivider from '@/components/race/FestoonDivider.vue';
+import SeatCounter from '@/components/registration/SeatCounter.vue';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { t } from '@/lib/i18n';
 import { can } from '@/lib/permissions';
 import { show } from '@/routes/event';
+import { create, show as showRegistration } from '@/routes/registration';
 import type { EventDetails } from '@/types/event';
 
 type Props = {
     event: EventDetails;
     canRegister: boolean;
+    isRegistered: boolean;
 };
 
 const props = defineProps<Props>();
@@ -27,6 +30,9 @@ defineOptions({
         ],
     },
 });
+
+const registrationLinkClasses =
+    'inline-flex min-h-11 w-full touch-manipulation items-center justify-center rounded-lg bg-primary font-display font-black tracking-wide text-primary-foreground uppercase';
 
 const isDraft = computed(() => props.event.status === 'draft');
 const title = computed(() => props.event.name ?? t('event.public.untitled'));
@@ -53,6 +59,28 @@ const title = computed(() => props.event.name ?? t('event.public.untitled'));
         <p v-if="canRegister" class="text-center text-sm text-muted-foreground">
             {{ t('event.public.registrations_open') }}
         </p>
+
+        <SeatCounter
+            v-if="canRegister || isRegistered"
+            :confirmed="event.confirmed_participants"
+            :capacity="event.max_participants"
+        />
+
+        <Link
+            v-if="isRegistered"
+            :href="showRegistration()"
+            :class="registrationLinkClasses"
+        >
+            {{ t('registration.show.call_to_action') }}
+        </Link>
+
+        <Link
+            v-else-if="canRegister"
+            :href="create()"
+            :class="registrationLinkClasses"
+        >
+            {{ t('registration.create.call_to_action') }}
+        </Link>
 
         <EventSummary :event="event" />
     </div>

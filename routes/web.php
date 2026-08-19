@@ -12,13 +12,15 @@ Route::inertia('/', 'Welcome')->name('home');
 Route::get('design-system', DesignSystemController::class)->name('design-system');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'Dashboard')->name('dashboard');
+    Route::inertia('dashboard', 'Dashboard')
+        ->name('dashboard');
 
-    Route::get('event', [EventController::class, 'show'])->name('event.show');
+    Route::singleton('event', EventController::class)
+        ->only(['show']);
 
     Route::singleton('registration', RegistrationController::class)
         ->creatable()
-        ->only(['create', 'store', 'show', 'edit', 'update']);
+        ->except(['destroy']);
 
     Route::middleware('can:'.Permission::ManageEvent->value)
         ->prefix('manage')
@@ -26,8 +28,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->group(function () {
             Route::get('/', Manage\IndexController::class)->name('index');
 
-            Route::get('event', [Manage\EventController::class, 'edit'])->name('event.edit');
-            Route::put('event', [Manage\EventController::class, 'update'])->name('event.update');
+            Route::singleton('event', Manage\EventController::class)
+                ->only(['edit', 'update']);
+
             Route::post('event/advance', Manage\AdvanceEventController::class)->name('event.advance');
         });
 });

@@ -27,7 +27,7 @@ class RegistrationController extends Controller
         Gate::authorize('create', [Participant::class, $event]);
 
         return Inertia::render('registration/Create', [
-            'event' => (new EventResource($event))->resolve(),
+            'event' => new EventResource($event)->resolve(),
         ]);
     }
 
@@ -54,7 +54,7 @@ class RegistrationController extends Controller
         Gate::authorize('view', $participant);
 
         return Inertia::render('registration/Show', [
-            'registration' => (new ParticipantResource($participant))->resolve(),
+            'registration' => new ParticipantResource($participant)->resolve(),
             'canEdit' => Gate::allows('update', $participant),
         ]);
     }
@@ -70,7 +70,7 @@ class RegistrationController extends Controller
         Gate::authorize('update', $participant);
 
         return Inertia::render('registration/Edit', [
-            'registration' => (new ParticipantResource($participant))->resolve(),
+            'registration' => new ParticipantResource($participant)->resolve(),
         ]);
     }
 

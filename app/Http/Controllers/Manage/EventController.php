@@ -21,7 +21,7 @@ class EventController extends Controller
         $lifecycle = $event->lifecycle();
 
         return Inertia::render('manage/Event', [
-            'event' => (new EventResource($event))->resolve(),
+            'event' => new EventResource($event)->resolve(),
             'transition' => [
                 'current' => $lifecycle->status()->value,
                 'next' => $lifecycle->nextStatus()?->value,
