@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(RolesAndPermissionsSeeder::class);
+        $this->call(EventSeeder::class);
 
         User::factory()->manager()->create(['email' => 'manager@backyard.test']);
         User::factory()->participant()->create(['email' => 'participant@backyard.test']);
