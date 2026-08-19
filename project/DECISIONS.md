@@ -426,3 +426,57 @@ affiche la clé brute. C'est le prix du choix multi-locale, et il est faible.
 
 **Hors périmètre de BR-02** : les écrans hérités du starter kit (auth, réglages, 2FA, passkeys)
 restent en anglais. Voir la question ouverte dans [QUESTIONS.md](QUESTIONS.md).
+
+## D-28 — Contrat de permissions : neuf capacités, deux enums, une map partagée
+
+Arrêté le 2026-08-19 par BR-01, qui applique D-05 pour la première fois.
+
+`App\Enums\Permission` (neuf cases) et `App\Enums\Role` (deux cases) sont la **seule** déclaration
+des noms : le seeder, le middleware de route et le partage Inertia les lisent tous. Aucun `label()`
+sur ni l'un ni l'autre — les permissions ne sont jamais affichées et il n'y a pas d'écran
+d'administration des comptes, ce serait la troisième déclaration morte contre laquelle D-26 met en
+garde.
+
+**Le contrôle d'accès passe par `can:`**, pas par les alias `role:` / `permission:` de Spatie.
+`can` est déjà enregistré nativement par le framework et traverse le Gate que Spatie alimente via
+`register_permission_check_method` : un seul mécanisme pour le middleware de route, les Policies à
+venir et le prop partagé. Le refus est fermé par défaut — une capacité sans ligne en base n'a pas
+de callback dans le Gate et l'exception « permission inconnue » de Spatie est avalée en `false`.
+
+**Le front reçoit une map complète de booléens**, `auth.permissions`, et non la liste des
+permissions accordées. Chaque valeur est le résultat du même `can()` par lequel le serveur
+autorise : une Policy ajoutée plus tard ne peut pas faire diverger les boutons et les décisions.
+Un invité reçoit les neuf clés à `false`, donc aucun écran ne branche sur une clé absente. Le
+helper vit dans `resources/js/lib/permissions.ts`, à côté de `t()` — c'est une lecture pure d'un
+prop partagé, pas une composable, qui n'existerait que si elle possédait un `ref`.
+
+La liste des neuf noms est **dupliquée côté TS**, mais pas pour la raison de D-26 : TypeScript ne
+porte ici aucun fait propre, c'est un miroir acheté pour l'autocomplétion. Ce qui justifie le
+`tests/Unit/Enums/PermissionParityTest.php`, c'est le mode de panne : renommer une capacité côté
+PHP seul compile, résout `undefined`, tombe en falsy et **fait disparaître le bouton du gérant la
+nuit de la course**. Les deux sens ont été vérifiés en les cassant.
+
+**`hasRole()` n'apparaît qu'à un seul endroit du dépôt** : les assertions d'inscription de
+`tests/Feature/Auth/RegistrationTest.php`. Le critère d'acceptation dit littéralement « il porte le
+rôle "participant" » ; un test doit pouvoir énoncer ce fait. Partout ailleurs, D-05 s'applique sans
+exception.
+
+**La purge du cache Spatie est en tête du seeder, pas en queue**, et c'est la ligne porteuse :
+`Permission::findOrCreate()` résout contre le snapshot mémoïsé du registrar, pas contre la table.
+Un snapshot pris table vide fait insérer des doublons au second passage et casse sur l'index unique
+`(name, guard_name)`. `Role::findOrCreate` n'a pas ce défaut, il interroge directement — asymétrie
+Spatie à connaître. La purge utilise `PermissionRegistrar::forgetCachedPermissions()` et non un
+`Cache::forget('spatie.permission.cache')`, qui laisserait la propriété en mémoire du registrar
+pleine et taperait le mauvais store le jour où `permission.cache.store` sera explicite.
+
+**Dette assumée : le seed des rôles est une étape de déploiement obligatoire.** L'inscription
+appelle `assignRole`, qui lève si le rôle manque : un `migrate --force` sans `db:seed` fait tomber
+la première inscription en 500. L'alternative — les rôles en migration de données de référence,
+comme le suggère la convention maison de seeder — a été écartée : la story demande un seeder, et on
+perdrait le test « permissions absentes en base → refus », qui est le garde-fou du cas limite le
+plus dangereux. **BR-32 doit porter l'étape de seed dans son runbook.**
+
+Enfin, les tests seedent **dans le corps de chaque test** qui en a besoin, jamais via
+`protected $seed`. `RefreshDatabase` ne lance `migrate:fresh --seed` qu'une fois, gardé par un
+static : si la première classe exécutée ne demande pas de seed, plus aucune ne seedera. Le résultat
+dépendrait de l'ordre des classes.
