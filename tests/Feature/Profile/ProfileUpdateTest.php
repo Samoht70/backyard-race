@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Settings;
+namespace Tests\Feature\Profile;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -42,26 +42,6 @@ class ProfileUpdateTest extends TestCase
         $this->assertSame('Test', $user->first_name);
         $this->assertSame('User', $user->last_name);
         $this->assertSame('test@example.com', $user->email);
-        $this->assertNull($user->email_verified_at);
-    }
-
-    public function test_email_verification_status_is_unchanged_when_the_email_address_is_unchanged()
-    {
-        $user = User::factory()->create();
-
-        $response = $this
-            ->actingAs($user)
-            ->patch(route('profile.update'), [
-                'first_name' => 'Test',
-                'last_name' => 'User',
-                'email' => $user->email,
-            ]);
-
-        $response
-            ->assertSessionHasNoErrors()
-            ->assertRedirect(route('profile.edit'));
-
-        $this->assertNotNull($user->refresh()->email_verified_at);
     }
 
     public function test_user_can_delete_their_account()

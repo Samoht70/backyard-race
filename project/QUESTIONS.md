@@ -33,31 +33,8 @@ question et ne la ferme pas ; BR-13 reste son porteur naturel.
 
 ---
 
-## Q-01 — Quand traduit-on les écrans hérités du starter kit ?
-
-Ouverte le 2026-08-19 par BR-02.
-
-BR-02 a établi la convention de traduction (D-27) et l'applique à tout ce qu'elle écrit, mais
-elle n'a pas fait de passe d'i18n sur l'existant. Restent en **anglais** : les 7 pages
-`pages/auth/*`, les 3 pages `pages/settings/*`, et les composants passkeys / 2FA
-(`ManagePasskeys`, `ManageTwoFactor`, `TwoFactorRecoveryCodes`, `DeleteUser`).
-
-Conséquence concrète : **un participant voit `/login` et `/register` en anglais** avant
-d'atteindre le moindre écran BR-02. Ce n'est pas tenable le soir de l'événement.
-
-Aucune story ne porte ce travail aujourd'hui. BR-05 (inscription) touche l'inscription et en
-est le foyer naturel ; les réglages et la 2FA n'ont pas de propriétaire.
-
-**Tranchée à moitié par BR-05 (2026-08-19), voir D-42.** Les 7 pages `pages/auth/*` sont passées
-en français, groupe `lang/fr/auth.php` à l'appui — qui porte aussi les clés `failed`, `password` et
-`throttle` lues par Fortify, donc les erreurs de connexion sont traduites elles aussi.
-
-**Reste ouvert** : les 3 pages `pages/settings/*` et les composants passkeys / 2FA
-(`ManagePasskeys`, `ManageTwoFactor`, `TwoFactorRecoveryCodes`, `DeleteUser`). Ces écrans ne sont
-sur le chemin d'aucun coureur le soir de la course, ce qui explique qu'aucune story ne les
-réclame. À trancher : story dédiée dans l'epic 1, ou on les laisse en anglais ?
-
----
+Q-01 (traduction des écrans hérités du starter kit) est fermée : à moitié par D-42, entièrement
+par D-43 — les écrans qui restaient en anglais sont soit supprimés, soit traduits.
 
 Les cinq questions initiales ont toutes été tranchées : les graphiques (D-16), la distance de
 boucle (D-17), Mailpit (D-18), l'hébergement (D-19) et `laravel/boost` (D-22).

@@ -13,7 +13,7 @@ Route::inertia('/', 'Welcome')
 Route::get('design-system', DesignSystemController::class)
     ->name('design-system');
 
-Route::middleware(['auth', 'verified'])
+Route::middleware('auth')
     ->group(function () {
         Route::inertia('dashboard', 'Dashboard')
             ->name('dashboard');
@@ -38,4 +38,4 @@ Route::middleware(['auth', 'verified'])
             });
     });
 
-require __DIR__.'/settings.php';
+require __DIR__.'/profile.php';

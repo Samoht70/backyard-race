@@ -1,11 +1,6 @@
 <script setup lang="ts">
 import { Form, Head, setLayoutProps } from '@inertiajs/vue3';
-import {
-    index as confirmOptions,
-    store as confirmStore,
-} from '@/actions/Laravel/Passkeys/Http/Controllers/PasskeyConfirmationController';
 import InputError from '@/components/InputError.vue';
-import PasskeyVerify from '@/components/PasskeyVerify.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -21,16 +16,6 @@ setLayoutProps({
 
 <template>
     <Head :title="t('auth.confirm.title')" />
-
-    <PasskeyVerify
-        :routes="{
-            options: confirmOptions(),
-            submit: confirmStore(),
-        }"
-        :label="t('auth.confirm.passkey')"
-        :loading-label="t('auth.confirm.passkey_loading')"
-        :separator="t('auth.confirm.passkey_separator')"
-    />
 
     <Form
         v-bind="store.form()"

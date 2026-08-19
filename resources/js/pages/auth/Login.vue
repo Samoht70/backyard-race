@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { Form, Head, setLayoutProps } from '@inertiajs/vue3';
 import InputError from '@/components/InputError.vue';
-import PasskeyVerify from '@/components/PasskeyVerify.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
 import TextLink from '@/components/TextLink.vue';
 import { Button } from '@/components/ui/button';
@@ -12,11 +11,9 @@ import { Spinner } from '@/components/ui/spinner';
 import { t } from '@/lib/i18n';
 import { register } from '@/routes';
 import { store } from '@/routes/login';
-import { request } from '@/routes/password';
 
 defineProps<{
     status?: string;
-    canResetPassword: boolean;
 }>();
 
 setLayoutProps({
@@ -34,8 +31,6 @@ setLayoutProps({
     >
         {{ status }}
     </div>
-
-    <PasskeyVerify />
 
     <Form
         v-bind="store.form()"
@@ -60,17 +55,7 @@ setLayoutProps({
             </div>
 
             <div class="grid gap-2">
-                <div class="flex items-center justify-between">
-                    <Label for="password">{{ t('auth.login.password') }}</Label>
-                    <TextLink
-                        v-if="canResetPassword"
-                        :href="request()"
-                        class="text-sm"
-                        :tabindex="5"
-                    >
-                        {{ t('auth.login.forgot') }}
-                    </TextLink>
-                </div>
+                <Label for="password">{{ t('auth.login.password') }}</Label>
                 <PasswordInput
                     id="password"
                     name="password"

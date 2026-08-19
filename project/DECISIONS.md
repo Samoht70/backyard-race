@@ -170,6 +170,11 @@ Fortify envoie en développement : réinitialisation de mot de passe, vérificat
 Aucun mail métier n'est prévu — pas de confirmation d'inscription, pas d'alerte d'élimination,
 conformément à D-15. Mailpit est un filet de développement, pas l'amorce d'une fonctionnalité.
 
+**Révision du 2026-08-20 (D-43) : l'application n'envoie plus aucun mail.** La vérification
+d'adresse et la réinitialisation de mot de passe sont supprimées, donc Mailpit n'intercepte plus
+rien. Il reste dans `compose.yaml` pour ne pas avoir à le recâbler si un mail apparaît, mais un
+Mailpit vide est désormais le comportement normal, pas le symptôme d'une panne.
+
 ## D-29 — Le cycle de vie de l'événement vit dans des classes d'état
 
 Arrêté le 2026-08-19 par BR-03, avec le propriétaire du projet.
@@ -880,3 +885,67 @@ Deux points techniques valent d'être connus :
 
 **Q-01 reste ouverte** pour les 3 pages `pages/settings/*` et les composants passkeys / 2FA, qui
 n'ont toujours pas de propriétaire.
+
+## D-43 — L'authentification se réduit à un mot de passe, les réglages à un profil
+
+Arrêté le 2026-08-19 par le propriétaire du projet.
+
+Le starter kit livrait quatre briques que le produit n'utilisera pas : 2FA (TOTP + codes de
+secours), passkeys (WebAuthn), vérification d'adresse email, et une page « Security » portant le
+changement de mot de passe. Toutes sont retirées.
+
+Ce qui reste du parcours d'authentification : inscription et connexion par mot de passe.
+`config/fortify.php` ne déclare plus que `registration()`, et `User` n'implémente plus
+`PasskeyUser` ni les traits Fortify associés.
+
+Trois conséquences valent d'être connues :
+
+- **le changement de mot de passe connecté disparaît**, arbitré explicitement. C'était la seule
+  fonctionnalité de « Security » qui n'était ni 2FA ni passkey, et elle n'a pas été déplacée dans
+  le profil.
+- **`email_verified_at` quitte la table `users`**, et le middleware `verified` quitte les routes.
+  Les migrations `add_two_factor_columns_to_users_table` et `create_passkeys_table` sont supprimées
+  plutôt que compensées par une migration de retrait : aucune base de production n'existe encore.
+- **plus de section « Settings »** : `routes/settings.php` devient `routes/profile.php`, le
+  contrôleur remonte de `App\Http\Controllers\Settings\` à `App\Http\Controllers\`, la page passe
+  de `pages/settings/Profile.vue` à `pages/Profile.vue`, et le sous-layout à onglets
+  (`layouts/settings/Layout.vue`) disparaît avec ses deux autres onglets.
+
+Le routage suit D-41 : `Route::singleton('profile', …)->destroyable()->only([…])`, donc
+`/profile/edit`, `PATCH /profile`, `DELETE /profile`.
+
+**Q-01 se ferme entièrement.** Les écrans qui la maintenaient ouverte sont soit supprimés, soit
+traduits : `pages/Profile.vue` et `DeleteUser` lisent un nouveau groupe `ui.profile`, et le menu
+utilisateur passe par `ui.nav`. Plus un seul écran du produit n'est en anglais.
+
+**Révision du 2026-08-20 : la réinitialisation par email part aussi.** L'entrée disait d'abord que
+la récupération passerait par « mot de passe oublié » ; le propriétaire a ensuite retiré ce chemin.
+Sont donc supprimés `Features::resetPasswords()`, l'action `ResetUserPassword`, les deux vues
+Fortify (`ForgotPassword`, `ResetPassword`), le lien de la page de connexion, la table
+`password_reset_tokens`, le broker `passwords` de `config/auth.php` et `config/fortify.php`, les
+groupes de traduction `auth.forgot` / `auth.reset`, et `PasswordResetTest`.
+
+**Conséquence assumée : un mot de passe perdu n'a plus aucune récupération en libre-service.** Ni
+changement connecté, ni lien par email — il faut une intervention en base ou un nouveau compte. Le
+produit tient sur un événement d'une soirée et ~40 participants, ce qui rend le coût acceptable,
+mais c'est le seul point du parcours d'authentification qui n'a pas de porte de sortie.
+
+Reste debout sans utilisateur : les routes Fortify `user/confirm-password` et la page
+`auth/ConfirmPassword.vue`. Fortify les enregistre inconditionnellement, et plus aucune route
+n'utilise `RequirePassword` depuis que « Security » a disparu.
+
+## D-44 — Le thème vit dans la navbar, plus dans une page de réglages
+
+Corollaire de D-43, arrêté le même jour.
+
+La page « Appearance » et ses trois onglets (clair / sombre / système) sont remplacés par un bouton
+unique dans l'en-tête de l'application (`AppSidebarHeader`), présent sur tous les écrans connectés.
+
+Le bouton **bascule entre clair et sombre**, il ne propose plus « système ». `system` reste
+néanmoins la valeur par défaut du composable et du cookie : un visiteur qui n'a jamais cliqué suit
+sa préférence OS, et le premier clic fige un choix explicite. `useAppearance()` expose désormais
+`toggleAppearance()`, qui lit `resolvedAppearance` — donc le premier clic depuis `system` inverse ce
+que l'utilisateur voit, pas ce que le cookie contient.
+
+Le rendu serveur ne change pas : `HandleAppearance` partage toujours le cookie `appearance` et
+`app.blade.php` pose la classe `dark` avant le premier octet de JS.
