@@ -17,6 +17,11 @@ final class EventTransitionRefusedException extends ConflictHttpException
         return new self(__('event.refusal.incomplete'));
     }
 
+    public static function illegal(): self
+    {
+        return new self(__('event.refusal.illegal_transition'));
+    }
+
     public static function terminal(): self
     {
         return new self(__('event.refusal.finished'));

@@ -2,8 +2,10 @@
 
 namespace Tests\Feature\Manage;
 
+use App\Actions\AdvanceEventStatus;
 use App\Enums\EventStatus;
 use App\Enums\Permission;
+use App\Exceptions\EventTransitionRefusedException;
 use App\Models\Event;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
@@ -83,6 +85,21 @@ class EventAdvanceTest extends TestCase
     }
 
     #[Test]
+    public function it_refuses_to_advance_an_event_someone_else_already_moved(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $event = Event::factory()->create();
+        $advance = app(AdvanceEventStatus::class);
+
+        Event::query()->whereKey($event->getKey())
+            ->update(['status' => EventStatus::Registration->value]);
+
+        $this->expectException(EventTransitionRefusedException::class);
+
+        $advance($event, EventStatus::Registration);
+    }
+
+    #[Test]
     public function it_refuses_a_participant(): void
     {
         $this->seed(RolesAndPermissionsSeeder::class);
@@ -151,8 +168,14 @@ class EventAdvanceTest extends TestCase
         $this->seed(RolesAndPermissionsSeeder::class);
         Event::factory()->create(['status' => $from]);
 
-        $this->actingAs($this->manager())
+        $response = $this->actingAs($this->manager())
             ->post(route('manage.event.advance'), ['to' => $to->value]);
+
+        if ($from === EventStatus::Finished) {
+            $response->assertForbidden();
+        } else {
+            $response->assertSessionHasErrors('to');
+        }
 
         $this->assertSame($from, Event::query()->sole()->status);
     }

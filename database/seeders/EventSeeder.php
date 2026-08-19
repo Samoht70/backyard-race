@@ -10,14 +10,20 @@ class EventSeeder extends Seeder
     private const NAME = 'Backyard des 40 ans';
 
     /**
-     * firstOrCreate rather than updateOrCreate: a second run must not overwrite
-     * what the manager has since configured.
+     * Guarded on existence rather than updateOrCreate: a second run must never
+     * overwrite what the manager has since configured.
+     *
+     * The factory writes the status, which is not fillable. Going through
+     * create() instead would have depended on `db:seed` unguarding the models
+     * — true today, but it made the seeded status hinge on how the seeder was
+     * invoked rather than on what it says.
      */
     public function run(): void
     {
-        Event::query()->firstOrCreate(
-            ['name' => self::NAME],
-            Event::factory()->registration()->make(['name' => self::NAME])->getAttributes(),
-        );
+        if (Event::query()->where('name', self::NAME)->exists()) {
+            return;
+        }
+
+        Event::factory()->registration()->create(['name' => self::NAME]);
     }
 }

@@ -8,6 +8,9 @@ import { Label } from '@/components/ui/label';
  * drops the value from the submission, `readonly` is poorly honoured by the
  * native date and time pickers, and neither says why the field is locked.
  *
+ * It still renders its error: a stale tab submitting a frozen field is the one
+ * case where that error can fire, and it would otherwise have nowhere to go.
+ *
  * The 44px touch floor lives here too — shadcn inputs are born at h-9.
  */
 type Props = {
@@ -45,6 +48,7 @@ withDefaults(defineProps<Props>(), {
             </span>
         </p>
         <p class="text-sm text-muted-foreground">{{ lockedReason }}</p>
+        <InputError :message="error" />
     </div>
 
     <div v-else class="grid gap-2 [&_input]:h-11 [&_textarea]:min-h-24">

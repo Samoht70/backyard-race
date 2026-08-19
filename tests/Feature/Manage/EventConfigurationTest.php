@@ -108,6 +108,52 @@ class EventConfigurationTest extends TestCase
     }
 
     #[Test]
+    public function it_refuses_a_date_without_an_hour_instead_of_dropping_it(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+        Event::factory()->create(['first_start_at' => '2026-09-12 13:00:00']);
+
+        $payload = $this->payload(['start_time' => '']);
+
+        $this->actingAs($this->manager())
+            ->put(route('manage.event.update'), $payload)
+            ->assertSessionHasErrors('start_time');
+
+        $this->assertSame(
+            '2026-09-12 13:00',
+            Event::query()->sole()->first_start_at?->format('Y-m-d H:i'),
+        );
+    }
+
+    #[Test]
+    public function it_refuses_an_hour_without_a_date(): void
+    {
+        $this->assertRejects(['start_date' => ''], 'start_date');
+    }
+
+    #[Test]
+    public function it_clears_the_first_start_when_both_halves_are_emptied(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+        Event::factory()->create(['first_start_at' => '2026-09-12 13:00:00']);
+
+        $this->actingAs($this->manager())
+            ->put(route('manage.event.update'), $this->payload([
+                'start_date' => '',
+                'start_time' => '',
+            ]))
+            ->assertSessionHasNoErrors();
+
+        $this->assertNull(Event::query()->sole()->first_start_at);
+    }
+
+    #[Test]
+    public function it_refuses_a_date_that_is_not_a_calendar_date(): void
+    {
+        $this->assertRejects(['start_date' => 'next tuesday'], 'start_date');
+    }
+
+    #[Test]
     public function it_accepts_an_event_without_coordinates(): void
     {
         $this->seed(RolesAndPermissionsSeeder::class);
@@ -151,6 +197,26 @@ class EventConfigurationTest extends TestCase
         $this->actingAs($this->manager())
             ->put(route('manage.event.update'), $payload)
             ->assertSessionHasErrors('lap_duration_minutes');
+    }
+
+    #[Test]
+    public function it_reports_the_frozen_field_when_a_stale_tab_resubmits_it(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+        Event::factory()->running()->create([
+            'first_start_at' => '2026-09-12 13:00:00',
+            'address' => 'Ancienne adresse',
+        ]);
+
+        $this->actingAs($this->manager())
+            ->put(route('manage.event.update'), $this->payload([
+                'start_date' => '2026-09-12',
+                'start_time' => '13:00',
+                'address' => 'Nouvelle adresse',
+            ]))
+            ->assertSessionHasErrors('first_start_at');
+
+        $this->assertSame('Ancienne adresse', Event::query()->sole()->address);
     }
 
     #[Test]

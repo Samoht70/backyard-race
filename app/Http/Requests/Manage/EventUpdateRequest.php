@@ -18,14 +18,25 @@ class EventUpdateRequest extends FormRequest
      * The screen collects a date and a time; the schema stores one instant,
      * because BR-04 computes lap starts from it and a split pair cannot say
      * which day a late lap falls on.
+     *
+     * Merging on either half rather than both is load-bearing: a date typed
+     * without an hour would otherwise never reach a rule, and the manager
+     * would be told the configuration was saved while it was dropped.
      */
     protected function prepareForValidation(): void
     {
-        if ($this->filled(['start_date', 'start_time'])) {
-            $this->merge([
-                'first_start_at' => $this->string('start_date').' '.$this->string('start_time'),
-            ]);
+        if (! $this->has(['start_date', 'start_time'])) {
+            return;
         }
+
+        $date = $this->string('start_date')->trim();
+        $time = $this->string('start_time')->trim();
+
+        $this->merge([
+            'first_start_at' => $date->isEmpty() && $time->isEmpty()
+                ? null
+                : trim($date.' '.$time),
+        ]);
     }
 
     /**
@@ -36,6 +47,8 @@ class EventUpdateRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:120'],
             'description' => ['nullable', 'string', 'max:5000'],
+            'start_date' => ['nullable', 'date_format:Y-m-d', 'required_with:start_time'],
+            'start_time' => ['nullable', 'date_format:H:i', 'required_with:start_date'],
             'first_start_at' => [
                 'nullable',
                 'date',

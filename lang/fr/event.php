@@ -77,6 +77,7 @@ return [
         'draft_notice_description' => 'Les participants ne voient pas encore cet événement.',
         'no_coordinates' => 'Coordonnées non renseignées.',
         'no_date' => 'Date non fixée.',
+        'untitled' => 'Événement sans nom',
         'seats' => 'places',
         'registrations_open' => 'Les inscriptions sont ouvertes.',
     ],

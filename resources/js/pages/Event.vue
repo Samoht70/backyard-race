@@ -29,10 +29,11 @@ defineOptions({
 });
 
 const isDraft = computed(() => props.event.status === 'draft');
+const title = computed(() => props.event.name ?? t('event.public.untitled'));
 </script>
 
 <template>
-    <Head :title="event.name" />
+    <Head :title="title" />
 
     <div class="flex flex-col gap-6 p-4">
         <Alert v-if="isDraft && can('manage-event')">
@@ -43,7 +44,7 @@ const isDraft = computed(() => props.event.status === 'draft');
         </Alert>
 
         <header class="flex flex-col items-center gap-2 text-center">
-            <h1 class="font-display text-lap">{{ event.name }}</h1>
+            <h1 class="font-display text-lap">{{ title }}</h1>
             <EventStatusBadge :status="event.status" />
         </header>
 

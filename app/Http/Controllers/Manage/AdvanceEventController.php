@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Manage;
 
 use App\Actions\AdvanceEventStatus;
+use App\Enums\EventStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Manage\EventAdvanceRequest;
 use App\Models\Event;
@@ -13,7 +14,10 @@ class AdvanceEventController extends Controller
 {
     public function __invoke(EventAdvanceRequest $request, AdvanceEventStatus $advance): RedirectResponse
     {
-        $event = $advance(Event::query()->firstOrFail());
+        $event = $advance(
+            Event::query()->firstOrFail(),
+            EventStatus::from($request->string('to')->value()),
+        );
 
         Inertia::flash('toast', [
             'type' => 'success',

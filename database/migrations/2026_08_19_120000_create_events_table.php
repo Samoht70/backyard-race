@@ -9,11 +9,17 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     *
+     * The `singleton` column exists to make the second row impossible. The
+     * whole application reads the event with sole() and firstOrFail(), so the
+     * invariant was assumed everywhere and enforced nowhere: two concurrent
+     * first saves would each have created one.
      */
     public function up(): void
     {
         Schema::create('events', function (Blueprint $table): void {
             $table->id();
+            $table->unsignedTinyInteger('singleton')->default(1)->unique();
             $table->string('name', 120);
             $table->text('description')->nullable();
             $table->string('status', 20)->default(EventStatus::Draft->value);

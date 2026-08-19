@@ -22,7 +22,7 @@ export const EVENT_FIELDS = [
 export type EventFieldName = (typeof EVENT_FIELDS)[number];
 
 export type EventDetails = {
-    name: string;
+    name: string | null;
     description: string | null;
     status: EventStatus;
     start_date: string | null;

@@ -8,19 +8,18 @@ use PHPUnit\Framework\TestCase;
 
 class EventStatusParityTest extends TestCase
 {
+    /**
+     * Order is asserted, not just membership: the manager's step list is built
+     * by indexOf against this array, so a reordering there would silently
+     * redraw the lifecycle the state classes own.
+     */
     #[Test]
     public function it_declares_every_php_case_in_the_typescript_event_status_list(): void
     {
-        $declared = $this->typescriptStatuses();
-        $cases = array_column(EventStatus::cases(), 'value');
-
-        sort($declared);
-        sort($cases);
-
         $this->assertSame(
-            $cases,
-            $declared,
-            'resources/js/types/event.ts must declare exactly the EventStatus cases.',
+            array_column(EventStatus::cases(), 'value'),
+            $this->typescriptStatuses(),
+            'resources/js/types/event.ts must declare the EventStatus cases, in the same order.',
         );
     }
 
