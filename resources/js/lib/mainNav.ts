@@ -1,10 +1,12 @@
-import { Flag, House } from '@lucide/vue';
+import { Flag, House, SlidersHorizontal } from '@lucide/vue';
 import { t } from '@/lib/i18n';
+import { can } from '@/lib/permissions';
 import { dashboard } from '@/routes';
+import { index as manage } from '@/routes/manage';
 import type { NavItem } from '@/types';
 
 export function mainNavItems(): NavItem[] {
-    return [
+    const entries: NavItem[] = [
         {
             title: t('ui.nav.race'),
             href: dashboard(),
@@ -16,4 +18,14 @@ export function mainNavItems(): NavItem[] {
             icon: Flag,
         },
     ];
+
+    if (can('manage-event')) {
+        entries.push({
+            title: t('ui.nav.manage'),
+            href: manage(),
+            icon: SlidersHorizontal,
+        });
+    }
+
+    return entries;
 }

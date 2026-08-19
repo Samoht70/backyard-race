@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\Permission;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
@@ -50,10 +52,29 @@ class HandleInertiaRequests extends Middleware
             'name' => config('app.name'),
             'auth' => [
                 'user' => $request->user(),
+                'permissions' => $this->permissions($request->user()),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'translations' => $this->translations(),
         ];
+    }
+
+    /**
+     * Always complete: a guest gets every ability at false, so no screen has to
+     * branch on a missing key. Each value is the result of the same can() the
+     * server authorises with, so display and decision cannot drift apart.
+     *
+     * @return array<string, bool>
+     */
+    private function permissions(?User $user): array
+    {
+        $granted = [];
+
+        foreach (Permission::cases() as $permission) {
+            $granted[$permission->value] = (bool) $user?->can($permission->value);
+        }
+
+        return $granted;
     }
 
     /**
