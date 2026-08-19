@@ -8,7 +8,7 @@ import StatusGallery from '@/components/design/StatusGallery.vue';
 import TypeSpecimen from '@/components/design/TypeSpecimen.vue';
 import ActionButton from '@/components/race/ActionButton.vue';
 import FestoonDivider from '@/components/race/FestoonDivider.vue';
-import LapHeader from '@/components/race/LapHeader.vue';
+import RoundHeader from '@/components/race/RoundHeader.vue';
 import StatCounter from '@/components/race/StatCounter.vue';
 import EmptyState from '@/components/state/EmptyState.vue';
 import ErrorState from '@/components/state/ErrorState.vue';
@@ -29,8 +29,8 @@ defineProps<Props>();
         </p>
 
         <DesignSection title="Entête de tour" note="L’élément signature.">
-            <LapHeader
-                :lap="17"
+            <RoundHeader
+                :round="17"
                 :runners-left="24"
                 start-at="18:00"
                 deadline-at="19:00"

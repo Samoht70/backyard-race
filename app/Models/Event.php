@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\UtcDateTime;
 use App\Enums\EventStatus;
 use App\Services\EventLifecycle\EventLifecycleFactory;
 use App\Services\EventLifecycle\EventLifecycleState;
@@ -10,13 +11,9 @@ use Database\Factories\EventFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * The root object of the product: a single event the whole application serves.
- *
- * `status` is deliberately absent from the fillable list — it is the only thing
- * standing between a crafted request and a race declared finished.
- *
  * @property int $id
  * @property string $name
  * @property string|null $description
@@ -48,10 +45,6 @@ class Event extends Model
     use HasFactory;
 
     /**
-     * A brand new event is a draft. The column default alone would leave an
-     * unsaved firstOrNew() without a status, and the lifecycle would have no
-     * state to build.
-     *
      * @var array<string, mixed>
      */
     protected $attributes = ['status' => EventStatus::Draft->value];
@@ -62,15 +55,21 @@ class Event extends Model
     }
 
     /**
-     * Get the attributes that should be cast.
-     *
+     * @return HasMany<Round, $this>
+     */
+    public function rounds(): HasMany
+    {
+        return $this->hasMany(Round::class);
+    }
+
+    /**
      * @return array<string, string>
      */
     protected function casts(): array
     {
         return [
             'status' => EventStatus::class,
-            'first_start_at' => 'immutable_datetime',
+            'first_start_at' => UtcDateTime::class,
             'lap_distance_meters' => 'integer',
             'lap_duration_minutes' => 'integer',
             'latitude' => 'float',

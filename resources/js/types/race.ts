@@ -6,3 +6,9 @@ export const RUNNER_STATUSES = [
 ] as const;
 
 export type RunnerStatus = (typeof RUNNER_STATUSES)[number];
+
+export type CurrentRound = {
+    number: number;
+    starts_at: string;
+    deadline_at: string;
+};

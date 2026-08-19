@@ -7,7 +7,7 @@ return [
         'withdrawn' => 'Abandon',
         'finished' => 'Terminé',
     ],
-    'lap' => [
+    'round' => [
         'number' => 'Tour',
         'runners_left' => 'en course',
         'start' => 'Départ',

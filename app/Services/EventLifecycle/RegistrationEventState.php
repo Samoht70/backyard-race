@@ -61,6 +61,11 @@ final class RegistrationEventState implements EventLifecycleState
         return true;
     }
 
+    public function isRacing(): bool
+    {
+        return false;
+    }
+
     public function frozenAttributes(): array
     {
         return [];

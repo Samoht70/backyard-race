@@ -19,7 +19,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->prefix('manage')
         ->name('manage.')
         ->group(function () {
-            Route::inertia('/', 'manage/Index')->name('index');
+            Route::get('/', Manage\IndexController::class)->name('index');
 
             Route::get('event', [Manage\EventController::class, 'edit'])->name('event.edit');
             Route::put('event', [Manage\EventController::class, 'update'])->name('event.update');

@@ -1,9 +1,17 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
 import { SlidersHorizontal } from '@lucide/vue';
+import RoundHeader from '@/components/race/RoundHeader.vue';
 import { t } from '@/lib/i18n';
 import { index as manage } from '@/routes/manage';
 import { edit as editEvent } from '@/routes/manage/event';
+import type { CurrentRound } from '@/types/race';
+
+type Props = {
+    currentRound: CurrentRound | null;
+};
+
+defineProps<Props>();
 
 defineOptions({
     layout: {
@@ -19,6 +27,13 @@ defineOptions({
 
 <template>
     <Head title="Gestion" />
+
+    <RoundHeader
+        v-if="currentRound"
+        :round="currentRound.number"
+        :start-at="currentRound.starts_at"
+        :deadline-at="currentRound.deadline_at"
+    />
 
     <div class="flex flex-col gap-4 p-4">
         <h1 class="font-display text-lg uppercase">

@@ -195,6 +195,18 @@ class EventLifecycleTest extends TestCase
         }
     }
 
+    #[Test]
+    public function it_only_races_while_the_event_is_running(): void
+    {
+        foreach (EventStatus::cases() as $status) {
+            $this->assertSame(
+                $status === EventStatus::Running,
+                $this->event($status)->lifecycle()->isRacing(),
+                $status->value,
+            );
+        }
+    }
+
     /**
      * @param  array<string, mixed>  $attributes
      */
