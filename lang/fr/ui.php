@@ -4,6 +4,7 @@ return [
     'nav' => [
         'race' => 'Course',
         'runners' => 'Coureurs',
+        'manage' => 'Gestion',
         'more' => 'Plus',
         'main' => 'Navigation principale',
         'sections' => 'Sections',
@@ -23,5 +24,9 @@ return [
     'settings' => [
         'profile_updated' => 'Profil mis à jour.',
         'password_updated' => 'Mot de passe mis à jour.',
+    ],
+    'manage' => [
+        'title' => 'Gestion de la course',
+        'empty' => 'Aucun outil de pilotage n’est encore disponible.',
     ],
 ];
