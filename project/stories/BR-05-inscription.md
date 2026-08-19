@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Epic** | 1 — Fondations |
-| **Statut** | À faire |
+| **Statut** | ✅ Terminé |
 | **Estimation** | 8 pts |
 | **Dépend de** | BR-01, BR-03 |
 
@@ -95,9 +95,9 @@ coureurs, y compris sur le tableau public des participants.
 
 ## Tâches
 
-- [ ] **T1** — Migration et modèle `Participant`, énumération de statut, lien vers `User` `2 pts`
-- [ ] **T2** — Factory et seeder d'une trentaine de participants pour le développement `1 pt`
-- [ ] **T3** — Form Request de validation, y compris capacité et unicité `2 pts`
-- [ ] **T4** — Contrôleur d'inscription, Policy « ma propre inscription » `2 pts`
-- [ ] **T5** — Écran d'inscription et écran de consultation de son inscription `3 pts`
-- [ ] **T6** — Tests : nominal, doublon, complet, cloisonnement entre participants `2 pts`
+- [x] **T1** — Migration et modèle `Participant`, énumération de statut, lien vers `User` `2 pts`
+- [x] **T2** — Factory et seeder d'une trentaine de participants pour le développement `1 pt`
+- [x] **T3** — Form Request de validation, y compris capacité et unicité `2 pts`
+- [x] **T4** — Contrôleur d'inscription, Policy « ma propre inscription » `2 pts`
+- [x] **T5** — Écran d'inscription et écran de consultation de son inscription `3 pts`
+- [x] **T6** — Tests : nominal, doublon, complet, cloisonnement entre participants `2 pts`

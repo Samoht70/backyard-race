@@ -25,7 +25,7 @@ Route::middleware(['auth', 'verified'])
             ->creatable()
             ->except(['destroy']);
 
-        Route::middleware('can:' . Permission::ManageEvent->value)
+        Route::middleware('can:'.Permission::ManageEvent->value)
             ->prefix('manage')
             ->name('manage.')
             ->group(function () {
@@ -38,4 +38,4 @@ Route::middleware(['auth', 'verified'])
             });
     });
 
-require __DIR__ . '/settings.php';
+require __DIR__.'/settings.php';

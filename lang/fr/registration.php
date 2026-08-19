@@ -28,8 +28,8 @@ return [
         'notes' => 'Allergie, traitement, régime : tout ce que le gérant doit savoir.',
     ],
     'seats' => [
-        'counted' => ':count coureurs confirmés sur :max places',
-        'unlimited' => ':count coureurs confirmés, sans limite de places',
+        'counted' => ':count / :max participants',
+        'unlimited' => ':count participants, sans limite de places',
     ],
     'create' => [
         'title' => 'S’inscrire à la course',

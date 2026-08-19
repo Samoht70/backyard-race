@@ -48,8 +48,14 @@ d'atteindre le moindre écran BR-02. Ce n'est pas tenable le soir de l'événeme
 Aucune story ne porte ce travail aujourd'hui. BR-05 (inscription) touche l'inscription et en
 est le foyer naturel ; les réglages et la 2FA n'ont pas de propriétaire.
 
-À trancher : on rattache la traduction des écrans hérités à BR-05, ou on ouvre une story
-dédiée dans l'epic 1 ?
+**Tranchée à moitié par BR-05 (2026-08-19), voir D-42.** Les 7 pages `pages/auth/*` sont passées
+en français, groupe `lang/fr/auth.php` à l'appui — qui porte aussi les clés `failed`, `password` et
+`throttle` lues par Fortify, donc les erreurs de connexion sont traduites elles aussi.
+
+**Reste ouvert** : les 3 pages `pages/settings/*` et les composants passkeys / 2FA
+(`ManagePasskeys`, `ManageTwoFactor`, `TwoFactorRecoveryCodes`, `DeleteUser`). Ces écrans ne sont
+sur le chemin d'aucun coureur le soir de la course, ce qui explique qu'aucune story ne les
+réclame. À trancher : story dédiée dans l'epic 1, ou on les laisse en anglais ?
 
 ---
 
