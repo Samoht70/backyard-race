@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Enums\EventStatus;
+use App\Services\EventLifecycle\EventLifecycleFactory;
+use App\Services\EventLifecycle\EventLifecycleState;
 use Carbon\CarbonImmutable;
 use Database\Factories\EventFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -44,6 +46,11 @@ class Event extends Model
 {
     /** @use HasFactory<EventFactory> */
     use HasFactory;
+
+    public function lifecycle(): EventLifecycleState
+    {
+        return app(EventLifecycleFactory::class)->fromStatus($this->status);
+    }
 
     /**
      * Get the attributes that should be cast.
