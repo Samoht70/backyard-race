@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { CircleOff } from '@lucide/vue';
 import DesignSection from '@/components/design/DesignSection.vue';
+import EventFieldSample from '@/components/design/EventFieldSample.vue';
+import EventStatusGallery from '@/components/design/EventStatusGallery.vue';
 import RunnerListSample from '@/components/design/RunnerListSample.vue';
 import StatusGallery from '@/components/design/StatusGallery.vue';
 import TypeSpecimen from '@/components/design/TypeSpecimen.vue';
@@ -47,6 +49,20 @@ defineProps<Props>();
             note="Couleur, pictogramme et libellé — jamais la couleur seule."
         >
             <StatusGallery />
+        </DesignSection>
+
+        <DesignSection
+            title="Statuts d’événement"
+            note="Quatre étapes, jamais de retour. Aucun token neuf : le brouillon en sourdine, les inscriptions sur l’accent, la course et la fin sur les encres du coureur."
+        >
+            <EventStatusGallery />
+        </DesignSection>
+
+        <DesignSection
+            title="Champs de formulaire"
+            note="Le plancher de 44 px vaut pour les saisies comme pour les boutons. Un champ figé est un fait, pas un champ désactivé."
+        >
+            <EventFieldSample />
         </DesignSection>
 
         <DesignSection title="Compteurs">
