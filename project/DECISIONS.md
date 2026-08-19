@@ -213,7 +213,12 @@ Arrêté le 2026-08-19 par BR-03.
   minimum de 1, donc la distance nulle et la durée négative sont refusées par la colonne
   elle-même, pas seulement par une règle.
 - **Coordonnées `decimal(10,7)` en base, castées `float`** : le cast `decimal:7` rendrait
-  `"45.7640000"`, que la carte de BR-19 recevrait tel quel.
+  `"45.7640000"`, que la carte de BR-19 recevrait tel quel. Vérifié par aller-retour en base :
+  aucune perte de précision, un `double` portant 15 à 17 chiffres significatifs pour 10 stockés.
+- **La date et l'heure se tiennent l'une l'autre à la saisie.** L'écran envoie deux contrôles pour
+  une seule colonne ; chacun est obligatoire dès que l'autre est rempli, et vider les deux efface
+  l'heure de premier départ. Sans cette réciprocité, une date saisie sans heure n'atteignait
+  aucune règle et disparaissait derrière un message de succès.
 - **`max_participants` nul signifie « pas de limite »**, jamais zéro. BR-05 doit le lire ainsi.
 - **Aucun index hors clé primaire** : la table porte une ligne (D-20). Ce n'est pas un oubli.
 - **`status` est absent de `#[Fillable]`**, et un test l'affirme : c'est la seule chose entre une
@@ -232,6 +237,12 @@ configuration doit fonctionner sur une base jamais semée) ou `firstOrFail()`.
 **Création et modification passent par le même `PUT`.** Un seul formulaire, une seule Form Request,
 un seul test. `updateOrCreate()` a été écarté : il court-circuite `#[Fillable]` et la Policy.
 
+**L'unicité est tenue par la base, pas par la convention.** Une revue adverse a relevé que tout le
+code lit l'événement avec `sole()` ou `firstOrFail()` — l'invariant était supposé partout et garanti
+nulle part, et deux premiers enregistrements concurrents auraient créé deux lignes. La table porte
+donc une colonne `singleton` à valeur unique, dont le seul rôle est de rendre la seconde ligne
+impossible.
+
 ## D-32 — Un refus de transition est une erreur de validation, pas une exception rendue
 
 Arrêté le 2026-08-19 par BR-03.
@@ -249,6 +260,14 @@ D'où deux canaux, **une seule règle** :
 
 La règle n'est pas dupliquée : la Form Request pose la question, l'état y répond, et `advance()`
 lève sur la même condition. L'exception est le filet, pas le canal.
+
+**L'écriture est conditionnelle, et c'est ce qui ferme la fenêtre.** La revue adverse a démontré
+qu'entre la vérification de la Form Request et l'écriture, une requête concurrente pouvait déplacer
+l'événement : le gérant demandait `registration`, la validation approuvait `registration`, et
+l'événement se retrouvait en `running`. `AdvanceEventStatus` reçoit désormais le `to` validé et
+écrit avec `where('status', <statut quitté>)` : zéro ligne touchée signifie que quelqu'un est passé
+avant, et le refus est levé. Aucune transition n'étant réversible, c'était le défaut le plus grave
+de la branche.
 
 Le champ `to` de la route d'avancement n'est pas décoratif : il nomme l'étape que le gérant croyait
 franchir, donc un double clic ou un onglet périmé est refusé au lieu de pousser la course un cran
