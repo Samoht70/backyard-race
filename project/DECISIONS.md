@@ -652,3 +652,131 @@ Enfin, les tests seedent **dans le corps de chaque test** qui en a besoin, jamai
 `protected $seed`. `RefreshDatabase` ne lance `migrate:fresh --seed` qu'une fois, gardé par un
 static : si la première classe exécutée ne demande pas de seed, plus aucune ne seedera. Le résultat
 dépendrait de l'ordre des classes.
+
+## D-34 — Le tour de course s'appelle `Round`, la boucle individuelle restera `Lap`
+
+Arrêté le 2026-08-19 par BR-04. Le français dit « tour » pour l'objet collectif et « boucle » pour
+la performance d'un coureur ; l'anglais du code devait trancher, aucune story ne l'avait fait.
+
+`Round` porte le numéro, l'heure de départ et l'heure limite, communs à tout le monde. `Lap` reste
+réservé à BR-08 : une boucle par participant et par tour. Les colonnes de l'événement gardent leur
+nom — `lap_distance_meters`, `lap_duration_minutes` — où « lap » désigne la boucle canonique,
+celle que tout le monde court : deux mots pour deux niveaux, ce qui est l'intention.
+
+Conséquence immédiate : `LapHeader.vue`, livré par BR-02, affichait un tour et non une boucle. Il
+est renommé `RoundHeader.vue` et le bloc `race.lap.*` de `lang/fr/race.php` devient `race.round.*`,
+sans qu'un seul libellé français change. Le renommage était gratuit tant que le composant ne vivait
+que dans la galerie ; dès BR-08 il aurait été un piège permanent. `race.lap.*` est désormais libre
+pour les boucles individuelles.
+
+## D-35 — Les horaires de tour sont stockés en UTC, et une boucle dure une heure réelle
+
+Arrêté le 2026-08-19 par BR-04. C'est la décision la plus lourde de la story, et elle corrige un
+défaut qu'aucun test n'aurait attrapé par hasard.
+
+**Le piège, vérifié en base.** Une colonne `DATETIME` MySQL stocke une horloge murale sans décalage.
+La nuit du 25 octobre, l'heure locale 02:00 est vécue deux fois : les tours 14 et 15 écrivent tous
+les deux `"02:00:00"`, et le cast `immutable_datetime` par défaut relit le premier **une heure trop
+tard**. Mesuré : timestamp attendu 1792886400, relu 1792890000, soit exactement 3600 secondes. Un
+coureur hors délai aurait gagné une heure et l'élimination de BR-11 serait fausse, en silence, la
+seule nuit où ça compte.
+
+D'où `App\Casts\UtcDateTime` sur `rounds.starts_at` et `rounds.deadline_at` : écriture en UTC,
+lecture dans le fuseau applicatif. Un test le prouve en repassant par la base
+(`it_stores_an_ambiguous_round_start_without_losing_an_hour`) — il est rouge avec le cast par
+défaut, vert avec celui-ci.
+
+**Faux problème écarté :** `addMinutes()` et `addRealMinutes()` sont identiques pour les unités
+infra-journalières, `DateTimeImmutable::add()` travaillant sur le timestamp. On garde `addMinutes()`,
+réellement typée, plutôt que la méthode magique dont le nom rassure sans rien garantir. La sémantique
+est épinglée par un test sur les timestamps, pas par un nom de méthode.
+
+**Sémantique arrêtée :** la boucle dure une heure **réelle**, l'affichage est l'horloge murale, et
+l'horloge murale a le droit de se répéter. Le 25 octobre, l'entête affichera « Départ 02:00 — Limite
+02:00 » sur un tour, puis « Départ 02:00 — Limite 03:00 » sur le suivant. C'est correct : les
+coureurs partis à 02:00 heure d'été sont rentrés quand le chronomètre du gérant affichait de nouveau
+02:00. L'alternative — des boucles d'une heure murale, donc de 0 ou 120 minutes réelles — n'est pas
+une Backyard. On accepte l'entête ambigu plutôt qu'une mention conditionnelle pour un cas qui
+survient une fois dans la vie du produit.
+
+**La règle vaut pour tout instant métier, `events.first_start_at` comprise.** La première rédaction
+de cette entrée exemptait cette colonne — un départ à 02:30 la nuit de la bascule étant absurde. La
+revue de la story a renversé l'arbitrage, et elle avait raison sur les deux plans. Sur le fond : la
+garantie « les horaires de tour survivent à la bascule » n'était pas absolue mais **conditionnelle à
+son origine**, puisque `RoundSchedule::fromEvent()` lit `first_start_at` — et rien dans le code ne le
+disait. Sur le coût : **aucune migration de schéma n'est nécessaire**, la colonne reste `DATETIME` et
+seule son interprétation change ; `2026_08_19_150000_store_the_event_first_start_in_utc` se contente
+de réécrire la valeur des lignes existantes, et se renverse.
+
+La règle est donc sans exception : **`UtcDateTime` sur tout instant métier**, `immutable_datetime`
+réservé aux `created_at` / `updated_at` que le framework possède. BR-08 (`laps.validated_at`) et
+BR-11 (l'heure d'élimination) n'ont plus à jouer leur cast à pile ou face.
+
+Un piège à connaître avant de toucher au cast : `set()` accepte **aussi une chaîne**, et ce n'est pas
+de la complaisance. `EventUpdateRequest::prepareForValidation()` fusionne les deux contrôles de
+l'écran en `"2026-09-12 13:00"` avant de remplir le modèle. Restreindre le cast à `DateTimeInterface`
+a été essayé : trois tests de BR-03 sont passés au rouge, la date arrivant `null` en base.
+
+## D-36 — La fenêtre d'un tour est semi-ouverte, la validation d'une boucle ne l'est pas
+
+Arrêté le 2026-08-19 par BR-04. Le tour N couvre `[départ(N), départ(N+1))` : à 14:00:00 pile, le
+tour courant est déjà le 2, pas le 1. C'est la lecture directe de « le tour N se termine au départ
+du tour N + 1 », et elle garantit qu'aucun instant n'appartient à deux tours.
+
+**Attention BR-09** : sa règle « validation à la seconde exacte de l'heure limite : acceptée » porte
+sur la **boucle** (`heure serveur <= limite de la boucle`, inclusif), pas sur le tour courant. À
+14:00:00, la boucle du tour 1 est encore validable alors que le tour courant est déjà le 2. Ce n'est
+pas une contradiction, ce sont deux prédicats distincts : BR-09 devra chercher la boucle par son
+tour, jamais par « le tour courant ». Un test de BR-04 nomme la borne pour que BR-09 la trouve.
+
+## D-37 — Les tours sont ouverts par une tâche planifiée, mais le tour affiché est recalculé
+
+Arrêté le 2026-08-19 par BR-04. Deux mécanismes distincts, et c'est délibéré.
+
+**L'écriture est planifiée.** `App\Actions\OpenDueRounds` matérialise tous les tours dus, et
+`race:open-rounds` l'appelle chaque minute (`routes/console.php`, premier planificateur du projet).
+La matérialisation paresseuse à la lecture a été écartée, et c'était la vraie tentation : dès BR-08,
+ouvrir un tour crée des boucles. Si une simple consultation de page ouvrait le tour N+1 **avant**
+que la tâche de BR-11 ait éliminé les retardataires du tour N, on donnerait une boucle à des coureurs
+qui doivent sortir. L'ordre élimination → ouverture est une règle de course : il ne peut pas dépendre
+de qui a rafraîchi son écran.
+
+**L'idempotence tient sur la base, pas sur la lecture.** La contrainte unique `(event_id, number)`
+ferme la fenêtre — même raisonnement qu'en D-32 : la vérification qui précède l'écriture est toujours
+périmée. `firstOrCreate` délègue à `createOrFirst`, qui attrape lui-même la violation d'unicité et
+relit la ligne gagnante ; le `try/catch` est dans le framework, pas dans notre code. Le rattrapage
+après une queue arrêtée tombe alors tout seul : les tours manquants sont créés **avec leurs horaires
+calculés, jamais l'heure d'exécution**, ce que BR-11 exige littéralement.
+
+**Écart assumé à `laravel:no-queries-in-loops`** : la boucle d'ouverture itère sur les tours
+*manquants*, donc zéro ou un en régime normal. L'alternative en une passe (`insertOrIgnore`,
+`upsert`) court-circuiterait le cast `UtcDateTime`, c'est-à-dire la correction de D-35 elle-même.
+
+**La lecture, elle, ne touche pas la base du tout.** `ResolveCurrentRound` recalcule le tour courant
+depuis l'heure serveur et rend un objet valeur `CurrentRound`, jamais un modèle. Quatre raisons : la
+règle métier dit « déterminé à partir de l'heure serveur », pas « depuis une table » ; un affichage
+lu en base serait en retard de 0 à 60 s à chaque changement de tour, sur le seul écran que le gérant
+regarde quinze heures durant ; le calcul répond avant que le planificateur ait jamais tourné ; et
+surtout un affichage lu en base **cacherait la panne** — planificateur mort, l'écran afficherait
+sereinement le tour 12 pendant que la course en est au 15. Recalculé, l'écran dit la vérité et
+l'écart avec `max(number)` devient le symptôme observable. Les deux entrées étant gelées en
+`running`, ligne persistée et calcul ne peuvent pas diverger ; un test l'épingle.
+
+**Pourquoi un objet valeur et pas un modèle `Round` non sauvegardé**, qui était la première écriture.
+Un modèle porte `save()`, `update()` et ses relations : BR-08 voudra « le tour courant » pour y
+rattacher des boucles, et un `$round->laps()->create(...)` sur un parent non sauvegardé produit soit
+une clé nulle, soit une sauvegarde implicite — qui ouvrirait un tour dans le dos de l'élimination.
+On avait fermé la porte de la lecture paresseuse et laissé la fenêtre ouverte. L'objet valeur rend
+le `save()` **inexprimable** plutôt que déconseillé : le raisonnement que D-29 applique déjà aux
+transitions. Bénéfice accessoire, la lecture ne coûte plus la requête que faisait le `firstOrNew`,
+et il n'y a plus deux sources pour la même valeur.
+
+**Reprise obligatoire par BR-11.** Sa tâche appellera l'élimination **puis** `OpenDueRounds`, et la
+ligne `Schedule::command(OpenDueRoundsCommand::class)` devra être **retirée** de `routes/console.php` :
+deux planificateurs indépendants qui écrivent des tours ne garantissent plus l'ordre. L'action est
+l'unité réutilisable, la commande est jetable par conception.
+
+**Ce qui arrive si le planificateur est mort la nuit de la course** : aucun tour matérialisé, donc
+aucune boucle ouverte par BR-08 et aucune élimination par BR-11, sans que rien ne l'affiche. C'est
+la panne silencieuse que BR-30 nomme. BR-04 y répond dans son budget par le rattrapage contigu et
+par l'affichage recalculé qui rend l'écart visible ; l'alerte reste à BR-30.
