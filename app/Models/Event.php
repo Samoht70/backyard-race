@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\UtcDateTime;
 use App\Enums\EventStatus;
 use App\Services\EventLifecycle\EventLifecycleFactory;
 use App\Services\EventLifecycle\EventLifecycleState;
@@ -10,6 +11,7 @@ use Database\Factories\EventFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * The root object of the product: a single event the whole application serves.
@@ -62,6 +64,14 @@ class Event extends Model
     }
 
     /**
+     * @return HasMany<Round, $this>
+     */
+    public function rounds(): HasMany
+    {
+        return $this->hasMany(Round::class);
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
@@ -70,7 +80,7 @@ class Event extends Model
     {
         return [
             'status' => EventStatus::class,
-            'first_start_at' => 'immutable_datetime',
+            'first_start_at' => UtcDateTime::class,
             'lap_distance_meters' => 'integer',
             'lap_duration_minutes' => 'integer',
             'latitude' => 'float',
