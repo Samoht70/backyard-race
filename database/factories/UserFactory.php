@@ -2,10 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Enums\Role;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Spatie\Permission\Exceptions\RoleDoesNotExist;
 
 /**
  * @extends Factory<User>
@@ -56,5 +58,25 @@ class UserFactory extends Factory
             'two_factor_recovery_codes' => encrypt(json_encode(['recovery-code-1'])),
             'two_factor_confirmed_at' => now(),
         ]);
+    }
+
+    /**
+     * @throws RoleDoesNotExist when the roles seeder has not run
+     */
+    public function manager(): static
+    {
+        return $this->afterCreating(function (User $user): void {
+            $user->assignRole(Role::Manager);
+        });
+    }
+
+    /**
+     * @throws RoleDoesNotExist when the roles seeder has not run
+     */
+    public function participant(): static
+    {
+        return $this->afterCreating(function (User $user): void {
+            $user->assignRole(Role::Participant);
+        });
     }
 }

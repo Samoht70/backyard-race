@@ -2,8 +2,13 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Enums\Permission;
+use App\Enums\Role;
+use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Fortify\Features;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class RegistrationTest extends TestCase
@@ -15,6 +20,8 @@ class RegistrationTest extends TestCase
         parent::setUp();
 
         $this->skipUnlessFortifyHas(Features::registration());
+
+        $this->seed(RolesAndPermissionsSeeder::class);
     }
 
     public function test_registration_screen_can_be_rendered()
@@ -35,5 +42,35 @@ class RegistrationTest extends TestCase
 
         $this->assertAuthenticated();
         $response->assertRedirect(route('dashboard', absolute: false));
+    }
+
+    #[Test]
+    public function it_gives_a_new_registration_the_participant_role(): void
+    {
+        $user = $this->register();
+
+        $this->assertTrue($user->hasRole(Role::Participant->value));
+    }
+
+    #[Test]
+    public function it_gives_a_new_registration_no_administration_permission(): void
+    {
+        $user = $this->register();
+
+        foreach (Permission::cases() as $permission) {
+            $this->assertFalse($user->can($permission->value));
+        }
+    }
+
+    private function register(): User
+    {
+        $this->post(route('register.store'), [
+            'name' => 'Nouvelle Recrue',
+            'email' => 'recrue@backyard.test',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+        ]);
+
+        return User::query()->where('email', 'recrue@backyard.test')->sole();
     }
 }
