@@ -8,12 +8,9 @@ use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Stores the instant in UTC and reads it back in the application timezone.
- *
- * The default datetime cast writes Paris wall-clock into a column that carries
- * no offset. On the October night the local hour 02:00 is lived twice: two
- * rounds store the same "02:00:00" and reading the earlier one back moves it
- * one hour later — the deadline that eliminates runners.
+ * A DATETIME column carries no offset: written as local wall-clock, the hour
+ * lived twice on the autumn clock change reads back one hour late, moving the
+ * deadline that eliminates runners.
  *
  * @implements CastsAttributes<CarbonImmutable, CarbonImmutable|string>
  */

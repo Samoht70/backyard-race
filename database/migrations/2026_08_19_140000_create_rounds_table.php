@@ -6,14 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * `starts_at` and `deadline_at` are derivable from the event, and stored
-     * anyway: BR-11 has to find overdue rounds with a SQL predicate after a
-     * queue outage, BR-08 copies both onto each lap, and the row is the record
-     * of what actually arbitrated the race.
-     */
     public function up(): void
     {
         Schema::create('rounds', function (Blueprint $table): void {
@@ -28,9 +20,6 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('rounds');

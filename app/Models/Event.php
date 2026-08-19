@@ -14,11 +14,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * The root object of the product: a single event the whole application serves.
- *
- * `status` is deliberately absent from the fillable list — it is the only thing
- * standing between a crafted request and a race declared finished.
- *
  * @property int $id
  * @property string $name
  * @property string|null $description
@@ -50,10 +45,6 @@ class Event extends Model
     use HasFactory;
 
     /**
-     * A brand new event is a draft. The column default alone would leave an
-     * unsaved firstOrNew() without a status, and the lifecycle would have no
-     * state to build.
-     *
      * @var array<string, mixed>
      */
     protected $attributes = ['status' => EventStatus::Draft->value];
@@ -72,8 +63,6 @@ class Event extends Model
     }
 
     /**
-     * Get the attributes that should be cast.
-     *
      * @return array<string, string>
      */
     protected function casts(): array

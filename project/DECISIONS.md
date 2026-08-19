@@ -704,9 +704,9 @@ de cette entrée exemptait cette colonne — un départ à 02:30 la nuit de la b
 revue de la story a renversé l'arbitrage, et elle avait raison sur les deux plans. Sur le fond : la
 garantie « les horaires de tour survivent à la bascule » n'était pas absolue mais **conditionnelle à
 son origine**, puisque `RoundSchedule::fromEvent()` lit `first_start_at` — et rien dans le code ne le
-disait. Sur le coût : **aucune migration de schéma n'est nécessaire**, la colonne reste `DATETIME` et
-seule son interprétation change ; `2026_08_19_150000_store_the_event_first_start_in_utc` se contente
-de réécrire la valeur des lignes existantes, et se renverse.
+disait. Sur le coût : **il est nul**. La colonne reste `DATETIME`, seule son interprétation change,
+et rien n'est déployé — il n'y a aucune donnée à reprendre. Une migration de reprise avait d'abord
+été écrite puis supprimée pour cette raison : elle n'aurait jamais eu de ligne à convertir.
 
 La règle est donc sans exception : **`UtcDateTime` sur tout instant métier**, `immutable_datetime`
 réservé aux `created_at` / `updated_at` que le framework possède. BR-08 (`laps.validated_at`) et

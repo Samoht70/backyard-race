@@ -10,11 +10,7 @@ use Carbon\CarbonImmutable;
 final class OpenDueRounds
 {
     /**
-     * Replayable by construction: the unique key on (event_id, number) closes
-     * the window, not the read that precedes it. A run that fires late still
-     * stores the scheduled hours, never its own execution time.
-     *
-     * @return list<Round> the rounds this call opened
+     * @return list<Round>
      */
     public function __invoke(Event $event, ?CarbonImmutable $at = null): array
     {

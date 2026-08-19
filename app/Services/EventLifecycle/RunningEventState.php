@@ -48,8 +48,7 @@ final class RunningEventState implements EventLifecycleState
     }
 
     /**
-     * BR-04 derives every lap start time from these two: changing them mid-race
-     * would silently reschedule laps already run.
+     * Changing either mid-race silently reschedules rounds already run.
      */
     public function frozenAttributes(): array
     {
