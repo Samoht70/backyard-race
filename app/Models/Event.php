@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Casts\UtcDateTime;
 use App\Enums\EventStatus;
+use App\Enums\RegistrationStatus;
 use App\Services\EventLifecycle\EventLifecycleFactory;
 use App\Services\EventLifecycle\EventLifecycleState;
 use Carbon\CarbonImmutable;
@@ -60,6 +61,27 @@ class Event extends Model
     public function rounds(): HasMany
     {
         return $this->hasMany(Round::class);
+    }
+
+    /**
+     * @return HasMany<Participant, $this>
+     */
+    public function participants(): HasMany
+    {
+        return $this->hasMany(Participant::class);
+    }
+
+    public function confirmedParticipantsCount(): int
+    {
+        return $this->participants()
+            ->where('status', RegistrationStatus::Confirmed)
+            ->count();
+    }
+
+    public function isFull(): bool
+    {
+        return $this->max_participants !== null
+            && $this->confirmedParticipantsCount() >= $this->max_participants;
     }
 
     /**
