@@ -42,6 +42,11 @@ final class RunningEventState implements EventLifecycleState
         return true;
     }
 
+    public function isRacing(): bool
+    {
+        return true;
+    }
+
     /**
      * BR-04 derives every lap start time from these two: changing them mid-race
      * would silently reschedule laps already run.

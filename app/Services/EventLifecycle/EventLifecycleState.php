@@ -42,6 +42,12 @@ interface EventLifecycleState
     public function isEditable(): bool;
 
     /**
+     * Whether the race clock is running: the guard BR-04 puts on the current
+     * round and BR-11 will put on its elimination task.
+     */
+    public function isRacing(): bool;
+
+    /**
      * Attributes the manager may no longer change in this status.
      *
      * @return list<string>

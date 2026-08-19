@@ -42,6 +42,11 @@ final class DraftEventState implements EventLifecycleState
         return true;
     }
 
+    public function isRacing(): bool
+    {
+        return false;
+    }
+
     public function frozenAttributes(): array
     {
         return [];

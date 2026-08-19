@@ -43,6 +43,11 @@ final class FinishedEventState implements EventLifecycleState
         return false;
     }
 
+    public function isRacing(): bool
+    {
+        return false;
+    }
+
     public function frozenAttributes(): array
     {
         return [
