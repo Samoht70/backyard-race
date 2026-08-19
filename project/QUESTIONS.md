@@ -31,6 +31,32 @@ lit en français dans l'écran. Tous les refus du parcours nominal du gérant pa
 Restent, inchangés, les 403 et 409 des chemins d'abus et d'onglet périmé. BR-03 n'aggrave pas la
 question et ne la ferme pas ; BR-13 reste son porteur naturel.
 
+## Q-03 — Que devient un compte dont l'inscription est annulée ?
+
+Ouverte le 2026-08-20 par D-45.
+
+La fusion de l'inscription retire `registration/create` : une inscription naît désormais dans le
+parcours par mail, en même temps que le compte. Un compte connecté n'a donc plus aucun écran pour
+créer une inscription.
+
+Le cas n'est pas atteignable aujourd'hui — on ne peut pas avoir un compte sans inscription. Il le
+devient dès que **BR-06** donne au gérant le pouvoir d'annuler : le coureur garde son compte, son
+code fonctionne, il se connecte, et `registration.show` le renvoie sur le tableau de bord sans rien
+lui dire.
+
+Trois branches, à trancher dans BR-06 :
+
+- **l'annulation est définitive** — le coureur voit son inscription annulée en lecture seule, et se
+  réinscrit avec une autre adresse s'il veut revenir. Le plus simple, le plus brutal.
+- **l'annulation rouvre le formulaire** — il faut alors ressusciter un écran de création côté
+  connecté, donc exactement ce que D-45 vient de supprimer, avec le doublon de formulaire que la
+  fusion cherchait à éliminer.
+- **le gérant réinscrit lui-même** — cohérent avec D-40, qui lui donne déjà les transitions, mais
+  ça suppose qu'il saisisse les cinq champs de participation à la place du coureur.
+
+Ce qui bloque le choix : on ne sait pas encore si l'annulation par le gérant sert à écarter un
+coureur (branche 1) ou à corriger une erreur de saisie (branche 2 ou 3).
+
 ---
 
 Q-01 (traduction des écrans hérités du starter kit) est fermée : à moitié par D-42, entièrement

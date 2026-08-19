@@ -8,6 +8,7 @@ return [
     ],
     'refusal' => [
         'full' => 'L’événement est complet : toutes les places confirmées sont prises.',
+        'closed' => 'Les inscriptions ne sont pas ouvertes.',
     ],
     'section' => [
         'runner' => 'Le coureur',
@@ -30,12 +31,6 @@ return [
     'seats' => [
         'counted' => ':count / :max participants',
         'unlimited' => ':count participants, sans limite de places',
-    ],
-    'create' => [
-        'title' => 'S’inscrire à la course',
-        'description' => 'Ton inscription part en attente : le gérant la confirme ensuite.',
-        'submit' => 'Envoyer mon inscription',
-        'call_to_action' => 'S’inscrire',
     ],
     'show' => [
         'title' => 'Mon inscription',

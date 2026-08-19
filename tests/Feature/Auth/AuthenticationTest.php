@@ -3,8 +3,10 @@
 namespace Tests\Feature\Auth;
 
 use App\Models\User;
+use Database\Factories\UserFactory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\RateLimiter;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class AuthenticationTest extends TestCase
@@ -24,7 +26,7 @@ class AuthenticationTest extends TestCase
 
         $response = $this->post(route('login.store'), [
             'email' => $user->email,
-            'password' => 'password',
+            'password' => UserFactory::ACCESS_CODE,
         ]);
 
         $this->assertAuthenticated();
@@ -37,10 +39,23 @@ class AuthenticationTest extends TestCase
 
         $this->post(route('login.store'), [
             'email' => $user->email,
-            'password' => 'wrong-password',
+            'password' => 'ZZZZ-ZZZZ-ZZZZ',
         ]);
 
         $this->assertGuest();
+    }
+
+    #[Test]
+    public function it_accepts_a_code_typed_without_its_dashes_or_capitals(): void
+    {
+        $user = User::factory()->create();
+
+        $this->post(route('login.store'), [
+            'email' => $user->email,
+            'password' => strtolower(str_replace('-', '', UserFactory::ACCESS_CODE)),
+        ]);
+
+        $this->assertAuthenticated();
     }
 
     public function test_users_can_logout()
@@ -62,7 +77,7 @@ class AuthenticationTest extends TestCase
 
         $response = $this->post(route('login.store'), [
             'email' => $user->email,
-            'password' => 'wrong-password',
+            'password' => 'ZZZZ-ZZZZ-ZZZZ',
         ]);
 
         $response->assertTooManyRequests();

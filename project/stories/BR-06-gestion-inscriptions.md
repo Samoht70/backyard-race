@@ -85,3 +85,16 @@ fait entrer le coureur dans les effectifs de la course.
 - [ ] **T2** — Écran gérant : liste filtrable, compteur de places, actions `2 pts`
 - [ ] **T3** — Modification d'une fiche participant par le gérant `1 pt`
 - [ ] **T4** — Tests : transitions valides et invalides, capacité, idempotence de la confirmation `2 pts`
+
+## À trancher avant de commencer (ajouté le 2026-08-20 par D-45)
+
+L'inscription et la création de compte ont fusionné : une inscription naît dans le parcours par
+mail, et `registration/create` n'existe plus. **Un compte connecté n'a donc plus aucun écran pour
+créer une inscription.**
+
+Cette story est la première à rendre le cas atteignable, puisqu'elle donne au gérant le pouvoir
+d'annuler. Trois branches sont posées dans [Q-03](../QUESTIONS.md) — annulation définitive,
+réouverture du formulaire, ou réinscription par le gérant — et le choix change T1 et T3.
+
+Il faudra donc **poser la question au propriétaire avant d'écrire T1**, pas la trancher en passant.
+

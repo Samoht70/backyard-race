@@ -3,6 +3,7 @@
 namespace Tests\Feature\Profile;
 
 use App\Models\User;
+use Database\Factories\UserFactory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -51,7 +52,7 @@ class ProfileUpdateTest extends TestCase
         $response = $this
             ->actingAs($user)
             ->delete(route('profile.destroy'), [
-                'password' => 'password',
+                'password' => UserFactory::ACCESS_CODE,
             ]);
 
         $response
@@ -70,7 +71,7 @@ class ProfileUpdateTest extends TestCase
             ->actingAs($user)
             ->from(route('profile.edit'))
             ->delete(route('profile.destroy'), [
-                'password' => 'wrong-password',
+                'password' => 'ZZZZ-ZZZZ-ZZZZ',
             ]);
 
         $response

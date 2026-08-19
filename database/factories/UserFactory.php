@@ -14,6 +14,8 @@ use Spatie\Permission\Exceptions\RoleDoesNotExist;
  */
 class UserFactory extends Factory
 {
+    public const ACCESS_CODE = 'ABCD-EFGH-JKLM';
+
     protected static ?string $password;
 
     /**
@@ -25,7 +27,7 @@ class UserFactory extends Factory
             'first_name' => fake()->firstName(),
             'last_name' => fake()->lastName(),
             'email' => fake()->unique()->safeEmail(),
-            'password' => static::$password ??= Hash::make('password'),
+            'password' => static::$password ??= Hash::make(self::ACCESS_CODE),
             'remember_token' => Str::random(10),
         ];
     }

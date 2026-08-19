@@ -84,6 +84,11 @@ class Event extends Model
             && $this->confirmedParticipantsCount() >= $this->max_participants;
     }
 
+    public function acceptsRegistrations(): bool
+    {
+        return $this->lifecycle()->allowsRegistration() && ! $this->isFull();
+    }
+
     /**
      * @return array<string, string>
      */

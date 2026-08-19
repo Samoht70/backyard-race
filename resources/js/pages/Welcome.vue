@@ -2,7 +2,8 @@
 import { Head, Link } from '@inertiajs/vue3';
 import ActionButton from '@/components/race/ActionButton.vue';
 import FestoonDivider from '@/components/race/FestoonDivider.vue';
-import { dashboard, login, register } from '@/routes';
+import { dashboard, login } from '@/routes';
+import { create as register } from '@/routes/account';
 </script>
 
 <template>

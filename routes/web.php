@@ -22,8 +22,7 @@ Route::middleware('auth')
             ->only(['show']);
 
         Route::singleton('registration', RegistrationController::class)
-            ->creatable()
-            ->except(['destroy']);
+            ->only(['show', 'edit', 'update']);
 
         Route::middleware('can:'.Permission::ManageEvent->value)
             ->prefix('manage')
@@ -38,4 +37,5 @@ Route::middleware('auth')
             });
     });
 
+require __DIR__.'/account.php';
 require __DIR__.'/profile.php';

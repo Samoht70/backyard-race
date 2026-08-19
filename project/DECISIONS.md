@@ -175,6 +175,13 @@ d'adresse et la réinitialisation de mot de passe sont supprimées, donc Mailpit
 rien. Il reste dans `compose.yaml` pour ne pas avoir à le recâbler si un mail apparaît, mais un
 Mailpit vide est désormais le comportement normal, pas le symptôme d'une panne.
 
+**Seconde révision du même jour (D-45) : le mail est de retour, et Mailpit redevient
+load-bearing.** Le lien d'inscription est le seul mail de l'application, et c'est le seul chemin
+pour créer un compte : si le mail ne part pas, personne ne s'inscrit. Mailpit n'est donc plus un
+filet mais l'outil de vérification du parcours en développement. `.env.example` porte encore
+`MAIL_MAILER=log` et `MAIL_PORT=2525` alors que Mailpit écoute sur `1025` — un poste qui veut voir
+le mail doit passer à `smtp` et `1025`.
+
 ## D-29 — Le cycle de vie de l'événement vit dans des classes d'état
 
 Arrêté le 2026-08-19 par BR-03, avec le propriétaire du projet.
@@ -304,6 +311,12 @@ classement temps réel, WebSockets, compte à rebours intégré, validation d'un
 participant, saisie manuelle de l'heure de fin.
 
 Ces absences sont un choix, pas un oubli. Une demande d'ajout rouvre cette entrée.
+
+**Révision du 2026-08-20 (D-45) : « notifications » ne couvre plus le mail d'inscription.**
+Le propriétaire a demandé une inscription en deux temps, dont le premier temps est un lien envoyé
+par mail. Ce mail est le **seul** que l'application envoie, et il appartient au parcours de création
+de compte, pas à la course. Tout le reste de la liste tient : aucune alerte d'élimination, aucun
+récapitulatif, aucune relance.
 
 ## D-19 — Déploiement sur un petit VPS mensuel, avec Dokploy
 
@@ -860,6 +873,11 @@ Le singleton supprime la question au lieu de la traiter : le contrôleur résout
 
 `destroy` est exclu : un coureur ne s'annule pas lui-même, c'est le gérant qui annule (BR-06).
 
+**Révision du 2026-08-20 (D-45) : `creatable()` tombe, le singleton se réduit à
+`->only(['show', 'edit', 'update'])`.** L'inscription ne se crée plus depuis un compte connecté
+mais dans le parcours public d'inscription ; il ne reste ici que la consultation et la correction.
+Le raisonnement sur `resource()` et le binding tient inchangé pour les trois routes restantes.
+
 La même déclaration a été passée sur l'événement, public comme géré : `Route::singleton('event', …)`
 remplace les trois routes unitaires qui les déclaraient, aux mêmes noms de route.
 
@@ -897,6 +915,10 @@ changement de mot de passe. Toutes sont retirées.
 Ce qui reste du parcours d'authentification : inscription et connexion par mot de passe.
 `config/fortify.php` ne déclare plus que `registration()`, et `User` n'implémente plus
 `PasskeyUser` ni les traits Fortify associés.
+
+**Révision du 2026-08-20 (D-45) : `config/fortify.php` ne déclare plus aucune feature.**
+L'inscription quitte Fortify pour un parcours en deux temps porté par l'application, et le mot de
+passe devient un code d'inscription généré. Le reste de cette entrée ne bouge pas.
 
 Trois conséquences valent d'être connues :
 
@@ -949,3 +971,113 @@ que l'utilisateur voit, pas ce que le cookie contient.
 
 Le rendu serveur ne change pas : `HandleAppearance` partage toujours le cookie `appearance` et
 `app.blade.php` pose la classe `dark` avant le premier octet de JS.
+
+## D-45 — L'inscription se fait par mail, et le mot de passe est un code généré
+
+Arrêté le 2026-08-20 par le propriétaire du projet.
+
+L'inscription en un formulaire (nom, prénom, email, mot de passe, confirmation) est remplacée par le
+parcours des sites d'inscription à une course : **on saisit son adresse, on reçoit un lien, on
+remplit son inscription, et on reçoit un code**. Ce code est le mot de passe du compte.
+
+**Une seule inscription, pas deux.** BR-05 avait livré un second formulaire, atteignable une fois
+connecté, pour la participation elle-même — téléphone, date de naissance, contact d'urgence,
+remarques. Le coureur passait donc par trois moments : créer un compte, se connecter, s'inscrire.
+Les deux formulaires fusionnent : le lien du mail ouvre **un** écran qui porte l'identité et la
+participation, et sa validation crée `User` et `Participant` dans une transaction.
+
+Ce que ça achète : plus aucun mot de passe choisi par le coureur, donc plus de mot de passe faible,
+plus de mot de passe réutilisé, et une adresse email prouvée avant que le compte n'existe — sans
+remettre en service la vérification d'adresse supprimée par D-43, puisque la preuve est *dans* le
+parcours au lieu de le suivre.
+
+**Le parcours ne quitte pas Fortify pour la connexion, seulement pour l'inscription.**
+`config/fortify.php` ne déclare plus aucune feature ; `Features::registration()` disparaît avec
+l'action `CreateNewUser`. La connexion reste Fortify, mais passe par
+`Fortify::authenticateUsing()` — voir la normalisation plus bas.
+
+### Les cinq étapes tiennent dans un seul singleton
+
+Conformément à D-41, le parcours est déclaré en une ligne de ressource et non en liste de verbes :
+
+```php
+Route::singleton('account', AccountController::class)->creatable()->only([…])
+```
+
+Les cinq verbes du singleton portent exactement les cinq étapes : `create` (saisir l'adresse),
+`store` (envoyer le lien), `edit` (le formulaire d'inscription, derrière signature), `update`
+(créer le compte et l'inscription), `show` (afficher le code). Le préfixe est `account` et non
+`register` pour ne pas cohabiter avec `registration`, qui garde la consultation et la correction
+d'une inscription existante.
+
+**La fenêtre d'inscription remonte sur la création de compte.** Un compte n'existe que pour courir,
+donc les gardes qui protégeaient l'ancien formulaire — événement en statut `registration`, capacité
+non atteinte — gardent maintenant l'étape 1. Hors fenêtre ou complet, l'écran d'adresse affiche un
+refus et le compteur de places au lieu du champ, et `POST /account` refuse aussi côté serveur. Le
+coureur apprend le refus avant d'avoir un compte, au lieu de le découvrir après.
+
+Le refus voyage en erreur de validation sur un champ `event`, comme D-32 l'a établi, et non en 403.
+`Event::acceptsRegistrations()` réunit les deux conditions ; `refuseOutsideRegistrationWindow()`
+dans `RegistrationValidationRules` les applique aux deux requêtes qui en ont besoin — l'étape 1 et
+l'étape finale. La seconde vérification n'est pas redondante : entre le clic sur le lien et l'envoi
+du formulaire, les dernières places peuvent partir, et un test couvre ce cas.
+
+**Ce que la fusion supprime.** `registration/create` et `POST registration` quittent le routage,
+avec `RegistrationStoreRequest`, la page `registration/Create.vue`, le groupe de traduction
+`registration.create` et le bouton « S'inscrire » de l'écran d'événement.
+`ParticipantPolicy::create()` disparaît aussi, faute d'appelant : sa moitié « pas déjà inscrit »
+est désormais portée par la contrainte d'unicité sur `users.email`, et sa moitié « inscriptions
+ouvertes » par la fenêtre ci-dessus.
+
+**Un compte sans inscription n'a plus d'écran pour en créer une.** Le cas n'existe aujourd'hui que
+si BR-06 annule une inscription ; `registration.show` et `registration.edit` renvoient alors sur le
+tableau de bord. C'est un trou connu, laissé à BR-06 — voir Q-03.
+
+Tout le groupe est en `guest`. **Le nouveau coureur n'est pas connecté automatiquement** : il
+termine sur son code et s'en sert immédiatement pour se connecter. C'est le seul moment où le
+produit peut lui apprendre à quoi sert ce code, et le passage par le formulaire de connexion permet
+à un gestionnaire de mots de passe de l'enregistrer.
+
+### Aucune table de jetons
+
+Le lien est une `URL::temporarySignedRoute` de 48 heures portant l'adresse en paramètre, comme la
+vérification d'adresse de Laravel. Pas de table `pending_registrations`, pas de purge, pas de
+modèle. Le rejeu est fermé par la contrainte d'unicité sur `users.email`, pas par un jeton consommé.
+
+`edit` vérifie la signature **dans le contrôleur** (`hasValidSignature()`) au lieu du middleware
+`signed`. Le middleware répond 403, donc la page d'erreur Symfony en anglais que Q-02 décrit ;
+le contrôleur renvoie sur l'étape 1 avec un message français. Un lien périmé est le cas normal
+d'un mail vieux de trois jours, pas un abus.
+
+Entre `edit` et `update`, l'adresse voyage **en session**, pas dans le formulaire : `update` n'a
+aucun champ email, donc aucune requête ne peut créer un compte sur une adresse non prouvée.
+
+### Le code : 12 caractères, sans ambiguïté, normalisé à la lecture
+
+`App\Support\AccessCode` tire 12 caractères dans un alphabet de 32 (`ABCDEFGHJKLMNPQRSTUVWXYZ`
+plus `23456789` — ni `I`, ni `O`, ni `0`, ni `1`) et les groupe par quatre : `ABCD-EFGH-JKLM`.
+Soit 60 bits, face à un limiteur de 5 tentatives par minute et par couple adresse/IP.
+
+**`AccessCode::normalise()` est la raison du `Fortify::authenticateUsing()`.** Un code recopié
+depuis une capture d'écran arrive en minuscules, sans tirets, ou les deux ; un `Auth::attempt` brut
+le refuserait. La normalisation remet en majuscules, retire tout ce qui n'est pas dans l'alphabet et
+regroupe par quatre, des deux côtés — à la connexion et dans `ProfileDeleteRequest`, qui demande le
+code pour supprimer le compte.
+
+Le code n'est **jamais renvoyé** : `users.password` n'en contient que le hash, et l'écran qui
+l'affiche lit un flash de session, donc un rechargement le perd. Combiné à D-43, qui a retiré la
+réinitialisation, **un code perdu est un compte perdu** — le coureur doit se réinscrire avec une
+autre adresse, ou le propriétaire intervenir en base. C'est la conséquence assumée de la demande
+« un code qu'il ne doit pas perdre » ; l'envoyer aussi par mail est un changement d'une ligne si
+l'arbitrage change.
+
+### Le mail est une Notification, pas un Mailable
+
+Premier envoi du projet, donc premier arbitrage. C'est `Notification::route('mail', $email)` avec
+un `AnonymousNotifiable` : le destinataire n'a pas encore de compte, et c'est exactement la forme
+que Laravel utilise pour ses propres `VerifyEmail` et `ResetPassword`. Le `MailMessage` évite
+d'écrire une vue Blade, et le test assure sur `actionUrl` plutôt que sur du HTML rendu.
+
+La copie vit dans `lang/fr/mail.php`, hors des groupes partagés à Inertia. `lang/fr.json` traduit
+les deux chaînes que le gabarit du framework pose lui-même (« All rights reserved. » et le
+sous-texte du bouton), sans quoi un mail français se termine en anglais.
