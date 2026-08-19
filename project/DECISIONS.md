@@ -16,6 +16,13 @@ PHP de l'hôte satisferait la contrainte de version.
 
 Les commandes npm tournent sur l'hôte (Node 22).
 
+**Constat de BR-03 :** il n'y a pas de Node sur l'hôte de développement actuel. Les commandes npm
+passent donc par Sail elles aussi (`./vendor/bin/sail npm run …`, Node 24 dans l'image). Deux
+pièges à connaître : un `npm install` lancé dans le conteneur réécrit le champ `name` du
+`package-lock.json` en `html`, d'après son répertoire de travail, et la CLI shadcn-vue en profite
+pour remonter des dépendances non demandées. Vérifier `git diff package.json package-lock.json`
+après toute commande npm qui touche aux manifestes.
+
 ## D-02 — Starter kit Vue officiel plutôt qu'un montage manuel
 
 Le projet est né de `laravel new --vue`, qui livre déjà Inertia 3, Vue 3 + TypeScript,
@@ -111,6 +118,19 @@ français, via les fichiers de traduction. `APP_LOCALE=fr`, `APP_TIMEZONE=Europe
 Le fuseau applicatif est Paris : les horaires de boucles sont manipulés en heure locale,
 ce qui évite un décalage de deux heures sur « premier départ 13:00 ».
 
+**Corrigé le 2026-08-19 par BR-03 : ce paragraphe était faux depuis le début.** `config/app.php`
+codait `'timezone' => 'UTC'` en dur — la valeur du squelette Laravel — donc `APP_TIMEZONE` du
+`.env` n'avait jamais eu le moindre effet et `now()` rendait de l'UTC, deux heures derrière la
+course. Personne ne l'avait vu : aucune donnée temporelle métier n'existait avant `first_start_at`.
+
+La ligne lit désormais `env('APP_TIMEZONE', 'UTC')`, `phpunit.xml` et le workflow d'intégration
+fixent `APP_TIMEZONE=Europe/Paris` — aucun des deux ne le faisait, la CI aurait donc divergé du
+poste en silence — et `tests/Unit/ApplicationTimezoneTest.php` épingle à la fois le fuseau effectif
+et le fait que la configuration le lise dans l'environnement.
+
+C'est exactement le décalage contre lequel BR-04 met en garde. Le corriger à l'arrivée de la
+première heure métier évitait d'avoir à migrer des horaires déjà saisis.
+
 ## D-16 — Aucun graphique : la page statistiques n'affiche que des chiffres
 
 Arbitré le 2026-08-18, en deux temps.
@@ -149,6 +169,128 @@ Fortify envoie en développement : réinitialisation de mot de passe, vérificat
 
 Aucun mail métier n'est prévu — pas de confirmation d'inscription, pas d'alerte d'élimination,
 conformément à D-15. Mailpit est un filet de développement, pas l'amorce d'une fonctionnalité.
+
+## D-29 — Le cycle de vie de l'événement vit dans des classes d'état
+
+Arrêté le 2026-08-19 par BR-03, avec le propriétaire du projet.
+
+`draft → registration → running → finished` est un vrai cycle de vie persisté. Les skills maison
+`laravel:status-lifecycle` et `design-patterns:state` en font une **règle dure** pour un cycle
+neuf : une classe par statut, les transitions illégales qui lèvent. On l'applique.
+
+**Le raisonnement de D-26 ne se transpose pas.** `RunnerStatus` est sans transitions parce qu'il
+est **dérivé** — jamais persisté, jamais franchi. `EventStatus` est l'inverse : une colonne que le
+gérant fait avancer. Le danger que D-26 combat n'est pas « mettre les transitions quelque part »,
+c'est **les déclarer deux fois**. Ici elles ne le sont qu'une : dans les états.
+
+**Variante linéaire, pas la forme canonique du skill.** La chaîne n'a aucun branchement, donc
+chaque état porte un seul `advance()` plutôt que trois méthodes de transition nommées dont neuf
+n'existeraient que pour lever. Ce que ça achète, et qui est le cœur de la story : le saut et le
+retour arrière ne sont pas *rejetés*, ils sont **inexprimables** — aucun appelant n'a d'API pour
+demander `running → registration`. Le `match` de `EventLifecycleFactory` est le seul du dépôt sur
+`EventStatus`, et il est exhaustif : un statut ajouté sans son état échoue à l'analyse statique,
+pas en production.
+
+Coût mesuré face à l'option « enum enrichi + service » : +5 fichiers, +170 lignes triviales,
+écrites une fois. L'option courte aurait listé les statuts dans cinq ou six `match` dont aucun
+n'est exhaustif, et le garde-fou le plus important du produit aurait reposé sur une vérification
+qu'on peut oublier. D-20 ne renverse pas l'arbitrage : ce n'est pas de la dette à amortir sur
+trois ans, c'est le prix d'une soirée où une course lancée par erreur ne se dé-lance pas.
+
+**Interdiction expresse** : ne jamais ajouter `next()` ni `canTransitionTo()` sur `App\Enums\EventStatus`.
+Ce serait la deuxième déclaration de la chaîne, et donc la dérive que tout ceci évite.
+
+## D-30 — Schéma de l'événement : unités entières et instant unique
+
+Arrêté le 2026-08-19 par BR-03.
+
+- **`first_start_at` est une seule colonne datetime**, pas une paire date + heure. BR-04 calcule
+  `premier départ + (N−1) × durée` : il lui faut un instant, et une paire ne dirait pas si le tour
+  12 tombe le 15 ou le 16. L'écran garde deux contrôles, fusionnés côté serveur.
+- **Distance en mètres entiers, durée en minutes entières.** La boucle canonique vaut 6 706 m, un
+  nombre rond en mètres et pas en kilomètres ; un `decimal` se caste en *string* en JSON et ferait
+  de la vitesse de BR-09 une division de flottants. Les deux colonnes sont `unsigned` avec un
+  minimum de 1, donc la distance nulle et la durée négative sont refusées par la colonne
+  elle-même, pas seulement par une règle.
+- **Coordonnées `decimal(10,7)` en base, castées `float`** : le cast `decimal:7` rendrait
+  `"45.7640000"`, que la carte de BR-19 recevrait tel quel. Vérifié par aller-retour en base :
+  aucune perte de précision, un `double` portant 15 à 17 chiffres significatifs pour 10 stockés.
+- **La date et l'heure se tiennent l'une l'autre à la saisie.** L'écran envoie deux contrôles pour
+  une seule colonne ; chacun est obligatoire dès que l'autre est rempli, et vider les deux efface
+  l'heure de premier départ. Sans cette réciprocité, une date saisie sans heure n'atteignait
+  aucune règle et disparaissait derrière un message de succès.
+- **`max_participants` nul signifie « pas de limite »**, jamais zéro. BR-05 doit le lire ainsi.
+- **Aucun index hors clé primaire** : la table porte une ligne (D-20). Ce n'est pas un oubli.
+- **`status` est absent de `#[Fillable]`**, et un test l'affirme : c'est la seule chose entre une
+  requête forgée et une course déclarée terminée. Le modèle porte aussi `draft` en attribut par
+  défaut — le défaut de colonne seul laissait un `firstOrNew()` non enregistré sans statut, et
+  l'écran de configuration tombait sur une base vierge.
+
+## D-31 — Un seul événement, donc un routage singleton
+
+Arrêté le 2026-08-19 par BR-03.
+
+Pas de segment `{event}`, pas de route model binding : `GET /event`, `GET|PUT /manage/event`,
+`POST /manage/event/advance`. L'événement est résolu à l'appel par `firstOrNew()` (l'écran de
+configuration doit fonctionner sur une base jamais semée) ou `firstOrFail()`.
+
+**Création et modification passent par le même `PUT`.** Un seul formulaire, une seule Form Request,
+un seul test. `updateOrCreate()` a été écarté : il court-circuite `#[Fillable]` et la Policy.
+
+**L'unicité est tenue par la base, pas par la convention.** Une revue adverse a relevé que tout le
+code lit l'événement avec `sole()` ou `firstOrFail()` — l'invariant était supposé partout et garanti
+nulle part, et deux premiers enregistrements concurrents auraient créé deux lignes. La table porte
+donc une colonne `singleton` à valeur unique, dont le seul rôle est de rendre la seconde ligne
+impossible.
+
+## D-32 — Un refus de transition est une erreur de validation, pas une exception rendue
+
+Arrêté le 2026-08-19 par BR-03.
+
+`NoTryCatchRule` interdit d'attraper l'exception de transition pour la convertir en erreur de
+formulaire, et Q-02 rappelle qu'aucune page d'erreur Inertia n'existe : un 409 sortirait sur la
+page Symfony par défaut, en anglais, hors de la SPA.
+
+D'où deux canaux, **une seule règle** :
+
+- le gérant qui clique reçoit un **422** — `EventAdvanceRequest::after()` interroge l'état et
+  ajoute les motifs aux erreurs de validation, en français, dans l'écran ;
+- tout appel hors formulaire (seeder, BR-20, onglet périmé côté serveur) reçoit un **409** —
+  `EventTransitionRefusedException` étend `ConflictHttpException`.
+
+La règle n'est pas dupliquée : la Form Request pose la question, l'état y répond, et `advance()`
+lève sur la même condition. L'exception est le filet, pas le canal.
+
+**L'écriture est conditionnelle, et c'est ce qui ferme la fenêtre.** La revue adverse a démontré
+qu'entre la vérification de la Form Request et l'écriture, une requête concurrente pouvait déplacer
+l'événement : le gérant demandait `registration`, la validation approuvait `registration`, et
+l'événement se retrouvait en `running`. `AdvanceEventStatus` reçoit désormais le `to` validé et
+écrit avec `where('status', <statut quitté>)` : zéro ligne touchée signifie que quelqu'un est passé
+avant, et le refus est levé. Aucune transition n'étant réversible, c'était le défaut le plus grave
+de la branche.
+
+Le champ `to` de la route d'avancement n'est pas décoratif : il nomme l'étape que le gérant croyait
+franchir, donc un double clic ou un onglet périmé est refusé au lieu de pousser la course un cran
+trop loin.
+
+**BR-03 ne ferme pas Q-02 et ne l'aggrave pas** : restent les 403 et 409 des chemins d'abus.
+
+## D-33 — `running → finished` est posée par BR-03, la clôture reste à BR-20
+
+Arrêté le 2026-08-19 avec le propriétaire du projet, en écart assumé au « Exclu » de BR-03.
+
+BR-03 rend `finished` atteignable et met l'événement en lecture seule, ce dont BR-17, BR-18 et
+BR-19 ont besoin pour leur règle « consultable dès que l'événement sort de `draft` ». Sans cela,
+`FinishedEventState` resterait sans couverture de bout en bout jusqu'à BR-20 et la Policy devrait
+être rouverte.
+
+Ce qui reste à BR-20, et qui est le vrai contenu de cette story : la confirmation explicite et le
+**classement figé**. BR-03 ne produit aucun classement.
+
+La transition vers `finished` exige `finish-event` ; les deux précédentes exigent `manage-event`.
+`finish-event`, créée sans consommateur par BR-01, en a donc un — sans changement de comportement,
+le rôle gérant portant les neuf permissions. Un test le vérifie avec un utilisateur ne portant que
+`manage-event`, faute de quoi aucun test bâti sur le rôle ne saurait distinguer les deux.
 
 ## D-15 — Hors périmètre, définitivement
 
@@ -317,9 +459,18 @@ le tour est l'unité, on referme la boucle dans l'heure ou on est sorti.
   d'un seul ton en paliers d'opacité — aucun token supplémentaire, aucune collision sémantique.
 - **Aucune librairie de composants ajoutée** : les 22 dossiers shadcn-vue déjà présents
   suffisent. Aucune primitive n'a eu besoin d'être ajoutée.
+  **Amendé le 2026-08-19 par BR-03 :** la 23ᵉ primitive, `textarea`, est arrivée avec le premier
+  champ multiligne du produit. « Aucune librairie ajoutée » reste vrai — la CLI shadcn-vue copie
+  de la source et n'ajoute rien à `package.json` ; le textarea n'utilise que `useVModel`, déjà
+  présent. La recopier à la main aurait dupliqué les quarante utilitaires d'`Input.vue`, dans un
+  fichier soumis au lint alors que `components/ui/*` en est exempté par contrat.
 - **Notation oklch**, pour viser AA au lieu de le deviner. La palette vit dans **trois**
   endroits : `:root`, `.dark`, et le `<style>` anti-flash de `resources/views/app.blade.php`
   que Blade ne peut pas lire depuis le CSS. Un test affirme que les trois concordent.
+- **L'accent tient désormais AA en texte normal.** Il n'était affirmé qu'à 3:1 (grand texte),
+  n'ayant servi qu'à du corps d'affichage ; la puce « inscriptions ouvertes » de BR-03 le porte en
+  `text-sm`. `primary` sur `background` et sur `card` sont passés à 4,5:1 dans le test, et la
+  palette est passée sans retouche — la valeur du token n'a pas bougé.
 - **AA est vérifié par un test, pas par la revue** : `tests/Unit/DesignSystem/PaletteContrastTest.php`
   analyse les tokens, convertit oklch → sRGB et contrôle 65 couples dans les deux thèmes, plus
   la présence de chaque token dans les deux (un token absent de `.dark` se figerait en silence
@@ -424,6 +575,21 @@ désormais en clés françaises.
 Réserve assumée : **aucune vérification statique des clés côté TS** — une faute de frappe
 affiche la clé brute. C'est le prix du choix multi-locale, et il est faible.
 
+**Complété le 2026-08-19 par BR-03**, sur deux points.
+
+Un **troisième groupe, `event`**, rejoint `ui` et `race` dans la liste partagée. Le découpage est
+par domaine — `ui` est le chrome, `race` la course vivante, `event` l'objet racine que reliront
+BR-04, BR-13, BR-20 et BR-23. La liste explicite de D-27 existe précisément pour qu'on y ajoute un
+groupe quand un domaine apparaît ; verser les quarante clés de BR-03 dans `ui` aurait fait du
+groupe « chrome » le fourre-tout du produit dès la troisième story.
+
+Et **`lang/fr/validation.php` existe enfin**. Le projet n'en avait aucun alors que
+`APP_FALLBACK_LOCALE=en` : personne ne l'avait vu parce qu'aucun écran n'avait encore affiché une
+erreur de règle. BR-03 en valide dix champs, et « The name field is required. » aurait été le
+premier message anglais du produit, contre D-14. Le fichier porte les règles réellement utilisées
+plus un bloc `attributes` avec les noms de champs français ; Laravel retombant sur l'anglais clé
+par clé, il n'a pas à être exhaustif.
+
 **Hors périmètre de BR-02** : les écrans hérités du starter kit (auth, réglages, 2FA, passkeys)
 restent en anglais. Voir la question ouverte dans [QUESTIONS.md](QUESTIONS.md).
 
@@ -475,6 +641,12 @@ la première inscription en 500. L'alternative — les rôles en migration de do
 comme le suggère la convention maison de seeder — a été écartée : la story demande un seeder, et on
 perdrait le test « permissions absentes en base → refus », qui est le garde-fou du cas limite le
 plus dangereux. **BR-32 doit porter l'étape de seed dans son runbook.**
+
+**`finish-event` a obtenu son premier consommateur le 2026-08-19** (BR-03) :
+`EventPolicy::advance` l'exige pour la transition vers `finished`, les deux étapes précédentes se
+contentant de `manage-event`. Aucun changement de comportement — le rôle gérant porte les neuf —
+mais la distinction est désormais réelle, et un test la vérifie avec un utilisateur ne portant que
+`manage-event`, faute de quoi aucun test bâti sur le rôle ne saurait la voir.
 
 Enfin, les tests seedent **dans le corps de chaque test** qui en a besoin, jamais via
 `protected $seed`. `RefreshDatabase` ne lance `migrate:fresh --seed` qu'une fois, gardé par un

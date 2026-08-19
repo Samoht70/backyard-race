@@ -104,7 +104,6 @@ class PaletteContrastTest extends TestCase
                 $pairs["{$theme}: {$ink} on {$surface}"] = [$theme, $ink, $surface, self::NORMAL_TEXT];
             }
 
-            $pairs["{$theme}: primary on background"] = [$theme, 'primary', 'background', self::LARGE_TEXT];
             $pairs["{$theme}: ring on background"] = [$theme, 'ring', 'background', self::LARGE_TEXT];
         }
 
@@ -125,6 +124,8 @@ class PaletteContrastTest extends TestCase
             ['muted-foreground', 'card'],
             ['muted-foreground', 'muted'],
             ['primary-foreground', 'primary'],
+            ['primary', 'background'],
+            ['primary', 'card'],
             ['secondary-foreground', 'secondary'],
             ['accent-foreground', 'accent'],
             ['destructive-foreground', 'destructive'],

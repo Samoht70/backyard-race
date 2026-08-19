@@ -27,6 +27,6 @@ return [
     ],
     'manage' => [
         'title' => 'Gestion de la course',
-        'empty' => 'Aucun outil de pilotage n’est encore disponible.',
+        'event' => 'Configurer l’événement',
     ],
 ];

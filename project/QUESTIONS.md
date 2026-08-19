@@ -22,6 +22,15 @@ banal.
 
 À trancher : story dédiée dans l'epic 1, ou rattachement à BR-13 ?
 
+**Point de BR-03 (2026-08-19) : la question ne bouge pas, mais elle a servi.** C'est elle qui a
+décidé du canal de refus d'une transition (D-32) : plutôt que de laisser une exception 409 sortir
+sur la page Symfony, la Form Request ajoute les motifs aux erreurs de validation, et le gérant les
+lit en français dans l'écran. Tous les refus du parcours nominal du gérant passent donc par
+422/Inertia.
+
+Restent, inchangés, les 403 et 409 des chemins d'abus et d'onglet périmé. BR-03 n'aggrave pas la
+question et ne la ferme pas ; BR-13 reste son porteur naturel.
+
 ---
 
 ## Q-01 — Quand traduit-on les écrans hérités du starter kit ?

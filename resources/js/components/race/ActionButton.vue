@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 
 type Props = {
     size?: 'touch' | 'validate';
+    type?: 'button' | 'submit';
     tone?: 'primary' | 'danger' | 'quiet';
     loading?: boolean;
     disabled?: boolean;
@@ -16,6 +17,7 @@ type Props = {
 
 const props = withDefaults(defineProps<Props>(), {
     size: 'touch',
+    type: 'button',
     tone: 'primary',
     loading: false,
     disabled: false,
@@ -48,7 +50,7 @@ const classes = computed(() =>
 
 <template>
     <button
-        type="button"
+        :type="type"
         :class="classes"
         :disabled="disabled || loading"
         :aria-disabled="disabled || undefined"
