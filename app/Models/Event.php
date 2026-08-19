@@ -47,6 +47,15 @@ class Event extends Model
     /** @use HasFactory<EventFactory> */
     use HasFactory;
 
+    /**
+     * A brand new event is a draft. The column default alone would leave an
+     * unsaved firstOrNew() without a status, and the lifecycle would have no
+     * state to build.
+     *
+     * @var array<string, mixed>
+     */
+    protected $attributes = ['status' => EventStatus::Draft->value];
+
     public function lifecycle(): EventLifecycleState
     {
         return app(EventLifecycleFactory::class)->fromStatus($this->status);
