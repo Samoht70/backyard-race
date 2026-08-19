@@ -9,13 +9,10 @@ use App\Models\User;
 
 class EventPolicy
 {
-    /**
-     * Nullable user: the invitation page has to stay answerable for a guest.
-     */
-    public function view(?User $user, Event $event): bool
+    public function view(User $user, Event $event): bool
     {
         return $event->lifecycle()->isVisibleToParticipants()
-            || $user?->can(Permission::ManageEvent->value) === true;
+            || $user->can(Permission::ManageEvent->value);
     }
 
     public function update(User $user, Event $event): bool
