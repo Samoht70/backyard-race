@@ -780,3 +780,103 @@ l'unité réutilisable, la commande est jetable par conception.
 aucune boucle ouverte par BR-08 et aucune élimination par BR-11, sans que rien ne l'affiche. C'est
 la panne silencieuse que BR-30 nomme. BR-04 y répond dans son budget par le rattrapage contigu et
 par l'affichage recalculé qui rend l'écart visible ; l'alerte reste à BR-30.
+
+## D-38 — L'identité du coureur vit sur le compte, scindée en prénom et nom
+
+Arrêté le 2026-08-19 avec le propriétaire du projet, par BR-05.
+
+Le « Inclus » de BR-05 liste prénom, nom et email parmi les champs du formulaire d'inscription.
+Les recopier dans `participants` aurait donné deux sources pour la même donnée : un coureur qui
+corrige son profil aurait laissé son ancien nom sur son dossard. `participants` porte donc le
+`user_id` et les seules données de course — téléphone, date de naissance, contact d'urgence,
+remarques — et l'identité se lit sur `users`.
+
+**`users.name` est scindé en `first_name` / `last_name`.** `RunnerCard`, écrit en BR-02, attend
+déjà `firstName` et `lastName` séparés, et BR-25 imprimera le dossard à partir des deux. Un nom
+complet ne se recoupe pas de façon fiable — un « Marie Claire Dupont » se scinde de trois façons.
+Un accesseur `name` (avec `$appends`) rend la concaténation, ce qui laisse l'avatar, le menu
+utilisateur et `getInitials()` intacts.
+
+La migration `create_users_table` a été **modifiée sur place** plutôt que doublée d'une migration
+de scission : rien n'est déployé, une reprise n'aurait eu aucune ligne à convertir. C'est le
+raisonnement qui avait déjà fait supprimer une migration en BR-04 (D-35).
+
+`profileRules()` renvoie désormais `first_name`, `last_name` et `email` ; l'écran de réglages et
+l'écran d'inscription y puisent tous les deux, donc ils ne peuvent pas diverger.
+
+## D-39 — La capacité se compte sur les inscriptions confirmées, la vraie course à la place est en BR-06
+
+Arrêté le 2026-08-19 avec le propriétaire du projet, par BR-05.
+
+BR-05 dit « quand le nombre d'inscriptions **confirmées** atteint le maximum, le formulaire
+n'accepte plus de nouvelle inscription ». On applique la lettre : `Event::isFull()` compte les
+`confirmed`, et `max_participants === null` signifie « pas de limite » (D-30), jamais zéro.
+
+**Conséquence assumée, à connaître avant d'écrire BR-06.** Comme une inscription naît en
+`pending`, le plafond n'est jamais atteint par une inscription. Le cas limite « deux inscriptions
+simultanées sur la dernière place » de BR-05 ne peut donc pas se produire ici : la vraie course à
+la dernière place se joue à la **confirmation**, et c'est BR-06 qui devra la fermer — vraisemblablement par une écriture conditionnelle, comme `AdvanceEventStatus` en D-32.
+
+La seule concurrence réelle de BR-05 est la double inscription d'un même compte, et elle est
+fermée par la base : `unique(['event_id', 'user_id'])`. Même doctrine qu'en D-31 et D-37 —
+l'invariant est tenu par le schéma, pas par un `if` qui lit puis écrit. Le 403 que reçoit un
+doublon passé par le contrôleur est une politesse ; l'index est la garantie, et un test l'attaque
+directement pour que ça reste vrai.
+
+`EventUpdateRequest` plafonne enfin `max_participants` par le bas au nombre de confirmés, la règle
+que BR-03 n'avait pas pu écrire faute de table `participants`.
+
+## D-40 — `RegistrationStatus` nomme les états, BR-06 possède les transitions
+
+Arrêté le 2026-08-19 par BR-05. Même partage qu'entre `EventStatus` et `App\Services\EventLifecycle`
+(D-29) : l'énumération porte les trois états persistés et leurs libellés, rien d'autre.
+
+Qui a le droit de passer `pending → confirmed` ou `pending → cancelled`, et par quel canal, est le
+sujet de BR-06. L'écrire ici aurait produit une règle sans consommateur, donc sans
+test, donc fausse au premier usage. La permission `manage-participants` existe depuis BR-01 et
+reste sans consommateur pour la même raison.
+
+Côté participant, la Policy dit la seule règle que BR-05 possède : une inscription `confirmed`
+n'est plus modifiable par son propriétaire.
+
+## D-41 — Le routage de l'inscription est un singleton, comme l'événement
+
+Arrêté le 2026-08-19 avec le propriétaire du projet, par BR-05.
+
+Un compte porte au plus une inscription sur l'unique événement : l'URL n'a donc pas d'identifiant
+à porter. `Route::singleton('registration', RegistrationController::class)->creatable()` produit
+exactement les cinq routes voulues — `registration/create`, `POST registration`, `registration`,
+`registration/edit`, `PUT registration` — sans segment `{registration}`.
+
+`Route::resource()` avait été proposé d'abord. Il aurait généré `GET /registration/{registration}`,
+donc un route model binding sur l'identifiant d'un autre coureur, à refuser ensuite par Policy.
+Le singleton supprime la question au lieu de la traiter : le contrôleur résout la fiche depuis
+`$request->user()->participant`, et il n'existe aucune URL désignant celle de quelqu'un d'autre.
+
+`destroy` est exclu : un coureur ne s'annule pas lui-même, c'est le gérant qui annule (BR-06).
+
+La même déclaration a été passée sur l'événement, public comme géré : `Route::singleton('event', …)`
+remplace les trois routes unitaires qui les déclaraient, aux mêmes noms de route.
+
+## D-42 — Q-01 se ferme à moitié : les 7 écrans d'authentification passent en français
+
+Arrêté le 2026-08-19 avec le propriétaire du projet, par BR-05.
+
+Q-01 constatait qu'un coureur voit `/login` et `/register` en anglais avant d'atteindre le moindre
+écran BR-02. BR-05 est le foyer naturel du parcours d'inscription : les 7 pages `pages/auth/*`
+passent donc en français, via un nouveau groupe `lang/fr/auth.php` ajouté aux groupes partagés.
+
+Ce groupe porte **aussi** les clés que Laravel et Fortify lisent eux-mêmes — `failed`, `password`,
+`throttle` — donc un mot de passe erroné répond désormais en français, ce qu'aucune story n'avait
+prévu.
+
+Deux points techniques valent d'être connus :
+
+- le titre de la page d'authentification passe de `defineOptions({ layout: … })` à
+  `setLayoutProps()`. Une traduction lue à l'évaluation du module n'a pas encore de props de page
+  à lire — le titre serait sorti en clé brute. `TwoFactorChallenge` utilisait déjà `setLayoutProps`.
+- `t()` accepte désormais des remplacements (`t('registration.seats.counted', { count, max })`),
+  ce dont le compteur de places avait besoin.
+
+**Q-01 reste ouverte** pour les 3 pages `pages/settings/*` et les composants passkeys / 2FA, qui
+n'ont toujours pas de propriétaire.

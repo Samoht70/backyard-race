@@ -29,6 +29,8 @@ return [
 
     'attributes' => [
         'name' => 'nom',
+        'first_name' => 'prénom',
+        'last_name' => 'nom',
         'description' => 'description',
         'first_start_at' => 'heure du premier départ',
         'start_date' => 'date',

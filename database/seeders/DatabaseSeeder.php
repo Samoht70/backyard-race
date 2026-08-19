@@ -21,5 +21,7 @@ class DatabaseSeeder extends Seeder
         User::factory()->manager()->create(['email' => 'manager@backyard.test']);
         User::factory()->participant()->create(['email' => 'participant@backyard.test']);
         User::factory()->count(29)->participant()->create();
+
+        $this->call(ParticipantSeeder::class);
     }
 }

@@ -33,6 +33,7 @@ export type EventDetails = {
     latitude: number | null;
     longitude: number | null;
     max_participants: number | null;
+    confirmed_participants: number;
 };
 
 export type EventTransition = {

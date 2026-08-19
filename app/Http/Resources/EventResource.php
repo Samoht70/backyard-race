@@ -31,6 +31,7 @@ class EventResource extends JsonResource
             'latitude' => $this->latitude,
             'longitude' => $this->longitude,
             'max_participants' => $this->max_participants,
+            'confirmed_participants' => $this->confirmedParticipantsCount(),
         ];
     }
 }

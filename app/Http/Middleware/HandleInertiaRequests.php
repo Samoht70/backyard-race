@@ -17,7 +17,7 @@ class HandleInertiaRequests extends Middleware
      * dotted keys. Groups rendered only by PHP (validation, mail) stay out:
      * shipping them would put every framework message in every response.
      */
-    private const SHARED_TRANSLATION_GROUPS = ['ui', 'race', 'event'];
+    private const SHARED_TRANSLATION_GROUPS = ['ui', 'race', 'event', 'registration', 'auth'];
 
     /**
      * The root template that's loaded on the first page visit.
