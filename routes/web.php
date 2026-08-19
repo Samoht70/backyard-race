@@ -4,6 +4,7 @@ use App\Enums\Permission;
 use App\Http\Controllers\DesignSystemController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\Manage;
+use App\Http\Controllers\RegistrationController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'Welcome')->name('home');
@@ -14,6 +15,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');
 
     Route::get('event', [EventController::class, 'show'])->name('event.show');
+
+    Route::singleton('registration', RegistrationController::class)
+        ->creatable()
+        ->only(['create', 'store', 'show', 'edit', 'update']);
 
     Route::middleware('can:'.Permission::ManageEvent->value)
         ->prefix('manage')

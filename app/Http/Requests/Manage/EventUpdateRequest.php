@@ -65,7 +65,12 @@ class EventUpdateRequest extends FormRequest
             'address' => ['nullable', 'string', 'max:255'],
             'latitude' => ['nullable', 'numeric', 'between:-90,90', 'required_with:longitude'],
             'longitude' => ['nullable', 'numeric', 'between:-180,180', 'required_with:latitude'],
-            'max_participants' => ['nullable', 'integer', 'min:1', 'max:1000'],
+            'max_participants' => [
+                'nullable',
+                'integer',
+                'min:'.max(1, $this->event()->confirmedParticipantsCount()),
+                'max:1000',
+            ],
         ];
     }
 
