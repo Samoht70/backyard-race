@@ -27,6 +27,7 @@ class EventFactory extends Factory
         return [
             'name' => 'Backyard '.fake()->lastName(),
             'description' => fake()->paragraph(),
+            'briefing' => __('briefing.default'),
             'status' => EventStatus::Draft,
             'first_start_at' => CarbonImmutable::parse('next saturday 13:00'),
             'lap_distance_meters' => 6706,

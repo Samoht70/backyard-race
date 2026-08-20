@@ -1417,3 +1417,91 @@ La position (« 2 sur 4 »), un retour arrière qui ne perd rien de ce qui est d
 déplacé en tête d'étape au changement pour que le lecteur d'écran suive, et des cibles tactiles au
 plancher de 44 px (D-46). Une étape qui avance sans annoncer où l'on en est est une page longue
 déguisée.
+
+## D-51 — Le briefing stocke du Markdown nettoyé, et le rend en HTML à chaque affichage
+
+Arrêté le 2026-08-20 par BR-17, avec le propriétaire du projet pour les deux arbitrages d'écran.
+
+Le briefing est le seul endroit du produit où du texte mis en forme entre par un formulaire et
+ressort dans une page. D-47 avait réduit la story à 2 points en tranchant « Markdown dans un
+`textarea` », en maintenant que « le nettoyage à l'entrée reste non négociable ». Voici comment.
+
+### La colonne stocke la source, jamais le rendu
+
+`events.briefing` porte le Markdown, et `Str::markdown()` produit le HTML à chaque affichage. Deux
+raisons, et la seconde est la vraie :
+
+- le gérant réédite le texte qu'il a tapé. Une colonne de HTML aurait exigé un dé-rendu
+  HTML → Markdown, ou un `textarea` où le gérant relit `<h1>Consignes</h1>` ;
+- une option de sécurité qui change demain couvre alors **tout** l'existant. Du HTML stocké est
+  figé au jour de son écriture : plus filtrable, et plus rien à faire sans migration de données.
+
+Pas de colonne `briefing_html`, pas de cache : une ligne, une page, quarante lecteurs.
+
+### Deux barrières, deux rôles distincts
+
+`Briefing::clean()` à l'entrée garantit ce que le critère d'acceptation demande littéralement — la
+**colonne** ne contient aucune balise. `html_input=strip` et `allow_unsafe_links=false` au rendu
+garantissent qu'aucun HTML ni URL exécutable ne **sort**, y compris sur les variantes que le
+nettoyage d'entrée ne prétend pas voir (`JaVaScRiPt:` en casse mélangée, entités déjà encodées).
+Le nettoyage rend `strip` sans effet sur les contenus neufs : c'est voulu, la barrière de rendu est
+le filet, pas le mécanisme.
+
+Trois détails du nettoyage sont load-bearing, chacun tenu par un test :
+
+- l'élément à contenu brut part **avec son corps**. `strip_tags` seul rend `alert(1)` en texte
+  visible — la balise disparaît, le script reste lisible dans la page ;
+- la balise **non refermée** est couverte, sinon `<script>alert(1)` sans fermeture traverse ;
+- une balise n'est reconnue que sur `<` suivi d'une **lettre**, donc `3 < 5`, `x <= 10` et `j <3`
+  reviennent octet pour octet. Et les entités ne sont **jamais** décodées : décoder
+  `&lt;script&gt;` refabriquerait la balise qu'on vient d'interdire.
+
+Aucun paquet n'a été ajouté : `league/commonmark` arrive avec le framework, et le HTML autorisé est
+l'ensemble vide — HTMLPurifier n'aurait rien à autoriser.
+
+### Le nettoyage vit dans le Form Request, pas dans un cast
+
+Un cast aurait couvert tous les chemins d'écriture, seeder et `tinker` compris. Il aurait aussi
+nettoyé **après** la validation, donc `required` et `max:` auraient compté un contenu que personne
+ne stocke. Dans `prepareForValidation()`, un envoi qui n'était *que* du script est refusé au lieu
+d'être stocké vide — c'est cette règle, et non le repli d'affichage, qui empêche une page blanche
+côté gérant. Le repli `Briefing::orDefault()` couvre l'autre moitié : un événement créé par l'écran
+de configuration n'a pas de briefing du tout.
+
+Le contenu initial vit donc dans `lang/fr/briefing.php`, lu par `EventFactory` — le seeder le livre
+sans une ligne de changement — et comme repli. Ce groupe n'est **pas** partagé au front : c'est du
+contenu résolu côté serveur, qui arrive par les props.
+
+### La colonne reste hors `#[Fillable]`
+
+Le jeu fillable de l'événement est le formulaire de configuration : `EventUpdateRequest::rules()` le
+reflète, `EVENT_FIELDS` le reflète côté TypeScript, et `EventLifecycleTest` assère
+`getFillable() === frozenAttributes()`. Le briefing répond à une **autre** permission ; l'y ajouter
+aurait ouvert un chemin d'écriture par `fill()` depuis l'écran de configuration, et fait grossir la
+liste des champs gelés d'un champ que ce formulaire ne rend pas. Il s'écrit donc par affectation
+directe, comme `status`.
+
+### Deux écrans, et le gel à « terminé »
+
+Deux arbitrages du propriétaire, contre la lettre du critère d'acceptation (« le gérant sur la page
+briefing ») :
+
+- **deux écrans**, `/briefing` en lecture et `/manage/briefing` en édition, parce que le produit
+  sépare partout la consultation de la gestion et qu'un écran mixte aurait été le seul du lot ;
+- **le briefing se gèle quand l'événement est `finished`**, comme la configuration. `manage-event`
+  et `manage-documents` obéissent alors à la même règle de fin de course, et l'écran d'édition rend
+  le briefing au lieu du formulaire.
+
+`manage-documents` a enfin un consommateur : elle ferme la route par middleware et la requête par
+`EventPolicy::updateBriefing`, exactement comme `manage-event` sur la configuration. La lecture, en
+revanche, n'a demandé aucune ligne d'autorisation : `EventPolicy::view` donnait déjà « refusé en
+`draft`, visible au gérant ».
+
+### Ce que le HTML rendu emporte, et ce qu'on ne bride pas
+
+`Str::markdown` utilise le convertisseur GitHub : tables, autolinks et cases à cocher passent en
+plus des « titres, listes, gras, émoji » de la story. Surensemble inoffensif, non bridé. Le rendu
+est injecté par un composant unique, pour que l'unique `v-html` du front ait un seul point à
+relire, et il est stylé par un bloc `@utility briefing` dans la feuille de style — un plugin
+`@tailwindcss/typography` et sa configuration de thème ne se paient pas pour une page, et le bloc
+parle les tokens du projet.

@@ -47,5 +47,6 @@ return [
         'title' => 'Gestion de la course',
         'event' => 'Configurer l’événement',
         'registrations' => 'Gérer les inscriptions',
+        'briefing' => 'Rédiger le briefing',
     ],
 ];

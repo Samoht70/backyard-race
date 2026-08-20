@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\Permission;
+use App\Http\Controllers\BriefingController;
 use App\Http\Controllers\DesignSystemController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\Manage;
@@ -21,6 +22,9 @@ Route::middleware('auth')
         Route::singleton('event', EventController::class)
             ->only(['show']);
 
+        Route::singleton('briefing', BriefingController::class)
+            ->only(['show']);
+
         Route::singleton('registration', RegistrationController::class)
             ->only(['show', 'edit', 'update']);
 
@@ -35,6 +39,12 @@ Route::middleware('auth')
                             ->only(['edit', 'update']);
 
                         Route::post('event/advance', Manage\AdvanceEventController::class)->name('event.advance');
+                    });
+
+                Route::middleware('can:'.Permission::ManageDocuments->value)
+                    ->group(function () {
+                        Route::singleton('briefing', Manage\BriefingController::class)
+                            ->only(['edit', 'update']);
                     });
 
                 Route::middleware('can:'.Permission::ManageParticipants->value)

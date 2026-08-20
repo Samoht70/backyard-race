@@ -16,6 +16,18 @@ return [
         'missing_lap_duration' => 'La durée d’une boucle n’est pas renseignée.',
         'illegal_transition' => 'Cette étape n’est pas la suivante : recharge la page.',
     ],
+    'briefing' => [
+        'title' => 'Briefing',
+        'description' => 'Ce qu’il faut savoir avant de prendre le départ.',
+        'manage_title' => 'Briefing de la course',
+        'manage_description' => 'Ce texte est lu par tous les coureurs inscrits. Markdown accepté : titres, listes, gras.',
+        'field' => 'Contenu du briefing',
+        'hint' => '# pour un titre, - pour une liste, **gras** pour insister.',
+        'save' => 'Enregistrer le briefing',
+        'saved' => 'Briefing enregistré.',
+        'readonly_title' => 'Événement terminé',
+        'readonly_description' => 'La course est close : le briefing n’est plus modifiable.',
+    ],
     'manage' => [
         'title' => 'Configuration de l’événement',
         'description' => 'Ces informations pilotent les inscriptions et les horaires de la course.',
