@@ -11,6 +11,7 @@ import {
 import type { RegistrationStatus } from '@/types/registration';
 
 type Props = {
+    bib: string | null;
     firstName: string;
     lastName: string;
     status: RegistrationStatus;
@@ -29,6 +30,10 @@ const statusLabel = computed(() => t(registrationStatusLabelKey(props.status)));
     <div
         class="flex min-h-[4.25rem] min-w-0 items-center gap-2 bg-card px-3 py-2.5"
     >
+        <span class="w-9 shrink-0 font-mono text-data font-bold tabular-nums">{{
+            bib ?? '—'
+        }}</span>
+
         <component
             :is="href ? Link : 'div'"
             :href="href"

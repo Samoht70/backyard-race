@@ -6,6 +6,7 @@ import EventField from '@/components/event/EventField.vue';
 import EventFieldset from '@/components/event/EventFieldset.vue';
 import Heading from '@/components/Heading.vue';
 import ActionButton from '@/components/race/ActionButton.vue';
+import StatCounter from '@/components/race/StatCounter.vue';
 import RegistrationActionForm from '@/components/registration/RegistrationActionForm.vue';
 import RegistrationFields from '@/components/registration/RegistrationFields.vue';
 import RegistrationStatusBadge from '@/components/registration/RegistrationStatusBadge.vue';
@@ -52,6 +53,20 @@ setLayoutProps({
             <h1 class="text-title">{{ fullName }}</h1>
             <RegistrationStatusBadge :status="registration.status" />
         </header>
+
+        <div class="flex flex-col gap-1">
+            <StatCounter
+                :value="registration.bib_label"
+                :label="t('registration.manage.bib')"
+                size="lg"
+            />
+            <p
+                v-if="registration.bib_label === null"
+                class="text-sm text-muted-foreground"
+            >
+                {{ t('registration.manage.no_bib') }}
+            </p>
+        </div>
 
         <Card>
             <CardHeader>

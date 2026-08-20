@@ -39,7 +39,7 @@ fichier de story : il vit dans une **décision** et prend une ligne dans le tabl
 | [BR-04](stories/BR-04-horaires-boucles.md) | Horaires des boucles calculés automatiquement | 5 | ✅ Terminé |
 | [BR-05](stories/BR-05-inscription.md) | Inscription d'un participant | 8 | ✅ Terminé |
 | [BR-06](stories/BR-06-gestion-inscriptions.md) | Gestion des inscriptions par le gérant | 5 | ✅ Terminé |
-| [BR-07](stories/BR-07-numero-dossard.md) | Attribution automatique du numéro de dossard | 5 | À faire |
+| [BR-07](stories/BR-07-numero-dossard.md) | Attribution automatique du numéro de dossard | 5 | ✅ Terminé |
 
 ### EPIC 2 — Moteur de course
 
@@ -107,7 +107,7 @@ pas de fichier de story mais du code en production et une décision qui les port
 | R-02 | Inscription par mail en cinq étapes, code d'accès en guise de mot de passe | 8 | [D-45](DECISIONS.md) |
 | R-03 | Direction artistique « Tableau des départs » à la place de « Corral » | 8 | [D-46](DECISIONS.md) |
 
-**Total : 29 stories actives + 3 reprises · 215 pts · 77 pts livrés (36 %)**
+**Total : 29 stories actives + 3 reprises · 215 pts · 82 pts livrés (38 %)**
 
 **Hors périmètre : 4 stories abandonnées, 32 pts non engagés** — voir [D-47](DECISIONS.md).
 

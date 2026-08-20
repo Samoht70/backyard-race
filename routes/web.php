@@ -43,10 +43,8 @@ Route::middleware('auth')
                             ->only(['index', 'edit', 'update'])
                             ->parameters(['registrations' => 'participant']);
 
-                        Route::post(
-                            'registrations/{participant}/transition',
-                            Manage\RegistrationTransitionController::class,
-                        )->name('registrations.transition');
+                        Route::post('registrations/{participant}/transition', Manage\RegistrationTransitionController::class)
+                            ->name('registrations.transition');
                     });
             });
     });

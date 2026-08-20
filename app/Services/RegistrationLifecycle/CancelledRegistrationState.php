@@ -42,4 +42,9 @@ final class CancelledRegistrationState implements RegistrationLifecycleState
     {
         return false;
     }
+
+    public function assignsBibNumber(): bool
+    {
+        return false;
+    }
 }

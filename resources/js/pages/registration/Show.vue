@@ -29,6 +29,14 @@ defineOptions({
 const isCancelled = computed(() => props.registration.status === 'cancelled');
 
 const facts = computed(() => [
+    ...(props.registration.bib_label === null
+        ? []
+        : [
+              {
+                  term: t('registration.field.bib'),
+                  detail: props.registration.bib_label,
+              },
+          ]),
     {
         term: t('registration.field.email'),
         detail: props.registration.email,

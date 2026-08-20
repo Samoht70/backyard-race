@@ -4,6 +4,7 @@ namespace App\Http\Resources\Manage;
 
 use App\Enums\RegistrationTransition;
 use App\Models\Participant;
+use App\Support\BibNumber;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -21,6 +22,8 @@ class RegistrationResource extends JsonResource
             'id' => $this->id,
             'status' => $this->status->value,
             'status_label' => $this->status->label(),
+            'bib_number' => $this->bib_number,
+            'bib_label' => BibNumber::label($this->bib_number),
             'first_name' => $this->user->first_name,
             'last_name' => $this->user->last_name,
             'email' => $this->user->email,

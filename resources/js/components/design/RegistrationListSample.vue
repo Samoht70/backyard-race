@@ -12,6 +12,7 @@ import type {
 } from '@/types/registration';
 
 type Sample = {
+    bib: string | null;
     firstName: string;
     lastName: string;
     status: RegistrationStatus;
@@ -20,18 +21,21 @@ type Sample = {
 
 const registrations: Sample[] = [
     {
+        bib: null,
         firstName: 'Marie',
         lastName: 'Lambert',
         status: 'pending',
         transition: 'confirm',
     },
     {
+        bib: '007',
         firstName: 'Thomas',
         lastName: 'Pierre',
         status: 'confirmed',
         transition: 'cancel',
     },
     {
+        bib: '003',
         firstName: 'Jean-Baptiste',
         lastName: 'de la Vallée-Poussin-Longuet',
         status: 'cancelled',
@@ -45,6 +49,7 @@ const registrations: Sample[] = [
         <RegistrationSlat
             v-for="registration in registrations"
             :key="registration.lastName"
+            :bib="registration.bib"
             :first-name="registration.firstName"
             :last-name="registration.lastName"
             :status="registration.status"

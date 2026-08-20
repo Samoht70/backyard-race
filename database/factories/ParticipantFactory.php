@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Actions\NextBibNumber;
 use App\Enums\RegistrationStatus;
 use App\Models\Event;
 use App\Models\Participant;
@@ -32,7 +33,21 @@ class ParticipantFactory extends Factory
 
     public function confirmed(): static
     {
-        return $this->withStatus(RegistrationStatus::Confirmed);
+        return $this->withStatus(RegistrationStatus::Confirmed)
+            ->afterCreating(function (Participant $participant): void {
+                if ($participant->bib_number !== null) {
+                    return;
+                }
+
+                $participant->forceFill([
+                    'bib_number' => app(NextBibNumber::class)($participant->event),
+                ])->save();
+            });
+    }
+
+    public function withBib(int $number): static
+    {
+        return $this->state(fn (array $attributes): array => ['bib_number' => $number]);
     }
 
     public function cancelled(): static

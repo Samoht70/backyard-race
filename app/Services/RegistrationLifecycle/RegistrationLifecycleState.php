@@ -33,4 +33,6 @@ interface RegistrationLifecycleState
     public function isEditableByRunner(): bool;
 
     public function consumesASeat(): bool;
+
+    public function assignsBibNumber(): bool;
 }

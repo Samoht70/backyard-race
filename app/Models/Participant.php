@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $event_id
  * @property int $user_id
  * @property RegistrationStatus $status
+ * @property int|null $bib_number
  * @property string $phone
  * @property CarbonImmutable $birth_date
  * @property string $emergency_contact_name
@@ -70,6 +71,7 @@ class Participant extends Model
     {
         return [
             'status' => RegistrationStatus::class,
+            'bib_number' => 'integer',
             'birth_date' => 'immutable_date',
         ];
     }

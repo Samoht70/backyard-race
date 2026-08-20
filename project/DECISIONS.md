@@ -1290,3 +1290,73 @@ refus sur une ligne s'affiche sous les quarante boutons.
 
 `BoardFilter` ne connaît ni `RegistrationStatus` ni `RunnerStatus` : il reçoit des options déjà
 construites par la page. BR-14 aura besoin de la même forme à quatre vues.
+
+## D-49 — Le dossard : verrou plutôt que réessai, unicité en base, formatage en PHP
+
+Arrêté le 2026-08-20 par BR-07.
+
+**Le numéro voyage dans le même `UPDATE` que le statut.** C'est ce qui rend un second dossard
+impossible sans un second changement de statut : pas une vérification, l'atomicité de l'écriture.
+Il est lu sous le verrou de ligne que `TransitionRegistration` tient déjà (D-48), donc deux
+confirmations concurrentes ne peuvent pas tirer le même numéro.
+
+**Les deux autres stratégies sont fermées par l'outillage, pas par le goût :**
+
+- `max + 1` puis **réessai sur violation d'unicité** — `NoTryCatchRule` interdit le `try/catch`
+  que ça exige. La règle n'admet pas d'exception, et c'est heureux : le réessai aurait masqué la
+  vraie cause d'une collision.
+- **insertion conditionnelle** — MySQL refuse une sous-requête portant sur la table cible d'un
+  `UPDATE` (erreur 1093).
+
+`unique(['event_id', 'bib_number'])`, sur le patron de `unique(['event_id','number'])` de `rounds`,
+reste **la** garantie — BR-07 l'exige littéralement, « garanti en base et pas seulement dans le
+code ». Un test l'attaque directement par une écriture forcée, au lieu de supposer qu'elle tient.
+
+**La colonne est nullable, et c'est la sémantique, pas une tolérance.** Une inscription est numérotée
+à la confirmation et jamais avant ; MySQL considère les `NULL` comme distincts, donc les vingt-huit
+inscriptions en attente cohabitent sous l'index unique.
+
+### `max + 1` égale « le plus petit non utilisé », mais seulement parce qu'on ne supprime jamais
+
+BR-07 dit « le plus petit entier positif non encore utilisé » en règle métier et « le premier libre
+au-delà du plus grand attribué » en critère d'acceptation. Les deux lectures coïncident **parce que
+BR-06 interdit la suppression** : une inscription annulée garde sa ligne et son numéro, donc le plus
+grand attribué est aussi le plus grand utilisé.
+
+C'est un équilibre à connaître : une story qui supprimerait un participant casserait la règle métier
+sans faire rougir un test. Le jour où ça arrive, c'est ici qu'il faut revenir.
+
+### Le formatage vit en PHP, contrairement à la carte de statuts
+
+Le raisonnement de D-26 — Tailwind ne voit pas une classe venue du PHP, une icône Lucide est un
+composant Vue — **ne s'applique pas** à un remplissage de zéros. TypeScript ne porterait ici aucun
+fait propre : ce serait une seconde déclaration gratuite, donc un second test de parité à écrire
+pour rien.
+
+`App\Support\BibNumber::label()` est donc l'unique déclaration, sur le patron d'`App\Support\AccessCode`,
+et les Resources exposent **les deux** : `bib_number` pour trier et comparer, `bib_label` pour
+afficher. Le cas limite « au-delà de la centaine » est gratuit. La planche de galerie perd son
+`padStart` codé en dur, qui était le seul appelant concurrent.
+
+Écarté au passage : un accessor sur `Participant` (`no-fat-models` — c'est de la présentation) et un
+value object avec cast Eloquent (l'invariant est déjà tenu par la colonne et l'index ; le seul fait
+partagé est le format, donc une fonction pure suffit).
+
+### L'invariant « confirmé ⇒ numéroté » est celui de l'action, pas du schéma
+
+`ParticipantFactory::confirmed()` numérote ce qu'elle crée, sinon la trentaine de tests qui
+fabriquent un confirmé le feraient sans numéro et l'invariant serait faux dès le premier. L'état
+`withBib()` reste prioritaire — la garde `bib_number !== null` est là pour ça, et deux tests
+combinent les deux. `ParticipantSeeder` n'a rien à changer : il passe déjà par `confirmed()`, donc
+la base de développement reste cohérente.
+
+Ce que ça ne garantit pas : rien n'empêche une écriture à la main de laisser un confirmé sans
+numéro. La colonne reste nullable, l'invariant vaut l'action. C'est dit plutôt que promis.
+
+### Pas de test de concurrence réelle, et c'est délibéré
+
+PHPUnit avec `RefreshDatabase` tourne sur une connexion unique, dans une transaction : un test à deux
+connexions serait soit sauté, soit vert sans avoir rien exercé — le pire des cas, un garde-fou qui
+rassure sans mesurer. Les deux mécanismes sont testés séparément et pour de vrai : l'écriture
+conditionnelle par `it_refuses_a_registration_someone_else_already_moved`, l'index unique par
+`it_lets_the_database_refuse_a_duplicate_number`.
