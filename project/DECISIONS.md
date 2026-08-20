@@ -1544,8 +1544,15 @@ conteneur et le navigateur doivent donc désigner le stockage par le même `hôt
 signature est rejetée — RustFS répond alors `InvalidAccessKeyId`, ce qui envoie chercher un problème
 de clés qui n'existe pas. En développement, cela demande deux choses : RustFS écoute désormais, dans
 le réseau Docker, sur le port qu'il publie (`FORWARD_RUSTFS_PORT` pilote les deux), et **chaque poste
-doit résoudre `rustfs` vers `127.0.0.1`** dans son fichier hosts. En production, un endpoint public
-unique rend la question sans objet.
+doit résoudre `rustfs` vers `127.0.0.1`**.
+
+Cette entrée va dans le fichier hosts du **système qui fait tourner le navigateur** — sous WSL, celui
+de Windows (`C:\Windows\System32\drivers\etc\hosts`), pas le `/etc/hosts` de la distribution.
+WSL en hérite de toute façon : son `resolv.conf` pointe sur le proxy DNS de Windows, qui lit ce même
+fichier. Le poste du propriétaire la portait déjà, posée par un projet antérieur, ce qui a fait
+passer la contrainte inaperçue à la livraison.
+
+En production, un endpoint public unique rend la question sans objet.
 
 ### Une règle de validation maison plutôt que `mimes:`
 

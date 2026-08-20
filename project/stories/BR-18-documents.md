@@ -103,7 +103,8 @@ Le téléchargement devait être servi par une route contrôlée. Il l'est final
 temporaire signée**, produite uniquement dans un contrôleur ayant déjà passé la Policy. L'écart à
 D-08 — une URL présignée reste un accès anonyme, borné à sept jours — est arbitré et documenté en
 [D-52](../DECISIONS.md), avec sa conséquence en développement : le conteneur et le navigateur
-doivent désigner le stockage par le même `hôte:port`, sinon SigV4 rejette la signature.
+doivent désigner le stockage par le même `hôte:port`, sinon SigV4 rejette la signature. Sous WSL,
+l'entrée `rustfs` va dans le fichier hosts de Windows, dont la distribution hérite.
 
 ## Tâches
 
