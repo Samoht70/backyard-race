@@ -65,6 +65,14 @@ class Event extends Model
     }
 
     /**
+     * @return HasMany<Document, $this>
+     */
+    public function documents(): HasMany
+    {
+        return $this->hasMany(Document::class)->orderBy('title');
+    }
+
+    /**
      * @return HasMany<Participant, $this>
      */
     public function participants(): HasMany
