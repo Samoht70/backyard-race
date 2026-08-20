@@ -35,12 +35,12 @@ briefing. Ce qui manque tient en quatre entrées : trois stories et une reprise.
 | Ordre | ID | Story | Pts | Pourquoi dans le lot |
 |-------|----|-------|-----|----------------------|
 | ✅ | [BR-17](stories/BR-17-briefing.md) | Briefing éditable | 2 | Dit comment se déroule l'événement |
-| 1 | [BR-18](stories/BR-18-documents.md) | Documents de l'événement, GPX compris | 4 | Règlement, consignes, logement, trace |
-| 2 | [BR-34](stories/BR-34-numero-pps.md) | Numéro PPS demandé à l'inscription | 2 | Le dernier champ qui manque au formulaire |
-| 3 | R-04 | Formulaire d'inscription en étapes | 5 | Reprise de l'écran de D-45, portée par [D-50](DECISIONS.md) |
-| 4 | [BR-33](stories/BR-33-acces-parcours-coureur.md) | Accès du coureur à son inscription | 5 | Branche le tout dans la navigation |
+| ✅ | [BR-18](stories/BR-18-documents.md) | Documents de l'événement, GPX compris | 4 | Règlement, consignes, logement, trace |
+| 1 | [BR-34](stories/BR-34-numero-pps.md) | Numéro PPS demandé à l'inscription | 2 | Le dernier champ qui manque au formulaire |
+| 2 | R-04 | Formulaire d'inscription en étapes | 5 | Reprise de l'écran de D-45, portée par [D-50](DECISIONS.md) |
+| 3 | [BR-33](stories/BR-33-acces-parcours-coureur.md) | Accès du coureur à son inscription | 5 | Branche le tout dans la navigation |
 
-**18 pts, dont 2 livrés.** BR-34 passe avant R-04 pour que le découpage en étapes place un
+**18 pts, dont 6 livrés.** BR-34 passe avant R-04 pour que le découpage en étapes place un
 formulaire déjà complet, plutôt que d'avoir à loger un champ de plus après coup. BR-33 ferme le lot
 plutôt qu'elle ne l'ouvre : c'est elle qui pose les entrées de navigation vers le briefing, les
 documents et l'inscription, et il serait absurde d'y revenir trois fois.
@@ -99,7 +99,7 @@ plateforme managée ferait tomber une vingtaine de ces points pour 30 à 60 €.
 | ID | Story | Pts | Statut |
 |----|-------|-----|--------|
 | [BR-17](stories/BR-17-briefing.md) | Briefing éditable | 2 | ✅ Terminé |
-| [BR-18](stories/BR-18-documents.md) | Documents de l'événement, GPX compris | 4 | 🔥 Lot 1 |
+| [BR-18](stories/BR-18-documents.md) | Documents de l'événement, GPX compris | 4 | ✅ Terminé |
 | [BR-19](stories/BR-19-parcours-gpx.md) | ~~Parcours GPX et carte~~ | — | ⛔ Abandonné |
 
 ### EPIC 5 — Après-course
@@ -143,13 +143,13 @@ pas de fichier de story : c'est la décision qui les porte, et elles prennent un
 | R-03 | Direction artistique « Tableau des départs » à la place de « Corral » | 8 | ✅ Livrée | [D-46](DECISIONS.md) |
 | R-04 | Formulaire d'inscription en quatre étapes au lieu d'une page scrollable | 5 | 🔥 Lot 1 | [D-50](DECISIONS.md) |
 
-**Total : 31 stories actives + 4 reprises · 227 pts · 84 pts livrés (37 %)**
+**Total : 31 stories actives + 4 reprises · 227 pts · 88 pts livrés (39 %)**
 
 **Hors périmètre : 4 stories abandonnées, 32 pts non engagés** — voir [D-47](DECISIONS.md).
 
 ## Ordre conseillé
 
-**Lot 1 — ouvrir les inscriptions (18 pts, BR-17 livrée)** — BR-18 → BR-34 → R-04 → BR-33
+**Lot 1 — ouvrir les inscriptions (18 pts, BR-17 et BR-18 livrées)** — BR-34 → R-04 → BR-33
 
 **Lot 2 — mettre en ligne (44 pts)** — BR-26 → BR-27 → BR-28 → BR-29 → BR-30 → BR-31 → BR-32
 

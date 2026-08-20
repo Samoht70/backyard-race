@@ -1505,3 +1505,75 @@ est injecté par un composant unique, pour que l'unique `v-html` du front ait un
 relire, et il est stylé par un bloc `@utility briefing` dans la feuille de style — un plugin
 `@tailwindcss/typography` et sa configuration de thème ne se paient pas pour une page, et le bloc
 parle les tokens du projet.
+
+## D-52 — Les documents sont un modèle éditorial et une URL signée, sans route de téléchargement
+
+Arrêté le 2026-08-20 par BR-18, avec le propriétaire du projet.
+
+### Un modèle `Document`, malgré D-09
+
+D-09 interdit « une table de fichiers maison ». La table `documents` n'en est pas une : elle porte
+un titre et une description, jamais un chemin, une taille ni un type. Le fichier reste entièrement
+à Media Library, dans une collection `file` en `singleFile()`.
+
+Deux raisons ont fait renoncer à tout poser sur `Event` via `name` et `custom_properties`, qui était
+l'option la plus économe :
+
+- **le titre est éditorial**. « Règlement de la course » se lit dans une liste ; `reglement-v3-final.pdf`
+  non. Les deux doivent coexister, et `usingName()` aurait fait porter au média un nom d'affichage
+  en plus de son nom de fichier, ce qui brouille les deux ;
+- **l'événement est un singleton**. Accrocher tous les médias dessus donne un sac plat, sans
+  propriétaire par document, où la suppression d'un fichier vise un `Media` par identifiant plutôt
+  qu'une ligne à soi.
+
+### Pas de route de téléchargement : une URL signée, valable sept jours
+
+La story écrivait « le téléchargement passe par une route contrôlée ». Elle ne l'est plus. Le média
+signe son URL — `App\Models\Media` étend celui de Spatie et expose `temporary_url` et `download_url`,
+le second ajoutant le `ResponseContentDisposition` qui fait enregistrer le fichier sous son nom
+d'origine. L'URL n'est fabriquée que dans un contrôleur ayant déjà passé la policy : en `draft`, un
+participant n'en obtient aucune.
+
+**L'écart à D-08 est réel et assumé** : une URL présignée est un accès anonyme, borné dans le temps
+et non devinable, là où D-08 demandait « aucun accès anonyme au bucket ». Ce qui l'achète, c'est que
+l'application ne relaie plus d'octets qu'elle n'a pas besoin de toucher, et que la durée retenue —
+sept jours, le plafond de SigV4 — couvre largement une page laissée ouverte.
+
+**La conséquence à connaître avant de déboguer un lien mort.** SigV4 signe l'en-tête `Host`. Le
+conteneur et le navigateur doivent donc désigner le stockage par le même `hôte:port`, sinon toute
+signature est rejetée — RustFS répond alors `InvalidAccessKeyId`, ce qui envoie chercher un problème
+de clés qui n'existe pas. En développement, cela demande deux choses : RustFS écoute désormais, dans
+le réseau Docker, sur le port qu'il publie (`FORWARD_RUSTFS_PORT` pilote les deux), et **chaque poste
+doit résoudre `rustfs` vers `127.0.0.1`** dans son fichier hosts. En production, un endpoint public
+unique rend la question sans objet.
+
+### Une règle de validation maison plutôt que `mimes:`
+
+Le GPX est du XML sur le disque. `mimes:gpx` refuserait une trace légitime, `mimetypes:` seule
+laisserait passer un XML renommé `.pdf`. `App\Rules\DocumentFile` porte donc une carte unique
+`extension → types MIME réels admis`, lue deux fois : par la règle, et par la collection Media
+Library qui refuse le reste. Le contrôle porte sur `getMimeType()`, résolu par `finfo` sur le
+fichier temporaire — jamais sur l'extension annoncée.
+
+Corollaire pour les tests : `Illuminate\Http\Testing\File::getMimeType()` renvoie le type qu'on lui
+a déclaré, jamais celui qu'il détecte. Un `UploadedFile::fake()` ne peut donc pas prouver le critère
+« fichier renommé ». Les fixtures du seeder — un vrai PDF, une vraie trace GPX — servent aussi de
+fixtures de test, ce qui donne un seul jeu de fichiers à maintenir.
+
+### Le dépôt gèle quand l'événement est terminé
+
+La story ne le demandait pas. Le briefing le fait (D-51), et un document qui pourrait encore
+apparaître après la course quand le briefing ne le peut plus aurait été une incohérence que personne
+n'aurait su expliquer. `DocumentPolicy::create` exige donc la permission **et** `isEditable()`.
+
+### La suppression passe par Eloquent
+
+`onDelete('cascade')` est exclu : Media Library supprime le fichier stocké depuis l'événement
+`deleted` du modèle propriétaire, qu'une cascade SQL ferait taire. Le fichier partirait alors de la
+base sans partir du bucket.
+
+### Le bucket se provisionne par commande
+
+`storage:ensure-bucket` crée le bucket quand il manque et ne fait rien sinon. Ce n'est pas une
+commande jetable : tout environnement neuf en a besoin, et BR-28 en aura besoin en production.
+Elle entre dans `composer setup`, avant les migrations.
