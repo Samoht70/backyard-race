@@ -4,9 +4,9 @@ import { Ellipsis } from '@lucide/vue';
 import { useSidebar } from '@/components/ui/sidebar';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { t } from '@/lib/i18n';
-import { mainNavItems } from '@/lib/mainNav';
+import { BOTTOM_NAV_LIMIT, mainNavItems } from '@/lib/mainNav';
 
-const items = mainNavItems();
+const items = mainNavItems().slice(0, BOTTOM_NAV_LIMIT);
 const { isCurrentUrl } = useCurrentUrl();
 const { setOpenMobile } = useSidebar();
 

@@ -2,7 +2,12 @@
 
 return [
     'nav' => [
+        'home' => 'Accueil',
         'race' => 'Course',
+        'registration' => 'Mon inscription',
+        'briefing' => 'Briefing',
+        'documents' => 'Documents',
+        'event' => 'Événement',
         'runners' => 'Coureurs',
         'manage' => 'Gestion',
         'more' => 'Plus',
