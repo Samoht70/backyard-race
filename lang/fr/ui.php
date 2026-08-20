@@ -2,7 +2,12 @@
 
 return [
     'nav' => [
+        'home' => 'Accueil',
         'race' => 'Course',
+        'registration' => 'Mon inscription',
+        'briefing' => 'Briefing',
+        'documents' => 'Documents',
+        'event' => 'Événement',
         'runners' => 'Coureurs',
         'manage' => 'Gestion',
         'more' => 'Plus',
@@ -10,6 +15,17 @@ return [
         'sections' => 'Sections',
         'profile' => 'Profil',
         'logout' => 'Se déconnecter',
+    ],
+    'dashboard' => [
+        'title' => 'Accueil',
+        'pending' => 'Ton inscription est en attente de confirmation par le gérant.',
+        'confirmed' => 'Ton inscription est confirmée. Garde ton dossard sous la main.',
+        'no_registration_title' => 'Tu n’es pas encore inscrit',
+        'no_registration_description' => 'Les inscriptions se prennent depuis la page de l’événement.',
+        'no_registration_action' => 'Voir l’événement',
+        'no_event_title' => 'Aucun événement',
+        'no_event_description' => 'Le gérant n’a pas encore ouvert l’événement. Reviens plus tard.',
+        'practical' => 'Informations pratiques',
     ],
     'state' => [
         'loading' => 'Chargement…',

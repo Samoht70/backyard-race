@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Epic** | 6 — Expérience participant |
-| **Statut** | À faire |
+| **Statut** | ✅ Terminé |
 | **Estimation** | 5 pts |
 | **Créée** | 2026-08-20 — lot « inscription en ligne d'abord » |
 | **Dépend de** | BR-05, BR-17, BR-18 |
@@ -109,8 +109,8 @@ entrée qui fuite vers un écran refusé ne se verra qu'en production.
 
 ## Tâches
 
-- [ ] **T1** — Prop partagée : présence d'une inscription et statut de l'événement `1 pt`
-- [ ] **T2** — Refonte de `mainNavItems()` : événement, mon inscription, briefing, documents,
+- [x] **T1** — Prop partagée : présence d'une inscription et statut de l'événement `1 pt`
+- [x] **T2** — Refonte de `mainNavItems()` : événement, mon inscription, briefing, documents,
   gestion `1 pt`
-- [ ] **T3** — Écran d'accueil d'avant-course : statut, dossard si confirmé, raccourcis `2 pts`
-- [ ] **T4** — Tests : entrées selon inscription, permission et statut d'événement `1 pt`
+- [x] **T3** — Écran d'accueil d'avant-course : statut, dossard si confirmé, raccourcis `2 pts`
+- [x] **T4** — Tests : entrées selon inscription, permission et statut d'événement `1 pt`

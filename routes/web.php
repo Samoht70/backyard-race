@@ -2,6 +2,7 @@
 
 use App\Enums\Permission;
 use App\Http\Controllers\BriefingController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DesignSystemController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\EventController;
@@ -17,7 +18,7 @@ Route::get('design-system', DesignSystemController::class)
 
 Route::middleware('auth')
     ->group(function () {
-        Route::inertia('dashboard', 'Dashboard')
+        Route::get('dashboard', DashboardController::class)
             ->name('dashboard');
 
         Route::singleton('event', EventController::class)
