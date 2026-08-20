@@ -5,7 +5,7 @@
 | **Epic** | 6 — Expérience participant |
 | **Statut** | À faire |
 | **Estimation** | 8 pts |
-| **Dépend de** | BR-02, BR-08 |
+| **Dépend de** | BR-02, BR-08, BR-33 |
 
 ## User story
 
@@ -18,6 +18,13 @@ Afin de **savoir où j'en suis et à quelle heure je repars, sans demander au g�
 Le coureur n'a pas besoin du tableau de bord du gérant : il veut son nombre de boucles, sa
 distance, son dernier temps et l'heure du prochain départ. Un écran, quatre chiffres, quelques
 raccourcis.
+
+## Frontière avec BR-33
+
+BR-33 a livré l'accueil d'avant-course — statut d'inscription, dossard, raccourcis — et la
+navigation qui y mène. Cette story **remplace le contenu de cet écran** par les chiffres de course
+dès que le moteur existe ; elle ne repose ni une route, ni une entrée de menu, ni un second tableau
+de bord.
 
 ## Périmètre fonctionnel
 

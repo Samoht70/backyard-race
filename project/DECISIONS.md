@@ -1360,3 +1360,60 @@ connexions serait soit sauté, soit vert sans avoir rien exercé — le pire des
 rassure sans mesurer. Les deux mécanismes sont testés séparément et pour de vrai : l'écriture
 conditionnelle par `it_refuses_a_registration_someone_else_already_moved`, l'index unique par
 `it_lets_the_database_refuse_a_duplicate_number`.
+
+## D-50 — Le formulaire d'inscription se remplit en étapes, sans rien stocker entre elles
+
+Arrêté le 2026-08-20 par le propriétaire du projet. Porté par la reprise **R-04**.
+
+D-45 a fusionné les deux formulaires en un seul écran, `auth/register/Complete.vue`, derrière le
+lien signé. Le résultat empile quatre groupes de champs — identité, coureur, contact d'urgence,
+remarques — soit une dizaine de saisies obligatoires d'affilée. Sur le téléphone où l'inscription se
+fera réellement, le coureur voit une page qui n'en finit pas avant d'avoir tapé son prénom.
+
+L'écran devient donc un formulaire en **quatre étapes** :
+
+1. **Identité** — prénom, nom, l'adresse déjà prouvée affichée sans être modifiable.
+2. **Coureur** — téléphone, date de naissance, numéro PPS (BR-34).
+3. **Contact d'urgence** — nom et téléphone.
+4. **Remarques** — le champ libre, puis la validation.
+
+### Les étapes sont une mise en scène, pas un état
+
+Elles vivent **côté client, pour une seule soumission**. D-45 avait fermé la porte à toute table
+d'état intermédiaire — pas de `pending_registrations`, pas de purge, le lien signé porte tout. Un
+POST par étape rouvrirait exactement cette porte : il faudrait stocker une inscription à moitié
+saisie, décider de sa durée de vie et la nettoyer. `account.update` reçoit donc la totalité en une
+fois et crée `User` et `Participant` dans la même transaction qu'aujourd'hui. Rien ne change côté
+serveur, ni route, ni Form Request, ni transaction.
+
+### Ce qui est réellement le travail : ramener le coureur sur son erreur
+
+La validation serveur reste globale, et elle a le dernier mot. Une erreur 422 sur `birth_date`
+pendant que le coureur est à l'étape 4 doit le **ramener à l'étape 2**, sur le champ fautif, focus
+posé. Sans ça il voit une soumission refusée et aucune erreur : le message existe, il est simplement
+sur un écran qu'il ne regarde pas. C'est le seul endroit où cette reprise peut échouer
+silencieusement, et c'est là que les tests comptent.
+
+L'erreur `event` — fenêtre fermée, dernières places parties entre le clic sur le lien et la
+soumission (D-45) — n'appartient à aucune étape. Elle s'affiche là où le coureur se trouve et coupe
+le parcours. Le compteur de places reste visible à toutes les étapes, pas seulement à la première.
+
+Le `required` natif garde le passage à l'étape suivante : il évite l'aller-retour serveur sur un
+champ vide, sans jamais remplacer la validation serveur, qui reste la seule autorité.
+
+### La correction reste une page unique
+
+`registration/Edit.vue` ne bouge pas. Les étapes servent la première saisie, où la longueur
+intimide ; un coureur qui vient corriger son numéro de téléphone n'a pas à traverser quatre écrans
+pour ça. `RegistrationFields` reste le composant partagé par les deux écrans — il rend ses groupes
+d'affilée dans la correction, un par étape dans la saisie initiale.
+
+C'est un écart assumé : deux présentations pour les mêmes champs. L'alternative — un parcours unique
+partout — punissait le geste le plus fréquent pour uniformiser le plus rare.
+
+### Ce que l'écran doit dire à chaque étape
+
+La position (« 2 sur 4 »), un retour arrière qui ne perd rien de ce qui est déjà saisi, le focus
+déplacé en tête d'étape au changement pour que le lecteur d'écran suive, et des cibles tactiles au
+plancher de 44 px (D-46). Une étape qui avance sans annoncer où l'on en est est une page longue
+déguisée.

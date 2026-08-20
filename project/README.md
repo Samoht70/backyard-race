@@ -12,6 +12,8 @@ Pas de Jira, pas d'outil externe : le backlog vit dans le repo.
 
 Statuts : `À faire` · `En cours` · `En revue` · `Terminé` · `Bloqué` · `Abandonné`
 
+Une story du lot prioritaire porte `🔥 Lot 1` à la place de `À faire` : c'est le même statut, signalé. Voir la section « Priorité actuelle » ci-dessous.
+
 Quand une story passe à `Terminé`, on met à jour la ligne du board **et** l'entête du fichier story.
 
 Une story `Abandonné` garde son fichier : il porte la raison, sous un titre « Pourquoi cette story
@@ -20,6 +22,37 @@ voit revenir.
 
 Le travail demandé en cours de route, qui refait ce qu'une story avait déjà livré, n'a pas de
 fichier de story : il vit dans une **décision** et prend une ligne dans le tableau des reprises.
+
+## Priorité actuelle — lot 1 : ouvrir les inscriptions
+
+Arrêtée le 2026-08-20 avec le propriétaire. L'objectif n'est plus de finir le produit dans l'ordre
+des epics, mais de **mettre en ligne le parcours d'inscription au plus tôt**, pour pouvoir dire aux
+coureurs de s'inscrire pendant que le moteur de course s'écrit.
+
+Le socle est déjà là : BR-05 a livré l'inscription, BR-06 sa gestion, BR-07 le dossard. Ce qui
+manque tient en cinq entrées : quatre stories et une reprise.
+
+| Ordre | ID | Story | Pts | Pourquoi dans le lot |
+|-------|----|-------|-----|----------------------|
+| 1 | [BR-17](stories/BR-17-briefing.md) | Briefing éditable | 2 | Dit comment se déroule l'événement |
+| 2 | [BR-18](stories/BR-18-documents.md) | Documents de l'événement, GPX compris | 4 | Règlement, consignes, logement, trace |
+| 3 | [BR-34](stories/BR-34-numero-pps.md) | Numéro PPS demandé à l'inscription | 2 | Le dernier champ qui manque au formulaire |
+| 4 | R-04 | Formulaire d'inscription en étapes | 5 | Reprise de l'écran de D-45, portée par [D-50](DECISIONS.md) |
+| 5 | [BR-33](stories/BR-33-acces-parcours-coureur.md) | Accès du coureur à son inscription | 5 | Branche le tout dans la navigation |
+
+**18 pts.** BR-34 passe avant R-04 pour que le découpage en étapes place un formulaire déjà complet,
+plutôt que d'avoir à loger un champ de plus après coup. BR-33 ferme le lot plutôt qu'elle ne l'ouvre :
+c'est elle qui pose les entrées de navigation vers le briefing, les documents et l'inscription, et il
+serait absurde d'y revenir trois fois.
+
+**Ce que le lot ne contient pas** — le moteur de course (epic 2), les écrans de course (epic 3) et
+le dashboard participant BR-24, qui dépend de BR-08. Un coureur inscrit consulte son inscription et
+les informations de la course ; il ne voit encore aucune boucle, parce qu'aucune n'existe.
+
+**Lot 2, juste après** — l'epic 7 de bout en bout (BR-26 → BR-32, 44 pts). Le lot 1 n'a aucune
+valeur tant que rien n'est joignable depuis l'extérieur ; c'est la mise en ligne qui transforme
+« l'inscription est développée » en « les inscriptions sont ouvertes ». D-19 rappelle qu'une
+plateforme managée ferait tomber une vingtaine de ces points pour 30 à 60 €.
 
 ## Board
 
@@ -40,6 +73,7 @@ fichier de story : il vit dans une **décision** et prend une ligne dans le tabl
 | [BR-05](stories/BR-05-inscription.md) | Inscription d'un participant | 8 | ✅ Terminé |
 | [BR-06](stories/BR-06-gestion-inscriptions.md) | Gestion des inscriptions par le gérant | 5 | ✅ Terminé |
 | [BR-07](stories/BR-07-numero-dossard.md) | Attribution automatique du numéro de dossard | 5 | ✅ Terminé |
+| [BR-34](stories/BR-34-numero-pps.md) | Numéro PPS demandé à l'inscription | 2 | 🔥 Lot 1 |
 
 ### EPIC 2 — Moteur de course
 
@@ -64,8 +98,8 @@ fichier de story : il vit dans une **décision** et prend une ligne dans le tabl
 
 | ID | Story | Pts | Statut |
 |----|-------|-----|--------|
-| [BR-17](stories/BR-17-briefing.md) | Briefing éditable | 2 | À faire |
-| [BR-18](stories/BR-18-documents.md) | Documents de l'événement, GPX compris | 4 | À faire |
+| [BR-17](stories/BR-17-briefing.md) | Briefing éditable | 2 | 🔥 Lot 1 |
+| [BR-18](stories/BR-18-documents.md) | Documents de l'événement, GPX compris | 4 | 🔥 Lot 1 |
 | [BR-19](stories/BR-19-parcours-gpx.md) | ~~Parcours GPX et carte~~ | — | ⛔ Abandonné |
 
 ### EPIC 5 — Après-course
@@ -81,6 +115,7 @@ fichier de story : il vit dans une **décision** et prend une ligne dans le tabl
 
 | ID | Story | Pts | Statut |
 |----|-------|-----|--------|
+| [BR-33](stories/BR-33-acces-parcours-coureur.md) | Accès du coureur à son inscription | 5 | 🔥 Lot 1 |
 | [BR-24](stories/BR-24-dashboard-participant.md) | Dashboard participant | 8 | À faire |
 | [BR-25](stories/BR-25-mon-dossard.md) | ~~Dossard imprimable~~ | — | ⛔ Abandonné |
 
@@ -96,39 +131,47 @@ fichier de story : il vit dans une **décision** et prend une ligne dans le tabl
 | [BR-31](stories/BR-31-domaine-https-supervision.md) | Domaine, HTTPS et supervision | 5 | À faire |
 | [BR-32](stories/BR-32-deploiement-dokploy.md) | Déploiement depuis Dokploy et branche develop | 3 | À faire |
 
-### Reprises livrées hors backlog
+### Reprises hors backlog
 
 Refontes demandées en cours de route, qui reprennent ce qu'une story avait déjà livré. Elles n'ont
-pas de fichier de story mais du code en production et une décision qui les porte.
+pas de fichier de story : c'est la décision qui les porte, et elles prennent une ligne ici.
 
-| ID | Reprise | Pts | Décision |
-|----|---------|-----|----------|
-| R-01 | Authentification réduite au mot de passe, réglages réduits au profil, thème dans la navbar | 5 | [D-43](DECISIONS.md), D-44 |
-| R-02 | Inscription par mail en cinq étapes, code d'accès en guise de mot de passe | 8 | [D-45](DECISIONS.md) |
-| R-03 | Direction artistique « Tableau des départs » à la place de « Corral » | 8 | [D-46](DECISIONS.md) |
+| ID | Reprise | Pts | Statut | Décision |
+|----|---------|-----|--------|----------|
+| R-01 | Authentification réduite au mot de passe, réglages réduits au profil, thème dans la navbar | 5 | ✅ Livrée | [D-43](DECISIONS.md), D-44 |
+| R-02 | Inscription par mail en cinq étapes, code d'accès en guise de mot de passe | 8 | ✅ Livrée | [D-45](DECISIONS.md) |
+| R-03 | Direction artistique « Tableau des départs » à la place de « Corral » | 8 | ✅ Livrée | [D-46](DECISIONS.md) |
+| R-04 | Formulaire d'inscription en quatre étapes au lieu d'une page scrollable | 5 | 🔥 Lot 1 | [D-50](DECISIONS.md) |
 
-**Total : 29 stories actives + 3 reprises · 215 pts · 82 pts livrés (38 %)**
+**Total : 31 stories actives + 4 reprises · 227 pts · 82 pts livrés (36 %)**
 
 **Hors périmètre : 4 stories abandonnées, 32 pts non engagés** — voir [D-47](DECISIONS.md).
 
 ## Ordre conseillé
 
-**Métier** — BR-06 → BR-07 → BR-08 → BR-09 → BR-10 → BR-11 → BR-12 → BR-13 → BR-14 → BR-15 →
-BR-16 → BR-17 → BR-18 → BR-20 → BR-23 → BR-24
+**Lot 1 — ouvrir les inscriptions (18 pts)** — BR-17 → BR-18 → BR-34 → R-04 → BR-33
 
-**Déploiement** — BR-26 → BR-27 → BR-28 → BR-29 → BR-30 → BR-31 → BR-32
+**Lot 2 — mettre en ligne (44 pts)** — BR-26 → BR-27 → BR-28 → BR-29 → BR-30 → BR-31 → BR-32
 
-Quatre remarques sur cet ordre :
+**Ensuite, le moteur et les écrans de course** — BR-08 → BR-09 → BR-10 → BR-11 → BR-12 → BR-13 →
+BR-14 → BR-15 → BR-16 → BR-24 → BR-20 → BR-23
 
-- BR-06 a tranché **Q-03** : l'inscription annulée est en lecture seule pour le coureur, le gérant la
-  remet en attente, et aucun écran de création ne revient côté connecté (D-48).
-- BR-09 et BR-11 sont le cœur métier — c'est là que les tests comptent le plus.
-- BR-13 est le porteur naturel de **Q-02** (page d'erreur Inertia) et de l'écart de cible tactile
-  relevé en D-46 : le bouton de validation a perdu un tiers de sa hauteur.
-- L'epic 7 n'attend pas la fin du métier. BR-26 à BR-29 peuvent être menées dès que le moteur
-  de course tourne (fin d'epic 2) : mettre en ligne tôt évite de découvrir les surprises
-  d'hébergement la semaine de l'événement. BR-30 est la story à ne pas bâcler — sans worker en
-  production, les éliminations automatiques ne tombent pas, et rien ne le signale à l'écran.
+Sept remarques sur cet ordre :
+
+- Les deux premiers lots livrent un produit **incomplet mais utile** : un coureur s'inscrit, lit le
+  briefing, télécharge le règlement et dépose son justificatif. Rien de la nuit de course n'existe
+  encore, et ça ne l'empêche pas d'ouvrir les inscriptions.
+- BR-33 vient en dernier de son lot parce qu'elle branche la navigation vers ce que BR-17, BR-18,
+  BR-34 et R-04 auront posé.
+- R-04 est une **reprise**, pas une story : elle refait l'écran que D-45 avait livré, donc elle vit
+  dans une décision (D-50) et dans le tableau des reprises, comme R-01 à R-03.
+- BR-24 sort de la fin du backlog pour rejoindre les écrans de course : elle dépend de BR-08 et
+  reprend l'accueil que BR-33 aura livré.
+- BR-09 et BR-11 restent le cœur métier — c'est là que les tests comptent le plus.
+- BR-13 est le porteur naturel de **Q-02** (page d'erreur Inertia) et de **Q-04**, l'écart de cible
+  tactile relevé en D-46 : le bouton de validation a perdu un tiers de sa hauteur.
+- BR-30 est la story du lot 2 à ne pas bâcler — sans worker en production, les éliminations
+  automatiques ne tombent pas, et rien ne le signale à l'écran.
 
 ## Voir aussi
 
