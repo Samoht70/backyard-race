@@ -3,8 +3,8 @@
 namespace App\Enums;
 
 /**
- * The transition chain is NOT declared here: confirming and cancelling a
- * registration is BR-06's subject, and this enum is only the persisted name.
+ * The transition chain is NOT declared here: it lives once, in
+ * App\Services\RegistrationLifecycle. This enum is the name of the state.
  */
 enum RegistrationStatus: string
 {

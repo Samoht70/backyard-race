@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Enums\RegistrationStatus;
+use App\Services\RegistrationLifecycle\RegistrationLifecycleFactory;
+use App\Services\RegistrationLifecycle\RegistrationLifecycleState;
 use Carbon\CarbonImmutable;
 use Database\Factories\ParticipantFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -39,6 +41,11 @@ class Participant extends Model
      * @var array<string, mixed>
      */
     protected $attributes = ['status' => RegistrationStatus::Pending->value];
+
+    public function lifecycle(): RegistrationLifecycleState
+    {
+        return app(RegistrationLifecycleFactory::class)->fromStatus($this->status);
+    }
 
     /**
      * @return BelongsTo<Event, $this>
