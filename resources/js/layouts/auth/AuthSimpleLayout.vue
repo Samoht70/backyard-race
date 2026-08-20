@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
+import AppearanceToggle from '@/components/AppearanceToggle.vue';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
 import { home } from '@/routes';
 
@@ -13,6 +14,9 @@ defineProps<{
     <div
         class="flex min-h-svh flex-col items-center justify-center gap-6 bg-background p-6 md:p-10"
     >
+        <AppearanceToggle
+            class="fixed top-[max(0.5rem,env(safe-area-inset-top))] right-2 z-50"
+        />
         <div class="w-full max-w-sm">
             <div class="flex flex-col gap-8">
                 <div class="flex flex-col items-center gap-4">
