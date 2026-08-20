@@ -22,6 +22,7 @@ return new class extends Migration
             $table->unsignedTinyInteger('singleton')->default(1)->unique();
             $table->string('name', 120);
             $table->text('description')->nullable();
+            $table->text('briefing')->nullable();
             $table->string('status', 20)->default(EventStatus::Draft->value);
             $table->dateTime('first_start_at')->nullable();
             $table->unsignedInteger('lap_distance_meters')->nullable();
