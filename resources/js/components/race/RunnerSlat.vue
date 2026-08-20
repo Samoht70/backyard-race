@@ -1,0 +1,64 @@
+<script setup lang="ts">
+import { Link } from '@inertiajs/vue3';
+import type { InertiaLinkProps } from '@inertiajs/vue3';
+import { computed } from 'vue';
+import SlatCell from '@/components/race/SlatCell.vue';
+import { t } from '@/lib/i18n';
+import {
+    runnerStatusIcons,
+    runnerStatusLabelKey,
+    runnerStatusTone,
+} from '@/lib/runnerStatus';
+import type { RunnerStatus } from '@/types/race';
+
+type Props = {
+    bib: number | string;
+    firstName: string;
+    lastName: string;
+    status: RunnerStatus;
+    laps: number;
+    meta?: string;
+    href?: NonNullable<InertiaLinkProps['href']>;
+};
+
+const props = defineProps<Props>();
+
+const fullName = computed(() => `${props.firstName} ${props.lastName}`);
+const icon = computed(() => runnerStatusIcons[props.status]);
+const tone = computed(() => runnerStatusTone[props.status]);
+const statusLabel = computed(() => t(runnerStatusLabelKey(props.status)));
+const isRunning = computed(() => props.status === 'running');
+</script>
+
+<template>
+    <component
+        :is="href ? Link : 'div'"
+        :href="href"
+        class="flex min-h-[4.25rem] min-w-0 items-center gap-2 bg-card px-3 py-2.5"
+    >
+        <span class="w-9 shrink-0 font-mono text-data font-bold tabular-nums">{{
+            bib
+        }}</span>
+        <span class="flex min-w-0 flex-1 flex-col gap-px">
+            <span class="truncate font-semibold">{{ fullName }}</span>
+            <span
+                class="flex min-w-0 items-center gap-1.5 font-mono text-data text-muted-foreground"
+            >
+                <component
+                    :is="icon"
+                    class="size-3 shrink-0"
+                    :class="tone"
+                    aria-hidden="true"
+                />
+                <span class="truncate">{{ meta ?? statusLabel }}</span>
+            </span>
+        </span>
+        <slot name="cell">
+            <SlatCell
+                :value="laps"
+                :label="t('race.runner.laps_completed')"
+                :tone="isRunning ? 'strong' : 'quiet'"
+            />
+        </slot>
+    </component>
+</template>

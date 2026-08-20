@@ -36,7 +36,7 @@ defineOptions({
     />
 
     <div class="flex flex-col gap-4 p-4">
-        <h1 class="font-display text-lg uppercase">
+        <h1 class="text-title">
             {{ t('ui.manage.title') }}
         </h1>
 

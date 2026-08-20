@@ -19,7 +19,9 @@ withDefaults(defineProps<Props>(), {
         class="flex items-center justify-center gap-2 text-muted-foreground"
         :class="variant === 'block' ? 'py-10' : 'py-2'"
     >
-        <Spinner class="size-5 shrink-0" />
-        <span class="text-sm">{{ label ?? t('ui.state.loading') }}</span>
+        <Spinner class="size-4 shrink-0" />
+        <span class="font-mono text-label uppercase">{{
+            label ?? t('ui.state.loading')
+        }}</span>
     </div>
 </template>

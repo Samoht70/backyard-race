@@ -1,45 +1,42 @@
 <script setup lang="ts">
-import StatCounter from '@/components/race/StatCounter.vue';
+import { computed } from 'vue';
 import { t } from '@/lib/i18n';
 
 type Props = {
     round: number;
     startAt: string;
     deadlineAt: string;
-    runnersLeft?: number;
+    eventName?: string;
 };
 
-defineProps<Props>();
+const props = defineProps<Props>();
+
+const roundLabel = computed(() =>
+    t('race.round.short', { number: String(props.round).padStart(2, '0') }),
+);
 </script>
 
 <template>
     <header
-        class="flex items-end justify-between gap-4 border-b border-border bg-background/95 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/80"
+        class="sticky top-0 z-10 flex flex-col gap-2 border-b-[3px] border-foreground bg-background px-4 pt-4 pb-3"
     >
-        <div class="flex min-w-0 items-end gap-5">
-            <StatCounter
-                :value="round"
-                :label="t('race.round.number')"
-                size="lg"
-            />
-            <StatCounter
-                v-if="runnersLeft !== undefined"
-                :value="runnersLeft"
-                :label="t('race.round.runners_left')"
-            />
-        </div>
-        <dl
-            class="flex shrink-0 flex-col items-end gap-0.5 font-display text-label text-muted-foreground uppercase"
+        <p
+            v-if="eventName"
+            class="truncate font-mono text-label text-muted-foreground uppercase"
         >
-            <div class="flex gap-1.5">
-                <dt>{{ t('race.round.start') }}</dt>
-                <dd class="text-foreground tabular-nums">{{ startAt }}</dd>
-            </div>
-            <div class="flex gap-1.5">
-                <dt>{{ t('race.round.deadline') }}</dt>
-                <dd class="text-foreground tabular-nums">{{ deadlineAt }}</dd>
-            </div>
-        </dl>
+            {{ eventName }}
+        </p>
+        <p class="flex items-baseline gap-2.5 font-mono">
+            <span class="text-label text-muted-foreground">{{
+                roundLabel
+            }}</span>
+            <span class="text-readout">{{ startAt }}</span>
+            <span
+                class="text-sm font-normal tracking-tight text-muted-foreground"
+            >
+                → {{ deadlineAt }}
+            </span>
+        </p>
         <slot name="trailing" />
     </header>
 </template>

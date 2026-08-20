@@ -4,7 +4,6 @@ import { computed } from 'vue';
 import ProfileController from '@/actions/App/Http/Controllers/ProfileController';
 import DeleteUser from '@/components/DeleteUser.vue';
 import InputError from '@/components/InputError.vue';
-import FestoonDivider from '@/components/race/FestoonDivider.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -30,7 +29,7 @@ const user = computed(() => usePage().props.auth.user);
 
     <div class="mx-auto flex max-w-xl flex-col gap-6 p-4">
         <header class="flex flex-col gap-2">
-            <h1 class="font-display text-lap">{{ t('ui.profile.title') }}</h1>
+            <h1 class="text-title">{{ t('ui.profile.title') }}</h1>
             <p class="text-sm text-muted-foreground">
                 {{ t('ui.profile.description') }}
             </p>
@@ -89,8 +88,6 @@ const user = computed(() => usePage().props.auth.user);
                 {{ t('ui.profile.save') }}
             </Button>
         </Form>
-
-        <FestoonDivider />
 
         <DeleteUser />
     </div>

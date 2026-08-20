@@ -8,7 +8,7 @@ defineProps<Props>();
 
 <template>
     <section class="flex flex-col gap-4">
-        <h2 class="font-display text-label text-muted-foreground uppercase">
+        <h2 class="font-mono text-label text-muted-foreground uppercase">
             {{ title }}
         </h2>
         <slot />

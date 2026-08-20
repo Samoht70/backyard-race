@@ -1,0 +1,2010 @@
+<title>Charte Tableau des départs</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400..700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Martian+Mono:wght@400..700&display=swap">
+
+<style>
+    :root {
+        --d-board: #FFFFFF;
+        --d-slat: #DCE0E4;
+        --d-alt: #CFD5DA;
+        --d-ink: #14161A;
+        --d-ink-2: #3A3F47;
+        --d-muted: #474D56;
+        --d-muted-board: #474D56;
+        --d-line: #AEB6BC;
+        --d-line-soft: #C6CDD3;
+        --d-keyline: #14161A;
+        --d-action: #14161A;
+        --d-action-ink: #FFFFFF;
+        --d-run: #0A6135;
+        --d-run-s: #E0EFE6;
+        --d-out: #A1221B;
+        --d-out-s: #FBE4E2;
+        --d-quit: #474D56;
+        --d-quit-s: #E8EAED;
+        --d-done: #6A5000;
+        --d-done-s: #F5EBD3;
+
+        --n-board: #0C0E11;
+        --n-slat: #191C21;
+        --n-alt: #22262C;
+        --n-ink: #F0F1F3;
+        --n-ink-2: #C3C7CE;
+        --n-muted: #949AA3;
+        --n-muted-board: #949AA3;
+        --n-line: #2B2F36;
+        --n-line-soft: #313640;
+        --n-keyline: #F0F1F3;
+        --n-action: #FFB020;
+        --n-action-ink: #14161A;
+        --n-run: #5CD494;
+        --n-run-s: #14301F;
+        --n-out: #FF8A72;
+        --n-out-s: #331A16;
+        --n-quit: #949AA3;
+        --n-quit-s: #23272D;
+        --n-done: #F0C24E;
+        --n-done-s: #322609;
+
+        --board: var(--d-board);
+        --slat: var(--d-slat);
+        --alt: var(--d-alt);
+        --ink: var(--d-ink);
+        --ink-2: var(--d-ink-2);
+        --muted: var(--d-muted);
+        --muted-board: var(--d-muted-board);
+        --line: var(--d-line);
+        --line-soft: var(--d-line-soft);
+        --keyline: var(--d-keyline);
+        --action: var(--d-action);
+        --action-ink: var(--d-action-ink);
+        --run: var(--d-run);
+        --run-s: var(--d-run-s);
+        --out: var(--d-out);
+        --out-s: var(--d-out-s);
+        --quit: var(--d-quit);
+        --quit-s: var(--d-quit-s);
+        --done: var(--d-done);
+        --done-s: var(--d-done-s);
+
+        --sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+        --mono: 'Martian Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+        --s1: 4px;
+        --s2: 8px;
+        --s3: 12px;
+        --s4: 16px;
+        --s5: 24px;
+        --s6: 32px;
+        --s7: 48px;
+        --s8: 72px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+            --board: var(--n-board);
+            --slat: var(--n-slat);
+            --alt: var(--n-alt);
+            --ink: var(--n-ink);
+            --ink-2: var(--n-ink-2);
+            --muted: var(--n-muted);
+            --muted-board: var(--n-muted-board);
+            --line: var(--n-line);
+            --line-soft: var(--n-line-soft);
+            --keyline: var(--n-keyline);
+            --action: var(--n-action);
+            --action-ink: var(--n-action-ink);
+            --run: var(--n-run);
+            --run-s: var(--n-run-s);
+            --out: var(--n-out);
+            --out-s: var(--n-out-s);
+            --quit: var(--n-quit);
+            --quit-s: var(--n-quit-s);
+            --done: var(--n-done);
+            --done-s: var(--n-done-s);
+        }
+    }
+
+    :root[data-theme="dark"] {
+        --board: var(--n-board);
+        --slat: var(--n-slat);
+        --alt: var(--n-alt);
+        --ink: var(--n-ink);
+        --ink-2: var(--n-ink-2);
+        --muted: var(--n-muted);
+        --muted-board: var(--n-muted-board);
+        --line: var(--n-line);
+        --line-soft: var(--n-line-soft);
+        --keyline: var(--n-keyline);
+        --action: var(--n-action);
+        --action-ink: var(--n-action-ink);
+        --run: var(--n-run);
+        --run-s: var(--n-run-s);
+        --out: var(--n-out);
+        --out-s: var(--n-out-s);
+        --quit: var(--n-quit);
+        --quit-s: var(--n-quit-s);
+        --done: var(--n-done);
+        --done-s: var(--n-done-s);
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        background: var(--board);
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: 17px;
+        line-height: 1.55;
+        font-variant-numeric: tabular-nums;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    .wrap {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: var(--s7) var(--s5) var(--s8);
+        display: flex;
+        flex-direction: column;
+        gap: var(--s8);
+    }
+
+    .eyebrow {
+        margin: 0;
+        font-family: var(--mono);
+        font-size: 0.625rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted-board);
+    }
+
+    h1, h2 {
+        margin: 0;
+        font-weight: 700;
+        letter-spacing: -0.025em;
+        text-wrap: balance;
+    }
+
+    h1 {
+        font-size: clamp(2.125rem, 5.5vw, 3.25rem);
+        line-height: 1.03;
+    }
+
+    h2 {
+        font-size: clamp(1.625rem, 3.6vw, 2.125rem);
+        line-height: 1.08;
+    }
+
+    h3 {
+        margin: 0;
+        font-size: 0.9375rem;
+        font-weight: 700;
+    }
+
+    p {
+        margin: 0;
+        max-width: 68ch;
+    }
+
+    .lede {
+        font-size: 1.125rem;
+        color: var(--ink-2);
+    }
+
+    .section {
+        display: flex;
+        flex-direction: column;
+        gap: var(--s5);
+    }
+
+    .section__head {
+        display: flex;
+        flex-direction: column;
+        gap: var(--s2);
+        border-top: 3px solid var(--keyline);
+        padding-top: var(--s3);
+    }
+
+    .slat {
+        background: var(--slat);
+        padding: var(--s5);
+        display: flex;
+        flex-direction: column;
+        gap: var(--s3);
+    }
+
+    .cols {
+        display: grid;
+        gap: 6px;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+
+    .cols--wide {
+        grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+    }
+
+    .note {
+        margin: 0;
+        font-size: 0.9375rem;
+        color: var(--muted);
+        line-height: 1.45;
+    }
+
+    .note b {
+        color: var(--ink-2);
+        font-weight: 600;
+    }
+
+    .kv {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .kv div {
+        display: flex;
+        justify-content: space-between;
+        gap: var(--s3);
+        padding: 7px 0;
+        border-bottom: 1px solid var(--line-soft);
+        font-size: 0.875rem;
+    }
+
+    .kv div:last-child {
+        border-bottom: none;
+    }
+
+    .kv span:first-child {
+        color: var(--muted);
+    }
+
+    .kv span:last-child {
+        font-family: var(--mono);
+        font-size: 0.75rem;
+        font-weight: 500;
+        letter-spacing: -0.03em;
+        text-align: right;
+    }
+
+    .board-demo {
+        background: var(--board);
+        padding: var(--s4);
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .head {
+        display: flex;
+        flex-direction: column;
+        gap: var(--s2);
+        padding-bottom: var(--s3);
+        border-bottom: 3px solid var(--keyline);
+    }
+
+    .head__event {
+        font-family: var(--mono);
+        font-size: 0.625rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--muted-board);
+    }
+
+    .head__line {
+        display: flex;
+        align-items: baseline;
+        gap: var(--s3);
+        font-family: var(--mono);
+        letter-spacing: -0.05em;
+    }
+
+    .head__round {
+        font-size: 0.6875rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        color: var(--muted-board);
+    }
+
+    .head__dep {
+        font-size: clamp(2.25rem, 8vw, 4rem);
+        font-weight: 700;
+        line-height: 0.95;
+    }
+
+    .head__lim {
+        font-size: clamp(1rem, 3vw, 1.375rem);
+        font-weight: 400;
+        color: var(--ink-2);
+    }
+
+    .tally {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--s4);
+        font-family: var(--mono);
+        font-size: 0.6875rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--ink);
+    }
+
+    .tally span {
+        color: var(--muted-board);
+        font-weight: 400;
+        margin-right: 5px;
+    }
+
+    .swatches {
+        display: grid;
+        gap: 6px;
+        grid-template-columns: repeat(auto-fit, minmax(158px, 1fr));
+    }
+
+    .sw {
+        background: var(--slat);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .sw__chip {
+        height: 64px;
+        border-bottom: 1px solid var(--line-soft);
+    }
+
+    .sw__meta {
+        padding: var(--s3);
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .sw__name {
+        font-size: 0.8125rem;
+        font-weight: 700;
+    }
+
+    .sw__hex {
+        font-family: var(--mono);
+        font-size: 0.6875rem;
+        letter-spacing: -0.04em;
+        color: var(--muted);
+    }
+
+    .sw__role {
+        font-size: 0.75rem;
+        color: var(--muted);
+        line-height: 1.35;
+    }
+
+    .spec {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        padding: var(--s3) 0;
+        border-bottom: 1px solid var(--line-soft);
+    }
+
+    .spec:last-child {
+        border-bottom: none;
+    }
+
+    .spec__tag {
+        font-family: var(--mono);
+        font-size: 0.625rem;
+        font-weight: 500;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--muted);
+    }
+
+    .t-readout {
+        font-family: var(--mono);
+        font-weight: 700;
+        font-size: 2.75rem;
+        line-height: 1;
+        letter-spacing: -0.06em;
+    }
+
+    .t-figure {
+        font-family: var(--mono);
+        font-weight: 700;
+        font-size: 1.75rem;
+        line-height: 1.05;
+        letter-spacing: -0.05em;
+    }
+
+    .t-data {
+        font-family: var(--mono);
+        font-weight: 500;
+        font-size: 0.8125rem;
+        letter-spacing: -0.04em;
+    }
+
+    .t-caps {
+        font-family: var(--mono);
+        font-size: 0.625rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+    }
+
+    .t-title {
+        font-size: 1.3125rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+    }
+
+    .t-body {
+        font-size: 1rem;
+    }
+
+    .t-small {
+        font-size: 0.8125rem;
+        color: var(--muted);
+    }
+
+    .btn {
+        font-family: var(--sans);
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        border: 1px solid var(--action);
+        border-radius: 0;
+        background: var(--action);
+        color: var(--action-ink);
+        padding: 15px 18px;
+        min-height: 50px;
+        cursor: pointer;
+    }
+
+    .btn--ghost {
+        background: transparent;
+        color: var(--ink);
+        border-color: var(--ink);
+    }
+
+    .btn--quiet {
+        background: transparent;
+        color: var(--muted);
+        border-color: var(--line);
+    }
+
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--s2);
+        align-items: center;
+    }
+
+    .badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+
+    .bdg {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 9px 5px 7px;
+        font-size: 0.6875rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+
+    .bdg svg {
+        width: 14px;
+        height: 14px;
+        flex: none;
+    }
+
+    .bdg--run {
+        background: var(--run-s);
+        color: var(--run);
+    }
+
+    .bdg--out {
+        background: var(--out-s);
+        color: var(--out);
+    }
+
+    .bdg--quit {
+        background: var(--quit-s);
+        color: var(--quit);
+    }
+
+    .bdg--done {
+        background: var(--done-s);
+        color: var(--done);
+    }
+
+    .grey {
+        filter: grayscale(1);
+    }
+
+    .refuse {
+        display: grid;
+        gap: 6px;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .refuse li {
+        background: var(--slat);
+        padding: var(--s3) var(--s4);
+        font-size: 0.875rem;
+        color: var(--muted);
+        border-left: 3px solid var(--out);
+    }
+
+    .refuse b {
+        display: block;
+        color: var(--ink);
+        font-size: 0.9375rem;
+        font-weight: 700;
+    }
+
+    pre {
+        margin: 0;
+        overflow-x: auto;
+        background: var(--slat);
+        padding: var(--s4);
+        font-family: var(--mono);
+        font-size: 0.6875rem;
+        line-height: 1.75;
+        letter-spacing: -0.04em;
+        color: var(--ink-2);
+    }
+
+    .screens {
+        display: grid;
+        gap: var(--s6);
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        justify-items: center;
+    }
+
+    .device {
+        width: 100%;
+        max-width: 372px;
+        display: flex;
+        flex-direction: column;
+        gap: var(--s3);
+    }
+
+    .ph {
+        border: 8px solid var(--ink);
+        overflow: hidden;
+    }
+
+    .ph__cap {
+        font-family: var(--mono);
+        font-size: 0.625rem;
+        font-weight: 500;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--muted-board);
+        text-align: center;
+    }
+
+    .mk {
+        display: flex;
+        flex-direction: column;
+        min-height: 660px;
+        background: var(--board);
+        color: var(--ink);
+        font-family: var(--sans);
+        font-variant-numeric: tabular-nums;
+    }
+
+    .mk.d {
+        --board: var(--d-board);
+        --slat: var(--d-slat);
+        --alt: var(--d-alt);
+        --ink: var(--d-ink);
+        --ink-2: var(--d-ink-2);
+        --muted: var(--d-muted);
+        --muted-board: var(--d-muted-board);
+        --line: var(--d-line);
+        --line-soft: var(--d-line-soft);
+        --keyline: var(--d-keyline);
+        --action: var(--d-action);
+        --action-ink: var(--d-action-ink);
+        --run: var(--d-run);
+        --run-s: var(--d-run-s);
+        --out: var(--d-out);
+        --out-s: var(--d-out-s);
+        --quit: var(--d-quit);
+        --quit-s: var(--d-quit-s);
+        --done: var(--d-done);
+        --done-s: var(--d-done-s);
+    }
+
+    .mk.n {
+        --board: var(--n-board);
+        --slat: var(--n-slat);
+        --alt: var(--n-alt);
+        --ink: var(--n-ink);
+        --ink-2: var(--n-ink-2);
+        --muted: var(--n-muted);
+        --muted-board: var(--n-muted-board);
+        --line: var(--n-line);
+        --line-soft: var(--n-line-soft);
+        --keyline: var(--n-keyline);
+        --action: var(--n-action);
+        --action-ink: var(--n-action-ink);
+        --run: var(--n-run);
+        --run-s: var(--n-run-s);
+        --out: var(--n-out);
+        --out-s: var(--n-out-s);
+        --quit: var(--n-quit);
+        --quit-s: var(--n-quit-s);
+        --done: var(--n-done);
+        --done-s: var(--n-done-s);
+    }
+
+    .m-head {
+        padding: 15px 16px 12px;
+        border-bottom: 3px solid var(--keyline);
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+    }
+
+    .m-event {
+        font-family: var(--mono);
+        font-size: 9.5px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--muted-board);
+    }
+
+    .m-line {
+        display: flex;
+        align-items: baseline;
+        gap: 9px;
+        font-family: var(--mono);
+        letter-spacing: -0.06em;
+    }
+
+    .m-round {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        color: var(--muted-board);
+    }
+
+    .m-dep {
+        font-size: 32px;
+        font-weight: 700;
+        line-height: 1;
+    }
+
+    .m-lim {
+        font-size: 13px;
+        font-weight: 400;
+        color: var(--ink-2);
+    }
+
+    .m-title {
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: -0.025em;
+    }
+
+    .m-tally {
+        display: flex;
+        gap: 14px;
+        padding: 10px 16px;
+        font-family: var(--mono);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .m-tally span {
+        color: var(--muted-board);
+        font-weight: 400;
+        margin-right: 4px;
+    }
+
+    .m-colhead {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px 7px;
+        font-family: var(--mono);
+        font-size: 8.5px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--muted-board);
+    }
+
+    .m-colhead__bib {
+        width: 38px;
+        flex: none;
+    }
+
+    .m-colhead__name {
+        flex: 1;
+    }
+
+    .m-slats {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        flex: 1;
+    }
+
+    .m-slat {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--slat);
+        padding: 10px 12px;
+        min-height: 68px;
+    }
+
+    .m-bib {
+        width: 38px;
+        flex: none;
+        font-family: var(--mono);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: -0.06em;
+    }
+
+    .m-id {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+    }
+
+    .m-name {
+        font-size: 15.5px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .m-sub {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-family: var(--mono);
+        font-size: 9.5px;
+        font-weight: 400;
+        letter-spacing: -0.02em;
+        color: var(--muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .m-sub svg {
+        width: 12px;
+        height: 12px;
+        flex: none;
+    }
+
+    .m-btn {
+        font-family: var(--sans);
+        font-size: 11.5px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        border: 1px solid var(--action);
+        border-radius: 0;
+        background: var(--action);
+        color: var(--action-ink);
+        padding: 14px 12px;
+        min-height: 50px;
+        min-width: 90px;
+        flex: none;
+        cursor: pointer;
+    }
+
+    .m-cell {
+        min-width: 90px;
+        flex: none;
+        text-align: right;
+    }
+
+    .m-cell b {
+        display: block;
+        font-family: var(--mono);
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: -0.07em;
+    }
+
+    .m-cell span {
+        display: block;
+        font-family: var(--mono);
+        font-size: 8.5px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+    }
+
+    .m-cell--out b {
+        color: var(--muted);
+    }
+
+    .m-tabs {
+        display: flex;
+        gap: 5px;
+        padding: 10px 16px;
+        overflow-x: auto;
+    }
+
+    .m-tab {
+        font-family: var(--sans);
+        font-size: 11.5px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        white-space: nowrap;
+        border: 1px solid var(--ink);
+        border-radius: 0;
+        background: transparent;
+        color: var(--ink);
+        padding: 11px 13px;
+        min-height: 44px;
+        cursor: pointer;
+    }
+
+    .m-tab--on {
+        background: var(--ink);
+        color: var(--board);
+    }
+
+    .m-fields {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+        padding: 6px 0 0;
+    }
+
+    .m-field {
+        background: var(--slat);
+        padding: 11px 12px 13px;
+    }
+
+    .m-field__l {
+        font-family: var(--mono);
+        font-size: 8.5px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--muted);
+    }
+
+    .m-field__v {
+        font-family: var(--mono);
+        font-size: 26px;
+        font-weight: 700;
+        letter-spacing: -0.07em;
+        line-height: 1.15;
+    }
+
+    .m-links {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding: 6px 0 0;
+    }
+
+    .m-link {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        background: var(--slat);
+        color: var(--ink);
+        text-decoration: none;
+        padding: 14px 14px;
+        min-height: 54px;
+        font-size: 14.5px;
+        font-weight: 600;
+    }
+
+    .m-link svg {
+        width: 18px;
+        height: 18px;
+        color: var(--muted);
+        flex: none;
+    }
+
+    .m-pad {
+        padding: 0 16px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .m-nav {
+        margin-top: auto;
+        display: flex;
+        background: var(--slat);
+        border-top: 3px solid var(--keyline);
+    }
+
+    .m-nav a {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        padding: 9px 4px 13px;
+        font-family: var(--mono);
+        font-size: 8px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+        text-decoration: none;
+    }
+
+    .m-nav a svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .m-nav a.on {
+        color: var(--ink);
+    }
+
+    .m-state {
+        background: var(--slat);
+        padding: 26px 18px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 9px;
+        text-align: center;
+    }
+
+    .m-state svg {
+        width: 26px;
+        height: 26px;
+        color: var(--muted);
+    }
+
+    .m-state__t {
+        font-size: 17px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+    }
+
+    .m-state__p {
+        font-size: 13.5px;
+        color: var(--muted);
+        max-width: 32ch;
+        line-height: 1.4;
+    }
+
+    .m-empty {
+        background: var(--slat);
+        min-height: 68px;
+    }
+
+    .m-bib-print {
+        background: var(--slat);
+        margin: 0;
+        padding: 26px 18px 30px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        text-align: center;
+    }
+
+    .m-bib-print__ev {
+        font-family: var(--mono);
+        font-size: 9.5px;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--muted);
+    }
+
+    .m-bib-print__n {
+        font-family: var(--mono);
+        font-size: 92px;
+        font-weight: 700;
+        line-height: 0.95;
+        letter-spacing: -0.1em;
+    }
+
+    .m-bib-print__rule {
+        width: 100%;
+        height: 3px;
+        background: var(--ink);
+        margin: 8px 0 6px;
+    }
+
+    .m-bib-print__name {
+        font-size: 21px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        text-transform: uppercase;
+    }
+
+    .m-bib-print__foot {
+        font-family: var(--mono);
+        font-size: 8.5px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-top: 6px;
+    }
+
+    .flip {
+        animation: flip 130ms ease-out;
+    }
+
+    @keyframes flip {
+        from {
+            transform: scaleY(0.1);
+            opacity: 0.4;
+        }
+        to {
+            transform: scaleY(1);
+            opacity: 1;
+        }
+    }
+
+    button:focus-visible,
+    a:focus-visible {
+        outline: 3px solid var(--action);
+        outline-offset: 2px;
+    }
+
+    .diagram {
+        font-family: var(--mono);
+        font-size: 0.6875rem;
+        line-height: 1.7;
+        letter-spacing: -0.04em;
+        white-space: pre;
+        overflow-x: auto;
+        color: var(--ink-2);
+        margin: 0;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .flip {
+            animation: none;
+        }
+    }
+</style>
+
+<div class="wrap">
+    <header class="section">
+        <p class="eyebrow">Direction arrêtée · Backyard Race</p>
+        <h1>Tableau des départs</h1>
+        <p class="lede">
+            Une Backyard est un tableau d'horaires : un départ par heure, une heure limite par
+            départ, et une liste de noms qui raccourcit. L'application est ce tableau. Le blanc
+            est la planche, chaque coureur est une latte grise posée dessus, et la dernière case
+            de la latte bascule du bouton vers l'heure d'arrivée. Rien d'autre ne bouge.
+        </p>
+        <div class="board-demo">
+            <div class="head">
+                <span class="head__event">La Backyard de Thomas</span>
+                <div class="head__line">
+                    <span class="head__round">T06</span>
+                    <span class="head__dep">18:00</span>
+                    <span class="head__lim">→ 19:00</span>
+                </div>
+            </div>
+            <div class="tally"><span>en course</span>24<span>sortis</span>13<span>rentrés</span>1</div>
+        </div>
+    </header>
+
+    <section class="section">
+        <div class="section__head">
+            <p class="eyebrow">Structure</p>
+            <h2>La planche et les lattes</h2>
+        </div>
+        <p class="lede">
+            Deux plans, pas plus. Le blanc est la planche : il porte l'entête, les compteurs et les
+            titres de colonnes, jamais une donnée de coureur. Le gris est la latte : elle porte un
+            coureur et rien d'autre, à bord perdu, séparée de ses voisines par six pixels de planche.
+            Aucune carte, aucun arrondi, aucune ombre — la hiérarchie tient dans un blanc, un gris et
+            un filet d'encre de trois pixels.
+        </p>
+        <div class="cols cols--wide">
+            <div class="slat">
+                <h3>Le partage des rôles</h3>
+                <p class="diagram">┌─ planche ────────────────┐
+│ LA BACKYARD DE THOMAS    │  blanc
+│ T06  18:00  → 19:00      │
+│ ════════════════════════ │  filet 3 px
+│ en course 24  sortis 13  │
+│ DOSS. COUREUR    ARRIVÉE │
+├──────────────────────────┤
+│┌ latte ─────────────────┐│  gris
+││ 012 Thomas P.  18:48:32││
+│└────────────────────────┘│
+│┌────────────────────────┐│
+││ 007 Camille B. [VALIDER]│
+│└────────────────────────┘│
+└──────────────────────────┘</p>
+            </div>
+            <div class="slat">
+                <h3>Pourquoi des lattes à bord perdu</h3>
+                <p class="note">
+                    Une latte pleine largeur donne au nom vingt pixels de plus qu'une carte à marges,
+                    ce qui compte quand quarante amis portent des noms composés. Elle donne aussi au
+                    bouton une cible qui va jusqu'au bord de l'écran, là où le pouce arrive
+                    naturellement.
+                </p>
+                <p class="note">
+                    <b>Six pixels de planche entre deux lattes.</b> C'est assez pour que l'œil compte
+                    les lignes sans filet, et trop peu pour qu'une liste de quarante coureurs
+                    ressemble à un empilement de cartes.
+                </p>
+            </div>
+            <div class="slat">
+                <h3>L'entête reste collée</h3>
+                <p class="note">
+                    La planche du haut — nom de l'événement, tour, heures, compteurs — est fixée en
+                    haut de l'écran pendant tout le défilement. C'est l'exigence de BR-02 : sur
+                    quarante coureurs, on ne doit jamais perdre de vue quel tour on valide.
+                </p>
+                <p class="note">
+                    Les titres de colonnes défilent avec la liste, eux : ils appartiennent au tableau,
+                    pas à l'entête.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section__head">
+            <p class="eyebrow">Palette</p>
+            <h2>Deux gris, une encre, quatre statuts</h2>
+        </div>
+        <p class="lede">
+            Le jour, il n'y a aucune couleur de marque : le bouton d'action est un aplat d'encre. La
+            seule couleur de l'écran est celle d'un statut, donc quand quelque chose est coloré, c'est
+            que ça compte. La nuit, la planche devient noire et le tableau s'allume en ambre — c'est
+            la seule couleur que la charte ajoute, et elle n'existe qu'après la tombée du jour.
+        </p>
+        <div class="swatches">
+            <div class="sw">
+                <div class="sw__chip" style="background: #FFFFFF; border-bottom: 1px solid #AEB6BC;"></div>
+                <div class="sw__meta">
+                    <span class="sw__name">Planche</span>
+                    <span class="sw__hex">#FFFFFF</span>
+                    <span class="sw__role">Fond d'écran. Ne porte que la structure, jamais une donnée de coureur. Nuit : #0C0E11.</span>
+                </div>
+            </div>
+            <div class="sw">
+                <div class="sw__chip" style="background: #DCE0E4;"></div>
+                <div class="sw__meta">
+                    <span class="sw__name">Latte</span>
+                    <span class="sw__hex">#DCE0E4</span>
+                    <span class="sw__role">Une latte, un coureur. Nuit : #191C21.</span>
+                </div>
+            </div>
+            <div class="sw">
+                <div class="sw__chip" style="background: #14161A;"></div>
+                <div class="sw__meta">
+                    <span class="sw__name">Encre</span>
+                    <span class="sw__hex">#14161A</span>
+                    <span class="sw__role">Texte, filets, et l'aplat du bouton d'action. Nuit : #F0F1F3.</span>
+                </div>
+            </div>
+            <div class="sw">
+                <div class="sw__chip" style="background: #FFB020;"></div>
+                <div class="sw__meta">
+                    <span class="sw__name">Ambre</span>
+                    <span class="sw__hex">#FFB020</span>
+                    <span class="sw__role">N'existe qu'en mode nuit : lectures d'heure et bouton d'action.</span>
+                </div>
+            </div>
+            <div class="sw">
+                <div class="sw__chip" style="background: #0A6135;"></div>
+                <div class="sw__meta">
+                    <span class="sw__name">En course</span>
+                    <span class="sw__hex">#0A6135</span>
+                    <span class="sw__role">Nuit : #5CD494.</span>
+                </div>
+            </div>
+            <div class="sw">
+                <div class="sw__chip" style="background: #A1221B;"></div>
+                <div class="sw__meta">
+                    <span class="sw__name">Éliminé</span>
+                    <span class="sw__hex">#A1221B</span>
+                    <span class="sw__role">Hors délai. Nuit : #FF8A72.</span>
+                </div>
+            </div>
+            <div class="sw">
+                <div class="sw__chip" style="background: #474D56;"></div>
+                <div class="sw__meta">
+                    <span class="sw__name">Abandon</span>
+                    <span class="sw__hex">#474D56</span>
+                    <span class="sw__role">Sert aussi de gris de texte secondaire. Nuit : #949AA3.</span>
+                </div>
+            </div>
+            <div class="sw">
+                <div class="sw__chip" style="background: #6A5000;"></div>
+                <div class="sw__meta">
+                    <span class="sw__name">Terminé</span>
+                    <span class="sw__hex">#6A5000</span>
+                    <span class="sw__role">Statut de l'événement clos, et le vainqueur. Nuit : #F0C24E.</span>
+                </div>
+            </div>
+        </div>
+        <div class="cols">
+            <div class="slat">
+                <h3>Contrastes mesurés</h3>
+                <div class="kv">
+                    <div><span>Encre sur planche</span><span>18,1:1</span></div>
+                    <div><span>Encre sur latte</span><span>13,7:1</span></div>
+                    <div><span>Secondaire sur planche</span><span>8,5:1</span></div>
+                    <div><span>Secondaire sur latte</span><span>6,4:1</span></div>
+                    <div><span>Statut sur son fond</span><span>6,3 à 7,1:1</span></div>
+                    <div><span>Statut sur la latte</span><span>5,7 à 6,4:1</span></div>
+                    <div><span>Ambre sur planche de nuit</span><span>10,6:1</span></div>
+                </div>
+                <p class="note">
+                    Aucune paire ne descend sous <b>5,7:1</b>, contre 4,5 exigé par AA. Le point
+                    bas est une couleur de statut posée sur la latte grise : c'est la contrainte qui
+                    a fixé les trois teintes de statut, chacune assombrie jusqu'à passer sur le gris
+                    et pas seulement sur le blanc.
+                </p>
+            </div>
+            <div class="slat">
+                <h3>Un seul gris de texte</h3>
+                <p class="note">
+                    Le gris secondaire doit rester conforme sur la planche <em>et</em> sur la latte,
+                    ce qui le fixe à <b>#474D56</b> — 8,5:1 sur le blanc, 6,4:1 sur le gris. Un gris
+                    plus clair passerait sur la planche et échouerait sur la latte, donc il n'y en a
+                    qu'un.
+                </p>
+                <p class="note">
+                    Même règle pour les statuts : ils sont assombris jusqu'à passer sur la latte.
+                    C'est le prix d'une surface grise, et c'est le seul endroit où il coûte quelque chose.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section__head">
+            <p class="eyebrow">Typographie</p>
+            <h2>Les chiffres en largeur fixe, les mots en proportionnelle</h2>
+        </div>
+        <p class="lede">
+            Une règle unique et sans exception : tout ce qui est un nombre, une heure ou un code est en
+            Martian Mono ; tout ce qui est un mot est en Instrument Sans. C'est ce qui fait qu'une
+            colonne de quarante heures d'arrivée s'aligne au pixel, et qu'un nom reste lisible à
+            15 px.
+        </p>
+        <div class="cols cols--wide">
+            <div class="slat">
+                <h3>Martian Mono — les lectures</h3>
+                <div class="spec">
+                    <span class="spec__tag">Lecture · 44 px · 700</span>
+                    <span class="t-readout">18:00</span>
+                </div>
+                <div class="spec">
+                    <span class="spec__tag">Chiffre · 28 px · 700</span>
+                    <span class="t-figure">24 · 48:32 · 012</span>
+                </div>
+                <div class="spec">
+                    <span class="spec__tag">Donnée · 13 px · 500</span>
+                    <span class="t-data">7 boucles · 42 km · 7,57 km/h</span>
+                </div>
+                <div class="spec">
+                    <span class="spec__tag">Capitale · 10 px · 700 · +0,14 em</span>
+                    <span class="t-caps">Doss. · Coureur · Arrivée</span>
+                </div>
+                <p class="note">Interlettrage négatif obligatoire en gros corps — jusqu'à <b>-0,07 em</b> à 44 px, sinon un mono large fait exploser la ligne.</p>
+            </div>
+            <div class="slat">
+                <h3>Instrument Sans — les mots</h3>
+                <div class="spec">
+                    <span class="spec__tag">Titre d'écran · 22 px · 700</span>
+                    <span class="t-title">Les coureurs</span>
+                </div>
+                <div class="spec">
+                    <span class="spec__tag">Nom de coureur · 15,5 px · 600</span>
+                    <span class="t-body" style="font-weight: 600;">Yanis Beaufort-Delcourt</span>
+                </div>
+                <div class="spec">
+                    <span class="spec__tag">Texte courant · 16 px · 400</span>
+                    <span class="t-body">Une boucle de 6 km, un départ toutes les heures, tout le monde repart ensemble. Boucle non terminée dans l'heure, c'est fini.</span>
+                </div>
+                <div class="spec">
+                    <span class="spec__tag">Bouton · 11,5 px · 700 · +0,1 em · capitales</span>
+                    <span class="t-small" style="letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; color: var(--ink);">Valider la boucle</span>
+                </div>
+                <p class="note">Un nom de coureur ne passe jamais en capitales : à quarante lignes, les capitales se ressemblent toutes.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section__head">
+            <p class="eyebrow">Formes</p>
+            <h2>Zéro arrondi, trois épaisseurs de filet</h2>
+        </div>
+        <div class="cols cols--wide">
+            <div class="slat">
+                <h3>Les filets</h3>
+                <div class="kv">
+                    <div><span>Sous l'entête</span><span>3 px encre</span></div>
+                    <div><span>Entre deux zones de planche</span><span>1 px planche</span></div>
+                    <div><span>À l'intérieur d'une latte</span><span>1 px doux</span></div>
+                    <div><span>Contour de bouton</span><span>1 px encre</span></div>
+                    <div><span>Liséré de statut</span><span>3 px, bord gauche</span></div>
+                </div>
+                <p class="note">Aucune ombre, nulle part. Le seul relief de l'interface est la différence entre la planche et la latte.</p>
+            </div>
+            <div class="slat">
+                <h3>Espacement</h3>
+                <div class="kv">
+                    <div><span>Entre deux lattes</span><span>6 px</span></div>
+                    <div><span>Intérieur de latte</span><span>10 / 12 px</span></div>
+                    <div><span>Gouttière d'écran</span><span>16 px</span></div>
+                    <div><span>Entre deux blocs</span><span>24 px</span></div>
+                    <div><span>Entre deux sections</span><span>32 px</span></div>
+                </div>
+                <p class="note">Une seule échelle, par pas de quatre. Le 6 px entre lattes est la seule valeur hors échelle, et c'est volontaire : c'est un joint, pas un espace.</p>
+            </div>
+            <div class="slat">
+                <h3>Cibles et boutons</h3>
+                <div class="row">
+                    <button type="button" class="btn">Valider la boucle</button>
+                    <button type="button" class="btn btn--ghost">Abandon</button>
+                    <button type="button" class="btn btn--quiet">Annuler</button>
+                </div>
+                <p class="note">
+                    <b>50 px de haut minimum, 90 px de large</b> pour valider ; 44 px pour tout le
+                    reste. Rectangles nets, pas de pastille : sur un tableau, un bouton est une case.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section__head">
+            <p class="eyebrow">Statuts</p>
+            <h2>Quatre états, trois porteurs chacun</h2>
+        </div>
+        <p class="lede">
+            Chaque statut porte une couleur, un pictogramme et un libellé. Les trois sont toujours
+            présents ensemble, ce qui rend l'information lisible sur un écran délavé par le soleil
+            comme pour un œil qui distingue mal le rouge du vert.
+        </p>
+        <div class="cols">
+            <div class="slat">
+                <h3>En couleur</h3>
+                <div class="badges">
+                    <span class="bdg bdg--run"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M8.5 12h6"></path><path d="M12 9.5l3 2.5-3 2.5"></path></svg>En course</span>
+                    <span class="bdg bdg--out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l2.5 1.75"></path><path d="M5 5l14 14"></path></svg>Éliminé</span>
+                    <span class="bdg bdg--quit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4v9"></path><path d="M8.5 9.5L12 13l3.5-3.5"></path><path d="M5 19h14"></path></svg>Abandon</span>
+                    <span class="bdg bdg--done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8 4h8v4.5a4 4 0 0 1-8 0z"></path><path d="M8 5.5H5.5a3 3 0 0 0 3 3"></path><path d="M16 5.5h2.5a3 3 0 0 1-3 3"></path><path d="M12 12.5V16"></path><path d="M8.5 20h7"></path></svg>Terminé</span>
+                </div>
+                <p class="note">Une flèche qui avance, une horloge barrée, une flèche qui redescend, une coupe. Quatre silhouettes qui ne se confondent pas.</p>
+            </div>
+            <div class="slat">
+                <h3>La même chose en niveaux de gris</h3>
+                <div class="badges grey">
+                    <span class="bdg bdg--run"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M8.5 12h6"></path><path d="M12 9.5l3 2.5-3 2.5"></path></svg>En course</span>
+                    <span class="bdg bdg--out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l2.5 1.75"></path><path d="M5 5l14 14"></path></svg>Éliminé</span>
+                    <span class="bdg bdg--quit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4v9"></path><path d="M8.5 9.5L12 13l3.5-3.5"></path><path d="M5 19h14"></path></svg>Abandon</span>
+                    <span class="bdg bdg--done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8 4h8v4.5a4 4 0 0 1-8 0z"></path><path d="M8 5.5H5.5a3 3 0 0 0 3 3"></path><path d="M16 5.5h2.5a3 3 0 0 1-3 3"></path><path d="M12 12.5V16"></path><path d="M8.5 20h7"></path></svg>Terminé</span>
+                </div>
+                <p class="note">Le motif de sortie accompagne toujours le statut « éliminé » : <b>hors délai</b> ou <b>abandon</b> ne se déduisent pas d'une couleur.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section__head">
+            <p class="eyebrow">Composants</p>
+            <h2>La latte, dans ses quatre états</h2>
+        </div>
+        <p class="lede">
+            C'est le seul composant qui compte : celui que le gérant touche des centaines de fois dans
+            la soirée. La dernière case bascule — le bouton disparaît, l'heure d'arrivée prend sa
+            place, en ambre la nuit. Appuie sur un bouton ci-dessous pour voir la bascule.
+        </p>
+        <div class="board-demo">
+            <div class="m-colhead">
+                <span class="m-colhead__bib">Doss.</span>
+                <span class="m-colhead__name">Coureur</span>
+                <span>Arrivée</span>
+            </div>
+            <div class="m-slat">
+                <span class="m-bib">007</span>
+                <span class="m-id">
+                    <span class="m-name">Camille Berthier</span>
+                    <span class="m-sub">6 boucles · 36 km</span>
+                </span>
+                <button type="button" class="m-btn" data-flip="18:49:07">Valider</button>
+            </div>
+            <div class="m-slat">
+                <span class="m-bib">012</span>
+                <span class="m-id">
+                    <span class="m-name">Thomas Poirey</span>
+                    <span class="m-sub">7 boucles · 42 km</span>
+                </span>
+                <span class="m-cell"><b>18:48:32</b><span>Rentré</span></span>
+            </div>
+            <div class="m-slat">
+                <span class="m-bib">029</span>
+                <span class="m-id">
+                    <span class="m-name">Farid Benazzouz</span>
+                    <span class="m-sub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l2.5 1.75"></path><path d="M5 5l14 14"></path></svg>Hors délai · tour 05</span>
+                </span>
+                <span class="m-cell m-cell--out"><b>—</b><span>Sorti</span></span>
+            </div>
+            <div class="m-slat">
+                <span class="m-bib">016</span>
+                <span class="m-id">
+                    <span class="m-name">Marion Le Guennec</span>
+                    <span class="m-sub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4v9"></path><path d="M8.5 9.5L12 13l3.5-3.5"></path><path d="M5 19h14"></path></svg>Abandon · tour 04</span>
+                </span>
+                <span class="m-cell m-cell--out"><b>—</b><span>Sorti</span></span>
+            </div>
+        </div>
+        <div class="cols cols--wide">
+            <div class="slat">
+                <h3>La bascule, seule animation de l'application</h3>
+                <p class="note">
+                    130 ms, un écrasement vertical, rien de plus. C'est la seule chose qui s'anime dans
+                    toute l'interface, et elle ne se déclenche que sur un appui du gérant — donc jamais
+                    toute seule, jamais en boucle, jamais pendant quinze heures de nuit.
+                </p>
+                <p class="note">Sous <b>prefers-reduced-motion</b>, la case change sans transition.</p>
+            </div>
+            <div class="slat">
+                <h3>Le coureur validé reste en place</h3>
+                <p class="note">
+                    Sa latte ne sort pas de la liste et ne se grise pas : elle affiche son heure. BR-13
+                    l'exige — le gérant doit voir ce qu'il vient de faire, surtout quand dix coureurs
+                    rentrent en même temps.
+                </p>
+                <p class="note">Un second appui sur une latte déjà validée ne fait rien, et n'affiche aucune erreur.</p>
+            </div>
+            <div class="slat">
+                <h3>Les onglets du tableau des coureurs</h3>
+                <div class="row" style="gap: 5px;">
+                    <button type="button" class="m-tab m-tab--on">Tous</button>
+                    <button type="button" class="m-tab">En course</button>
+                    <button type="button" class="m-tab">Sortis</button>
+                </div>
+                <p class="note">Rectangles à contour d'encre, l'onglet actif est un aplat. Quatre vues : tous, en course, sortis, tour courant.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section__head">
+            <p class="eyebrow">États d'écran</p>
+            <h2>Un tableau qui n'a rien à dire le dit</h2>
+        </div>
+        <div class="cols cols--wide">
+            <div class="board-demo">
+                <div class="m-colhead"><span>Chargement</span></div>
+                <div class="m-empty"></div>
+                <div class="m-empty"></div>
+                <div class="m-empty"></div>
+                <p class="note" style="color: var(--muted-board);">Des lattes vides, pas un tourniquet. La structure apparaît avant les données, donc l'écran ne saute pas quand elles arrivent.</p>
+            </div>
+            <div class="board-demo">
+                <div class="m-colhead"><span>Liste vide</span></div>
+                <div class="m-state">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 18h16"></path><path d="M7 18V9"></path><path d="M12 18V6"></path><path d="M17 18v-6"></path></svg>
+                    <span class="m-state__t">Personne n'est rentré</span>
+                    <span class="m-state__p">Le tour 6 vient de partir. Les heures d'arrivée s'afficheront ici.</span>
+                </div>
+            </div>
+            <div class="board-demo">
+                <div class="m-colhead"><span>Erreur</span></div>
+                <div class="m-state">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 4l9 16H3z"></path><path d="M12 10v4"></path><path d="M12 17h.01"></path></svg>
+                    <span class="m-state__t">Course indisponible</span>
+                    <span class="m-state__p">Le réseau n'a pas répondu. La validation reprendra dès que la connexion revient.</span>
+                    <button type="button" class="btn" style="margin-top: 4px;">Réessayer</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section__head">
+            <p class="eyebrow">Écrans</p>
+            <h2>Cinq écrans, du plein soleil à quatre heures du matin</h2>
+        </div>
+        <div class="screens">
+            <div class="device">
+                <div class="ph">
+                    <div class="mk d">
+                        <div class="m-head">
+                            <span class="m-event">La Backyard de Thomas</span>
+                            <div class="m-line">
+                                <span class="m-round">T06</span>
+                                <span class="m-dep">18:00</span>
+                                <span class="m-lim">→ 19:00</span>
+                            </div>
+                        </div>
+                        <div class="m-tally"><span>en course</span>24<span>sortis</span>13<span>rentrés</span>1</div>
+                        <div class="m-colhead">
+                            <span class="m-colhead__bib">Doss.</span>
+                            <span class="m-colhead__name">Coureur</span>
+                            <span>Arrivée</span>
+                        </div>
+                        <div class="m-slats">
+                            <div class="m-slat">
+                                <span class="m-bib">012</span>
+                                <span class="m-id">
+                                    <span class="m-name">Thomas Poirey</span>
+                                    <span class="m-sub">7 boucles · 42 km</span>
+                                </span>
+                                <span class="m-cell"><b>18:48:32</b><span>Rentré</span></span>
+                            </div>
+                            <div class="m-slat">
+                                <span class="m-bib">007</span>
+                                <span class="m-id">
+                                    <span class="m-name">Camille Berthier</span>
+                                    <span class="m-sub">6 boucles · 36 km</span>
+                                </span>
+                                <button type="button" class="m-btn" data-flip="18:51:44">Valider</button>
+                            </div>
+                            <div class="m-slat">
+                                <span class="m-bib">021</span>
+                                <span class="m-id">
+                                    <span class="m-name">Nadia Lemarchand</span>
+                                    <span class="m-sub">6 boucles · 36 km</span>
+                                </span>
+                                <button type="button" class="m-btn" data-flip="18:53:02">Valider</button>
+                            </div>
+                            <div class="m-slat">
+                                <span class="m-bib">034</span>
+                                <span class="m-id">
+                                    <span class="m-name">Yanis Beaufort-Delcourt</span>
+                                    <span class="m-sub">6 boucles · 36 km</span>
+                                </span>
+                                <button type="button" class="m-btn" data-flip="18:55:19">Valider</button>
+                            </div>
+                        </div>
+                        <nav class="m-nav">
+                            <a class="on" href="#e1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l3 2"></path></svg>Course</a>
+                            <a href="#e2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M4 6h16"></path><path d="M4 12h16"></path><path d="M4 18h10"></path></svg>Coureurs</a>
+                            <a href="#e3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M12 3l8 4v6c0 4-3.5 7-8 8-4.5-1-8-4-8-8V7z"></path></svg>Infos</a>
+                        </nav>
+                    </div>
+                </div>
+                <p class="ph__cap">Course · plein soleil · le gérant valide</p>
+            </div>
+
+            <div class="device">
+                <div class="ph">
+                    <div class="mk n">
+                        <div class="m-head">
+                            <span class="m-event">La Backyard de Thomas</span>
+                            <div class="m-line">
+                                <span class="m-round">T14</span>
+                                <span class="m-dep" style="color: var(--action);">02:00</span>
+                                <span class="m-lim">→ 03:00</span>
+                            </div>
+                        </div>
+                        <div class="m-tally"><span>en course</span>6<span>sortis</span>31<span>rentrés</span>1</div>
+                        <div class="m-colhead">
+                            <span class="m-colhead__bib">Doss.</span>
+                            <span class="m-colhead__name">Coureur</span>
+                            <span>Arrivée</span>
+                        </div>
+                        <div class="m-slats">
+                            <div class="m-slat">
+                                <span class="m-bib">012</span>
+                                <span class="m-id">
+                                    <span class="m-name">Thomas Poirey</span>
+                                    <span class="m-sub">14 boucles · 84 km</span>
+                                </span>
+                                <span class="m-cell"><b style="color: var(--action);">02:52:07</b><span>Rentré</span></span>
+                            </div>
+                            <div class="m-slat">
+                                <span class="m-bib">003</span>
+                                <span class="m-id">
+                                    <span class="m-name">Paul Vasseur</span>
+                                    <span class="m-sub">13 boucles · 78 km</span>
+                                </span>
+                                <button type="button" class="m-btn" data-flip="02:54:11">Valider</button>
+                            </div>
+                            <div class="m-slat">
+                                <span class="m-bib">018</span>
+                                <span class="m-id">
+                                    <span class="m-name">Julie Marchetti</span>
+                                    <span class="m-sub">13 boucles · 78 km</span>
+                                </span>
+                                <button type="button" class="m-btn" data-flip="02:57:38">Valider</button>
+                            </div>
+                            <div class="m-slat">
+                                <span class="m-bib">029</span>
+                                <span class="m-id">
+                                    <span class="m-name">Farid Benazzouz</span>
+                                    <span class="m-sub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l2.5 1.75"></path><path d="M5 5l14 14"></path></svg>Hors délai · 01:00</span>
+                                </span>
+                                <span class="m-cell m-cell--out"><b>—</b><span>Sorti</span></span>
+                            </div>
+                        </div>
+                        <nav class="m-nav">
+                            <a class="on" href="#e4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l3 2"></path></svg>Course</a>
+                            <a href="#e5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M4 6h16"></path><path d="M4 12h16"></path><path d="M4 18h10"></path></svg>Coureurs</a>
+                            <a href="#e6"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M12 3l8 4v6c0 4-3.5 7-8 8-4.5-1-8-4-8-8V7z"></path></svg>Infos</a>
+                        </nav>
+                    </div>
+                </div>
+                <p class="ph__cap">Course · 2 h du matin · le tableau s'allume</p>
+            </div>
+
+            <div class="device">
+                <div class="ph">
+                    <div class="mk d">
+                        <div class="m-head">
+                            <span class="m-event">La Backyard de Thomas</span>
+                            <span class="m-title">Les coureurs</span>
+                        </div>
+                        <div class="m-tabs">
+                            <button type="button" class="m-tab m-tab--on">Tous</button>
+                            <button type="button" class="m-tab">En course</button>
+                            <button type="button" class="m-tab">Sortis</button>
+                            <button type="button" class="m-tab">Tour 06</button>
+                        </div>
+                        <div class="m-colhead">
+                            <span class="m-colhead__bib">Doss.</span>
+                            <span class="m-colhead__name">Coureur</span>
+                            <span>Boucles</span>
+                        </div>
+                        <div class="m-slats">
+                            <div class="m-slat">
+                                <span class="m-bib">012</span>
+                                <span class="m-id">
+                                    <span class="m-name">Thomas Poirey</span>
+                                    <span class="m-sub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--run);" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M8.5 12h6"></path><path d="M12 9.5l3 2.5-3 2.5"></path></svg>En course · 42 km</span>
+                                </span>
+                                <span class="m-cell"><b>7</b><span>Boucles</span></span>
+                            </div>
+                            <div class="m-slat">
+                                <span class="m-bib">003</span>
+                                <span class="m-id">
+                                    <span class="m-name">Paul Vasseur</span>
+                                    <span class="m-sub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--run);" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M8.5 12h6"></path><path d="M12 9.5l3 2.5-3 2.5"></path></svg>En course · 42 km</span>
+                                </span>
+                                <span class="m-cell"><b>7</b><span>Boucles</span></span>
+                            </div>
+                            <div class="m-slat">
+                                <span class="m-bib">029</span>
+                                <span class="m-id">
+                                    <span class="m-name">Farid Benazzouz</span>
+                                    <span class="m-sub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--out);" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l2.5 1.75"></path><path d="M5 5l14 14"></path></svg>Hors délai · 17:00</span>
+                                </span>
+                                <span class="m-cell m-cell--out"><b>4</b><span>Boucles</span></span>
+                            </div>
+                            <div class="m-slat">
+                                <span class="m-bib">016</span>
+                                <span class="m-id">
+                                    <span class="m-name">Marion Le Guennec</span>
+                                    <span class="m-sub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--quit);" aria-hidden="true"><path d="M12 4v9"></path><path d="M8.5 9.5L12 13l3.5-3.5"></path><path d="M5 19h14"></path></svg>Abandon · 16:12</span>
+                                </span>
+                                <span class="m-cell m-cell--out"><b>3</b><span>Boucles</span></span>
+                            </div>
+                            <div class="m-slat">
+                                <span class="m-bib">041</span>
+                                <span class="m-id">
+                                    <span class="m-name">Chloé Vandenbrouck</span>
+                                    <span class="m-sub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--out);" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l2.5 1.75"></path><path d="M5 5l14 14"></path></svg>Hors délai · 15:00</span>
+                                </span>
+                                <span class="m-cell m-cell--out"><b>2</b><span>Boucles</span></span>
+                            </div>
+                        </div>
+                        <nav class="m-nav">
+                            <a href="#e7"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l3 2"></path></svg>Course</a>
+                            <a class="on" href="#e8"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M4 6h16"></path><path d="M4 12h16"></path><path d="M4 18h10"></path></svg>Coureurs</a>
+                            <a href="#e9"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M12 3l8 4v6c0 4-3.5 7-8 8-4.5-1-8-4-8-8V7z"></path></svg>Infos</a>
+                        </nav>
+                    </div>
+                </div>
+                <p class="ph__cap">Les coureurs · qui court encore, et pourquoi pas</p>
+            </div>
+
+            <div class="device">
+                <div class="ph">
+                    <div class="mk d">
+                        <div class="m-head">
+                            <span class="m-event">Dossard 012 · Thomas</span>
+                            <div class="m-line">
+                                <span class="m-round">Prochain départ · T08</span>
+                                <span class="m-dep">20:00</span>
+                                <span class="m-lim">→ 21:00</span>
+                            </div>
+                        </div>
+                        <div class="m-pad" style="padding-top: 6px;">
+                            <div class="m-fields" style="padding-top: 0;">
+                                <div class="m-field">
+                                    <div class="m-field__l">Boucles</div>
+                                    <div class="m-field__v">7</div>
+                                </div>
+                                <div class="m-field">
+                                    <div class="m-field__l">Distance</div>
+                                    <div class="m-field__v">42 km</div>
+                                </div>
+                                <div class="m-field">
+                                    <div class="m-field__l">Dernière boucle</div>
+                                    <div class="m-field__v">48:32</div>
+                                </div>
+                                <div class="m-field">
+                                    <div class="m-field__l">Moyenne</div>
+                                    <div class="m-field__v">7,57</div>
+                                </div>
+                            </div>
+                            <div class="m-links">
+                                <a class="m-link" href="#e10">Mon dossard<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></a>
+                                <a class="m-link" href="#e11">Le parcours<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></a>
+                                <a class="m-link" href="#e12">Le briefing<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></a>
+                            </div>
+                        </div>
+                        <nav class="m-nav">
+                            <a class="on" href="#e13"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l3 2"></path></svg>Ma course</a>
+                            <a href="#e14"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M4 6h16"></path><path d="M4 12h16"></path><path d="M4 18h10"></path></svg>Coureurs</a>
+                            <a href="#e15"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M12 3l8 4v6c0 4-3.5 7-8 8-4.5-1-8-4-8-8V7z"></path></svg>Infos</a>
+                        </nav>
+                    </div>
+                </div>
+                <p class="ph__cap">Ma course · quatre champs et l'heure du prochain départ</p>
+            </div>
+
+            <div class="device">
+                <div class="ph">
+                    <div class="mk d">
+                        <div class="m-head">
+                            <span class="m-event">Mon dossard</span>
+                        </div>
+                        <div class="m-pad" style="padding-top: 6px;">
+                            <div class="m-bib-print">
+                                <span class="m-bib-print__ev">La Backyard de Thomas</span>
+                                <span class="m-bib-print__n">012</span>
+                                <span class="m-bib-print__rule"></span>
+                                <span class="m-bib-print__name">Thomas Poirey</span>
+                                <span class="m-bib-print__foot">6 km · chaque heure · jusqu'au dernier</span>
+                            </div>
+                            <button type="button" class="btn" style="width: 100%;">Imprimer mon dossard</button>
+                        </div>
+                        <nav class="m-nav">
+                            <a class="on" href="#e16"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l3 2"></path></svg>Ma course</a>
+                            <a href="#e17"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M4 6h16"></path><path d="M4 12h16"></path><path d="M4 18h10"></path></svg>Coureurs</a>
+                            <a href="#e18"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M12 3l8 4v6c0 4-3.5 7-8 8-4.5-1-8-4-8-8V7z"></path></svg>Infos</a>
+                        </nav>
+                    </div>
+                </div>
+                <p class="ph__cap">Mon dossard · le numéro comme une lecture de tableau</p>
+            </div>
+        </div>
+        <div class="cols cols--wide">
+            <div class="slat">
+                <h3>Le dossard à l'impression</h3>
+                <p class="note">
+                    À l'impression, la planche disparaît : il ne reste que la latte, centrée sur une A4
+                    portrait. Le numéro est en Martian Mono, sur trois chiffres, dans la plus grande
+                    taille de la page ; l'interlettrage descend à -0,1 em, sans quoi trois chiffres
+                    d'un mono large ne tiennent pas dans la largeur.
+                </p>
+                <p class="note">Navigation, boutons et aplats de gris sont retirés par <b>@media print</b>. Aucun PDF serveur.</p>
+            </div>
+            <div class="slat">
+                <h3>Ce que la nuit change, et rien d'autre</h3>
+                <p class="note">
+                    La planche passe au noir, les lattes au gris foncé, et les <b>lectures d'heure</b>
+                    passent en ambre — l'heure de départ, les heures d'arrivée, le bouton de
+                    validation. Tout le reste garde exactement les mêmes tailles et les mêmes
+                    positions.
+                </p>
+                <p class="note">Le basculement suit le réglage du téléphone. Aucun réglage dans l'application.</p>
+            </div>
+            <div class="slat">
+                <h3>Tablette et desktop</h3>
+                <p class="note">
+                    La latte ne change pas de forme, elle s'allonge : au-delà de 700 px, les colonnes
+                    boucles, distance et dernière boucle s'insèrent entre le nom et la case d'arrivée.
+                    Le tableau n'est jamais découpé en cartes à plusieurs colonnes.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section__head">
+            <p class="eyebrow">Interdits</p>
+            <h2>Ce que la charte refuse</h2>
+        </div>
+        <ul class="refuse">
+            <li><b>Aucun compte à rebours, aucune barre de progression</b>Un chronomètre physique s'en charge. Les heures sont des faits envoyés par le serveur.</li>
+            <li><b>Aucune horloge côté client</b>Rien à dériver de l'heure serveur, rien qui s'anime pendant quinze heures.</li>
+            <li><b>Aucun classement pendant la course</b>La question est « qui est encore debout », pas « qui est premier ».</li>
+            <li><b>Aucun arrondi, aucune ombre, aucun dégradé</b>Un blanc, un gris et un filet suffisent. Le soleil efface tout le reste.</li>
+            <li><b>Aucune couleur de marque le jour</b>La couleur est réservée aux statuts. L'ambre n'apparaît qu'en mode nuit.</li>
+            <li><b>Aucune donnée personnelle dans une latte</b>Téléphone, date de naissance et contact d'urgence n'apparaissent jamais devant un autre coureur.</li>
+        </ul>
+    </section>
+
+    <section class="section">
+        <div class="section__head">
+            <p class="eyebrow">Mise en œuvre</p>
+            <h2>Les jetons, tels qu'ils sont posés</h2>
+        </div>
+        <p class="lede">
+            Voici le contenu exact de <b>resources/css/app.css</b>. Les noms que l'application
+            consommait déjà n'ont pas changé — seules leurs valeurs et les deux familles de
+            caractères ont bougé, plus un jeton ajouté pour le filet clair intérieur à une latte.
+            Les valeurs sont écrites en oklch parce que c'est le format que la suite de tests
+            analyse pour vérifier chaque paire de contraste ; les hexadécimaux cités plus haut dans
+            cette page en sont l'équivalent exact.
+        </p>
+        <pre>:root {
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.1998 0.0086 264.4);
+    --card: oklch(0.9048 0.007 247.9);
+    --card-foreground: oklch(0.1998 0.0086 264.4);
+    --popover: oklch(0.9048 0.007 247.9);
+    --popover-foreground: oklch(0.1998 0.0086 264.4);
+    --primary: oklch(0.1998 0.0086 264.4);
+    --primary-foreground: oklch(1 0 0);
+    --secondary: oklch(0.8699 0.0095 242.9);
+    --secondary-foreground: oklch(0.1998 0.0086 264.4);
+    --muted: oklch(0.8699 0.0095 242.9);
+    --muted-foreground: oklch(0.4182 0.0169 258.4);
+    --accent: oklch(0.8447 0.0114 243.7);
+    --accent-foreground: oklch(0.1998 0.0086 264.4);
+    --destructive: oklch(0.4643 0.1641 28.6);
+    --destructive-foreground: oklch(1 0 0);
+    --border: oklch(0.7718 0.0124 240);
+    --border-soft: oklch(0.8447 0.0114 243.7);
+    --input: oklch(0.7718 0.0124 240);
+    --ring: oklch(0.1998 0.0086 264.4);
+    --radius: 0px;
+    --status-running: oklch(0.4341 0.1049 154.1);
+    --status-running-surface: oklch(0.9384 0.0199 159.7);
+    --status-running-foreground: oklch(1 0 0);
+    --status-eliminated: oklch(0.4643 0.1641 28.6);
+    --status-eliminated-surface: oklch(0.9369 0.0255 23.6);
+    --status-eliminated-foreground: oklch(1 0 0);
+    --status-abandoned: oklch(0.4182 0.0169 258.4);
+    --status-abandoned-surface: oklch(0.9364 0.0046 258.3);
+    --status-abandoned-foreground: oklch(1 0 0);
+    --status-finished: oklch(0.4463 0.0913 86.9);
+    --status-finished-surface: oklch(0.9416 0.0334 88.1);
+    --status-finished-foreground: oklch(1 0 0);
+    --sidebar-background: oklch(0.9602 0.0034 247.9);
+    --sidebar-foreground: oklch(0.1998 0.0086 264.4);
+    --sidebar-primary: oklch(0.1998 0.0086 264.4);
+    --sidebar-primary-foreground: oklch(1 0 0);
+    --sidebar-accent: oklch(0.9048 0.007 247.9);
+    --sidebar-accent-foreground: oklch(0.1998 0.0086 264.4);
+    --sidebar-border: oklch(0.7718 0.0124 240);
+    --sidebar-ring: oklch(0.1998 0.0086 264.4);
+}
+
+.dark {
+    --background: oklch(0.1629 0.0071 258.4);
+    --foreground: oklch(0.9579 0.0029 264.5);
+    --card: oklch(0.2255 0.0107 260.7);
+    --card-foreground: oklch(0.9579 0.0029 264.5);
+    --popover: oklch(0.2255 0.0107 260.7);
+    --popover-foreground: oklch(0.9579 0.0029 264.5);
+    --primary: oklch(0.8131 0.165 75);
+    --primary-foreground: oklch(0.1998 0.0086 264.4);
+    --secondary: oklch(0.2671 0.0126 258.4);
+    --secondary-foreground: oklch(0.9579 0.0029 264.5);
+    --muted: oklch(0.2671 0.0126 258.4);
+    --muted-foreground: oklch(0.6842 0.0149 258.4);
+    --accent: oklch(0.3041 0.0138 261.7);
+    --accent-foreground: oklch(0.9579 0.0029 264.5);
+    --destructive: oklch(0.7567 0.1469 32.7);
+    --destructive-foreground: oklch(0.1998 0.0086 264.4);
+    --border: oklch(0.3041 0.0138 261.7);
+    --border-soft: oklch(0.3322 0.019 264.3);
+    --input: oklch(0.3322 0.019 264.3);
+    --ring: oklch(0.8131 0.165 75);
+    --status-running: oklch(0.7847 0.1429 157.3);
+    --status-running-surface: oklch(0.2815 0.0467 155.2);
+    --status-running-foreground: oklch(0.1998 0.0086 264.4);
+    --status-eliminated: oklch(0.7567 0.1469 32.7);
+    --status-eliminated-surface: oklch(0.2512 0.0409 29.9);
+    --status-eliminated-foreground: oklch(0.1998 0.0086 264.4);
+    --status-abandoned: oklch(0.6842 0.0149 258.4);
+    --status-abandoned-surface: oklch(0.2712 0.0126 258.4);
+    --status-abandoned-foreground: oklch(0.1998 0.0086 264.4);
+    --status-finished: oklch(0.834 0.1408 87);
+    --status-finished-surface: oklch(0.2759 0.0467 86.1);
+    --status-finished-foreground: oklch(0.1998 0.0086 264.4);
+    --sidebar-background: oklch(0.1395 0.0048 262.8);
+    --sidebar-foreground: oklch(0.9579 0.0029 264.5);
+    --sidebar-primary: oklch(0.8131 0.165 75);
+    --sidebar-primary-foreground: oklch(0.1998 0.0086 264.4);
+    --sidebar-accent: oklch(0.2671 0.0126 258.4);
+    --sidebar-accent-foreground: oklch(0.9579 0.0029 264.5);
+    --sidebar-border: oklch(0.3041 0.0138 261.7);
+    --sidebar-ring: oklch(0.8131 0.165 75);
+}</pre>
+        <div class="cols cols--wide">
+            <div class="slat">
+                <h3>Ce qui a été touché dans l'application</h3>
+                <p class="note">
+                    <b>resources/css/app.css</b> pour les jetons, <b>vite.config.ts</b> et
+                    <b>resources/fonts</b> pour les deux woff2 auto-hébergés — Archivo est sorti. Les
+                    composants de course portent la latte, la case bascule, l'entête collée et la
+                    ligne de comptage ; les composants du starter kit ont suivi les jetons sans être
+                    touchés. Le diviseur festif a été supprimé : la charte ne veut pas de décor.
+                </p>
+                <p class="note">
+                    234 tests passent, dont la suite de contraste qui relit ce fichier CSS et vérifie
+                    chaque paire.
+                </p>
+            </div>
+            <div class="slat">
+                <h3>Ce qui reste à trancher</h3>
+                <p class="note">
+                    Le <b>nom réel de l'événement</b> — « La Backyard de Thomas » reste un texte de
+                    remplissage tiré des stories.
+                </p>
+                <p class="note">
+                    Et le sort de <b>BR-02</b>, aujourd'hui terminée : cette charte remplace la
+                    direction qu'elle avait arrêtée, donc l'entrée de DECISIONS.md qui la fige est à
+                    reprendre. C'est ton arbitrage, pas le mien.
+                </p>
+            </div>
+            <div class="slat">
+                <h3>Une limite assumée</h3>
+                <p class="note">
+                    Les deux polices sont auto-hébergées dans leur sous-ensemble <b>latin</b>, ce qui
+                    couvre l'intégralité du français. Un nom portant un diacritique hors de ce
+                    sous-ensemble — un ł, un ő — s'affichera dans la police système.
+                </p>
+            </div>
+        </section>
+</div>
+
+<script>
+    document.addEventListener('click', function (event) {
+        const button = event.target.closest('[data-flip]');
+
+        if (!button) {
+            return;
+        }
+
+        const cell = document.createElement('span');
+        cell.className = 'm-cell flip';
+        cell.innerHTML = '<b>' + button.dataset.flip + '</b><span>Rentré</span>';
+
+        if (button.closest('.n')) {
+            cell.firstChild.style.color = 'var(--action)';
+        }
+
+        button.replaceWith(cell);
+    });
+</script>

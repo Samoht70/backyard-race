@@ -1,4 +1,9 @@
-import { CircleMinus, CircleX, Footprints, Trophy } from '@lucide/vue';
+import {
+    ArrowDownToLine,
+    CircleArrowRight,
+    TimerOff,
+    Trophy,
+} from '@lucide/vue';
 import type { LucideIcon } from '@lucide/vue';
 import { cva } from 'class-variance-authority';
 import type { RunnerStatus } from '@/types/race';
@@ -8,29 +13,33 @@ import type { RunnerStatus } from '@/types/race';
  * pictogram has to carry the status on its own in greyscale.
  */
 export const runnerStatusIcons = {
-    running: Footprints,
-    eliminated: CircleX,
-    withdrawn: CircleMinus,
+    running: CircleArrowRight,
+    eliminated: TimerOff,
+    withdrawn: ArrowDownToLine,
     finished: Trophy,
 } satisfies Record<RunnerStatus, LucideIcon>;
 
+export const runnerStatusTone = {
+    running: 'text-status-running',
+    eliminated: 'text-status-eliminated',
+    withdrawn: 'text-status-abandoned',
+    finished: 'text-status-finished',
+} satisfies Record<RunnerStatus, string>;
+
 export const runnerStatusVariants = cva(
-    'inline-flex shrink-0 items-center gap-1.5 rounded-md border font-medium',
+    'inline-flex shrink-0 items-center gap-1.5 font-bold tracking-wide uppercase',
     {
         variants: {
             status: {
-                running:
-                    'border-status-running/20 bg-status-running-surface text-status-running',
+                running: 'bg-status-running-surface text-status-running',
                 eliminated:
-                    'border-status-eliminated/20 bg-status-eliminated-surface text-status-eliminated',
-                withdrawn:
-                    'border-status-abandoned/20 bg-status-abandoned-surface text-status-abandoned',
-                finished:
-                    'border-status-finished/20 bg-status-finished-surface text-status-finished',
+                    'bg-status-eliminated-surface text-status-eliminated',
+                withdrawn: 'bg-status-abandoned-surface text-status-abandoned',
+                finished: 'bg-status-finished-surface text-status-finished',
             },
             size: {
-                sm: 'px-1.5 py-0.5 text-xs',
-                md: 'px-2 py-1 text-sm',
+                sm: 'px-1.5 py-0.5 text-[0.625rem]',
+                md: 'px-2.5 py-1 text-[0.6875rem]',
             },
         },
         defaultVariants: {
