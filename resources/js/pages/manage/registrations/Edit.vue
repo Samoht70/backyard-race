@@ -145,7 +145,11 @@ setLayoutProps({
                 </EventField>
             </EventFieldset>
 
-            <RegistrationFields :registration="registration" :errors="errors" />
+            <RegistrationFields
+                :registration="registration"
+                :errors="errors"
+                lock-pps
+            />
 
             <ActionButton type="submit" :loading="processing">
                 {{ t('registration.manage.save') }}

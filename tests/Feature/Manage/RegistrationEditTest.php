@@ -143,6 +143,36 @@ class RegistrationEditTest extends TestCase
             ->assertSessionHas('inertia.flash_data.toast.message', 'Fiche mise à jour.');
     }
 
+    #[Test]
+    public function it_shows_the_declared_pps_number_to_the_manager(): void
+    {
+        $participant = $this->registration(RegistrationStatus::Pending);
+        $participant->update(['pps_number' => 'PPS12345678']);
+
+        $this->actingAs($this->manager())
+            ->get(route('manage.registrations.edit', $participant))
+            ->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->component('manage/registrations/Edit')
+                ->where('registration.pps_number', 'PPS12345678'));
+    }
+
+    #[Test]
+    public function it_refuses_a_pps_number_posted_by_the_manager(): void
+    {
+        $participant = $this->registration(RegistrationStatus::Pending);
+        $participant->update(['pps_number' => 'PPS12345678']);
+
+        $this->actingAs($this->manager())
+            ->put(
+                route('manage.registrations.update', $participant),
+                $this->payload(['pps_number' => 'PPS99990000']),
+            )
+            ->assertSessionHasErrors('pps_number');
+
+        $this->assertSame('PPS12345678', $participant->refresh()->pps_number);
+    }
+
     private function assertCorrects(RegistrationStatus $status): void
     {
         $participant = $this->registration($status);

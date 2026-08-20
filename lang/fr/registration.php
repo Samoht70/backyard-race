@@ -24,6 +24,7 @@ return [
         'last_name' => 'Nom',
         'phone' => 'Téléphone',
         'birth_date' => 'Date de naissance',
+        'pps_number' => 'Numéro PPS',
         'emergency_contact_name' => 'Personne à prévenir',
         'emergency_contact_phone' => 'Téléphone de cette personne',
         'notes' => 'Remarques',
@@ -32,7 +33,14 @@ return [
     'hint' => [
         'phone' => 'Le gérant t’appelle dessus la nuit de la course.',
         'birth_date' => 'Il faut être majeur le jour du départ.',
+        'pps_number' => 'Prétexte Pour Siffler 🍺',
         'notes' => 'Allergie, traitement, régime : tout ce que le gérant doit savoir.',
+    ],
+    'locked' => [
+        'pps_number' => 'Déclaré par le coureur, jamais vérifié.',
+    ],
+    'validation' => [
+        'pps_number' => 'Le numéro PPS s’écrit trois lettres puis huit chiffres, comme PPS12345678.',
     ],
     'seats' => [
         'counted' => ':count / :max participants',
@@ -45,6 +53,7 @@ return [
         'cancelled_title' => 'Inscription annulée',
         'cancelled_description' => 'Le gérant a annulé ton inscription. Contacte-le si c’est une erreur.',
         'call_to_action' => 'Voir mon inscription',
+        'no_pps' => 'Non renseigné',
     ],
     'edit' => [
         'title' => 'Corriger mon inscription',

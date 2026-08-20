@@ -32,6 +32,7 @@ trait RegistersRunners
             'last_name' => 'Recrue',
             'phone' => '06 12 34 56 78',
             'birth_date' => '1986-04-17',
+            'pps_number' => 'PPS12345678',
             'emergency_contact_name' => 'Camille Berger',
             'emergency_contact_phone' => '06 87 65 43 21',
             'notes' => 'Allergie aux fruits à coque.',

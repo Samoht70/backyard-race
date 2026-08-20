@@ -24,6 +24,7 @@ export type RegistrationDetails = {
     email: string;
     phone: string;
     birth_date: string;
+    pps_number: string | null;
     emergency_contact_name: string;
     emergency_contact_phone: string;
     notes: string | null;

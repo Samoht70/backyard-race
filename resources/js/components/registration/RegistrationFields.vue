@@ -9,9 +9,12 @@ import type { RegistrationDetails } from '@/types/registration';
 type Props = {
     registration?: RegistrationDetails;
     errors: Record<string, string>;
+    lockPps?: boolean;
 };
 
-defineProps<Props>();
+withDefaults(defineProps<Props>(), {
+    lockPps: false,
+});
 </script>
 
 <template>
@@ -47,6 +50,26 @@ defineProps<Props>();
                 required
                 class="tabular-nums"
                 :default-value="registration?.birth_date"
+            />
+        </EventField>
+
+        <EventField
+            name="pps_number"
+            :label="t('registration.field.pps_number')"
+            :hint="t('registration.hint.pps_number')"
+            :error="errors.pps_number"
+            :locked="lockPps"
+            :locked-reason="t('registration.locked.pps_number')"
+            :value="registration?.pps_number ?? undefined"
+        >
+            <Input
+                id="pps_number"
+                name="pps_number"
+                autocomplete="off"
+                maxlength="16"
+                placeholder="PPS12345678"
+                class="tabular-nums"
+                :default-value="registration?.pps_number ?? undefined"
             />
         </EventField>
     </EventFieldset>
