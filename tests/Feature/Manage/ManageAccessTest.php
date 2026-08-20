@@ -65,4 +65,13 @@ class ManageAccessTest extends TestCase
 
         $response->assertForbidden();
     }
+
+    #[Test]
+    public function it_refuses_the_registrations_when_the_permissions_were_never_seeded(): void
+    {
+        $response = $this->actingAs(User::factory()->create())
+            ->get(route('manage.registrations.index'));
+
+        $response->assertForbidden();
+    }
 }

@@ -24,7 +24,7 @@ class RegistrationIndexRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         if ($this->enum('status', RegistrationStatus::class) === null) {
-            $this->request->remove('status');
+            $this->merge(['status' => null]);
         }
     }
 

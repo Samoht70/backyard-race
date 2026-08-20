@@ -28,6 +28,7 @@ class RegistrationController extends Controller
                 'capacity' => $event->max_participants,
             ],
             'status' => $status?->value,
+            'refusals' => $event->isFull() ? [__('registration.refusal.full')] : [],
         ]);
     }
 
