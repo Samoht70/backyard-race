@@ -3,10 +3,13 @@
 namespace App\Http\Middleware;
 
 use App\Enums\Permission;
+use App\Models\Document;
+use App\Models\Event;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Lang;
 use Inertia\Middleware;
 
@@ -54,6 +57,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
                 'permissions' => $this->permissions($request->user()),
             ],
+            'access' => $this->access($request->user()),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'translations' => $this->translations(),
         ];
@@ -75,6 +79,25 @@ class HandleInertiaRequests extends Middleware
         }
 
         return $granted;
+    }
+
+    /**
+     * @return array<string, bool>
+     */
+    private function access(?User $user): array
+    {
+        if ($user === null) {
+            return ['event' => false, 'documents' => false, 'registration' => false];
+        }
+
+        $event = Event::query()->first();
+        $gate = Gate::forUser($user);
+
+        return [
+            'event' => $event !== null && $gate->allows('view', $event),
+            'documents' => $event !== null && $gate->allows('viewAny', [Document::class, $event]),
+            'registration' => $user->participant()->exists(),
+        ];
     }
 
     /**
