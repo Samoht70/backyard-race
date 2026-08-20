@@ -5,6 +5,7 @@ namespace Tests\Feature\Auth;
 use App\Enums\Permission;
 use App\Enums\Role;
 use App\Models\User;
+use App\Notifications\RegistrationConfirmed;
 use App\Notifications\RegistrationLink;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -157,6 +158,22 @@ class RegistrationTest extends TestCase
         foreach (Permission::cases() as $permission) {
             $this->assertFalse($this->registered()->can($permission->value));
         }
+    }
+
+    #[Test]
+    public function it_mails_the_access_code_to_the_new_runner(): void
+    {
+        $code = $this->register();
+        $runner = $this->registered();
+
+        Notification::assertSentTo(
+            $runner,
+            RegistrationConfirmed::class,
+            fn (RegistrationConfirmed $notification) => str_contains(
+                implode(' ', $notification->toMail($runner)->introLines),
+                $code
+            )
+        );
     }
 
     private function register(): string

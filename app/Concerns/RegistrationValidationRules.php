@@ -16,7 +16,7 @@ trait RegistrationValidationRules
     {
         return [
             'phone' => ['required', 'string', 'max:40'],
-            'birth_date' => ['required', 'date', 'before_or_equal:-18 years'],
+            'birth_date' => ['required', 'date', 'before_or_equal:-8 years'],
             'pps_number' => ['nullable', 'string', 'regex:'.PpsNumber::PATTERN],
             'emergency_contact_name' => ['required', 'string', 'max:120'],
             'emergency_contact_phone' => ['required', 'string', 'max:40'],

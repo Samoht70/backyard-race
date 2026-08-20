@@ -6,6 +6,7 @@ use App\Enums\Role;
 use App\Models\Event;
 use App\Models\Participant;
 use App\Models\User;
+use App\Notifications\RegistrationConfirmed;
 use App\Support\AccessCode;
 use Illuminate\Support\Facades\DB;
 
@@ -18,7 +19,7 @@ final class RegisterRunner
     {
         $code = AccessCode::generate();
 
-        DB::transaction(function () use ($event, $email, $attributes, $code): void {
+        $user = DB::transaction(function () use ($event, $email, $attributes, $code): User {
             $user = User::create([
                 'first_name' => $attributes['first_name'],
                 'last_name' => $attributes['last_name'],
@@ -32,7 +33,11 @@ final class RegisterRunner
             $participant->event()->associate($event);
             $participant->user()->associate($user);
             $participant->save();
+
+            return $user;
         });
+
+        $user->notify(new RegistrationConfirmed($code));
 
         return $code;
     }
