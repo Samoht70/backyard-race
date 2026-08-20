@@ -13,8 +13,16 @@ class EnsureStorageBucketCommand extends Command
 
     public function handle(): int
     {
+        $name = config()->string('media-library.disk_name');
+
         /** @var array<string, mixed> $disk */
-        $disk = config('filesystems.disks.s3');
+        $disk = config("filesystems.disks.{$name}", []);
+
+        if (($disk['driver'] ?? null) !== 's3') {
+            $this->comment("Media disk `{$name}` is not object storage: nothing to provision.");
+
+            return self::SUCCESS;
+        }
 
         $bucket = (string) $disk['bucket'];
         $client = $this->client($disk);
