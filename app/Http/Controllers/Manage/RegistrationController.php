@@ -2,14 +2,18 @@
 
 namespace App\Http\Controllers\Manage;
 
+use App\Actions\UpdateRegistration;
 use App\Enums\RegistrationStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Manage\RegistrationIndexRequest;
+use App\Http\Requests\Manage\RegistrationUpdateRequest;
 use App\Http\Resources\Manage\RegistrationResource;
 use App\Models\Event;
 use App\Models\Participant;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -30,6 +34,27 @@ class RegistrationController extends Controller
             'status' => $status?->value,
             'refusals' => $event->isFull() ? [__('registration.refusal.full')] : [],
         ]);
+    }
+
+    public function edit(Participant $participant): Response
+    {
+        Gate::authorize('manage', $participant);
+
+        return Inertia::render('manage/registrations/Edit', [
+            'registration' => new RegistrationResource($participant)->resolve(),
+        ]);
+    }
+
+    public function update(
+        RegistrationUpdateRequest $request,
+        UpdateRegistration $update,
+        Participant $participant,
+    ): RedirectResponse {
+        $update($participant, $request->validated());
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('registration.manage.saved')]);
+
+        return to_route('manage.registrations.edit', $participant);
     }
 
     /**

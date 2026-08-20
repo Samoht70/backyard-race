@@ -257,6 +257,43 @@ class RegistrationTest extends TestCase
     }
 
     #[Test]
+    public function it_shows_a_cancelled_registration_in_read_only(): void
+    {
+        $event = $this->openEvent();
+        $runner = $this->runner();
+        Participant::factory()->cancelled()->create([
+            'event_id' => $event->id,
+            'user_id' => $runner->id,
+        ]);
+
+        $this->actingAs($runner)
+            ->get(route('registration.show'))
+            ->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->component('registration/Show')
+                ->where('registration.status', RegistrationStatus::Cancelled->value)
+                ->where('canEdit', false));
+    }
+
+    #[Test]
+    public function it_freezes_a_cancelled_registration_against_its_own_runner(): void
+    {
+        $event = $this->openEvent();
+        $runner = $this->runner();
+        Participant::factory()->cancelled()->create([
+            'event_id' => $event->id,
+            'user_id' => $runner->id,
+            'phone' => '06 12 34 56 78',
+        ]);
+
+        $this->actingAs($runner)
+            ->put(route('registration.update'), $this->registrationPayload(['phone' => '07 98 76 54 32']))
+            ->assertForbidden();
+
+        $this->assertSame('06 12 34 56 78', Participant::query()->sole()->phone);
+    }
+
+    #[Test]
     public function it_sends_a_runner_without_a_registration_to_the_dashboard(): void
     {
         $event = $this->openEvent();
