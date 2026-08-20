@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Epic** | 1 — Fondations |
-| **Statut** | À faire |
+| **Statut** | ✅ Terminé |
 | **Estimation** | 2 pts |
 | **Créée** | 2026-08-20 — lot « inscription en ligne d'abord » |
 | **Révisée** | 2026-08-20 — le justificatif en pièce jointe tombe, il ne reste que le champ |
@@ -112,6 +112,6 @@ Le format est une constante nommée, pas une expression régulière recopiée da
 
 ## Tâches
 
-- [ ] **T1** — Colonne `pps_number`, règle de format et normalisation partagées `1 pt`
-- [ ] **T2** — Champ et glose dans les deux formulaires, affichage sur les fiches, tests : format
+- [x] **T1** — Colonne `pps_number`, règle de format et normalisation partagées `1 pt`
+- [x] **T2** — Champ et glose dans les deux formulaires, affichage sur les fiches, tests : format
   valide, format refusé, normalisation, champ vide `1 pt`
