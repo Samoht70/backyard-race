@@ -27,11 +27,22 @@ return [
         ],
         'complete' => [
             'title' => 'Ton inscription',
-            'description' => 'Remplis tout : ton inscription part en attente et le gérant la confirme ensuite.',
+            'description' => 'Quatre étapes, et c’est fait : ton inscription part en attente et le gérant la confirme ensuite.',
             'identity' => 'Toi',
             'email' => 'Adresse email',
             'first_name' => 'Prénom',
             'last_name' => 'Nom',
+            'nav' => 'Étapes de l’inscription',
+            'position' => 'Étape :current sur :total',
+            'go_to' => 'Revenir à l’étape :position',
+            'back' => 'Retour',
+            'next' => 'Suivant',
+            'step' => [
+                'identity' => 'Toi',
+                'runner' => 'Coureur',
+                'emergency' => 'Pépin',
+                'notes' => 'Signaler',
+            ],
             'submit' => 'Envoyer mon inscription',
         ],
         'code' => [

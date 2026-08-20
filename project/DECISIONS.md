@@ -1623,3 +1623,73 @@ inscription sans numéro est valide et reste confirmable. Un numéro inventé pa
 arrêté avec le propriétaire — la pièce jointe justificative avait été retirée le même jour, avant
 l'implémentation, pour ne pas monter une collection Media Library, une route sous policy et une
 purge autour d'un document que personne n'allait ouvrir.
+
+## D-54 — Les quatre étapes sont un seul formulaire, et le remappage d'erreur est la seule chose testée
+
+Arrêté le 2026-08-20 par la reprise **R-04**, qui met D-50 en œuvre. Deux points ont été arbitrés
+avec le propriétaire : la stratégie de test front et la forme de l'indicateur d'étape.
+
+### Rien n'est démonté, donc rien n'est perdu
+
+`Complete.vue` n'a aucun état réactif, et ce n'est pas un oubli : le composant `<Form>` d'Inertia
+sérialise les inputs natifs du DOM au moment du submit, et aucun écran du projet n'utilise
+`useForm`. Les valeurs vivent donc dans le DOM, nulle part ailleurs.
+
+Une étape masquée par `v-if` serait démontée, et la saisie partirait avec elle. Les quatre étapes
+restent **montées en permanence** dans un `<Form>` unique et sont révélées par `v-show`. C'est ce qui
+rend le retour arrière gratuit — il n'y a rien à restaurer — et c'est ce qui garde la soumission
+unique qu'exige D-50 : les huit champs sont là, visibles ou non, quand le coureur valide.
+
+L'alternative — un objet réactif et un `v-if` par étape — aurait dupliqué l'état de huit champs et
+forcé `RegistrationFields` à fonctionner dans deux régimes, alors que trois écrans le partagent.
+
+### `novalidate`, parce qu'un `required` masqué refuse la soumission sans le dire
+
+Un contrôle `required` vide dans une étape en `display: none` fait échouer la validation native du
+navigateur, qui ne peut pas y poser le focus : le submit est abandonné, la console reçoit un
+avertissement, et l'écran ne dit rien. C'est exactement l'échec silencieux que D-50 désigne comme le
+risque de cette reprise, et il serait arrivé par la porte de derrière.
+
+Le formulaire porte donc `novalidate`, et le passage à l'étape suivante appelle `reportValidity()`
+sur les seuls contrôles de l'étape courante. Le `required` natif garde le passage d'étape — il évite
+l'aller-retour serveur sur un champ vide — et ne garde plus jamais la soumission. La validation
+serveur reste la seule autorité, ce qui était déjà le contrat.
+
+### Le remappage sort du composant, et c'est la seule chose testée
+
+Une erreur 422 sur `birth_date` pendant que le coureur est à l'étape 4 doit le ramener à l'étape 2,
+sur le champ fautif. `resources/js/lib/registrationSteps.ts` porte ce calcul en deux fonctions pures
+— quelle étape, puis quel champ — et `Complete.vue` ne fait que les brancher sur le hook `@error`
+du `<Form>`.
+
+Le dépôt n'avait aucune infra de test front. Elle entre ici, réduite au strict nécessaire :
+`vitest`, **sans jsdom et sans `@vue/test-utils`**, parce qu'il n'y a rien à monter. Le calcul
+risqué est du TypeScript sans DOM ; ce qui l'entoure — `v-show`, focus, `reportValidity()` — demande
+un harnais de rendu dont le coût ne se justifie pas pour un écran. `npm run test` rejoint
+`ci:check` dans `composer.json`, donc la CI l'exécute sans que le workflow change.
+
+Ce qui reste non couvert est nommé : le déplacement du focus et la révélation d'étape se vérifient
+à la main.
+
+### Des repères, pas une barre
+
+La charte « Tableau des départs » interdit toute barre de progression. La position s'affiche donc en
+quatre repères numérotés, portant `aria-current="step"` sur l'étape courante, doublés d'une ligne
+« Étape 2 sur 4 ». Les étapes déjà franchies sont cliquables et ramènent en arrière ; les suivantes
+sont inertes, parce qu'y sauter contournerait le seul garde-fou client.
+
+Le titre long de chaque étape n'est pas répété dans l'indicateur : c'est l'en-tête `EventFieldset`
+du groupe qui le porte, comme dans les deux écrans de correction.
+
+### Ce que la reprise n'a pas touché, et ce qu'elle a débordé
+
+Aucune ligne de serveur : ni route, ni contrôleur, ni Form Request, ni transaction. Aucun test PHP
+modifié. `RegistrationFields` gagne une prop `section` **optionnelle** — sans valeur, il rend ses
+trois groupes d'affilée comme avant, donc `registration/Edit.vue` et
+`manage/registrations/Edit.vue` ne bougent pas.
+
+Deux débords assumés, tous deux au service du même objectif — que le coureur lise son erreur.
+`lang/fr/validation.php` déclarait le nom français de trois champs sur huit : les cinq manquants sont
+ajoutés, faute de quoi le message ramené à l'écran parle de `emergency_contact_phone`. Et la
+description de l'écran annonce désormais les quatre étapes, puisque c'est la première chose que le
+coureur doit savoir avant de commencer.

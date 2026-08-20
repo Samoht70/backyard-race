@@ -14,6 +14,10 @@ export const REGISTRATION_TRANSITIONS = [
 
 export type RegistrationTransition = (typeof REGISTRATION_TRANSITIONS)[number];
 
+export const REGISTRATION_SECTIONS = ['runner', 'emergency', 'notes'] as const;
+
+export type RegistrationSection = (typeof REGISTRATION_SECTIONS)[number];
+
 export type RegistrationDetails = {
     status: RegistrationStatus;
     status_label: string;

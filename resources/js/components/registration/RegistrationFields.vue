@@ -4,21 +4,32 @@ import EventFieldset from '@/components/event/EventFieldset.vue';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { t } from '@/lib/i18n';
-import type { RegistrationDetails } from '@/types/registration';
+import type {
+    RegistrationDetails,
+    RegistrationSection,
+} from '@/types/registration';
 
 type Props = {
     registration?: RegistrationDetails;
     errors: Record<string, string>;
     lockPps?: boolean;
+    section?: RegistrationSection;
 };
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
     lockPps: false,
 });
+
+function shows(section: RegistrationSection): boolean {
+    return props.section === undefined || props.section === section;
+}
 </script>
 
 <template>
-    <EventFieldset :title="t('registration.section.runner')">
+    <EventFieldset
+        v-if="shows('runner')"
+        :title="t('registration.section.runner')"
+    >
         <EventField
             name="phone"
             :label="t('registration.field.phone')"
@@ -73,7 +84,10 @@ withDefaults(defineProps<Props>(), {
         </EventField>
     </EventFieldset>
 
-    <EventFieldset :title="t('registration.section.emergency')">
+    <EventFieldset
+        v-if="shows('emergency')"
+        :title="t('registration.section.emergency')"
+    >
         <EventField
             name="emergency_contact_name"
             :label="t('registration.field.emergency_contact_name')"
@@ -104,7 +118,10 @@ withDefaults(defineProps<Props>(), {
         </EventField>
     </EventFieldset>
 
-    <EventFieldset :title="t('registration.section.notes')">
+    <EventFieldset
+        v-if="shows('notes')"
+        :title="t('registration.section.notes')"
+    >
         <EventField
             name="notes"
             :label="t('registration.field.notes')"
