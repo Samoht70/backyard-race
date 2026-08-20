@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Epic** | 4 — Informations événement |
-| **Statut** | À faire |
+| **Statut** | ✅ Terminé |
 | **Estimation** | 2 pts |
 | **Révisée** | 2026-08-20 — réduite de 5 à 2 pts (voir D-47) |
 | **Dépend de** | BR-03 |
@@ -81,7 +81,7 @@ nettoyage à l'entrée n'est pas optionnel.
 
 ## Tâches
 
-- [ ] **T1** — Colonne de briefing sur l'événement, nettoyage à l'enregistrement, contenu
+- [x] **T1** — Colonne de briefing sur l'événement, nettoyage à l'enregistrement, contenu
   initial en seeder `1 pt`
-- [ ] **T2** — Page de consultation, `textarea` d'édition, et tests : consultation, édition,
+- [x] **T2** — Page de consultation, `textarea` d'édition, et tests : consultation, édition,
   refus participant, nettoyage `1 pt`
