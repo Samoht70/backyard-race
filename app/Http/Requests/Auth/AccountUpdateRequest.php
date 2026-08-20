@@ -35,4 +35,9 @@ class AccountUpdateRequest extends FormRequest
             Event::query()->first(),
         )];
     }
+
+    protected function prepareForValidation(): void
+    {
+        $this->normalisePpsNumber();
+    }
 }

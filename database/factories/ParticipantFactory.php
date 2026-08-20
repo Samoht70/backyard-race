@@ -25,6 +25,7 @@ class ParticipantFactory extends Factory
             'status' => RegistrationStatus::Pending,
             'phone' => fake()->phoneNumber(),
             'birth_date' => fake()->dateTimeBetween('-60 years', '-18 years')->format('Y-m-d'),
+            'pps_number' => null,
             'emergency_contact_name' => fake()->name(),
             'emergency_contact_phone' => fake()->phoneNumber(),
             'notes' => null,
@@ -48,6 +49,13 @@ class ParticipantFactory extends Factory
     public function withBib(int $number): static
     {
         return $this->state(fn (array $attributes): array => ['bib_number' => $number]);
+    }
+
+    public function withPps(?string $number = null): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'pps_number' => $number ?? 'PPS'.fake()->numerify('########'),
+        ]);
     }
 
     public function cancelled(): static

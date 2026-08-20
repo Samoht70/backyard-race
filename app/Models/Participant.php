@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int|null $bib_number
  * @property string $phone
  * @property CarbonImmutable $birth_date
+ * @property string|null $pps_number
  * @property string $emergency_contact_name
  * @property string $emergency_contact_phone
  * @property string|null $notes
@@ -29,6 +30,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[Fillable([
     'phone',
     'birth_date',
+    'pps_number',
     'emergency_contact_name',
     'emergency_contact_phone',
     'notes',

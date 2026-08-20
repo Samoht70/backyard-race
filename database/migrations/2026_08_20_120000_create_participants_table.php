@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedSmallInteger('bib_number')->nullable();
             $table->string('phone', 40);
             $table->date('birth_date');
+            $table->string('pps_number', 11)->nullable();
             $table->string('emergency_contact_name', 120);
             $table->string('emergency_contact_phone', 40);
             $table->text('notes')->nullable();
