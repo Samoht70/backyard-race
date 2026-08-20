@@ -1,0 +1,2066 @@
+<title>Quatre chartes Backyard</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400..700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Hanken+Grotesk:wght@400..800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Martian+Mono:wght@400..700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass:wght@400..800&family=Overpass+Mono:wght@400..700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400..800&family=Karla:wght@400..800&display=swap">
+
+<style>
+    :root {
+        --page-ground: #F3F3F1;
+        --page-surface: #FFFFFF;
+        --page-ink: #1A1A18;
+        --page-ink-2: #46463F;
+        --page-muted: #6B6B64;
+        --page-line: #DCDCD7;
+
+        --tint-g: #9A5B00;
+        --tint-t: #14161A;
+        --tint-c: #14181B;
+        --tint-p: #7B3FA0;
+
+        --ui: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+
+        --s1: 4px;
+        --s2: 8px;
+        --s3: 12px;
+        --s4: 16px;
+        --s5: 24px;
+        --s6: 32px;
+        --s7: 48px;
+        --s8: 72px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+            --page-ground: #131313;
+            --page-surface: #1B1B1A;
+            --page-ink: #F0F0EE;
+            --page-ink-2: #C4C4BE;
+            --page-muted: #93938C;
+            --page-line: #2E2E2B;
+            --tint-g: #FFB43D;
+            --tint-t: #FFB020;
+            --tint-c: #4FD8E8;
+            --tint-p: #C08BE8;
+        }
+    }
+
+    :root[data-theme="dark"] {
+        --page-ground: #131313;
+        --page-surface: #1B1B1A;
+        --page-ink: #F0F0EE;
+        --page-ink-2: #C4C4BE;
+        --page-muted: #93938C;
+        --page-line: #2E2E2B;
+        --tint-g: #FFB43D;
+        --tint-t: #FFB020;
+        --tint-c: #4FD8E8;
+        --tint-p: #C08BE8;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        background: var(--page-ground);
+        color: var(--page-ink);
+        font-family: var(--ui);
+        font-size: 17px;
+        line-height: 1.55;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    .wrap {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: var(--s7) var(--s5) var(--s8);
+        display: flex;
+        flex-direction: column;
+        gap: var(--s8);
+    }
+
+    .eyebrow {
+        margin: 0;
+        font-size: 0.6875rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--page-muted);
+    }
+
+    h1 {
+        margin: 0;
+        font-family: var(--ui);
+        font-size: clamp(2.25rem, 6vw, 3.5rem);
+        font-weight: 700;
+        line-height: 1.02;
+        letter-spacing: -0.02em;
+        text-wrap: balance;
+    }
+
+    h2 {
+        margin: 0;
+        font-size: clamp(1.75rem, 4vw, 2.375rem);
+        font-weight: 700;
+        line-height: 1.05;
+        letter-spacing: -0.02em;
+        text-wrap: balance;
+    }
+
+    h3 {
+        margin: 0;
+        font-size: 0.9375rem;
+        font-weight: 700;
+    }
+
+    p {
+        margin: 0;
+        max-width: 68ch;
+    }
+
+    .lede {
+        font-size: 1.1875rem;
+        color: var(--page-ink-2);
+    }
+
+    .intro {
+        display: flex;
+        flex-direction: column;
+        gap: var(--s4);
+    }
+
+    .rules {
+        display: grid;
+        gap: var(--s3);
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        list-style: none;
+        margin: 0;
+        padding: var(--s5);
+        background: var(--page-surface);
+        border: 1px solid var(--page-line);
+        border-radius: 6px;
+    }
+
+    .rules li {
+        font-size: 0.9375rem;
+        color: var(--page-ink-2);
+        padding-left: var(--s3);
+        border-left: 2px solid var(--page-line);
+    }
+
+    .dir {
+        display: flex;
+        flex-direction: column;
+        gap: var(--s5);
+    }
+
+    .dir__head {
+        display: flex;
+        flex-direction: column;
+        gap: var(--s2);
+        border-top: 3px solid currentColor;
+        padding-top: var(--s3);
+    }
+
+    .dir--g .dir__head {
+        color: var(--tint-g);
+    }
+
+    .dir--t .dir__head {
+        color: var(--tint-t);
+    }
+
+    .dir--c .dir__head {
+        color: var(--tint-c);
+    }
+
+    .dir--p .dir__head {
+        color: var(--tint-p);
+    }
+
+    .dir__head h2 {
+        color: var(--page-ink);
+    }
+
+    .dir__head .eyebrow {
+        color: currentColor;
+    }
+
+    .dir__phones {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--s6);
+        justify-content: center;
+    }
+
+    .dir__facts {
+        display: grid;
+        gap: var(--s4);
+        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    }
+
+    .fact {
+        background: var(--page-surface);
+        border: 1px solid var(--page-line);
+        border-radius: 6px;
+        padding: var(--s4);
+        display: flex;
+        flex-direction: column;
+        gap: var(--s2);
+    }
+
+    .fact p {
+        font-size: 0.875rem;
+        color: var(--page-muted);
+        line-height: 1.45;
+    }
+
+    .fact strong {
+        color: var(--page-ink-2);
+        font-weight: 600;
+    }
+
+    .device {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--s3);
+        width: 100%;
+        max-width: 372px;
+    }
+
+    .ph {
+        width: 100%;
+        border: 8px solid var(--page-ink);
+        border-radius: 30px;
+        overflow: hidden;
+    }
+
+    .ph__cap {
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: var(--page-muted);
+        text-align: center;
+    }
+
+    .mk {
+        display: flex;
+        flex-direction: column;
+        min-height: 610px;
+        background: var(--ground);
+        color: var(--ink);
+        font-variant-numeric: tabular-nums;
+    }
+
+    .mk__list {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+    }
+
+    .mk__nav {
+        margin-top: auto;
+        display: flex;
+        background: var(--surface);
+    }
+
+    .mk__nav a {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        padding: 9px 4px 13px;
+        font-size: 9.5px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+        text-decoration: none;
+    }
+
+    .mk__nav a svg {
+        width: 21px;
+        height: 21px;
+    }
+
+    .mk__nav a.on {
+        color: var(--brand-text);
+    }
+
+    button:focus-visible,
+    a:focus-visible {
+        outline: 3px solid var(--tint-p);
+        outline-offset: 2px;
+    }
+
+    .g {
+        --ground: #FDF7EF;
+        --surface: #FFFFFF;
+        --ink: #143026;
+        --ink-2: #3E5147;
+        --muted: #6E6355;
+        --line: #E7DBC9;
+        --brand: #E08700;
+        --brand-text: #9A5B00;
+        --brand-ink: #21160A;
+        --run: #1A6B44;
+        --run-s: #E2F0E6;
+        --out: #C0341B;
+        --out-s: #FBE6DF;
+        --quit: #6E6355;
+        --quit-s: #EFEAE1;
+        --done: #8A2E63;
+        --done-s: #F8E4EE;
+        font-family: 'Hanken Grotesk', ui-sans-serif, sans-serif;
+    }
+
+    .g-night {
+        --ground: #1A201A;
+        --surface: #242B23;
+        --ink: #F5EDE1;
+        --ink-2: #C9C1B3;
+        --muted: #A0968A;
+        --line: #38402F;
+        --brand: #FFB43D;
+        --brand-text: #FFB43D;
+        --brand-ink: #1F1607;
+        --run: #6CCB90;
+        --run-s: #1D3A28;
+        --out: #FF8A6B;
+        --out-s: #3B211A;
+        --quit: #A79A8A;
+        --quit-s: #2C3129;
+        --done: #F58BB6;
+        --done-s: #3A2130;
+    }
+
+    .g-band {
+        padding: 18px 16px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .g-event {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--brand-text);
+    }
+
+    .g-tag {
+        align-self: flex-start;
+        position: relative;
+        background: var(--brand);
+        color: var(--brand-ink);
+        border-radius: 16px;
+        padding: 10px 20px 12px 34px;
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+    }
+
+    .g-tag::before {
+        content: "";
+        position: absolute;
+        left: 13px;
+        top: 50%;
+        width: 9px;
+        height: 9px;
+        margin-top: -4px;
+        border-radius: 50%;
+        background: var(--ground);
+    }
+
+    .g-tag__round {
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        opacity: 0.75;
+    }
+
+    .g-tag__hour {
+        font-family: 'Bricolage Grotesque', ui-sans-serif, sans-serif;
+        font-weight: 800;
+        font-size: 40px;
+        line-height: 1;
+    }
+
+    .g-limit {
+        font-size: 14px;
+        color: var(--ink-2);
+    }
+
+    .g-limit b {
+        font-weight: 700;
+        color: var(--ink);
+    }
+
+    .g-counters {
+        display: flex;
+        gap: 10px;
+        padding: 0 16px 14px;
+    }
+
+    .g-counter {
+        flex: 1;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 12px 14px;
+    }
+
+    .g-counter__v {
+        font-family: 'Bricolage Grotesque', ui-sans-serif, sans-serif;
+        font-weight: 800;
+        font-size: 34px;
+        line-height: 1;
+    }
+
+    .g-counter__l {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--muted);
+    }
+
+    .g-rows {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 0 16px 16px;
+    }
+
+    .g-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 12px;
+        min-height: 74px;
+    }
+
+    .g-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        flex: none;
+        background: var(--run);
+    }
+
+    .g-id {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .g-name {
+        font-weight: 700;
+        font-size: 16px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .g-meta {
+        font-size: 12.5px;
+        color: var(--muted);
+    }
+
+    .g-btn {
+        font-family: inherit;
+        font-weight: 700;
+        font-size: 14px;
+        border: none;
+        border-radius: 999px;
+        background: var(--brand);
+        color: var(--brand-ink);
+        padding: 14px 18px;
+        min-height: 52px;
+        cursor: pointer;
+    }
+
+    .g-time {
+        text-align: right;
+        min-width: 82px;
+    }
+
+    .g-time b {
+        font-family: 'Bricolage Grotesque', ui-sans-serif, sans-serif;
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--run);
+    }
+
+    .g-time span {
+        display: block;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--muted);
+    }
+
+    .g .mk__nav {
+        border-top: 1px solid var(--line);
+        border-radius: 20px 20px 0 0;
+    }
+
+    .t {
+        --ground: #F2F3F5;
+        --surface: #FFFFFF;
+        --ink: #14161A;
+        --ink-2: #3A3F47;
+        --muted: #5E646E;
+        --line: #C9CCD2;
+        --brand: #14161A;
+        --brand-text: #14161A;
+        --brand-ink: #FFFFFF;
+        --run: #0B6B3A;
+        --run-s: #E0EFE6;
+        --out: #B3261E;
+        --out-s: #FBE4E2;
+        --quit: #5E646E;
+        --quit-s: #E8EAED;
+        --done: #7A5C00;
+        --done-s: #F5EBD3;
+        font-family: 'Instrument Sans', ui-sans-serif, sans-serif;
+    }
+
+    .t-night {
+        --ground: #101215;
+        --surface: #191C21;
+        --ink: #F0F1F3;
+        --ink-2: #C3C7CE;
+        --muted: #8A9099;
+        --line: #2B2F36;
+        --brand: #FFB020;
+        --brand-text: #FFB020;
+        --brand-ink: #14161A;
+        --run: #5CD494;
+        --run-s: #14301F;
+        --out: #FF8A72;
+        --out-s: #331A16;
+        --quit: #8A9099;
+        --quit-s: #23272D;
+        --done: #F0C24E;
+        --done-s: #322609;
+    }
+
+    .t-top {
+        padding: 14px 16px 10px;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .t-event {
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--muted);
+    }
+
+    .t-board {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        padding: 12px 16px 14px;
+        border-bottom: 3px solid var(--ink);
+        font-family: 'Martian Mono', ui-monospace, monospace;
+    }
+
+    .t-board__round {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+    }
+
+    .t-board__hour {
+        font-size: 30px;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+        color: var(--brand-text);
+    }
+
+    .t-board__lim {
+        font-size: 13px;
+        font-weight: 400;
+        letter-spacing: -0.03em;
+        color: var(--ink-2);
+    }
+
+    .t-tally {
+        display: flex;
+        gap: 16px;
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--line);
+        font-family: 'Martian Mono', ui-monospace, monospace;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+    }
+
+    .t-tally span {
+        color: var(--muted);
+        font-weight: 400;
+    }
+
+    .t-colhead {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 16px;
+        border-bottom: 1px solid var(--line);
+        font-size: 9.5px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--muted);
+    }
+
+    .t-colhead__bib {
+        width: 40px;
+    }
+
+    .t-colhead__name {
+        flex: 1;
+    }
+
+    .t-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--line);
+        min-height: 68px;
+        background: var(--surface);
+    }
+
+    .t-bib {
+        width: 40px;
+        flex: none;
+        font-family: 'Martian Mono', ui-monospace, monospace;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+    }
+
+    .t-id {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .t-name {
+        font-size: 15.5px;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .t-sub {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 11.5px;
+        color: var(--muted);
+    }
+
+    .t-sub svg {
+        width: 13px;
+        height: 13px;
+        flex: none;
+    }
+
+    .t-btn {
+        font-family: 'Instrument Sans', ui-sans-serif, sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        border: 1px solid var(--ink);
+        border-radius: 0;
+        background: var(--brand);
+        color: var(--brand-ink);
+        padding: 14px 14px;
+        min-height: 50px;
+        min-width: 92px;
+        cursor: pointer;
+    }
+
+    .t-stamp {
+        min-width: 92px;
+        text-align: right;
+        font-family: 'Martian Mono', ui-monospace, monospace;
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: -0.05em;
+        color: var(--brand-text);
+    }
+
+    .t-stamp span {
+        display: block;
+        font-family: 'Instrument Sans', ui-sans-serif, sans-serif;
+        font-size: 9.5px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--muted);
+    }
+
+    .t .mk__nav {
+        border-top: 3px solid var(--ink);
+    }
+
+    .c {
+        --ground: #C4CBD0;
+        --surface: #D3D9DD;
+        --ink: #14181B;
+        --ink-2: #3B4247;
+        --muted: #4A5359;
+        --line: #A6AFB6;
+        --brand: #14181B;
+        --brand-text: #14181B;
+        --brand-ink: #D3D9DD;
+        --run: #0C5334;
+        --run-s: #C6D2C8;
+        --out: #962713;
+        --out-s: #DCC7C1;
+        --quit: #454E54;
+        --quit-s: #C2C9CE;
+        --done: #5E4600;
+        --done-s: #D2CDB8;
+        font-family: 'Overpass', ui-sans-serif, sans-serif;
+    }
+
+    .c-night {
+        --ground: #0D1417;
+        --surface: #141E22;
+        --ink: #E6F4F2;
+        --ink-2: #B4CBC8;
+        --muted: #86A09D;
+        --line: #24343A;
+        --brand: #4FD8E8;
+        --brand-text: #4FD8E8;
+        --brand-ink: #06171B;
+        --run: #55D9A6;
+        --run-s: #10312A;
+        --out: #FF8E77;
+        --out-s: #351C18;
+        --quit: #86A09D;
+        --quit-s: #1D2A2D;
+        --done: #E9C15C;
+        --done-s: #2F2711;
+    }
+
+    .c-top {
+        padding: 14px 14px 0;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .c-event {
+        font-family: 'Overpass Mono', ui-monospace, monospace;
+        font-size: 10.5px;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+    }
+
+    .c-windows {
+        display: flex;
+        gap: 8px;
+    }
+
+    .c-field {
+        flex: 1;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        background: var(--surface);
+        padding: 7px 10px 9px;
+    }
+
+    .c-field__l {
+        font-family: 'Overpass Mono', ui-monospace, monospace;
+        font-size: 9px;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--muted);
+    }
+
+    .c-field__v {
+        font-family: 'Overpass Mono', ui-monospace, monospace;
+        font-weight: 700;
+        font-size: 30px;
+        line-height: 1.1;
+        letter-spacing: -0.03em;
+        color: var(--brand-text);
+    }
+
+    .c-field__v--sm {
+        font-size: 24px;
+        color: var(--ink);
+    }
+
+    .c-round {
+        font-family: 'Overpass Mono', ui-monospace, monospace;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--ink-2);
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 8px;
+    }
+
+    .c-rows {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding: 10px 14px 14px;
+    }
+
+    .c-row {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        background: var(--surface);
+        padding: 9px 9px 9px 0;
+        min-height: 68px;
+        overflow: hidden;
+    }
+
+    .c-bar {
+        width: 4px;
+        align-self: stretch;
+        flex: none;
+        background: var(--run);
+    }
+
+    .c-id {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .c-name {
+        font-size: 15px;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .c-meta {
+        font-family: 'Overpass Mono', ui-monospace, monospace;
+        font-size: 11px;
+        color: var(--muted);
+        letter-spacing: -0.02em;
+    }
+
+    .c-btn {
+        font-family: 'Overpass', ui-sans-serif, sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        border: 1px solid var(--ink);
+        border-radius: 4px;
+        background: var(--brand);
+        color: var(--brand-ink);
+        padding: 13px 14px;
+        min-height: 50px;
+        min-width: 96px;
+        cursor: pointer;
+    }
+
+    .c-read {
+        min-width: 96px;
+        text-align: right;
+        padding-right: 4px;
+    }
+
+    .c-read b {
+        font-family: 'Overpass Mono', ui-monospace, monospace;
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        color: var(--brand-text);
+    }
+
+    .c-read span {
+        display: block;
+        font-family: 'Overpass Mono', ui-monospace, monospace;
+        font-size: 9px;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--muted);
+    }
+
+    .c .mk__nav {
+        border-top: 1px solid var(--line);
+    }
+
+    .p {
+        --ground: #F1F0EA;
+        --surface: #FFFFFF;
+        --ink: #2B2A26;
+        --ink-2: #4F4D46;
+        --muted: #67655C;
+        --line: #D6D2C4;
+        --contour: #A98A5F;
+        --brand: #7B3FA0;
+        --brand-text: #7B3FA0;
+        --brand-ink: #FFFFFF;
+        --run: #2F6B3F;
+        --run-s: #E3EEE4;
+        --out: #B03A1F;
+        --out-s: #F8E5DE;
+        --quit: #67655C;
+        --quit-s: #EAE8DF;
+        --done: #8A6300;
+        --done-s: #F4EBD2;
+        font-family: 'Karla', ui-sans-serif, sans-serif;
+    }
+
+    .p-night {
+        --ground: #141613;
+        --surface: #1E211C;
+        --ink: #EDEEE7;
+        --ink-2: #C2C4B9;
+        --muted: #94968B;
+        --line: #33372E;
+        --contour: #6B5C42;
+        --brand: #C08BE8;
+        --brand-text: #C08BE8;
+        --brand-ink: #1B1023;
+        --run: #6FC98A;
+        --run-s: #1A3323;
+        --out: #FF8D6B;
+        --out-s: #35201A;
+        --quit: #94968B;
+        --quit-s: #272B24;
+        --done: #E3B24A;
+        --done-s: #302711;
+    }
+
+    .p-band {
+        position: relative;
+        overflow: hidden;
+        padding: 15px 16px 18px;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .p-contours {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        color: var(--contour);
+        opacity: 0.3;
+        pointer-events: none;
+    }
+
+    .p-band__in {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .p-event {
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--muted);
+    }
+
+    .p-round {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--brand-text);
+    }
+
+    .p-hours {
+        font-family: 'Epilogue', ui-sans-serif, sans-serif;
+        font-weight: 800;
+        font-size: 36px;
+        line-height: 1;
+        letter-spacing: -0.03em;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .p-hours svg {
+        width: 22px;
+        height: 22px;
+        color: var(--brand-text);
+        flex: none;
+    }
+
+    .p-hours em {
+        font-style: normal;
+        color: var(--muted);
+        font-weight: 400;
+    }
+
+    .p-rule {
+        height: 3px;
+        width: 72px;
+        background: var(--brand);
+        margin-top: 2px;
+    }
+
+    .p-legend {
+        display: flex;
+        gap: 18px;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--line);
+        font-size: 12.5px;
+        color: var(--ink-2);
+    }
+
+    .p-legend div {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+    }
+
+    .p-legend b {
+        font-family: 'Epilogue', ui-sans-serif, sans-serif;
+        font-size: 17px;
+        font-weight: 800;
+        color: var(--ink);
+    }
+
+    .p-key {
+        width: 11px;
+        height: 11px;
+        flex: none;
+        border-radius: 2px;
+    }
+
+    .p-rows {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .p-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 11px 16px;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+        min-height: 72px;
+    }
+
+    .p-pin {
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        border: 3px solid var(--run);
+        background: var(--surface);
+        flex: none;
+    }
+
+    .p-id {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .p-name {
+        font-size: 15.5px;
+        font-weight: 700;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .p-loops {
+        display: flex;
+        align-items: center;
+        flex-wrap: nowrap;
+        overflow: hidden;
+        gap: 3px;
+        margin-top: 3px;
+        color: var(--run);
+    }
+
+    .p-loops svg {
+        width: 11px;
+        height: 11px;
+        flex: none;
+    }
+
+    .p-loops b {
+        font-size: 11.5px;
+        font-weight: 700;
+        color: var(--muted);
+        margin-left: 4px;
+        letter-spacing: 0.02em;
+    }
+
+    .p-btn {
+        font-family: 'Karla', ui-sans-serif, sans-serif;
+        font-size: 13.5px;
+        font-weight: 700;
+        border: none;
+        border-radius: 3px;
+        background: var(--brand);
+        color: var(--brand-ink);
+        padding: 14px 15px;
+        min-height: 50px;
+        min-width: 94px;
+        cursor: pointer;
+    }
+
+    .p-time {
+        min-width: 94px;
+        text-align: right;
+    }
+
+    .p-time b {
+        font-family: 'Epilogue', ui-sans-serif, sans-serif;
+        font-size: 19px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        color: var(--brand-text);
+    }
+
+    .p-time span {
+        display: block;
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+    }
+
+    .p .mk__nav {
+        border-top: 1px solid var(--line);
+    }
+
+    .badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .bdg {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 5px 10px 5px 8px;
+    }
+
+    .bdg svg {
+        width: 14px;
+        height: 14px;
+        flex: none;
+    }
+
+    .bdg--run {
+        background: var(--run-s);
+        color: var(--run);
+    }
+
+    .bdg--out {
+        background: var(--out-s);
+        color: var(--out);
+    }
+
+    .bdg--quit {
+        background: var(--quit-s);
+        color: var(--quit);
+    }
+
+    .bdg--done {
+        background: var(--done-s);
+        color: var(--done);
+    }
+
+    .g .bdg {
+        border-radius: 999px;
+    }
+
+    .t .bdg {
+        border-radius: 0;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        font-size: 11px;
+    }
+
+    .c .bdg {
+        border-radius: 3px;
+        font-family: 'Overpass Mono', ui-monospace, monospace;
+        font-size: 11px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+
+    .p .bdg {
+        border-radius: 2px;
+    }
+
+    .swatchbar {
+        display: flex;
+        border-radius: 4px;
+        overflow: hidden;
+        border: 1px solid var(--page-line);
+    }
+
+    .swatchbar div {
+        flex: 1;
+        height: 30px;
+    }
+
+    .close {
+        display: flex;
+        flex-direction: column;
+        gap: var(--s4);
+        border-top: 3px solid var(--page-ink);
+        padding-top: var(--s4);
+    }
+
+    .close ol {
+        margin: 0;
+        padding-left: 1.2em;
+        display: flex;
+        flex-direction: column;
+        gap: var(--s2);
+        color: var(--page-ink-2);
+        font-size: 1rem;
+        max-width: 68ch;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        * {
+            transition: none !important;
+        }
+    }
+</style>
+
+<div class="wrap">
+    <header class="intro">
+        <p class="eyebrow">Direction artistique — quatre pistes</p>
+        <h1>Quatre mondes pour la même course</h1>
+        <p class="lede">
+            Quatre directions sans rapport entre elles, chacune tirée d'une facette différente de
+            l'événement : la fête au jardin, le tableau d'horaires, l'instrument de mesure, la carte du
+            parcours. Pour qu'elles se comparent, elles montrent toutes le même écran avec le même
+            contenu — le gérant valide les arrivées du tour 6 — de jour et de nuit.
+        </p>
+        <ul class="rules">
+            <li>Les quatre tiennent les mêmes contraintes : cibles de 44 px minimum, 50 px pour valider, contraste AA sur les deux sols.</li>
+            <li>Les quatre statuts gardent toujours couleur + pictogramme + libellé, donc restent lisibles en niveaux de gris.</li>
+            <li>Aucune ne contient de compte à rebours, de barre de progression ni d'horloge côté client.</li>
+            <li>Dans les quatre, le thème sombre est la seconde moitié de la course, pas une préférence.</li>
+        </ul>
+    </header>
+
+    <section class="dir dir--g">
+        <div class="dir__head">
+            <p class="eyebrow">Guinguette</p>
+            <h2>C'est l'anniversaire d'un copain, pas un championnat</h2>
+        </div>
+        <p class="lede">
+            La chaleur d'une table dressée dehors : ivoire, vert bouteille, blocs largement arrondis, et
+            un marigold de guirlande qui ne sert qu'à l'action. L'heure est portée par une étiquette de
+            papier, comme celles qu'on accroche aux bouteilles. Bricolage Grotesque donne aux chiffres
+            un dessin volontairement irrégulier — un score de fête, pas une performance.
+        </p>
+        <div class="dir__phones">
+            <div class="device">
+                <div class="ph">
+                    <div class="mk g">
+                        <div class="g-band">
+                            <span class="g-event">La Backyard de Thomas</span>
+                            <div class="g-tag">
+                                <span class="g-tag__round">Tour 06</span>
+                                <span class="g-tag__hour">18:00</span>
+                            </div>
+                            <span class="g-limit">Tout le monde doit être rentré avant <b>19:00</b></span>
+                        </div>
+                        <div class="g-counters">
+                            <div class="g-counter">
+                                <div class="g-counter__v">24</div>
+                                <div class="g-counter__l">en course</div>
+                            </div>
+                            <div class="g-counter">
+                                <div class="g-counter__v">13</div>
+                                <div class="g-counter__l">sortis</div>
+                            </div>
+                        </div>
+                        <div class="mk__list">
+                            <div class="g-rows">
+                                <div class="g-row">
+                                    <span class="g-dot"></span>
+                                    <span class="g-id">
+                                        <span class="g-name">Thomas Poirey</span>
+                                        <span class="g-meta">Dossard 012 · 7 boucles</span>
+                                    </span>
+                                    <span class="g-time"><b>48:32</b><span>rentré</span></span>
+                                </div>
+                                <div class="g-row">
+                                    <span class="g-dot"></span>
+                                    <span class="g-id">
+                                        <span class="g-name">Camille Berthier</span>
+                                        <span class="g-meta">Dossard 007 · 6 boucles</span>
+                                    </span>
+                                    <button type="button" class="g-btn">Valider</button>
+                                </div>
+                                <div class="g-row">
+                                    <span class="g-dot"></span>
+                                    <span class="g-id">
+                                        <span class="g-name">Nadia Lemarchand</span>
+                                        <span class="g-meta">Dossard 021 · 6 boucles</span>
+                                    </span>
+                                    <button type="button" class="g-btn">Valider</button>
+                                </div>
+                                <div class="g-row">
+                                    <span class="g-dot"></span>
+                                    <span class="g-id">
+                                        <span class="g-name">Yanis Beaufort-Delcourt</span>
+                                        <span class="g-meta">Dossard 034 · 6 boucles</span>
+                                    </span>
+                                    <button type="button" class="g-btn">Valider</button>
+                                </div>
+                            </div>
+                        </div>
+                        <nav class="mk__nav">
+                            <a class="on" href="#g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l3 2"></path></svg>Course</a>
+                            <a href="#g2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16"></path><path d="M4 12h16"></path><path d="M4 18h10"></path></svg>Coureurs</a>
+                            <a href="#g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 4v6c0 4-3.5 7-8 8-4.5-1-8-4-8-8V7z"></path></svg>Infos</a>
+                        </nav>
+                    </div>
+                </div>
+                <p class="ph__cap">Jour — ivoire et vert bouteille</p>
+            </div>
+            <div class="device">
+                <div class="ph">
+                    <div class="mk g g-night">
+                        <div class="g-band">
+                            <span class="g-event">La Backyard de Thomas</span>
+                            <div class="g-tag">
+                                <span class="g-tag__round">Tour 14</span>
+                                <span class="g-tag__hour">02:00</span>
+                            </div>
+                            <span class="g-limit">Tout le monde doit être rentré avant <b>03:00</b></span>
+                        </div>
+                        <div class="g-counters">
+                            <div class="g-counter">
+                                <div class="g-counter__v">6</div>
+                                <div class="g-counter__l">en course</div>
+                            </div>
+                            <div class="g-counter">
+                                <div class="g-counter__v">31</div>
+                                <div class="g-counter__l">sortis</div>
+                            </div>
+                        </div>
+                        <div class="mk__list">
+                            <div class="g-rows">
+                                <div class="g-row">
+                                    <span class="g-dot"></span>
+                                    <span class="g-id">
+                                        <span class="g-name">Thomas Poirey</span>
+                                        <span class="g-meta">Dossard 012 · 14 boucles</span>
+                                    </span>
+                                    <span class="g-time"><b>52:07</b><span>rentré</span></span>
+                                </div>
+                                <div class="g-row">
+                                    <span class="g-dot"></span>
+                                    <span class="g-id">
+                                        <span class="g-name">Paul Vasseur</span>
+                                        <span class="g-meta">Dossard 003 · 13 boucles</span>
+                                    </span>
+                                    <button type="button" class="g-btn">Valider</button>
+                                </div>
+                                <div class="g-row">
+                                    <span class="g-dot"></span>
+                                    <span class="g-id">
+                                        <span class="g-name">Julie Marchetti</span>
+                                        <span class="g-meta">Dossard 018 · 13 boucles</span>
+                                    </span>
+                                    <button type="button" class="g-btn">Valider</button>
+                                </div>
+                            </div>
+                        </div>
+                        <nav class="mk__nav">
+                            <a class="on" href="#g4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l3 2"></path></svg>Course</a>
+                            <a href="#g5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16"></path><path d="M4 12h16"></path><path d="M4 18h10"></path></svg>Coureurs</a>
+                            <a href="#g6"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 4v6c0 4-3.5 7-8 8-4.5-1-8-4-8-8V7z"></path></svg>Infos</a>
+                        </nav>
+                    </div>
+                </div>
+                <p class="ph__cap">Nuit — la guirlande allumée</p>
+            </div>
+        </div>
+        <div class="dir__facts">
+            <div class="fact">
+                <h3>Palette</h3>
+                <div class="swatchbar">
+                    <div style="background: #FDF7EF;"></div>
+                    <div style="background: #143026;"></div>
+                    <div style="background: #E08700;"></div>
+                    <div style="background: #1A6B44;"></div>
+                    <div style="background: #C0341B;"></div>
+                    <div style="background: #8A2E63;"></div>
+                </div>
+                <p><strong>Ivoire · vert bouteille · marigold · pelouse · brique · framboise.</strong> Le marigold n'est jamais du texte, seulement un aplat : c'est là qu'il passe AA. Le rose framboise porte « terminé », ce qui laisse le rouge au seul « éliminé ».</p>
+            </div>
+            <div class="fact">
+                <h3>Typographie</h3>
+                <p><strong>Bricolage Grotesque</strong> pour les chiffres et les titres — dessin irrégulier assumé, largeur variable. <strong>Hanken Grotesk</strong> pour tout le texte, y compris les durées en chiffres tabulaires.</p>
+            </div>
+            <div class="fact">
+                <h3>Structure et signature</h3>
+                <p>Cartes arrondies à 16-18 px, aucune bordure lourde, un point de couleur au bord gauche. La signature est <strong>l'étiquette</strong> : un pendant de papier marigold percé d'un œillet, qui porte l'heure de départ.</p>
+                <div class="badges">
+                    <span class="bdg bdg--run"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M8.5 12h6"></path><path d="M12 9.5l3 2.5-3 2.5"></path></svg>En course</span>
+                    <span class="bdg bdg--out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l2.5 1.75"></path><path d="M5 5l14 14"></path></svg>Éliminé</span>
+                    <span class="bdg bdg--quit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v9"></path><path d="M8.5 9.5L12 13l3.5-3.5"></path><path d="M5 19h14"></path></svg>Abandon</span>
+                    <span class="bdg bdg--done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8v4.5a4 4 0 0 1-8 0z"></path><path d="M8 5.5H5.5a3 3 0 0 0 3 3"></path><path d="M16 5.5h2.5a3 3 0 0 1-3 3"></path><path d="M12 12.5V16"></path><path d="M8.5 20h7"></path></svg>Terminé</span>
+                </div>
+            </div>
+            <div class="fact">
+                <h3>Ce que ça coûte</h3>
+                <p>La plus chaleureuse, la moins « outil de gestion ». À quatre heures du matin, un gérant fatigué peut la trouver bavarde : les libellés en minuscules se lisent moins vite qu'une colonne de capitales.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="dir dir--t">
+        <div class="dir__head">
+            <p class="eyebrow">Tableau des départs</p>
+            <h2>Une Backyard, c'est un tableau d'horaires</h2>
+        </div>
+        <p class="lede">
+            Ni carte, ni arrondi, ni couleur de marque : des lignes, des filets, des chiffres à largeur
+            fixe. Le jour, c'est une feuille d'horaires imprimée en noir ; la nuit, le tableau s'allume
+            en ambre, comme un panneau d'affichage de gare. La seule couleur de l'écran est celle d'un
+            statut — donc quand quelque chose est coloré, c'est que ça compte.
+        </p>
+        <div class="dir__phones">
+            <div class="device">
+                <div class="ph">
+                    <div class="mk t">
+                        <div class="t-top">
+                            <span class="t-event">La Backyard de Thomas</span>
+                        </div>
+                        <div class="t-board">
+                            <span class="t-board__round">T06</span>
+                            <span class="t-board__hour">18:00</span>
+                            <span class="t-board__lim">→ 19:00</span>
+                        </div>
+                        <div class="t-tally">
+                            <span>en course</span>24<span>sortis</span>13<span>rentrés</span>1
+                        </div>
+                        <div class="t-colhead">
+                            <span class="t-colhead__bib">Doss.</span>
+                            <span class="t-colhead__name">Coureur</span>
+                            <span>Arrivée</span>
+                        </div>
+                        <div class="mk__list">
+                            <div class="t-row">
+                                <span class="t-bib">012</span>
+                                <span class="t-id">
+                                    <span class="t-name">Thomas Poirey</span>
+                                    <span class="t-sub">7 boucles · 42 km</span>
+                                </span>
+                                <span class="t-stamp">18:48:32<span>rentré</span></span>
+                            </div>
+                            <div class="t-row">
+                                <span class="t-bib">007</span>
+                                <span class="t-id">
+                                    <span class="t-name">Camille Berthier</span>
+                                    <span class="t-sub">6 boucles · 36 km</span>
+                                </span>
+                                <button type="button" class="t-btn">Valider</button>
+                            </div>
+                            <div class="t-row">
+                                <span class="t-bib">021</span>
+                                <span class="t-id">
+                                    <span class="t-name">Nadia Lemarchand</span>
+                                    <span class="t-sub">6 boucles · 36 km</span>
+                                </span>
+                                <button type="button" class="t-btn">Valider</button>
+                            </div>
+                            <div class="t-row">
+                                <span class="t-bib">034</span>
+                                <span class="t-id">
+                                    <span class="t-name">Yanis Beaufort-Delcourt</span>
+                                    <span class="t-sub">6 boucles · 36 km</span>
+                                </span>
+                                <button type="button" class="t-btn">Valider</button>
+                            </div>
+                        </div>
+                        <nav class="mk__nav">
+                            <a class="on" href="#t1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l3 2"></path></svg>Course</a>
+                            <a href="#t2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M4 6h16"></path><path d="M4 12h16"></path><path d="M4 18h10"></path></svg>Coureurs</a>
+                            <a href="#t3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M12 3l8 4v6c0 4-3.5 7-8 8-4.5-1-8-4-8-8V7z"></path></svg>Infos</a>
+                        </nav>
+                    </div>
+                </div>
+                <p class="ph__cap">Jour — la feuille imprimée</p>
+            </div>
+            <div class="device">
+                <div class="ph">
+                    <div class="mk t t-night">
+                        <div class="t-top">
+                            <span class="t-event">La Backyard de Thomas</span>
+                        </div>
+                        <div class="t-board">
+                            <span class="t-board__round">T14</span>
+                            <span class="t-board__hour">02:00</span>
+                            <span class="t-board__lim">→ 03:00</span>
+                        </div>
+                        <div class="t-tally">
+                            <span>en course</span>6<span>sortis</span>31<span>rentrés</span>1
+                        </div>
+                        <div class="t-colhead">
+                            <span class="t-colhead__bib">Doss.</span>
+                            <span class="t-colhead__name">Coureur</span>
+                            <span>Arrivée</span>
+                        </div>
+                        <div class="mk__list">
+                            <div class="t-row">
+                                <span class="t-bib">012</span>
+                                <span class="t-id">
+                                    <span class="t-name">Thomas Poirey</span>
+                                    <span class="t-sub">14 boucles · 84 km</span>
+                                </span>
+                                <span class="t-stamp">02:52:07<span>rentré</span></span>
+                            </div>
+                            <div class="t-row">
+                                <span class="t-bib">003</span>
+                                <span class="t-id">
+                                    <span class="t-name">Paul Vasseur</span>
+                                    <span class="t-sub">13 boucles · 78 km</span>
+                                </span>
+                                <button type="button" class="t-btn">Valider</button>
+                            </div>
+                            <div class="t-row">
+                                <span class="t-bib">018</span>
+                                <span class="t-id">
+                                    <span class="t-name">Julie Marchetti</span>
+                                    <span class="t-sub">13 boucles · 78 km</span>
+                                </span>
+                                <button type="button" class="t-btn">Valider</button>
+                            </div>
+                            <div class="t-row">
+                                <span class="t-bib">029</span>
+                                <span class="t-id">
+                                    <span class="t-name">Farid Benazzouz</span>
+                                    <span class="t-sub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l2.5 1.75"></path><path d="M5 5l14 14"></path></svg>Hors délai · 01:00</span>
+                                </span>
+                                <span class="t-stamp" style="color: var(--muted);">—<span>sorti</span></span>
+                            </div>
+                        </div>
+                        <nav class="mk__nav">
+                            <a class="on" href="#t4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l3 2"></path></svg>Course</a>
+                            <a href="#t5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M4 6h16"></path><path d="M4 12h16"></path><path d="M4 18h10"></path></svg>Coureurs</a>
+                            <a href="#t6"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M12 3l8 4v6c0 4-3.5 7-8 8-4.5-1-8-4-8-8V7z"></path></svg>Infos</a>
+                        </nav>
+                    </div>
+                </div>
+                <p class="ph__cap">Nuit — le tableau s'allume</p>
+            </div>
+        </div>
+        <div class="dir__facts">
+            <div class="fact">
+                <h3>Palette</h3>
+                <div class="swatchbar">
+                    <div style="background: #F2F3F5;"></div>
+                    <div style="background: #14161A;"></div>
+                    <div style="background: #FFB020;"></div>
+                    <div style="background: #0B6B3A;"></div>
+                    <div style="background: #B3261E;"></div>
+                    <div style="background: #7A5C00;"></div>
+                </div>
+                <p><strong>Papier froid · encre · ambre de nuit · vert · rouge · or.</strong> Aucune couleur de marque le jour : le bouton d'action est un aplat d'encre. L'ambre n'existe qu'en mode nuit, quand le tableau est censé être éclairé.</p>
+            </div>
+            <div class="fact">
+                <h3>Typographie</h3>
+                <p><strong>Martian Mono</strong> pour toutes les heures et tous les dossards — largeur fixe, donc des colonnes qui s'alignent au pixel. <strong>Instrument Sans</strong> pour les noms et les libellés.</p>
+            </div>
+            <div class="fact">
+                <h3>Structure et signature</h3>
+                <p>Zéro arrondi, zéro carte, lignes à bord perdu séparées par un filet d'un pixel, en-tête de colonnes en capitales. La signature est <strong>la ligne de tableau</strong> : chaque coureur est une entrée d'horaire dont la dernière case bascule du bouton vers l'heure d'arrivée.</p>
+                <div class="badges">
+                    <span class="bdg bdg--run"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M8.5 12h6"></path><path d="M12 9.5l3 2.5-3 2.5"></path></svg>En course</span>
+                    <span class="bdg bdg--out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l2.5 1.75"></path><path d="M5 5l14 14"></path></svg>Éliminé</span>
+                    <span class="bdg bdg--quit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4v9"></path><path d="M8.5 9.5L12 13l3.5-3.5"></path><path d="M5 19h14"></path></svg>Abandon</span>
+                    <span class="bdg bdg--done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8 4h8v4.5a4 4 0 0 1-8 0z"></path><path d="M8 5.5H5.5a3 3 0 0 0 3 3"></path><path d="M16 5.5h2.5a3 3 0 0 1-3 3"></path><path d="M12 12.5V16"></path><path d="M8.5 20h7"></path></svg>Terminé</span>
+                </div>
+            </div>
+            <div class="fact">
+                <h3>Ce que ça coûte</h3>
+                <p>La plus rapide à lire et la plus austère. Elle ne dit rien de la fête : tout le festif devra passer par le dossard imprimé et la page de résultats. Martian Mono mange de la largeur, donc les noms longs tronquent plus tôt.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="dir dir--c">
+        <div class="dir__head">
+            <p class="eyebrow">Chronographe</p>
+            <h2>L'objet que le gérant a déjà dans la main</h2>
+        </div>
+        <p class="lede">
+            Un boîtier, pas une page. Chaque valeur vit dans un champ de lecture encadré, étiquetée en
+            tout petites capitales, alignée à droite. Le jour, c'est un écran à cristaux liquides
+            gris-bleu, sans rétroéclairage ; la nuit, le rétroéclairage cyan s'allume. Overpass descend
+            de la signalétique routière américaine et son mono porte tous les chiffres.
+        </p>
+        <div class="dir__phones">
+            <div class="device">
+                <div class="ph">
+                    <div class="mk c">
+                        <div class="c-top">
+                            <span class="c-event">La Backyard de Thomas</span>
+                            <div class="c-windows">
+                                <div class="c-field">
+                                    <div class="c-field__l">Départ</div>
+                                    <div class="c-field__v">18:00</div>
+                                </div>
+                                <div class="c-field">
+                                    <div class="c-field__l">Limite</div>
+                                    <div class="c-field__v c-field__v--sm">19:00</div>
+                                </div>
+                            </div>
+                            <div class="c-windows">
+                                <div class="c-field">
+                                    <div class="c-field__l">En course</div>
+                                    <div class="c-field__v c-field__v--sm">24</div>
+                                </div>
+                                <div class="c-field">
+                                    <div class="c-field__l">Sortis</div>
+                                    <div class="c-field__v c-field__v--sm">13</div>
+                                </div>
+                            </div>
+                            <div class="c-round">Tour 06 — arrivées</div>
+                        </div>
+                        <div class="mk__list">
+                            <div class="c-rows">
+                                <div class="c-row">
+                                    <span class="c-bar"></span>
+                                    <span class="c-id">
+                                        <span class="c-name">Thomas Poirey</span>
+                                        <span class="c-meta">012 · 7 bcl · 42 km</span>
+                                    </span>
+                                    <span class="c-read"><b>48:32</b><span>Rentré</span></span>
+                                </div>
+                                <div class="c-row">
+                                    <span class="c-bar"></span>
+                                    <span class="c-id">
+                                        <span class="c-name">Camille Berthier</span>
+                                        <span class="c-meta">007 · 6 bcl · 36 km</span>
+                                    </span>
+                                    <button type="button" class="c-btn">Valider</button>
+                                </div>
+                                <div class="c-row">
+                                    <span class="c-bar"></span>
+                                    <span class="c-id">
+                                        <span class="c-name">Nadia Lemarchand</span>
+                                        <span class="c-meta">021 · 6 bcl · 36 km</span>
+                                    </span>
+                                    <button type="button" class="c-btn">Valider</button>
+                                </div>
+                                <div class="c-row">
+                                    <span class="c-bar"></span>
+                                    <span class="c-id">
+                                        <span class="c-name">Yanis Beaufort-Delcourt</span>
+                                        <span class="c-meta">034 · 6 bcl · 36 km</span>
+                                    </span>
+                                    <button type="button" class="c-btn">Valider</button>
+                                </div>
+                            </div>
+                        </div>
+                        <nav class="mk__nav">
+                            <a class="on" href="#c1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l3 2"></path></svg>Course</a>
+                            <a href="#c2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M4 6h16"></path><path d="M4 12h16"></path><path d="M4 18h10"></path></svg>Coureurs</a>
+                            <a href="#c3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M12 3l8 4v6c0 4-3.5 7-8 8-4.5-1-8-4-8-8V7z"></path></svg>Infos</a>
+                        </nav>
+                    </div>
+                </div>
+                <p class="ph__cap">Jour — dalle LCD, sans rétroéclairage</p>
+            </div>
+            <div class="device">
+                <div class="ph">
+                    <div class="mk c c-night">
+                        <div class="c-top">
+                            <span class="c-event">La Backyard de Thomas</span>
+                            <div class="c-windows">
+                                <div class="c-field">
+                                    <div class="c-field__l">Départ</div>
+                                    <div class="c-field__v">02:00</div>
+                                </div>
+                                <div class="c-field">
+                                    <div class="c-field__l">Limite</div>
+                                    <div class="c-field__v c-field__v--sm">03:00</div>
+                                </div>
+                            </div>
+                            <div class="c-windows">
+                                <div class="c-field">
+                                    <div class="c-field__l">En course</div>
+                                    <div class="c-field__v c-field__v--sm">6</div>
+                                </div>
+                                <div class="c-field">
+                                    <div class="c-field__l">Sortis</div>
+                                    <div class="c-field__v c-field__v--sm">31</div>
+                                </div>
+                            </div>
+                            <div class="c-round">Tour 14 — arrivées</div>
+                        </div>
+                        <div class="mk__list">
+                            <div class="c-rows">
+                                <div class="c-row">
+                                    <span class="c-bar"></span>
+                                    <span class="c-id">
+                                        <span class="c-name">Thomas Poirey</span>
+                                        <span class="c-meta">012 · 14 bcl · 84 km</span>
+                                    </span>
+                                    <span class="c-read"><b>52:07</b><span>Rentré</span></span>
+                                </div>
+                                <div class="c-row">
+                                    <span class="c-bar"></span>
+                                    <span class="c-id">
+                                        <span class="c-name">Paul Vasseur</span>
+                                        <span class="c-meta">003 · 13 bcl · 78 km</span>
+                                    </span>
+                                    <button type="button" class="c-btn">Valider</button>
+                                </div>
+                                <div class="c-row">
+                                    <span class="c-bar"></span>
+                                    <span class="c-id">
+                                        <span class="c-name">Julie Marchetti</span>
+                                        <span class="c-meta">018 · 13 bcl · 78 km</span>
+                                    </span>
+                                    <button type="button" class="c-btn">Valider</button>
+                                </div>
+                                <div class="c-row">
+                                    <span class="c-bar" style="background: var(--out);"></span>
+                                    <span class="c-id">
+                                        <span class="c-name">Farid Benazzouz</span>
+                                        <span class="c-meta">029 · hors délai · 01:00</span>
+                                    </span>
+                                    <span class="c-read"><b style="color: var(--muted);">——:——</b><span>Sorti</span></span>
+                                </div>
+                            </div>
+                        </div>
+                        <nav class="mk__nav">
+                            <a class="on" href="#c4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l3 2"></path></svg>Course</a>
+                            <a href="#c5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M4 6h16"></path><path d="M4 12h16"></path><path d="M4 18h10"></path></svg>Coureurs</a>
+                            <a href="#c6"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M12 3l8 4v6c0 4-3.5 7-8 8-4.5-1-8-4-8-8V7z"></path></svg>Infos</a>
+                        </nav>
+                    </div>
+                </div>
+                <p class="ph__cap">Nuit — rétroéclairage cyan</p>
+            </div>
+        </div>
+        <div class="dir__facts">
+            <div class="fact">
+                <h3>Palette</h3>
+                <div class="swatchbar">
+                    <div style="background: #C4CBD0;"></div>
+                    <div style="background: #14181B;"></div>
+                    <div style="background: #4FD8E8;"></div>
+                    <div style="background: #0C5334;"></div>
+                    <div style="background: #962713;"></div>
+                    <div style="background: #5E4600;"></div>
+                </div>
+                <p><strong>Dalle gris-bleu · encre · cyan de rétroéclairage · vert · rouge · ocre.</strong> Les surfaces de statut sont teintées dans le gris de la dalle, jamais en pastel : l'écran reste un écran d'appareil, pas une page web.</p>
+            </div>
+            <div class="fact">
+                <h3>Typographie</h3>
+                <p><strong>Overpass Mono</strong> pour toutes les lectures — heures, durées, dossards, distances. <strong>Overpass</strong>, sa sœur proportionnelle, pour les noms et les boutons. Une seule famille, deux largeurs.</p>
+            </div>
+            <div class="fact">
+                <h3>Structure et signature</h3>
+                <p>Arrondis à 4 px, bordures d'un pixel, boutons rectangulaires — un appareil, pas des pastilles. La signature est <strong>le champ de lecture</strong> : étiquette minuscule en haut, valeur alignée à droite, comme sur un cadran.</p>
+                <div class="badges">
+                    <span class="bdg bdg--run"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M8.5 12h6"></path><path d="M12 9.5l3 2.5-3 2.5"></path></svg>En course</span>
+                    <span class="bdg bdg--out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l2.5 1.75"></path><path d="M5 5l14 14"></path></svg>Éliminé</span>
+                    <span class="bdg bdg--quit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M12 4v9"></path><path d="M8.5 9.5L12 13l3.5-3.5"></path><path d="M5 19h14"></path></svg>Abandon</span>
+                    <span class="bdg bdg--done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M8 4h8v4.5a4 4 0 0 1-8 0z"></path><path d="M8 5.5H5.5a3 3 0 0 0 3 3"></path><path d="M16 5.5h2.5a3 3 0 0 1-3 3"></path><path d="M12 12.5V16"></path><path d="M8.5 20h7"></path></svg>Terminé</span>
+                </div>
+            </div>
+            <div class="fact">
+                <h3>Ce que ça coûte</h3>
+                <p>Très lisible, très « instrument ». Mais un fond gris de jour est inhabituel sur le web et peut sembler éteint sur un bel écran — c'est le prix de la métaphore, et c'est le point à trancher en premier sur cette piste.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="dir dir--p">
+        <div class="dir__head">
+            <p class="eyebrow">Topographie</p>
+            <h2>La boucle est un objet dessiné</h2>
+        </div>
+        <p class="lede">
+            Tout vient de la carte du parcours : papier de randonnée, courbes de niveau en fond, un
+            violet d'itinéraire, des repères ronds en bord de ligne comme des points de passage. Et le
+            pointage des boucles prend la forme du terrain — chaque boucle validée ajoute un signe au
+            chapelet du coureur, au lieu d'incrémenter un chiffre.
+        </p>
+        <div class="dir__phones">
+            <div class="device">
+                <div class="ph">
+                    <div class="mk p">
+                        <div class="p-band">
+                            <svg class="p-contours" viewBox="0 0 340 130" preserveAspectRatio="none" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+                                <path d="M-10 22C60 6 120 44 190 26s110-26 170-6"></path>
+                                <path d="M-10 48C60 32 120 70 190 52s110-26 170-6"></path>
+                                <path d="M-10 76C60 60 120 98 190 80s110-26 170-6"></path>
+                                <path d="M-10 106C60 90 120 128 190 110s110-26 170-6"></path>
+                            </svg>
+                            <div class="p-band__in">
+                                <span class="p-event">La Backyard de Thomas</span>
+                                <span class="p-round">Tour 06 · boucle de 6 km</span>
+                                <span class="p-hours">
+                                    18:00
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h14"></path><path d="M13 7l5 5-5 5"></path></svg>
+                                    <em>19:00</em>
+                                </span>
+                                <span class="p-rule"></span>
+                            </div>
+                        </div>
+                        <div class="p-legend">
+                            <div><span class="p-key" style="background: #2F6B3F;"></span><b>24</b> en course</div>
+                            <div><span class="p-key" style="background: #B03A1F;"></span><b>13</b> sortis</div>
+                        </div>
+                        <div class="mk__list">
+                            <div class="p-rows">
+                                <div class="p-row">
+                                    <span class="p-pin"></span>
+                                    <span class="p-id">
+                                        <span class="p-name">Thomas Poirey</span>
+                                        <span class="p-loops">
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <b>42 km</b>
+                                        </span>
+                                    </span>
+                                    <span class="p-time"><b>48:32</b><span>rentré</span></span>
+                                </div>
+                                <div class="p-row">
+                                    <span class="p-pin"></span>
+                                    <span class="p-id">
+                                        <span class="p-name">Camille Berthier</span>
+                                        <span class="p-loops">
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <b>36 km</b>
+                                        </span>
+                                    </span>
+                                    <button type="button" class="p-btn">Valider</button>
+                                </div>
+                                <div class="p-row">
+                                    <span class="p-pin"></span>
+                                    <span class="p-id">
+                                        <span class="p-name">Nadia Lemarchand</span>
+                                        <span class="p-loops">
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <b>36 km</b>
+                                        </span>
+                                    </span>
+                                    <button type="button" class="p-btn">Valider</button>
+                                </div>
+                                <div class="p-row">
+                                    <span class="p-pin" style="border-color: #B03A1F;"></span>
+                                    <span class="p-id">
+                                        <span class="p-name">Farid Benazzouz</span>
+                                        <span class="p-loops" style="color: #B03A1F;">
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <b>hors délai au tour 05</b>
+                                        </span>
+                                    </span>
+                                    <span class="p-time"><b style="color: var(--muted);">—</b><span>sorti</span></span>
+                                </div>
+                            </div>
+                        </div>
+                        <nav class="mk__nav">
+                            <a class="on" href="#p1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l3 2"></path></svg>Course</a>
+                            <a href="#p2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16"></path><path d="M4 12h16"></path><path d="M4 18h10"></path></svg>Coureurs</a>
+                            <a href="#p3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 4v6c0 4-3.5 7-8 8-4.5-1-8-4-8-8V7z"></path></svg>Infos</a>
+                        </nav>
+                    </div>
+                </div>
+                <p class="ph__cap">Jour — papier de randonnée</p>
+            </div>
+            <div class="device">
+                <div class="ph">
+                    <div class="mk p p-night">
+                        <div class="p-band">
+                            <svg class="p-contours" viewBox="0 0 340 130" preserveAspectRatio="none" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+                                <path d="M-10 22C60 6 120 44 190 26s110-26 170-6"></path>
+                                <path d="M-10 48C60 32 120 70 190 52s110-26 170-6"></path>
+                                <path d="M-10 76C60 60 120 98 190 80s110-26 170-6"></path>
+                                <path d="M-10 106C60 90 120 128 190 110s110-26 170-6"></path>
+                            </svg>
+                            <div class="p-band__in">
+                                <span class="p-event">La Backyard de Thomas</span>
+                                <span class="p-round">Tour 14 · boucle de 6 km</span>
+                                <span class="p-hours">
+                                    02:00
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h14"></path><path d="M13 7l5 5-5 5"></path></svg>
+                                    <em>03:00</em>
+                                </span>
+                                <span class="p-rule"></span>
+                            </div>
+                        </div>
+                        <div class="p-legend">
+                            <div><span class="p-key" style="background: #6FC98A;"></span><b>6</b> en course</div>
+                            <div><span class="p-key" style="background: #FF8D6B;"></span><b>31</b> sortis</div>
+                        </div>
+                        <div class="mk__list">
+                            <div class="p-rows">
+                                <div class="p-row">
+                                    <span class="p-pin"></span>
+                                    <span class="p-id">
+                                        <span class="p-name">Thomas Poirey</span>
+                                        <span class="p-loops">
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <b>+6 · 84 km</b>
+                                        </span>
+                                    </span>
+                                    <span class="p-time"><b>52:07</b><span>rentré</span></span>
+                                </div>
+                                <div class="p-row">
+                                    <span class="p-pin"></span>
+                                    <span class="p-id">
+                                        <span class="p-name">Paul Vasseur</span>
+                                        <span class="p-loops">
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <b>+5 · 78 km</b>
+                                        </span>
+                                    </span>
+                                    <button type="button" class="p-btn">Valider</button>
+                                </div>
+                                <div class="p-row">
+                                    <span class="p-pin"></span>
+                                    <span class="p-id">
+                                        <span class="p-name">Julie Marchetti</span>
+                                        <span class="p-loops">
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M6 1c3.1.5 5.2 3.4 3.8 6.1C8.4 9.8 4.2 11.3 2.1 9.1-.1 6.8 1.4 2.2 6 1z"></path></svg>
+                                            <b>+5 · 78 km</b>
+                                        </span>
+                                    </span>
+                                    <button type="button" class="p-btn">Valider</button>
+                                </div>
+                            </div>
+                        </div>
+                        <nav class="mk__nav">
+                            <a class="on" href="#p4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l3 2"></path></svg>Course</a>
+                            <a href="#p5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16"></path><path d="M4 12h16"></path><path d="M4 18h10"></path></svg>Coureurs</a>
+                            <a href="#p6"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 4v6c0 4-3.5 7-8 8-4.5-1-8-4-8-8V7z"></path></svg>Infos</a>
+                        </nav>
+                    </div>
+                </div>
+                <p class="ph__cap">Nuit — la carte sous la frontale</p>
+            </div>
+        </div>
+        <div class="dir__facts">
+            <div class="fact">
+                <h3>Palette</h3>
+                <div class="swatchbar">
+                    <div style="background: #F1F0EA;"></div>
+                    <div style="background: #2B2A26;"></div>
+                    <div style="background: #7B3FA0;"></div>
+                    <div style="background: #A98A5F;"></div>
+                    <div style="background: #2F6B3F;"></div>
+                    <div style="background: #B03A1F;"></div>
+                </div>
+                <p><strong>Papier · encre brune · violet d'itinéraire · courbe de niveau · forêt · brique.</strong> Le violet est la couleur du tracé sur les cartes de randonnée : il est ici la marque et l'action, et rien d'autre ne l'utilise.</p>
+            </div>
+            <div class="fact">
+                <h3>Typographie</h3>
+                <p><strong>Epilogue</strong> pour les heures et les chiffres — géométrique, très serrée en gros corps. <strong>Karla</strong> pour les noms et les libellés, avec ses formes un peu sèches de police utilitaire.</p>
+            </div>
+            <div class="fact">
+                <h3>Structure et signature</h3>
+                <p>Zéro arrondi sur les blocs, un repère circulaire de couleur au bord de chaque ligne, des filets couleur courbe de niveau. La signature est <strong>le chapelet de boucles</strong> : un signe par boucle validée, plafonné à huit, au-delà on ajoute « +6 ».</p>
+                <div class="badges">
+                    <span class="bdg bdg--run"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M8.5 12h6"></path><path d="M12 9.5l3 2.5-3 2.5"></path></svg>En course</span>
+                    <span class="bdg bdg--out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l2.5 1.75"></path><path d="M5 5l14 14"></path></svg>Éliminé</span>
+                    <span class="bdg bdg--quit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v9"></path><path d="M8.5 9.5L12 13l3.5-3.5"></path><path d="M5 19h14"></path></svg>Abandon</span>
+                    <span class="bdg bdg--done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8v4.5a4 4 0 0 1-8 0z"></path><path d="M8 5.5H5.5a3 3 0 0 0 3 3"></path><path d="M16 5.5h2.5a3 3 0 0 1-3 3"></path><path d="M12 12.5V16"></path><path d="M8.5 20h7"></path></svg>Terminé</span>
+                </div>
+            </div>
+            <div class="fact">
+                <h3>Ce que ça coûte</h3>
+                <p>La plus liée au terrain, donc la plus dépendante du parcours GPX pour tenir sa promesse. Le chapelet est joli mais bavard : sur une nuit à vingt boucles, il ne remplace pas le chiffre, il l'accompagne.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="close">
+        <p class="eyebrow">Comment on tranche</p>
+        <h2>Trois questions suffisent</h2>
+        <ol>
+            <li><strong>À quatre heures du matin, tu veux un outil ou une fête ?</strong> Si c'est l'outil, Tableau des départs ou Chronographe. Si c'est la fête, Guinguette. Topographie est entre les deux.</li>
+            <li><strong>Le fond gris de la dalle LCD, tu le supportes ?</strong> C'est le seul parti pris vraiment clivant du lot. Si non, Chronographe sort tout de suite.</li>
+            <li><strong>Le parcours compte-t-il autant que le chrono ?</strong> Si oui, Topographie a un vrai fil conducteur ; sinon son décor est gratuit.</li>
+        </ol>
+        <p>
+            Dis-moi laquelle tu retiens, ou ce que tu prendrais dans chacune, et je la pousse au bout :
+            l'échelle typographique complète, les états d'écran, le dossard imprimable et les jetons
+            prêts à poser dans l'application.
+        </p>
+    </section>
+</div>
