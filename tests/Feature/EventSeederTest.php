@@ -27,6 +27,17 @@ class EventSeederTest extends TestCase
     }
 
     #[Test]
+    public function it_seeds_the_event_with_the_initial_briefing(): void
+    {
+        $this->seed(EventSeeder::class);
+
+        $briefing = Event::query()->sole()->briefing;
+
+        $this->assertNotNull($briefing);
+        $this->assertStringContainsString('Lampe frontale', $briefing);
+    }
+
+    #[Test]
     public function it_does_not_duplicate_the_event_on_a_second_run(): void
     {
         $this->seed(EventSeeder::class);

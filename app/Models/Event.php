@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $id
  * @property string $name
  * @property string|null $description
+ * @property string|null $briefing
  * @property EventStatus $status
  * @property CarbonImmutable|null $first_start_at
  * @property int|null $lap_distance_meters
