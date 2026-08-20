@@ -7,6 +7,7 @@ import EventFieldSample from '@/components/design/EventFieldSample.vue';
 import EventStatusGallery from '@/components/design/EventStatusGallery.vue';
 import RegistrationListSample from '@/components/design/RegistrationListSample.vue';
 import RegistrationStatusGallery from '@/components/design/RegistrationStatusGallery.vue';
+import RegistrationStepperSample from '@/components/design/RegistrationStepperSample.vue';
 import RunnerListSample from '@/components/design/RunnerListSample.vue';
 import StatusGallery from '@/components/design/StatusGallery.vue';
 import TypeSpecimen from '@/components/design/TypeSpecimen.vue';
@@ -100,6 +101,13 @@ const counts = [
                 note="Quatre vues au maximum, toutes visibles sans ouvrir de menu."
             >
                 <BoardFilterSample />
+            </DesignSection>
+
+            <DesignSection
+                title="Repères d’étape"
+                note="Quatre repères, jamais une barre de progression : la position est un fait, pas une animation. Les étapes franchies ramènent en arrière, les suivantes restent inertes."
+            >
+                <RegistrationStepperSample />
             </DesignSection>
 
             <DesignSection
