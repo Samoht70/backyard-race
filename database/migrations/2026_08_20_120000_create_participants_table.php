@@ -14,6 +14,7 @@ return new class extends Migration
             $table->foreignId('event_id')->constrained();
             $table->foreignId('user_id')->constrained();
             $table->string('status', 20)->default(RegistrationStatus::Pending->value);
+            $table->unsignedSmallInteger('bib_number')->nullable();
             $table->string('phone', 40);
             $table->date('birth_date');
             $table->string('emergency_contact_name', 120);
@@ -22,6 +23,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->unique(['event_id', 'user_id']);
+            $table->unique(['event_id', 'bib_number']);
         });
     }
 
