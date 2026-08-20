@@ -14,24 +14,25 @@ const props = withDefaults(defineProps<Props>(), {
 
 const displayed = computed(() => props.value ?? '—');
 const valueClass = computed(() =>
-    props.size === 'lg' ? 'text-lap' : 'text-metric',
+    props.size === 'lg' ? 'text-readout' : 'text-figure',
 );
 </script>
 
 <template>
-    <div class="flex min-w-0 flex-col gap-0.5">
-        <p class="flex items-baseline gap-1">
-            <span class="font-display tabular-nums" :class="valueClass">{{
+    <div class="flex min-w-0 flex-col gap-1 bg-card px-3 py-2.5">
+        <p class="font-mono text-label text-muted-foreground uppercase">
+            {{ label }}
+        </p>
+        <p class="flex items-baseline gap-1 font-mono">
+            <span class="tabular-nums" :class="valueClass">{{
                 displayed
             }}</span>
             <span
                 v-if="unit"
-                class="font-display text-label text-muted-foreground uppercase"
-                >{{ unit }}</span
+                class="text-label text-muted-foreground uppercase"
             >
-        </p>
-        <p class="font-display text-label text-muted-foreground uppercase">
-            {{ label }}
+                {{ unit }}
+            </span>
         </p>
     </div>
 </template>

@@ -49,7 +49,7 @@ const isBlocked = computed(() => props.transition.refusals.length > 0);
 <template>
     <Card>
         <CardHeader>
-            <CardTitle class="font-display text-label uppercase">
+            <CardTitle class="font-mono text-label uppercase">
                 {{ t('event.status.section_title') }}
             </CardTitle>
         </CardHeader>
@@ -96,7 +96,7 @@ const isBlocked = computed(() => props.transition.refusals.length > 0);
                     />
                     <span
                         v-else
-                        class="ml-auto font-display text-label text-muted-foreground uppercase"
+                        class="ml-auto font-mono text-label text-muted-foreground uppercase"
                     >
                         {{
                             step.done

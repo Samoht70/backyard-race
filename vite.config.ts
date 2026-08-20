@@ -12,9 +12,9 @@ export default defineConfig({
             input: ['resources/css/app.css', 'resources/js/app.ts'],
             refresh: true,
             fonts: [
-                local('Archivo', {
-                    alias: 'archivo',
-                    variable: '--font-archivo',
+                local('Instrument Sans', {
+                    alias: 'instrument-sans',
+                    variable: '--font-instrument-sans',
                     display: 'swap',
                     preload: true,
                     fallbacks: [
@@ -26,8 +26,27 @@ export default defineConfig({
                     ],
                     variants: [
                         {
-                            src: 'resources/fonts/Archivo[wdth,wght].woff2',
-                            weight: '100 900',
+                            src: 'resources/fonts/InstrumentSans[wght].woff2',
+                            weight: '400 700',
+                            style: 'normal',
+                        },
+                    ],
+                }),
+                local('Martian Mono', {
+                    alias: 'martian-mono',
+                    variable: '--font-martian-mono',
+                    display: 'swap',
+                    preload: true,
+                    fallbacks: [
+                        'ui-monospace',
+                        'SFMono-Regular',
+                        'Menlo',
+                        'monospace',
+                    ],
+                    variants: [
+                        {
+                            src: 'resources/fonts/MartianMono[wght].woff2',
+                            weight: '400 700',
                             style: 'normal',
                         },
                     ],

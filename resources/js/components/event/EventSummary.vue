@@ -64,7 +64,7 @@ const facts = computed(() => [
                 class="flex flex-wrap justify-between gap-2 border-b border-border pb-2"
             >
                 <dt
-                    class="font-display text-label text-muted-foreground uppercase"
+                    class="font-mono text-label text-muted-foreground uppercase"
                 >
                     {{ fact.term }}
                 </dt>

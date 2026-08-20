@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { TriangleAlert } from '@lucide/vue';
 import ActionButton from '@/components/race/ActionButton.vue';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { t } from '@/lib/i18n';
 
 type Props = {
@@ -20,19 +19,21 @@ defineEmits<{
 </script>
 
 <template>
-    <Alert variant="destructive" role="alert">
-        <TriangleAlert class="size-4" />
-        <AlertTitle>{{ title ?? t('ui.state.error_title') }}</AlertTitle>
-        <AlertDescription>
-            <p>{{ description ?? t('ui.state.error_description') }}</p>
-            <ActionButton
-                v-if="retryable"
-                tone="quiet"
-                class="mt-3 w-auto"
-                @click="$emit('retry')"
-            >
+    <div
+        role="alert"
+        class="flex flex-col items-center gap-2 border-l-[3px] border-destructive bg-card px-6 py-8 text-center"
+    >
+        <TriangleAlert class="size-7 text-destructive" aria-hidden="true" />
+        <p class="text-base font-bold tracking-tight">
+            {{ title ?? t('ui.state.error_title') }}
+        </p>
+        <p class="max-w-[32ch] text-sm text-muted-foreground">
+            {{ description ?? t('ui.state.error_description') }}
+        </p>
+        <div v-if="retryable" class="mt-2 w-full max-w-xs">
+            <ActionButton @click="$emit('retry')">
                 {{ t('ui.state.retry') }}
             </ActionButton>
-        </AlertDescription>
-    </Alert>
+        </div>
+    </div>
 </template>

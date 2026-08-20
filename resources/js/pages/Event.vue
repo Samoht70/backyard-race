@@ -3,7 +3,6 @@ import { Head, Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import EventStatusBadge from '@/components/event/EventStatusBadge.vue';
 import EventSummary from '@/components/event/EventSummary.vue';
-import FestoonDivider from '@/components/race/FestoonDivider.vue';
 import SeatCounter from '@/components/registration/SeatCounter.vue';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { t } from '@/lib/i18n';
@@ -32,7 +31,7 @@ defineOptions({
 });
 
 const registrationLinkClasses =
-    'inline-flex min-h-11 w-full touch-manipulation items-center justify-center rounded-lg bg-primary font-display font-black tracking-wide text-primary-foreground uppercase';
+    'inline-flex min-h-11 w-full touch-manipulation items-center justify-center border border-primary bg-primary text-xs font-bold tracking-widest text-primary-foreground uppercase';
 
 const isDraft = computed(() => props.event.status === 'draft');
 const title = computed(() => props.event.name ?? t('event.public.untitled'));
@@ -50,11 +49,9 @@ const title = computed(() => props.event.name ?? t('event.public.untitled'));
         </Alert>
 
         <header class="flex flex-col items-center gap-2 text-center">
-            <h1 class="font-display text-lap">{{ title }}</h1>
+            <h1 class="text-title">{{ title }}</h1>
             <EventStatusBadge :status="event.status" />
         </header>
-
-        <FestoonDivider />
 
         <p v-if="canRegister" class="text-center text-sm text-muted-foreground">
             {{ t('event.public.registrations_open') }}

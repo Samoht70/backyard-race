@@ -28,9 +28,7 @@ function openSections(): void {
             class="flex min-h-11 flex-1 flex-col items-center justify-center gap-1 px-2 py-2 text-muted-foreground transition-colors aria-[current=page]:text-primary"
         >
             <component :is="item.icon" class="size-5" aria-hidden="true" />
-            <span class="font-display text-label uppercase">{{
-                item.title
-            }}</span>
+            <span class="font-mono text-label uppercase">{{ item.title }}</span>
         </Link>
         <button
             type="button"
@@ -38,7 +36,7 @@ function openSections(): void {
             @click="openSections"
         >
             <Ellipsis class="size-5" aria-hidden="true" />
-            <span class="font-display text-label uppercase">{{
+            <span class="font-mono text-label uppercase">{{
                 t('ui.nav.more')
             }}</span>
         </button>

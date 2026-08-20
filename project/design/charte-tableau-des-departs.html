@@ -17,13 +17,13 @@
         --d-keyline: #14161A;
         --d-action: #14161A;
         --d-action-ink: #FFFFFF;
-        --d-run: #0B6B3A;
+        --d-run: #0A6135;
         --d-run-s: #E0EFE6;
-        --d-out: #B3261E;
+        --d-out: #A1221B;
         --d-out-s: #FBE4E2;
         --d-quit: #5A616B;
         --d-quit-s: #E8EAED;
-        --d-done: #7A5C00;
+        --d-done: #6A5000;
         --d-done-s: #F5EBD3;
 
         --n-board: #0C0E11;
@@ -1223,18 +1223,18 @@
                 </div>
             </div>
             <div class="sw">
-                <div class="sw__chip" style="background: #0B6B3A;"></div>
+                <div class="sw__chip" style="background: #0A6135;"></div>
                 <div class="sw__meta">
                     <span class="sw__name">En course</span>
-                    <span class="sw__hex">#0B6B3A</span>
+                    <span class="sw__hex">#0A6135</span>
                     <span class="sw__role">Nuit : #5CD494.</span>
                 </div>
             </div>
             <div class="sw">
-                <div class="sw__chip" style="background: #B3261E;"></div>
+                <div class="sw__chip" style="background: #A1221B;"></div>
                 <div class="sw__meta">
                     <span class="sw__name">Éliminé</span>
-                    <span class="sw__hex">#B3261E</span>
+                    <span class="sw__hex">#A1221B</span>
                     <span class="sw__role">Hors délai. Nuit : #FF8A72.</span>
                 </div>
             </div>
@@ -1247,10 +1247,10 @@
                 </div>
             </div>
             <div class="sw">
-                <div class="sw__chip" style="background: #7A5C00;"></div>
+                <div class="sw__chip" style="background: #6A5000;"></div>
                 <div class="sw__meta">
                     <span class="sw__name">Terminé</span>
-                    <span class="sw__hex">#7A5C00</span>
+                    <span class="sw__hex">#6A5000</span>
                     <span class="sw__role">Statut de l'événement clos, et le vainqueur. Nuit : #F0C24E.</span>
                 </div>
             </div>
@@ -1261,24 +1261,30 @@
                 <div class="kv">
                     <div><span>Encre sur latte</span><span>18,1:1</span></div>
                     <div><span>Encre sur planche</span><span>11,0:1</span></div>
-                    <div><span>Secondaire sur latte</span><span>6,3:1</span></div>
+                    <div><span>Secondaire sur latte</span><span>8,5:1</span></div>
                     <div><span>Secondaire sur planche</span><span>5,2:1</span></div>
-                    <div><span>Statut sur son fond</span><span>5,2 à 5,6:1</span></div>
+                    <div><span>Statut sur son fond</span><span>6,3 à 7,1:1</span></div>
+                    <div><span>Statut sur la planche</span><span>4,6 à 5,2:1</span></div>
                     <div><span>Ambre sur planche de nuit</span><span>10,6:1</span></div>
                 </div>
-                <p class="note">Aucune paire de la charte ne descend sous <b>5,1:1</b>, contre 4,5 exigé par AA.</p>
+                <p class="note">
+                    Aucune paire ne descend sous <b>4,6:1</b>, contre 4,5 exigé par AA. Le point
+                    bas est une couleur de statut posée directement sur la planche : c'est la
+                    contrainte qui a fixé les trois teintes de statut, chacune assombrie jusqu'à
+                    passer sur le gris et pas seulement sur le blanc.
+                </p>
             </div>
             <div class="slat">
-                <h3>Deux gris de texte, pas un</h3>
+                <h3>Un seul gris de texte</h3>
                 <p class="note">
-                    Le gris secondaire n'est pas le même sur la latte et sur la planche : sur le gris,
-                    il faut descendre à <b>#474D56</b> pour rester conforme. C'est la seule
-                    duplication de la palette, et elle est là parce que les titres de colonnes vivent
-                    sur la planche.
+                    Le gris secondaire doit rester conforme sur la latte <em>et</em> sur la planche,
+                    ce qui le fixe à <b>#474D56</b> — 8,5:1 sur le blanc, 5,2:1 sur le gris. Un gris
+                    plus clair passerait sur la latte et échouerait sur la planche, donc il n'y en a
+                    qu'un.
                 </p>
                 <p class="note">
-                    En mode nuit, la question ne se pose pas : la planche est plus sombre que la latte,
-                    donc un seul gris suffit.
+                    Même règle pour les statuts : ils sont assombris jusqu'à passer sur la planche.
+                    C'est le prix du fond gris, et c'est le seul endroit où il coûte quelque chose.
                 </p>
             </div>
         </div>
@@ -1849,76 +1855,122 @@
     <section class="section">
         <div class="section__head">
             <p class="eyebrow">Mise en œuvre</p>
-            <h2>Les jetons, prêts à poser</h2>
+            <h2>Les jetons, tels qu'ils sont posés</h2>
         </div>
         <p class="lede">
-            Les noms de jetons que l'application consomme déjà ne changent pas — seules leurs valeurs
-            et les deux familles de caractères bougent. Trois jetons s'ajoutent : la planche, la latte
-            et le gris de texte sur planche.
+            Voici le contenu exact de <b>resources/css/app.css</b>. Les noms que l'application
+            consommait déjà n'ont pas changé — seules leurs valeurs et les deux familles de
+            caractères ont bougé, plus un jeton ajouté pour le filet clair intérieur à une latte.
+            Les valeurs sont écrites en oklch parce que c'est le format que la suite de tests
+            analyse pour vérifier chaque paire de contraste ; les hexadécimaux cités plus haut dans
+            cette page en sont l'équivalent exact.
         </p>
         <pre>:root {
-    --font-sans: 'Instrument Sans';
-    --font-mono: 'Martian Mono';
-
+    --background: oklch(0.8382 0.0104 238.5);
+    --foreground: oklch(0.1998 0.0086 264.4);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.1998 0.0086 264.4);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.1998 0.0086 264.4);
+    --primary: oklch(0.1998 0.0086 264.4);
+    --primary-foreground: oklch(1 0 0);
+    --secondary: oklch(0.9534 0.0042 236.5);
+    --secondary-foreground: oklch(0.1998 0.0086 264.4);
+    --muted: oklch(0.9534 0.0042 236.5);
+    --muted-foreground: oklch(0.4182 0.0169 258.4);
+    --accent: oklch(0.9048 0.007 247.9);
+    --accent-foreground: oklch(0.1998 0.0086 264.4);
+    --destructive: oklch(0.4643 0.1641 28.6);
+    --destructive-foreground: oklch(1 0 0);
+    --border: oklch(0.7718 0.0124 240);
+    --border-soft: oklch(0.9048 0.007 247.9);
+    --input: oklch(0.7718 0.0124 240);
+    --ring: oklch(0.1998 0.0086 264.4);
     --radius: 0px;
-
-    --background: #C4CBD0;
-    --card: #FFFFFF;
-    --secondary: #EDF0F2;
-    --foreground: #14161A;
-    --muted-foreground: #5A616B;
-    --muted-foreground-board: #474D56;
-    --border: #AEB6BC;
-    --border-soft: #DCE0E4;
-    --primary: #14161A;
-    --primary-foreground: #FFFFFF;
-
-    --status-running: #0B6B3A;
-    --status-running-surface: #E0EFE6;
-    --status-eliminated: #B3261E;
-    --status-eliminated-surface: #FBE4E2;
-    --status-abandoned: #5A616B;
-    --status-abandoned-surface: #E8EAED;
-    --status-finished: #7A5C00;
-    --status-finished-surface: #F5EBD3;
+    --status-running: oklch(0.4341 0.1049 154.1);
+    --status-running-surface: oklch(0.9384 0.0199 159.7);
+    --status-running-foreground: oklch(1 0 0);
+    --status-eliminated: oklch(0.4643 0.1641 28.6);
+    --status-eliminated-surface: oklch(0.9369 0.0255 23.6);
+    --status-eliminated-foreground: oklch(1 0 0);
+    --status-abandoned: oklch(0.4182 0.0169 258.4);
+    --status-abandoned-surface: oklch(0.9364 0.0046 258.3);
+    --status-abandoned-foreground: oklch(1 0 0);
+    --status-finished: oklch(0.4463 0.0913 86.9);
+    --status-finished-surface: oklch(0.9416 0.0334 88.1);
+    --status-finished-foreground: oklch(1 0 0);
+    --sidebar-background: oklch(0.8096 0.0123 239.9);
+    --sidebar-foreground: oklch(0.1998 0.0086 264.4);
+    --sidebar-primary: oklch(0.1998 0.0086 264.4);
+    --sidebar-primary-foreground: oklch(1 0 0);
+    --sidebar-accent: oklch(1 0 0);
+    --sidebar-accent-foreground: oklch(0.1998 0.0086 264.4);
+    --sidebar-border: oklch(0.7718 0.0124 240);
+    --sidebar-ring: oklch(0.1998 0.0086 264.4);
 }
 
 .dark {
-    --background: #0C0E11;
-    --card: #191C21;
-    --secondary: #22262C;
-    --foreground: #F0F1F3;
-    --muted-foreground: #949AA3;
-    --muted-foreground-board: #949AA3;
-    --border: #2B2F36;
-    --border-soft: #313640;
-    --primary: #FFB020;
-    --primary-foreground: #14161A;
-
-    --status-running: #5CD494;
-    --status-running-surface: #14301F;
-    --status-eliminated: #FF8A72;
-    --status-eliminated-surface: #331A16;
-    --status-abandoned: #949AA3;
-    --status-abandoned-surface: #23272D;
-    --status-finished: #F0C24E;
-    --status-finished-surface: #322609;
+    --background: oklch(0.1629 0.0071 258.4);
+    --foreground: oklch(0.9579 0.0029 264.5);
+    --card: oklch(0.2255 0.0107 260.7);
+    --card-foreground: oklch(0.9579 0.0029 264.5);
+    --popover: oklch(0.2255 0.0107 260.7);
+    --popover-foreground: oklch(0.9579 0.0029 264.5);
+    --primary: oklch(0.8131 0.165 75);
+    --primary-foreground: oklch(0.1998 0.0086 264.4);
+    --secondary: oklch(0.2671 0.0126 258.4);
+    --secondary-foreground: oklch(0.9579 0.0029 264.5);
+    --muted: oklch(0.2671 0.0126 258.4);
+    --muted-foreground: oklch(0.6842 0.0149 258.4);
+    --accent: oklch(0.3041 0.0138 261.7);
+    --accent-foreground: oklch(0.9579 0.0029 264.5);
+    --destructive: oklch(0.7567 0.1469 32.7);
+    --destructive-foreground: oklch(0.1998 0.0086 264.4);
+    --border: oklch(0.3041 0.0138 261.7);
+    --border-soft: oklch(0.3322 0.019 264.3);
+    --input: oklch(0.3322 0.019 264.3);
+    --ring: oklch(0.8131 0.165 75);
+    --status-running: oklch(0.7847 0.1429 157.3);
+    --status-running-surface: oklch(0.2815 0.0467 155.2);
+    --status-running-foreground: oklch(0.1998 0.0086 264.4);
+    --status-eliminated: oklch(0.7567 0.1469 32.7);
+    --status-eliminated-surface: oklch(0.2512 0.0409 29.9);
+    --status-eliminated-foreground: oklch(0.1998 0.0086 264.4);
+    --status-abandoned: oklch(0.6842 0.0149 258.4);
+    --status-abandoned-surface: oklch(0.2712 0.0126 258.4);
+    --status-abandoned-foreground: oklch(0.1998 0.0086 264.4);
+    --status-finished: oklch(0.834 0.1408 87);
+    --status-finished-surface: oklch(0.2759 0.0467 86.1);
+    --status-finished-foreground: oklch(0.1998 0.0086 264.4);
+    --sidebar-background: oklch(0.1395 0.0048 262.8);
+    --sidebar-foreground: oklch(0.9579 0.0029 264.5);
+    --sidebar-primary: oklch(0.8131 0.165 75);
+    --sidebar-primary-foreground: oklch(0.1998 0.0086 264.4);
+    --sidebar-accent: oklch(0.2671 0.0126 258.4);
+    --sidebar-accent-foreground: oklch(0.9579 0.0029 264.5);
+    --sidebar-border: oklch(0.3041 0.0138 261.7);
+    --sidebar-ring: oklch(0.8131 0.165 75);
 }</pre>
         <div class="cols cols--wide">
             <div class="slat">
-                <h3>Ce que ça touche dans l'application</h3>
+                <h3>Ce qui a été touché dans l'application</h3>
                 <p class="note">
-                    <b>resources/css/app.css</b> pour les valeurs, <b>resources/fonts</b> pour les deux
-                    woff2 auto-hébergés comme Archivo aujourd'hui, et les composants de course pour la
-                    latte, la case bascule et l'entête collée. Les composants du starter kit suivent
-                    sans être touchés.
+                    <b>resources/css/app.css</b> pour les jetons, <b>vite.config.ts</b> et
+                    <b>resources/fonts</b> pour les deux woff2 auto-hébergés — Archivo est sorti. Les
+                    composants de course portent la latte, la case bascule, l'entête collée et la
+                    ligne de comptage ; les composants du starter kit ont suivi les jetons sans être
+                    touchés. Le diviseur festif a été supprimé : la charte ne veut pas de décor.
+                </p>
+                <p class="note">
+                    234 tests passent, dont la suite de contraste qui relit ce fichier CSS et vérifie
+                    chaque paire.
                 </p>
             </div>
             <div class="slat">
                 <h3>Ce qui reste à trancher</h3>
                 <p class="note">
-                    Le <b>nom réel de l'événement</b> — « La Backyard de Thomas » est un texte de
-                    remplissage tiré des stories, il apparaît sur chaque entête et sur le dossard.
+                    Le <b>nom réel de l'événement</b> — « La Backyard de Thomas » reste un texte de
+                    remplissage tiré des stories.
                 </p>
                 <p class="note">
                     Et le sort de <b>BR-02</b>, aujourd'hui terminée : cette charte remplace la
@@ -1926,8 +1978,15 @@
                     reprendre. C'est ton arbitrage, pas le mien.
                 </p>
             </div>
-        </div>
-    </section>
+            <div class="slat">
+                <h3>Une limite assumée</h3>
+                <p class="note">
+                    Les deux polices sont auto-hébergées dans leur sous-ensemble <b>latin</b>, ce qui
+                    couvre l'intégralité du français. Un nom portant un diacritique hors de ce
+                    sous-ensemble — un ł, un ő — s'affichera dans la police système.
+                </p>
+            </div>
+        </section>
 </div>
 
 <script>

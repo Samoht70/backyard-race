@@ -24,17 +24,17 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const actionButtonVariants = cva(
-    'inline-flex w-full touch-manipulation items-center justify-center gap-2 rounded-lg font-display font-black tracking-wide uppercase transition-[background-color,transform] outline-none select-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-[0.98] disabled:pointer-events-none aria-disabled:opacity-50',
+    'inline-flex w-full touch-manipulation items-center justify-center gap-2 border font-bold tracking-widest uppercase transition-colors outline-none select-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none aria-disabled:opacity-50',
     {
         variants: {
             size: {
-                touch: 'min-h-11 px-4 text-sm',
-                validate: 'min-h-18 px-6 text-xl',
+                touch: 'min-h-11 px-4 text-xs',
+                validate: 'min-h-[3.125rem] min-w-[5.625rem] px-5 text-sm',
             },
             tone: {
-                primary: 'bg-primary text-primary-foreground',
-                danger: 'bg-destructive text-destructive-foreground',
-                quiet: 'border border-border bg-card text-foreground',
+                primary: 'border-primary bg-primary text-primary-foreground',
+                danger: 'border-destructive bg-destructive text-destructive-foreground',
+                quiet: 'border-foreground bg-transparent text-foreground',
             },
         },
     },
@@ -56,11 +56,11 @@ const classes = computed(() =>
         :aria-disabled="disabled || undefined"
         :aria-busy="loading"
     >
-        <Spinner v-if="loading" class="size-5 shrink-0" />
+        <Spinner v-if="loading" class="size-4 shrink-0" />
         <component
             v-else-if="icon"
             :is="icon"
-            class="size-5 shrink-0"
+            class="size-4 shrink-0"
             aria-hidden="true"
         />
         <span><slot /></span>

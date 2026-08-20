@@ -34,7 +34,7 @@ withDefaults(defineProps<Props>(), {
         v-if="locked"
         class="grid gap-1 rounded-lg border border-border bg-muted/40 px-3 py-2"
     >
-        <p class="font-display text-label text-muted-foreground uppercase">
+        <p class="font-mono text-label text-muted-foreground uppercase">
             {{ label }}
         </p>
         <p class="flex items-center gap-2">

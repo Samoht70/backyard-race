@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
 import ActionButton from '@/components/race/ActionButton.vue';
-import FestoonDivider from '@/components/race/FestoonDivider.vue';
 import { dashboard, login } from '@/routes';
 import { create as register } from '@/routes/account';
 </script>
@@ -13,13 +12,13 @@ import { create as register } from '@/routes/account';
         class="flex min-h-svh flex-col items-center justify-center gap-6 bg-background px-6 py-12 text-foreground"
     >
         <div class="flex w-full max-w-sm flex-col items-center gap-1">
-            <p class="font-display text-label text-muted-foreground uppercase">
+            <p class="font-mono text-label text-muted-foreground uppercase">
                 Backyard Ultra
             </p>
-            <h1 class="text-center font-display text-lap">Backyard Race</h1>
+            <h1 class="text-center text-3xl font-bold tracking-tight">
+                Backyard Race
+            </h1>
         </div>
-
-        <FestoonDivider />
 
         <div class="flex w-full max-w-xs flex-col gap-2">
             <Link v-if="$page.props.auth.user" :href="dashboard()">

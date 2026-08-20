@@ -2,7 +2,6 @@
 import { Form, Head } from '@inertiajs/vue3';
 import RegistrationController from '@/actions/App/Http/Controllers/RegistrationController';
 import ActionButton from '@/components/race/ActionButton.vue';
-import FestoonDivider from '@/components/race/FestoonDivider.vue';
 import RegistrationFields from '@/components/registration/RegistrationFields.vue';
 import { t } from '@/lib/i18n';
 import { show } from '@/routes/registration';
@@ -31,15 +30,13 @@ defineOptions({
 
     <div class="flex flex-col gap-6 p-4">
         <header class="flex flex-col items-center gap-2 text-center">
-            <h1 class="font-display text-lap">
+            <h1 class="text-title">
                 {{ t('registration.edit.title') }}
             </h1>
             <p class="text-sm text-muted-foreground">
                 {{ t('registration.edit.description') }}
             </p>
         </header>
-
-        <FestoonDivider />
 
         <Form
             v-bind="RegistrationController.update.form()"

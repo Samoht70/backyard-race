@@ -11,15 +11,18 @@ defineProps<Props>();
 </script>
 
 <template>
-    <div class="flex flex-col items-center gap-2 px-6 py-12 text-center">
+    <div class="flex flex-col items-center gap-2 bg-card px-6 py-8 text-center">
         <component
             :is="icon"
             v-if="icon"
-            class="size-8 text-muted-foreground"
+            class="size-7 text-muted-foreground"
             aria-hidden="true"
         />
-        <p class="font-display font-black uppercase">{{ title }}</p>
-        <p v-if="description" class="max-w-sm text-sm text-muted-foreground">
+        <p class="text-base font-bold tracking-tight">{{ title }}</p>
+        <p
+            v-if="description"
+            class="max-w-[32ch] text-sm text-muted-foreground"
+        >
             {{ description }}
         </p>
         <div class="mt-2 w-full max-w-xs">
