@@ -24,7 +24,7 @@ return [
         'last_name' => 'Nom',
         'phone' => 'Téléphone',
         'birth_date' => 'Date de naissance',
-        'pps_number' => 'Numéro PPS',
+        'pps_number' => 'Numéro PPS (Prétexte Pour Siffler 🍺)',
         'emergency_contact_name' => 'Personne à prévenir',
         'emergency_contact_phone' => 'Téléphone de cette personne',
         'notes' => 'Remarques',
