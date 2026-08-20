@@ -1693,3 +1693,98 @@ Deux débords assumés, tous deux au service du même objectif — que le coureu
 ajoutés, faute de quoi le message ramené à l'écran parle de `emergency_contact_phone`. Et la
 description de l'écran annonce désormais les quatre étapes, puisque c'est la première chose que le
 coureur doit savoir avant de commencer.
+
+## D-55 — La navigation lit une décision d'accès partagée, et la barre basse s'arrête à quatre entrées
+
+Arrêté le 2026-08-20 par **BR-33**. Deux points ont été arbitrés avec le propriétaire : quelle
+entrée cède sa place dans la barre basse, et le renommage de l'entrée d'accueil.
+
+### Une prop d'accès, sur le patron de `auth.permissions`
+
+La navigation devait apprendre deux faits qu'aucun écran ne portait : l'utilisateur connecté tient-il
+une inscription, et l'événement est-il sorti de `draft`. Les deux partent en prop partagée, dans un
+nœud `access`, construit exactement comme `auth.permissions` l'est depuis BR-01 — **chaque valeur est
+le résultat du même `Gate` que le serveur applique**, jamais une relecture du statut. Une entrée
+apparaît donc si et seulement si l'écran derrière elle serait autorisé, et les deux lectures ne
+peuvent pas diverger.
+
+L'alternative était d'exposer le statut brut de l'événement et de laisser `mainNavItems()` tester
+`!== 'draft'`. C'est la deuxième déclaration de la règle que D-29 interdit : le jour où un état
+supplémentaire cesse d'être visible aux participants, `EventPolicy::view()` le sait et la navigation
+l'ignore.
+
+`access` est un nœud **racine**, pas `auth.access` : `auth` porte l'identité et les capacités du
+compte, quand ces trois valeurs dépendent du compte **et** de l'état de l'événement. Et le nœud ne
+pouvait pas s'appeler `event` — `pages/Event.vue` et `pages/manage/Event.vue` reçoivent déjà une prop
+de page de ce nom, qui écrase une prop partagée homonyme dans `page.props`. Le défaut aurait été
+silencieux et local à deux écrans.
+
+`documents` reste séparé de `event` bien que `DocumentPolicy::viewAny()` et `EventPolicy::view()` se
+lisent identiquement aujourd'hui. Ce sont deux policies, et rien ne promet qu'elles restent en phase.
+
+L'événement se lit avec `first()`, jamais `firstOrFail()` : une prop partagée ne doit pas
+transformer une base vide en 404 sur toutes les pages. Un invité sort avant les deux requêtes, ce qui
+laisse la page publique, l'écran de connexion et tout le parcours `account/*` à coût nul.
+
+### La barre basse tient quatre entrées, et l'ordre décide du repli
+
+`AppBottomNav` rendait toutes les entrées en `flex-1`. À l'échelle `text-label` — 10 px mono,
+`letter-spacing: 0.14em`, `px-2` — une cellule portant « INSCRIPTION » demande ~95 px : un écran de
+375 px en tient quatre, plus le bouton « … ». BR-33 en produit cinq pour un coureur et six pour un
+gérant.
+
+`BOTTOM_NAV_LIMIT` nomme le plafond et `AppBottomNav` y tronque, tandis que la sidebar et le tiroir
+mobile continuent de rendre la liste entière : ce qui dépasse est **replié, jamais retiré**. Aucun
+écran ne devient injoignable.
+
+C'est « Événement » qui cède chez le coureur : l'accueil porte déjà son statut et le briefing porte
+le déroulé de la nuit, donc `/event` n'ajoute que le nom, les places et le résumé. Et **la gestion
+passe devant l'inscription du gérant** — un gérant qui court aussi garde son hub sous le pouce, la
+story n'exigeant que « les deux jeux d'entrées », pas leur rang.
+
+`BOTTOM_NAV_LIMIT` porte un test, parce que Q-04 est le procès-verbal de ce qui arrive à une valeur
+de mise en page que rien ne garde : la charte l'a déplacée d'un tiers en silence.
+
+### « Coureurs » est retirée, pas laissée à pointer nulle part
+
+L'entrée pointait sur `dashboard()` faute de destination. Elle attend BR-14, et une entrée qui ne
+mène pas où elle annonce apprend au coureur que les entrées ne mènent nulle part. Sa clé de
+traduction reste. Même raisonnement en creux pour « Course », qui cède la place à « Accueil » :
+l'écran ne parle pas de la course tant que le moteur n'existe pas, et BR-24 remplacera son contenu
+sans retoucher le libellé. `ui.nav.race` reste en place pour BR-13.
+
+### L'accueil quitte `Route::inertia`, et lit `first()` là où ses voisines lisent `firstOrFail()`
+
+Une route sans contrôleur ne peut porter aucune prop : c'est ce qui maintenait l'écran à un libellé.
+Elle gagne un contrôleur à action unique, sur le patron de `DesignSystemController`.
+
+La projection est **plus étroite que `ParticipantResource`** : la ressource emporte téléphone, date
+de naissance, numéro PPS et contact d'urgence, et rien de tout cela n'a de raison de voyager vers un
+écran qui affiche un statut et un dossard. `EventResource` est écarté au même titre — l'accueil n'a
+que faire de la latitude, de la longitude et de la capacité.
+
+`/event`, `/briefing` et `/documents` renvoient 404 sur une base sans événement ; l'accueil répond
+200. Ces trois écrans **parlent de** l'événement, donc son absence est bien un 404. L'accueil parle
+de la personne, et il a quelque chose à dire avant que le gérant ait créé quoi que ce soit.
+
+Aucune redirection non plus : `RegistrationController` renvoie déjà vers l'accueil l'utilisateur sans
+inscription, donc un accueil qui pousserait vers l'inscription refermerait la boucle sur lui. La
+branche annulée reprend la copie de `registration/Show` plutôt que de la réécrire — D-48 a arrêté ce
+qu'on dit à un coureur dont l'inscription est retirée, et le redire en deux formulations est la façon
+dont les deux se désalignent.
+
+### Ce que BR-33 ne fait pas
+
+Aucune action sur l'inscription depuis l'accueil : on y navigue, on n'y modifie rien. Aucun chiffre
+de course — boucles, distance, prochain départ appartiennent à BR-24, qui hérite de cette route, de
+ce contrôleur et de cette navigation au lieu de les reposer.
+
+**Q-02 reste ouverte.** La navigation masque l'entrée qui serait refusée ; elle ne répare pas le
+refus. Un participant qui atteint `/briefing` à la main sur un événement en `draft` reçoit toujours un
+403 sur la page Symfony non traduite. BR-13 en reste le porteur.
+
+Aucun composant nouveau : `RegistrationStatusBadge`, `EmptyState`, `StatCounter` et `Alert`
+couvraient les quatre branches. En revanche la chaîne de classes du lien pleine largeur est
+désormais déclarée dans **trois** écrans — `Event.vue`, `registration/Show.vue` et `Dashboard.vue`.
+Le troisième exemplaire est le seuil où l'extraction se justifie ; elle n'est pas faite ici pour ne
+pas déborder sur deux écrans qui ne sont pas de cette story.
