@@ -32,6 +32,7 @@ return [
         'first_name' => 'prénom',
         'last_name' => 'nom',
         'description' => 'description',
+        'briefing' => 'briefing',
         'first_start_at' => 'heure du premier départ',
         'start_date' => 'date',
         'start_time' => 'heure du premier départ',

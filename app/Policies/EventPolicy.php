@@ -21,6 +21,12 @@ class EventPolicy
             && $event->lifecycle()->isEditable();
     }
 
+    public function updateBriefing(User $user, Event $event): bool
+    {
+        return $user->can(Permission::ManageDocuments->value)
+            && $event->lifecycle()->isEditable();
+    }
+
     public function advance(User $user, Event $event): bool
     {
         $next = $event->lifecycle()->nextStatus();
