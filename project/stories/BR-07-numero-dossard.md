@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Epic** | 1 — Fondations |
-| **Statut** | À faire |
+| **Statut** | ✅ Terminé |
 | **Estimation** | 5 pts |
 | **Dépend de** | BR-06 |
 
@@ -76,7 +76,18 @@ portée par la base de données, la vérification applicative seule ne suffit pa
 
 ## Tâches
 
-- [ ] **T1** — Colonne de numéro de dossard, index unique par événement `1 pt`
-- [ ] **T2** — Action d'attribution du premier numéro libre, à l'abri des accès concurrents `2 pts`
-- [ ] **T3** — Formatage sur trois chiffres, partagé par tous les écrans `1 pt`
-- [ ] **T4** — Tests : premier numéro, suite, annulation, reconfirmation, concurrence `2 pts`
+- [x] **T1** — Colonne de numéro de dossard, index unique par événement `1 pt`
+- [x] **T2** — Action d'attribution du premier numéro libre, à l'abri des accès concurrents `2 pts`
+- [x] **T3** — Formatage sur trois chiffres, partagé par tous les écrans `1 pt`
+- [x] **T4** — Tests : premier numéro, suite, annulation, reconfirmation, concurrence `2 pts`
+
+## Ce que la concurrence est réellement, ici
+
+L'attribution n'a pas de mécanisme propre : elle hérite du verrou de ligne que la confirmation
+prend déjà (D-48), et le numéro s'écrit dans le même `UPDATE` conditionnel que le statut. Les deux
+autres stratégies — réessai sur violation d'unicité, insertion conditionnelle — sont fermées, la
+première par `NoTryCatchRule`, la seconde par MySQL. Voir [D-49](../DECISIONS.md).
+
+Le cas limite « deux confirmations simultanées » n'a pas de test qui simule deux connexions : sous
+`RefreshDatabase` il serait vert sans rien exercer. Ce sont l'écriture conditionnelle et l'index
+unique qui sont testés, chacun de son côté.
