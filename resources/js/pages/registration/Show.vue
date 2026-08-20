@@ -51,8 +51,7 @@ const facts = computed(() => [
     },
     {
         term: t('registration.field.pps_number'),
-        detail:
-            props.registration.pps_number ?? t('registration.show.no_pps'),
+        detail: props.registration.pps_number ?? t('registration.show.no_pps'),
     },
     {
         term: t('registration.field.emergency_contact_name'),
