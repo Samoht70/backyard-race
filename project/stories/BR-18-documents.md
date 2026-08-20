@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Epic** | 4 — Informations événement |
-| **Statut** | À faire |
+| **Statut** | ✅ Terminé |
 | **Estimation** | 4 pts |
 | **Révisée** | 2026-08-20 — réduite de 8 à 4 pts, absorbe le GPX de BR-19 (voir D-47) |
 | **Dépend de** | BR-03 |
@@ -99,14 +99,17 @@ Alors l'accès est refusé
 
 ## Impacts techniques
 
-Le téléchargement reste servi par une route contrôlée plutôt que par une URL de stockage
-publique. Ce n'est plus pour cacher un document — il n'y a plus de document caché — mais pour
-que le bucket objet n'ait aucun accès anonyme, conformément à D-08.
+Le téléchargement devait être servi par une route contrôlée. Il l'est finalement par une **URL
+temporaire signée**, produite uniquement dans un contrôleur ayant déjà passé la Policy. L'écart à
+D-08 — une URL présignée reste un accès anonyme, borné à sept jours — est arbitré et documenté en
+[D-52](../DECISIONS.md), avec sa conséquence en développement : le conteneur et le navigateur
+doivent désigner le stockage par le même `hôte:port`, sinon SigV4 rejette la signature. Sous WSL,
+l'entrée `rustfs` va dans le fichier hosts de Windows, dont la distribution hérite.
 
 ## Tâches
 
-- [ ] **T1** — Migration et modèle `Document`, collection Media Library dédiée `1 pt`
-- [ ] **T2** — Validation stricte des fichiers : type réel, taille, extension `1 pt`
-- [ ] **T3** — Écran gérant de dépôt et suppression, page de consultation participant, route de
-  téléchargement contrôlée par Policy `1 pt`
-- [ ] **T4** — Tests : dépôt, fichier invalide, suppression, refus participant, refus en `draft` `1 pt`
+- [x] **T1** — Migration et modèle `Document`, collection Media Library dédiée `1 pt`
+- [x] **T2** — Validation stricte des fichiers : type réel, taille, extension `1 pt`
+- [x] **T3** — Écran gérant de dépôt et suppression, page de consultation participant,
+  téléchargement par URL signée sous Policy `1 pt`
+- [x] **T4** — Tests : dépôt, fichier invalide, suppression, refus participant, refus en `draft` `1 pt`

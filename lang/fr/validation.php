@@ -33,6 +33,8 @@ return [
         'last_name' => 'nom',
         'description' => 'description',
         'briefing' => 'briefing',
+        'title' => 'titre',
+        'file' => 'fichier',
         'first_start_at' => 'heure du premier départ',
         'start_date' => 'date',
         'start_time' => 'heure du premier départ',

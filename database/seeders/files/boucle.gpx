@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="Backyard Race" xmlns="http://www.topografix.com/GPX/1/1">
+  <trk>
+    <name>Boucle de la Backyard Race</name>
+    <trkseg>
+      <trkpt lat="47.218371" lon="-1.553621"><ele>18.0</ele></trkpt>
+      <trkpt lat="47.219450" lon="-1.550120"><ele>21.5</ele></trkpt>
+      <trkpt lat="47.221008" lon="-1.547330"><ele>24.0</ele></trkpt>
+      <trkpt lat="47.218371" lon="-1.553621"><ele>18.0</ele></trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(RolesAndPermissionsSeeder::class);
         $this->call(EventSeeder::class);
+        $this->call(DocumentSeeder::class);
 
         User::factory()->manager()->create(['email' => 'manager@backyard.test']);
         User::factory()->participant()->create(['email' => 'participant@backyard.test']);

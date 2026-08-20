@@ -3,6 +3,7 @@
 use App\Enums\Permission;
 use App\Http\Controllers\BriefingController;
 use App\Http\Controllers\DesignSystemController;
+use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\Manage;
 use App\Http\Controllers\RegistrationController;
@@ -25,6 +26,9 @@ Route::middleware('auth')
         Route::singleton('briefing', BriefingController::class)
             ->only(['show']);
 
+        Route::resource('documents', DocumentController::class)
+            ->only(['index']);
+
         Route::singleton('registration', RegistrationController::class)
             ->only(['show', 'edit', 'update']);
 
@@ -45,6 +49,9 @@ Route::middleware('auth')
                     ->group(function () {
                         Route::singleton('briefing', Manage\BriefingController::class)
                             ->only(['edit', 'update']);
+
+                        Route::resource('documents', Manage\DocumentController::class)
+                            ->only(['index', 'store', 'destroy']);
                     });
 
                 Route::middleware('can:'.Permission::ManageParticipants->value)
