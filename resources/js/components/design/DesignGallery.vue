@@ -2,6 +2,7 @@
 import { CircleOff } from '@lucide/vue';
 import BoardFilterSample from '@/components/design/BoardFilterSample.vue';
 import DesignSection from '@/components/design/DesignSection.vue';
+import DocumentListSample from '@/components/design/DocumentListSample.vue';
 import EventFieldSample from '@/components/design/EventFieldSample.vue';
 import EventStatusGallery from '@/components/design/EventStatusGallery.vue';
 import RegistrationListSample from '@/components/design/RegistrationListSample.vue';
@@ -85,6 +86,13 @@ const counts = [
                 note="Une seule action par latte, celle que l’état permet. Le nom ouvre la fiche, le bouton agit."
             >
                 <RegistrationListSample />
+            </DesignSection>
+
+            <DesignSection
+                title="Lattes de document"
+                note="Le titre est éditorial et mène au fichier ; le nom réel et le poids restent lisibles en dessous."
+            >
+                <DocumentListSample />
             </DesignSection>
 
             <DesignSection

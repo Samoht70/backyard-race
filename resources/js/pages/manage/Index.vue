@@ -1,11 +1,17 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import { ClipboardList, ScrollText, SlidersHorizontal } from '@lucide/vue';
+import {
+    ClipboardList,
+    Files,
+    ScrollText,
+    SlidersHorizontal,
+} from '@lucide/vue';
 import RoundHeader from '@/components/race/RoundHeader.vue';
 import { t } from '@/lib/i18n';
 import { can } from '@/lib/permissions';
 import { index as manage } from '@/routes/manage';
 import { edit as editBriefing } from '@/routes/manage/briefing';
+import { index as documents } from '@/routes/manage/documents';
 import { edit as editEvent } from '@/routes/manage/event';
 import { index as registrations } from '@/routes/manage/registrations';
 import type { CurrentRound } from '@/types/race';
@@ -68,6 +74,20 @@ defineOptions({
                 />
                 <span class="text-sm font-medium">{{
                     t('ui.manage.briefing')
+                }}</span>
+            </Link>
+
+            <Link
+                v-if="can('manage-documents')"
+                :href="documents()"
+                class="flex min-h-11 items-center gap-3 rounded-lg border border-border bg-card px-3 py-2"
+            >
+                <Files
+                    class="size-5 shrink-0 text-muted-foreground"
+                    aria-hidden="true"
+                />
+                <span class="text-sm font-medium">{{
+                    t('ui.manage.documents')
                 }}</span>
             </Link>
 
