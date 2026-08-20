@@ -3,9 +3,21 @@
 | | |
 |---|---|
 | **Epic** | 5 — Après-course |
-| **Statut** | À faire |
-| **Estimation** | 8 pts |
+| **Statut** | ⛔ Abandonné |
+| **Estimation** | 8 pts, non engagés |
 | **Dépend de** | BR-03 |
+
+## Pourquoi cette story n'est pas faite
+
+Abandonnée le 2026-08-20, à l'élagage du backlog (voir D-47).
+
+C'est la seule story du backlog qu'un outil gratuit fait mieux. Le dépôt était réservé au gérant
+et les participants ne pouvaient pas contribuer : un album partagé reçoit les photos de tout le
+monde, sans vignettes à convertir, sans stockage objet à payer, sans conversion Horizon à
+surveiller la semaine où le worker sert à éliminer les coureurs.
+
+Un lien vers l'album depuis la page de résultats remplace les huit points. BR-23 perd donc
+l'accès « aux photos » de son périmètre et gagne ce lien.
 
 ## User story
 

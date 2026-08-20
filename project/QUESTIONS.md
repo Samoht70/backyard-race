@@ -57,6 +57,23 @@ Trois branches, à trancher dans BR-06 :
 Ce qui bloque le choix : on ne sait pas encore si l'annulation par le gérant sert à écarter un
 coureur (branche 1) ou à corriger une erreur de saisie (branche 2 ou 3).
 
+## Q-04 — Le bouton de validation garde-t-il ses 72 px ?
+
+Ouverte le 2026-08-20 par D-46.
+
+D-24 exigeait 72 px de haut pour la validation d'une boucle — le geste le plus répété de la nuit,
+fait debout, une main occupée, parfois avec des gants. La charte « Tableau des départs » a reposé le
+bouton : la variante `validate` d'`ActionButton` mesure aujourd'hui 50 px sur 90 px. Le plancher
+général de 44 px, lui, est respecté.
+
+Personne ne l'a vu parce que les cibles n'ont jamais eu de token : leur intention vivait dans les
+variantes nommées, et aucun test ne les garde. Le bouton n'existe pour l'instant que dans la galerie
+du design system, où sa taille ne se juge pas.
+
+À trancher dans BR-09 ou BR-13, qui le posent en situation réelle : soit la variante remonte à
+72 px, soit la règle tombe explicitement — et dans les deux cas, la valeur retenue mérite un test,
+faute de quoi la prochaine charte la déplacera aussi silencieusement.
+
 ---
 
 Q-01 (traduction des écrans hérités du starter kit) est fermée : à moitié par D-42, entièrement

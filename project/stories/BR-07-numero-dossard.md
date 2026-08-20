@@ -15,8 +15,8 @@ Afin de **ne pas tenir une liste de numéros à la main et de n'avoir aucun doub
 
 ## Contexte
 
-Le numéro de dossard identifie le coureur sur le terrain et sur son dossard imprimé. Il doit
-être unique, stable, et attribué sans intervention.
+Le numéro de dossard identifie le coureur sur le terrain, dans le tableau des coureurs et sur
+son tableau de bord. Il doit être unique, stable, et attribué sans intervention.
 
 ## Périmètre fonctionnel
 
@@ -27,7 +27,8 @@ Le numéro de dossard identifie le coureur sur le terrain et sur son dossard imp
 
 **Exclu**
 - L'attribution manuelle ou le choix de son numéro par le coureur.
-- Le rendu graphique du dossard : BR-25.
+- Le dossard imprimable : abandonné le 2026-08-20 (voir D-47). Le numéro s'affiche à
+  l'écran, sur le tableau de bord du coureur (BR-24).
 
 **Dépendances** — BR-06.
 

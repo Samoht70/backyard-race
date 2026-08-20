@@ -25,11 +25,11 @@ raccourcis.
 - Son prénom, son numéro de dossard, son statut de course.
 - Ses boucles réalisées, sa distance totale, la durée de sa dernière boucle.
 - Le prochain départ : numéro du tour et heure.
-- Les raccourcis vers son dossard, le parcours, le briefing et les documents.
+- Les raccourcis vers le briefing et les documents.
 
 **Exclu**
 - Toute action sur la course : le coureur ne valide rien et n'abandonne pas lui-même.
-- Le détail boucle par boucle : c'est la fiche coureur (BR-16).
+- Le détail boucle par boucle : il se déplie dans le tableau des coureurs (BR-14, BR-16).
 - Tout compte à rebours (voir D-15).
 
 **Dépendances** — BR-02, BR-08.

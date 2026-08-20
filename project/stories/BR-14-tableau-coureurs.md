@@ -24,7 +24,7 @@ debout. Le tableau répond à cette question, sans prétendre trancher un ordre 
 - Quatre vues : tous, en course, sortis, tour courant.
 - Par coureur : prénom, nom, dossard, statut, nombre de boucles validées.
 - Pour les coureurs sortis : dernière boucle validée, distance totale, heure de sortie, motif.
-- Accès à la fiche détaillée d'un coureur.
+- Le détail des boucles d'un coureur, déplié dans sa ligne (BR-16).
 
 **Exclu**
 - Tout classement pendant la course (voir D-15).

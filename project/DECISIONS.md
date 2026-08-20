@@ -455,6 +455,10 @@ Deux réserves relevées à l'intégration, corrigées le 2026-08-19 :
 
 ## D-24 — Direction artistique « Corral » : tokens Tailwind, aucune librairie ajoutée
 
+**Remplacée le 2026-08-20 par D-46.** Cette entrée ne décrit plus le produit : ni la police, ni
+l'accent, ni l'élément signature décrits ci-dessous ne sont dans le code. Elle est conservée
+comme journal de la charte précédente, et pour les règles que D-46 reprend telles quelles.
+
 Arrêtée le 2026-08-19 avec le propriétaire du projet.
 
 L'interface est un **tableau de chronométrage**, pas un back-office : dans un Backyard Ultra
@@ -1081,3 +1085,97 @@ d'écrire une vue Blade, et le test assure sur `actionUrl` plutôt que sur du HT
 La copie vit dans `lang/fr/mail.php`, hors des groupes partagés à Inertia. `lang/fr.json` traduit
 les deux chaînes que le gabarit du framework pose lui-même (« All rights reserved. » et le
 sous-texte du bouton), sans quoi un mail français se termine en anglais.
+
+## D-46 — Direction artistique « Tableau des départs », qui remplace « Corral »
+
+Arrêtée le 2026-08-20 par le propriétaire du projet, après maquettage de trois chartes complètes
+(`project/design/*.html`). Elle remplace D-24 en totalité, et le code était livré avant que cette
+entrée n'existe — c'est la correction de cet écart.
+
+**La métaphore est le panneau des départs d'une gare.** Le coureur n'est plus une carte mais une
+**latte** : `RunnerSlat` et `SlatCell` remplacent `RunnerCard`, empilées par l'utilitaire `slats`
+à 6 px, et un changement d'état s'annonce par `animate-flip` — un `scaleY` de 130 ms, le seul
+mouvement du produit. D-25 tient : pas d'horloge cliente, pas de barre de progression, et le filet
+de chargement d'Inertia reste la seule autre animation. `FestoonDivider` et la note d'anniversaire
+en guirlande sont supprimés.
+
+**Deux familles aux rôles séparés, plus une seule à trois voix.** Instrument Sans porte le texte,
+Martian Mono porte les chiffres en `tabular-nums` — c'est le monospace qui aligne les colonnes d'un
+tableau de départs, ce qu'un axe de largeur ne faisait pas. Les deux sont auto-hébergées dans
+`resources/fonts/` ; Archivo est retirée du dépôt. Aucune requête tierce, comme en D-24.
+
+**L'échelle typographique est nommée, en cinq crans** : `readout` (2,75 rem, le nombre qu'on lit de
+loin), `figure`, `title`, `data`, `label` (0,625 rem, capitales espacées). Une taille ne se choisit
+plus à l'usage, elle se nomme.
+
+**L'accent outremer disparaît, et c'est le changement le plus lourd.** `--primary` est désormais
+l'encre presque noire, donc la couleur ne sert plus **qu'aux quatre statuts**, chacun en triplet
+`ink / surface / foreground` — vert « en course », rouge « éliminé », ardoise « abandon », ambre
+« terminé ». Un écran de course est noir et blanc partout où aucun statut ne parle. Ce qui était le
+compromis de D-24 — un accent choisi hors du jeu sémantique pour ne pas le percuter — devient sans
+objet : il n'y a plus d'accent à placer.
+
+**Ce qui ne bouge pas de D-24** : notation oklch ; palette déclarée en trois endroits (`:root`,
+`.dark`, et le `<style>` anti-flash de `app.blade.php`) avec un test qui affirme leur concordance ;
+AA vérifié par `PaletteContrastTest` et non par la revue ; aucune librairie de composants ajoutée ;
+aucun graphique (D-16) ; plancher tactile de 44 px, porté par la variante `touch` d'`ActionButton`.
+
+**Un écart à surveiller, relevé en écrivant cette entrée.** D-24 exigeait 72 px pour la validation
+d'une boucle ; la variante `validate` d'`ActionButton` mesure aujourd'hui 50 px de haut sur 90 px
+de large. Le geste le plus répété de la nuit a donc perdu un tiers de sa hauteur, et aucun test ne
+le garde — les cibles n'ont jamais eu de token, leur intention vivait dans les variantes. À
+trancher dans BR-09 ou BR-13, qui sont les stories qui posent le bouton en situation réelle : soit
+la variante remonte, soit la règle des 72 px tombe explicitement.
+
+## D-47 — Élagage du backlog : quatre stories abandonnées, cinq redimensionnées
+
+Arrêté le 2026-08-20 avec le propriétaire du projet, après revue du backlog restant au regard de
+D-20 — un événement, une nuit, quarante coureurs, puis l'arrêt.
+
+Le critère appliqué n'est pas « est-ce utile » mais « est-ce que ça vaut ses heures pour un usage
+unique, sachant qu'un outil gratuit ou une feuille de papier fait parfois le travail ». Quatre
+stories ne passent pas ce filtre, cinq en sortent redimensionnées. **42 points quittent le
+périmètre**, sur les 185 qui restaient : 32 points de stories abandonnées, 13 points de réductions,
+moins les 3 points que BR-23 gagne en absorbant BR-21.
+
+**Abandonnées.** Leur fichier reste dans `stories/`, au statut `⛔ Abandonné`, et porte la raison :
+un backlog qui perd une story sans dire pourquoi la voit revenir.
+
+- **BR-22 — Galerie photos (8 pts).** La seule story qu'un outil gratuit fait mieux : le dépôt
+  était réservé au gérant, donc les coureurs ne pouvaient pas contribuer, alors qu'un album partagé
+  reçoit les photos de tout le monde. Elle emportait des vignettes, des conversions Horizon et du
+  volume de stockage objet, la semaine où le worker sert à éliminer les coureurs.
+- **BR-19 — Parcours GPX et carte (8 pts).** Leaflet, tuiles tierces, analyse XML d'un fichier
+  fourni de l'extérieur et extraction de dénivelé en tâche de fond, pour une boucle unique et
+  balisée que personne ne consulte en courant. Le GPX devient un document de BR-18.
+- **BR-25 — Dossard imprimable (8 pts).** Quarante impressions sur autant d'imprimantes
+  familiales, avec un fond calibré pour le papier : le produit maîtrisait un rendu qu'il ne voit
+  jamais. D-15 excluait déjà l'impression de listes.
+- **BR-21 — Statistiques (8 pts).** Doublon de BR-23, qui annonçait déjà les mêmes chiffres
+  collectifs. Deux pages d'après-course pour un événement qui sert une fois.
+
+**Redimensionnées.**
+
+- **BR-23 : 5 → 8 pts.** Absorbe les indicateurs et le tableau par tour de BR-21, et devient la
+  seule page d'après-course. Ses dépendances tombent à BR-20 seul.
+- **BR-18 : 8 → 4 pts.** La visibilité par document et la date de publication sont retirées : tout
+  le monde ici est inscrit, il n'y a personne à qui cacher le règlement. Reçoit en échange le GPX
+  et une capture du tracé, comme deux fichiers ordinaires. La route de téléchargement contrôlée
+  reste, non plus pour cacher un document mais pour que le bucket n'ait aucun accès anonyme (D-08).
+- **BR-15 : 5 → 2 pts.** Chaque validation recharge déjà la page par Inertia ; ce qui manquait
+  n'est qu'un `router.reload()` périodique, suspendu sur onglet masqué.
+- **BR-16 : 5 → 2 pts.** Le détail d'un coureur se déplie dans le tableau de BR-14 au lieu d'être
+  un écran et une route de plus. Une main occupée à 4 h du matin ne quitte pas la liste.
+- **BR-17 : 5 → 2 pts.** Le briefing se saisit en Markdown dans un `textarea`. Il ne changera pas
+  dix fois ; le nettoyage à l'entrée, lui, reste non négociable.
+
+**Ce que cet élagage ne touche pas.** Le moteur de course (BR-06 à BR-14) est intégral, **BR-12**
+compris — le filet contre l'appui perdu est la story la moins visible et la plus rentable de la
+nuit. BR-29 garde sa restauration réellement exécutée et BR-30 ses trois processus : sans worker ni
+planificateur, les éliminations ne tombent pas et rien ne le signale.
+
+**L'epic 7 n'est pas arbitré ici.** D-19 reconnaît qu'une plateforme managée ferait presque
+disparaître BR-26 et réduirait BR-29 à une vérification, soit environ 20 points de moins pour 30 à
+60 € — le meilleur rapport du backlog. Le choix « payer moins et faire le travail » reste celui du
+propriétaire et n'est pas rouvert par cette entrée ; il est simplement chiffré une fois de plus,
+pour qu'il soit tenu en connaissance de cause plutôt que par inertie.
