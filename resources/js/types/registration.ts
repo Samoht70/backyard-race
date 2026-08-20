@@ -17,6 +17,8 @@ export type RegistrationTransition = (typeof REGISTRATION_TRANSITIONS)[number];
 export type RegistrationDetails = {
     status: RegistrationStatus;
     status_label: string;
+    bib_number: number | null;
+    bib_label: string | null;
     first_name: string;
     last_name: string;
     email: string;

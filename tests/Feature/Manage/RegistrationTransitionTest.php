@@ -28,7 +28,10 @@ class RegistrationTransitionTest extends TestCase
         $this->transition($participant, RegistrationTransition::Confirm)
             ->assertRedirect(route('manage.registrations.index'));
 
-        $this->assertSame(RegistrationStatus::Confirmed, $participant->refresh()->status);
+        $confirmed = $participant->refresh();
+
+        $this->assertSame(RegistrationStatus::Confirmed, $confirmed->status);
+        $this->assertNotNull($confirmed->bib_number);
     }
 
     #[Test]
@@ -49,10 +52,15 @@ class RegistrationTransitionTest extends TestCase
 
         $this->assertSame(1, $participant->event->confirmedParticipantsCount());
 
+        $bib = $participant->bib_number;
+
         $this->transition($participant, RegistrationTransition::Cancel);
 
-        $this->assertSame(RegistrationStatus::Cancelled, $participant->refresh()->status);
+        $cancelled = $participant->refresh();
+
+        $this->assertSame(RegistrationStatus::Cancelled, $cancelled->status);
         $this->assertSame(0, $participant->event->confirmedParticipantsCount());
+        $this->assertSame($bib, $cancelled->bib_number);
     }
 
     #[Test]
@@ -139,10 +147,15 @@ class RegistrationTransitionTest extends TestCase
         $participant = $this->registration(RegistrationStatus::Pending);
 
         $this->transition($participant, RegistrationTransition::Confirm);
+        $bib = $participant->refresh()->bib_number;
+
         $this->transition($participant, RegistrationTransition::Confirm)
             ->assertSessionHasErrors('transition');
 
-        $this->assertSame(RegistrationStatus::Confirmed, $participant->refresh()->status);
+        $confirmed = $participant->refresh();
+
+        $this->assertSame(RegistrationStatus::Confirmed, $confirmed->status);
+        $this->assertSame($bib, $confirmed->bib_number);
     }
 
     /** Between the form request's read and the write, another request can move the row. */

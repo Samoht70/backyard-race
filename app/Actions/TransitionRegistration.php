@@ -10,10 +10,13 @@ use Illuminate\Support\Facades\DB;
 
 final class TransitionRegistration
 {
+    public function __construct(private NextBibNumber $nextBibNumber) {}
+
     /**
      * Dropping the `where` on the status being left lets a concurrent request's
-     * transition be overwritten, and a double click move the same runner twice.
-     * Releasing the event lock lets two confirmations share the last seat.
+     * transition be overwritten, and a double click assign a second bib number.
+     * Releasing the event lock lets two confirmations share the last seat, or
+     * the same bib number.
      *
      * @throws RegistrationTransitionRefusedException
      */
@@ -32,10 +35,16 @@ final class TransitionRegistration
                 throw RegistrationTransitionRefusedException::full();
             }
 
+            $changes = ['status' => $next->status()->value];
+
+            if ($next->assignsBibNumber() && $participant->bib_number === null) {
+                $changes['bib_number'] = ($this->nextBibNumber)($event);
+            }
+
             $moved = Participant::query()
                 ->whereKey($participant->getKey())
                 ->where('status', $leaving->value)
-                ->update(['status' => $next->status()->value]);
+                ->update($changes);
 
             if ($moved === 0) {
                 throw RegistrationTransitionRefusedException::stale();

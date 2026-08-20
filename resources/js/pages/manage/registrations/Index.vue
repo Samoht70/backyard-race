@@ -92,6 +92,7 @@ const isBlocked = computed(() => props.refusals.length > 0);
             <RegistrationSlat
                 v-for="registration in registrations"
                 :key="registration.id"
+                :bib="registration.bib_label"
                 :first-name="registration.first_name"
                 :last-name="registration.last_name"
                 :status="registration.status"

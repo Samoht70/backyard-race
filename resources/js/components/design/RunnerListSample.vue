@@ -23,7 +23,7 @@ const names: [string, string][] = [
 ];
 
 const runners: Sample[] = names.map(([firstName, lastName], position) => ({
-    bib: String(101 + position * 13).padStart(3, '0'),
+    bib: ['007', '020', '033', '046'][position],
     firstName,
     lastName,
     status: RUNNER_STATUSES[position % RUNNER_STATUSES.length],

@@ -42,4 +42,9 @@ final class ConfirmedRegistrationState implements RegistrationLifecycleState
     {
         return true;
     }
+
+    public function assignsBibNumber(): bool
+    {
+        return true;
+    }
 }
