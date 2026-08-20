@@ -5,15 +5,15 @@
 
 <style>
     :root {
-        --d-board: #C4CBD0;
-        --d-slat: #FFFFFF;
-        --d-alt: #EDF0F2;
+        --d-board: #FFFFFF;
+        --d-slat: #DCE0E4;
+        --d-alt: #CFD5DA;
         --d-ink: #14161A;
         --d-ink-2: #3A3F47;
-        --d-muted: #5A616B;
+        --d-muted: #474D56;
         --d-muted-board: #474D56;
         --d-line: #AEB6BC;
-        --d-line-soft: #DCE0E4;
+        --d-line-soft: #C6CDD3;
         --d-keyline: #14161A;
         --d-action: #14161A;
         --d-action-ink: #FFFFFF;
@@ -21,7 +21,7 @@
         --d-run-s: #E0EFE6;
         --d-out: #A1221B;
         --d-out-s: #FBE4E2;
-        --d-quit: #5A616B;
+        --d-quit: #474D56;
         --d-quit-s: #E8EAED;
         --d-done: #6A5000;
         --d-done-s: #F5EBD3;
@@ -1102,8 +1102,8 @@
         <h1>Tableau des départs</h1>
         <p class="lede">
             Une Backyard est un tableau d'horaires : un départ par heure, une heure limite par
-            départ, et une liste de noms qui raccourcit. L'application est ce tableau. Le fond gris
-            est la planche, chaque coureur est une latte blanche posée dessus, et la dernière case
+            départ, et une liste de noms qui raccourcit. L'application est ce tableau. Le blanc
+            est la planche, chaque coureur est une latte grise posée dessus, et la dernière case
             de la latte bascule du bouton vers l'heure d'arrivée. Rien d'autre ne bouge.
         </p>
         <div class="board-demo">
@@ -1125,23 +1125,23 @@
             <h2>La planche et les lattes</h2>
         </div>
         <p class="lede">
-            Deux plans, pas plus. Le gris est la planche : il porte l'entête, les compteurs et les
-            titres de colonnes, jamais une donnée de coureur. Le blanc est la latte : elle porte un
+            Deux plans, pas plus. Le blanc est la planche : il porte l'entête, les compteurs et les
+            titres de colonnes, jamais une donnée de coureur. Le gris est la latte : elle porte un
             coureur et rien d'autre, à bord perdu, séparée de ses voisines par six pixels de planche.
-            Aucune carte, aucun arrondi, aucune ombre — la hiérarchie tient dans deux valeurs de gris
-            et un filet d'encre de trois pixels.
+            Aucune carte, aucun arrondi, aucune ombre — la hiérarchie tient dans un blanc, un gris et
+            un filet d'encre de trois pixels.
         </p>
         <div class="cols cols--wide">
             <div class="slat">
                 <h3>Le partage des rôles</h3>
                 <p class="diagram">┌─ planche ────────────────┐
-│ LA BACKYARD DE THOMAS    │  gris
+│ LA BACKYARD DE THOMAS    │  blanc
 │ T06  18:00  → 19:00      │
 │ ════════════════════════ │  filet 3 px
 │ en course 24  sortis 13  │
 │ DOSS. COUREUR    ARRIVÉE │
 ├──────────────────────────┤
-│┌ latte ─────────────────┐│  blanc
+│┌ latte ─────────────────┐│  gris
 ││ 012 Thomas P.  18:48:32││
 │└────────────────────────┘│
 │┌────────────────────────┐│
@@ -1191,18 +1191,18 @@
         </p>
         <div class="swatches">
             <div class="sw">
-                <div class="sw__chip" style="background: #C4CBD0;"></div>
+                <div class="sw__chip" style="background: #FFFFFF; border-bottom: 1px solid #AEB6BC;"></div>
                 <div class="sw__meta">
                     <span class="sw__name">Planche</span>
-                    <span class="sw__hex">#C4CBD0</span>
-                    <span class="sw__role">Fond d'écran. Recule pour laisser avancer les lattes, et ne réverbère pas au soleil.</span>
+                    <span class="sw__hex">#FFFFFF</span>
+                    <span class="sw__role">Fond d'écran. Ne porte que la structure, jamais une donnée de coureur. Nuit : #0C0E11.</span>
                 </div>
             </div>
             <div class="sw">
-                <div class="sw__chip" style="background: #FFFFFF; border-bottom: 1px solid #AEB6BC;"></div>
+                <div class="sw__chip" style="background: #DCE0E4;"></div>
                 <div class="sw__meta">
                     <span class="sw__name">Latte</span>
-                    <span class="sw__hex">#FFFFFF</span>
+                    <span class="sw__hex">#DCE0E4</span>
                     <span class="sw__role">Une latte, un coureur. Nuit : #191C21.</span>
                 </div>
             </div>
@@ -1239,10 +1239,10 @@
                 </div>
             </div>
             <div class="sw">
-                <div class="sw__chip" style="background: #5A616B;"></div>
+                <div class="sw__chip" style="background: #474D56;"></div>
                 <div class="sw__meta">
                     <span class="sw__name">Abandon</span>
-                    <span class="sw__hex">#5A616B</span>
+                    <span class="sw__hex">#474D56</span>
                     <span class="sw__role">Sert aussi de gris de texte secondaire. Nuit : #949AA3.</span>
                 </div>
             </div>
@@ -1259,32 +1259,32 @@
             <div class="slat">
                 <h3>Contrastes mesurés</h3>
                 <div class="kv">
-                    <div><span>Encre sur latte</span><span>18,1:1</span></div>
-                    <div><span>Encre sur planche</span><span>11,0:1</span></div>
-                    <div><span>Secondaire sur latte</span><span>8,5:1</span></div>
-                    <div><span>Secondaire sur planche</span><span>5,2:1</span></div>
+                    <div><span>Encre sur planche</span><span>18,1:1</span></div>
+                    <div><span>Encre sur latte</span><span>13,7:1</span></div>
+                    <div><span>Secondaire sur planche</span><span>8,5:1</span></div>
+                    <div><span>Secondaire sur latte</span><span>6,4:1</span></div>
                     <div><span>Statut sur son fond</span><span>6,3 à 7,1:1</span></div>
-                    <div><span>Statut sur la planche</span><span>4,6 à 5,2:1</span></div>
+                    <div><span>Statut sur la latte</span><span>5,7 à 6,4:1</span></div>
                     <div><span>Ambre sur planche de nuit</span><span>10,6:1</span></div>
                 </div>
                 <p class="note">
-                    Aucune paire ne descend sous <b>4,6:1</b>, contre 4,5 exigé par AA. Le point
-                    bas est une couleur de statut posée directement sur la planche : c'est la
-                    contrainte qui a fixé les trois teintes de statut, chacune assombrie jusqu'à
-                    passer sur le gris et pas seulement sur le blanc.
+                    Aucune paire ne descend sous <b>5,7:1</b>, contre 4,5 exigé par AA. Le point
+                    bas est une couleur de statut posée sur la latte grise : c'est la contrainte qui
+                    a fixé les trois teintes de statut, chacune assombrie jusqu'à passer sur le gris
+                    et pas seulement sur le blanc.
                 </p>
             </div>
             <div class="slat">
                 <h3>Un seul gris de texte</h3>
                 <p class="note">
-                    Le gris secondaire doit rester conforme sur la latte <em>et</em> sur la planche,
-                    ce qui le fixe à <b>#474D56</b> — 8,5:1 sur le blanc, 5,2:1 sur le gris. Un gris
-                    plus clair passerait sur la latte et échouerait sur la planche, donc il n'y en a
+                    Le gris secondaire doit rester conforme sur la planche <em>et</em> sur la latte,
+                    ce qui le fixe à <b>#474D56</b> — 8,5:1 sur le blanc, 6,4:1 sur le gris. Un gris
+                    plus clair passerait sur la planche et échouerait sur la latte, donc il n'y en a
                     qu'un.
                 </p>
                 <p class="note">
-                    Même règle pour les statuts : ils sont assombris jusqu'à passer sur la planche.
-                    C'est le prix du fond gris, et c'est le seul endroit où il coûte quelque chose.
+                    Même règle pour les statuts : ils sont assombris jusqu'à passer sur la latte.
+                    C'est le prix d'une surface grise, et c'est le seul endroit où il coûte quelque chose.
                 </p>
             </div>
         </div>
@@ -1814,7 +1814,7 @@
                     taille de la page ; l'interlettrage descend à -0,1 em, sans quoi trois chiffres
                     d'un mono large ne tiennent pas dans la largeur.
                 </p>
-                <p class="note">Navigation, boutons et fond gris sont retirés par <b>@media print</b>. Aucun PDF serveur.</p>
+                <p class="note">Navigation, boutons et aplats de gris sont retirés par <b>@media print</b>. Aucun PDF serveur.</p>
             </div>
             <div class="slat">
                 <h3>Ce que la nuit change, et rien d'autre</h3>
@@ -1846,7 +1846,7 @@
             <li><b>Aucun compte à rebours, aucune barre de progression</b>Un chronomètre physique s'en charge. Les heures sont des faits envoyés par le serveur.</li>
             <li><b>Aucune horloge côté client</b>Rien à dériver de l'heure serveur, rien qui s'anime pendant quinze heures.</li>
             <li><b>Aucun classement pendant la course</b>La question est « qui est encore debout », pas « qui est premier ».</li>
-            <li><b>Aucun arrondi, aucune ombre, aucun dégradé</b>Deux gris et un filet suffisent. Le soleil efface tout le reste.</li>
+            <li><b>Aucun arrondi, aucune ombre, aucun dégradé</b>Un blanc, un gris et un filet suffisent. Le soleil efface tout le reste.</li>
             <li><b>Aucune couleur de marque le jour</b>La couleur est réservée aux statuts. L'ambre n'apparaît qu'en mode nuit.</li>
             <li><b>Aucune donnée personnelle dans une latte</b>Téléphone, date de naissance et contact d'urgence n'apparaissent jamais devant un autre coureur.</li>
         </ul>
@@ -1866,24 +1866,24 @@
             cette page en sont l'équivalent exact.
         </p>
         <pre>:root {
-    --background: oklch(0.8382 0.0104 238.5);
+    --background: oklch(1 0 0);
     --foreground: oklch(0.1998 0.0086 264.4);
-    --card: oklch(1 0 0);
+    --card: oklch(0.9048 0.007 247.9);
     --card-foreground: oklch(0.1998 0.0086 264.4);
-    --popover: oklch(1 0 0);
+    --popover: oklch(0.9048 0.007 247.9);
     --popover-foreground: oklch(0.1998 0.0086 264.4);
     --primary: oklch(0.1998 0.0086 264.4);
     --primary-foreground: oklch(1 0 0);
-    --secondary: oklch(0.9534 0.0042 236.5);
+    --secondary: oklch(0.8699 0.0095 242.9);
     --secondary-foreground: oklch(0.1998 0.0086 264.4);
-    --muted: oklch(0.9534 0.0042 236.5);
+    --muted: oklch(0.8699 0.0095 242.9);
     --muted-foreground: oklch(0.4182 0.0169 258.4);
-    --accent: oklch(0.9048 0.007 247.9);
+    --accent: oklch(0.8447 0.0114 243.7);
     --accent-foreground: oklch(0.1998 0.0086 264.4);
     --destructive: oklch(0.4643 0.1641 28.6);
     --destructive-foreground: oklch(1 0 0);
     --border: oklch(0.7718 0.0124 240);
-    --border-soft: oklch(0.9048 0.007 247.9);
+    --border-soft: oklch(0.8447 0.0114 243.7);
     --input: oklch(0.7718 0.0124 240);
     --ring: oklch(0.1998 0.0086 264.4);
     --radius: 0px;
@@ -1899,11 +1899,11 @@
     --status-finished: oklch(0.4463 0.0913 86.9);
     --status-finished-surface: oklch(0.9416 0.0334 88.1);
     --status-finished-foreground: oklch(1 0 0);
-    --sidebar-background: oklch(0.8096 0.0123 239.9);
+    --sidebar-background: oklch(0.9602 0.0034 247.9);
     --sidebar-foreground: oklch(0.1998 0.0086 264.4);
     --sidebar-primary: oklch(0.1998 0.0086 264.4);
     --sidebar-primary-foreground: oklch(1 0 0);
-    --sidebar-accent: oklch(1 0 0);
+    --sidebar-accent: oklch(0.9048 0.007 247.9);
     --sidebar-accent-foreground: oklch(0.1998 0.0086 264.4);
     --sidebar-border: oklch(0.7718 0.0124 240);
     --sidebar-ring: oklch(0.1998 0.0086 264.4);

@@ -47,7 +47,7 @@ const counts = [
 
             <DesignSection
                 title="La planche et les lattes"
-                note="Le gris est la planche : entête, compteurs, titres de colonnes. Le blanc est la latte : un coureur, rien d’autre."
+                note="Le blanc est la planche : entête, compteurs, titres de colonnes. Le gris est la latte : un coureur, rien d’autre."
             >
                 <RunnerListSample />
             </DesignSection>
