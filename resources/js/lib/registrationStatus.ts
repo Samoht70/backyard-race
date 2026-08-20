@@ -1,7 +1,16 @@
-import { CircleCheckBig, CircleSlash, Hourglass } from '@lucide/vue';
+import {
+    Check,
+    CircleCheckBig,
+    CircleSlash,
+    Hourglass,
+    Undo2,
+} from '@lucide/vue';
 import type { LucideIcon } from '@lucide/vue';
 import { cva } from 'class-variance-authority';
-import type { RegistrationStatus } from '@/types/registration';
+import type {
+    RegistrationStatus,
+    RegistrationTransition,
+} from '@/types/registration';
 
 export const registrationStatusIcons = {
     pending: Hourglass,
@@ -34,4 +43,34 @@ export const registrationStatusVariants = cva(
 
 export function registrationStatusLabelKey(status: RegistrationStatus): string {
     return `registration.status.${status}`;
+}
+
+export const registrationStatusTone = {
+    pending: 'text-muted-foreground',
+    confirmed: 'text-status-running',
+    cancelled: 'text-status-eliminated',
+} satisfies Record<RegistrationStatus, string>;
+
+type RegistrationTransitionPresentation = {
+    icon: LucideIcon;
+    tone: 'primary' | 'danger' | 'quiet';
+    needsConfirmation: boolean;
+};
+
+export const registrationTransitions = {
+    confirm: { icon: Check, tone: 'primary', needsConfirmation: false },
+    cancel: { icon: CircleSlash, tone: 'danger', needsConfirmation: true },
+    reopen: { icon: Undo2, tone: 'quiet', needsConfirmation: false },
+} satisfies Record<RegistrationTransition, RegistrationTransitionPresentation>;
+
+export function registrationTransitionLabelKey(
+    transition: RegistrationTransition,
+): string {
+    return `registration.transition.${transition}`;
+}
+
+export function registrationTransitionAriaKey(
+    transition: RegistrationTransition,
+): string {
+    return `registration.transition.aria_${transition}`;
 }

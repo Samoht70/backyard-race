@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { CircleOff } from '@lucide/vue';
+import BoardFilterSample from '@/components/design/BoardFilterSample.vue';
 import DesignSection from '@/components/design/DesignSection.vue';
 import EventFieldSample from '@/components/design/EventFieldSample.vue';
 import EventStatusGallery from '@/components/design/EventStatusGallery.vue';
+import RegistrationListSample from '@/components/design/RegistrationListSample.vue';
+import RegistrationStatusGallery from '@/components/design/RegistrationStatusGallery.vue';
 import RunnerListSample from '@/components/design/RunnerListSample.vue';
 import StatusGallery from '@/components/design/StatusGallery.vue';
 import TypeSpecimen from '@/components/design/TypeSpecimen.vue';
@@ -68,6 +71,27 @@ const counts = [
                 note="Quatre étapes, jamais de retour."
             >
                 <EventStatusGallery />
+            </DesignSection>
+
+            <DesignSection
+                title="Statuts d’inscription"
+                note="Trois états : en attente, confirmée, annulée."
+            >
+                <RegistrationStatusGallery />
+            </DesignSection>
+
+            <DesignSection
+                title="Lattes d’inscription"
+                note="Une seule action par latte, celle que l’état permet. Le nom ouvre la fiche, le bouton agit."
+            >
+                <RegistrationListSample />
+            </DesignSection>
+
+            <DesignSection
+                title="Filtres de vue"
+                note="Quatre vues au maximum, toutes visibles sans ouvrir de menu."
+            >
+                <BoardFilterSample />
             </DesignSection>
 
             <DesignSection

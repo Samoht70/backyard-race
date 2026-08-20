@@ -24,16 +24,30 @@ Route::middleware('auth')
         Route::singleton('registration', RegistrationController::class)
             ->only(['show', 'edit', 'update']);
 
-        Route::middleware('can:'.Permission::ManageEvent->value)
-            ->prefix('manage')
+        Route::prefix('manage')
             ->name('manage.')
             ->group(function () {
-                Route::get('/', Manage\IndexController::class)->name('index');
+                Route::middleware('can:'.Permission::ManageEvent->value)
+                    ->group(function () {
+                        Route::get('/', Manage\IndexController::class)->name('index');
 
-                Route::singleton('event', Manage\EventController::class)
-                    ->only(['edit', 'update']);
+                        Route::singleton('event', Manage\EventController::class)
+                            ->only(['edit', 'update']);
 
-                Route::post('event/advance', Manage\AdvanceEventController::class)->name('event.advance');
+                        Route::post('event/advance', Manage\AdvanceEventController::class)->name('event.advance');
+                    });
+
+                Route::middleware('can:'.Permission::ManageParticipants->value)
+                    ->group(function () {
+                        Route::resource('registrations', Manage\RegistrationController::class)
+                            ->only(['index', 'edit', 'update'])
+                            ->parameters(['registrations' => 'participant']);
+
+                        Route::post(
+                            'registrations/{participant}/transition',
+                            Manage\RegistrationTransitionController::class,
+                        )->name('registrations.transition');
+                    });
             });
     });
 

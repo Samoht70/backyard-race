@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
+import { CircleSlash } from '@lucide/vue';
 import { computed } from 'vue';
 import RegistrationStatusBadge from '@/components/registration/RegistrationStatusBadge.vue';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { t } from '@/lib/i18n';
 import { edit, show } from '@/routes/registration';
 import type { RegistrationDetails } from '@/types/registration';
@@ -23,6 +25,8 @@ defineOptions({
         ],
     },
 });
+
+const isCancelled = computed(() => props.registration.status === 'cancelled');
 
 const facts = computed(() => [
     {
@@ -59,6 +63,16 @@ const facts = computed(() => [
             <RegistrationStatusBadge :status="registration.status" />
         </header>
 
+        <Alert v-if="isCancelled" variant="destructive">
+            <CircleSlash class="size-4" />
+            <AlertTitle>{{
+                t('registration.show.cancelled_title')
+            }}</AlertTitle>
+            <AlertDescription>
+                {{ t('registration.show.cancelled_description') }}
+            </AlertDescription>
+        </Alert>
+
         <dl class="flex flex-col gap-2">
             <div
                 v-for="fact in facts"
@@ -86,7 +100,10 @@ const facts = computed(() => [
             {{ t('registration.show.edit') }}
         </Link>
 
-        <p v-else class="text-center text-sm text-muted-foreground">
+        <p
+            v-else-if="!isCancelled"
+            class="text-center text-sm text-muted-foreground"
+        >
             {{ t('registration.show.locked') }}
         </p>
     </div>

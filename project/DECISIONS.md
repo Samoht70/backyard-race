@@ -1179,3 +1179,114 @@ disparaître BR-26 et réduirait BR-29 à une vérification, soit environ 20 poi
 60 € — le meilleur rapport du backlog. Le choix « payer moins et faire le travail » reste celui du
 propriétaire et n'est pas rouvert par cette entrée ; il est simplement chiffré une fois de plus,
 pour qu'il soit tenu en connaissance de cause plutôt que par inertie.
+
+## D-48 — Le cycle de vie de l'inscription est un graphe, et la confirmation est le point de bascule
+
+Arrêté le 2026-08-20 par BR-06, avec le propriétaire du projet pour la branche de Q-03.
+
+D-40 avait laissé les transitions à cette story. Elles vivent dans
+`App\Services\RegistrationLifecycle`, jamais sur `App\Enums\RegistrationStatus` — même interdiction
+expresse que pour `EventStatus`.
+
+**La forme canonique du State s'applique ici, pas la variante linéaire de D-29.** D-29 justifiait
+son `advance()` unique par l'absence de branchement : la chaîne de l'événement n'en a aucun. Le
+graphe de l'inscription en a trois — `pending → confirmed`, `pending → cancelled`,
+`confirmed → cancelled`, `cancelled → pending`, et `cancelled → confirmed` interdit. Chaque état
+porte donc `confirm()`, `cancel()` et `reopen()`, et les cinq transitions illégales lèvent. Ce que
+ça achète est le même bénéfice qu'en D-29, obtenu par l'autre bout : un appelant ne peut pas
+demander une confirmation directe depuis `cancelled`, la méthode n'a pas d'autre corps qu'un
+`throw`.
+
+`allowedTransitions()` s'ajoute aux trois méthodes parce que **deux appelants réels** doivent
+énumérer ce qu'une ligne permet : la Form Request qui refuse en français, et les boutons du gérant.
+Trois prédicats booléens auraient été la deuxième déclaration du graphe que D-29 interdit. Le risque
+résiduel — la liste et les méthodes qui divergent dans un même état — n'est pas promis mais
+**vérifié** : `it_agrees_with_its_own_allowed_transitions` confronte les deux lectures sur les neuf
+couples état/transition. `RegistrationTransition::apply()` porte un `match`, mais il ne sait pas ce
+qui est légal : il traduit un nom d'action HTTP en appel de méthode.
+
+### La course à la dernière place se joue ici, et le verrou n'est pas un confort
+
+D-39 l'avait annoncé : une inscription naît `pending`, donc le plafond n'est jamais atteint par une
+inscription. `TransitionRegistration` prend un verrou de ligne sur l'événement, compte les confirmés
+dessous, puis écrit **conditionnellement** sur le statut quitté — patron d'`AdvanceEventStatus`
+(D-32). Zéro ligne touchée signifie que quelqu'un est passé avant.
+
+Les deux alternatives sont fermées par l'outillage, pas par le goût :
+
+- **réessayer sur violation d'unicité** — `NoTryCatchRule` interdit le `try/catch` que ça exige ;
+- **une sous-requête conditionnelle** — MySQL refuse une sous-requête sur la table cible d'un
+  `UPDATE` (erreur 1093), et le compteur de capacité n'est pas sur la ligne écrite.
+
+Le verrou porte sur une table d'une seule ligne, pour une quarantaine de confirmations en une
+soirée. **Ce qu'il ne fait pas** : garantir en base que les confirmés ne dépassent jamais le
+plafond. Aucune contrainte SQL ne l'exprime ici ; la garantie vaut la transaction, pas plus, et
+c'est dit plutôt que promis.
+
+**Le double clic voit deux choses selon le cas, et les deux canaux restent d'accord** : deux clics
+séquentiels sont refusés en 422 par la Form Request, deux clics concurrents par l'écriture
+conditionnelle en 409. Dans les deux cas rien n'est écrit deux fois. Le 409 reste sur le chemin
+d'onglet périmé que Q-02 couvre déjà pour l'événement — BR-06 ne l'aggrave pas.
+
+**Écart assumé avec BR-05 :** la confirmation ne consulte pas `allowsRegistration()`. BR-06 exige
+qu'un retardataire soit confirmable course lancée, alors que le parcours d'inscription se ferme dès
+`running`. Deux chemins, deux règles, volontairement — un test tient chacune, pour que
+l'incohérence apparente ne se fasse pas « corriger ».
+
+### Première ressource plurielle, et deux groupes de permissions frères
+
+L'argument de D-31 et D-41 — « pas d'identifiant à porter » — ne se transpose pas côté gérant : il
+regarde quarante fiches, l'identifiant *est* l'information. `Route::resource('registrations', …)`
+avec `->parameters(['registrations' => 'participant'])` garde le style déclaratif et le nom du
+modèle dans l'URL.
+
+Le groupe `manage` se scinde en **deux groupes frères** plutôt qu'imbriqués : le hub et l'événement
+sous `manage-event`, les inscriptions sous `manage-participants`. Imbriquer aurait exigé les deux
+capacités et laissé la distinction de D-28 invisible aux tests. `manage-participants` a enfin son
+premier consommateur depuis BR-01, et un test le voit avec un utilisateur ne portant que lui.
+
+`ParticipantPolicy` gagne `manage()` et ne touche pas à `update()`. Les deux règles sont des
+conditions contradictoires sur le même verbe — « le propriétaire, tant que c'est en attente » contre
+« n'importe qui d'habilité, à tout moment ». Fusionnées dans un `||`, la garantie « une inscription
+confirmée est en lecture seule pour son coureur » serait devenue la branche gauche d'une
+alternative, et le `canEdit` de l'écran coureur aurait dépendu d'une permission qui ne le concerne
+pas. Le `status === Pending` de la Policy laisse place à `isEditableByRunner()` : c'était le dernier
+test de statut hors des états.
+
+### Q-03 se ferme sur la branche 1 plus la branche 3, sans ressusciter d'écran
+
+Le coureur voit son inscription annulée **en lecture seule**, avec un message qui dit ce qui s'est
+passé ; il ne regagne aucun pouvoir de création. Le **gérant** peut la remettre en `pending`, et
+rien de ce que le coureur avait saisi n'est perdu dans l'aller-retour — un test le vérifie sur le
+téléphone et le contact d'urgence.
+
+D-45 tient donc intégralement : le second formulaire qu'il avait supprimé ne revient pas. Ce que la
+fusion avait laissé ouvert était un compte sans écran, pas un compte sans données.
+
+Défaut de copie corrigé au passage : l'annulation étant jusqu'ici inatteignable, une inscription
+annulée tombait sur `registration.show.locked`, qui annonce « ton inscription est confirmée ».
+L'écran a maintenant trois branches explicites.
+
+### Le filtre voyage dans l'URL
+
+Trois raisons, par poids décroissant : BR-14 exige un filtrage serveur pour le tableau des coureurs,
+donc un filtre client ici tiendrait deux idiomes pour un geste ; une transition redirige, donc le
+gérant qui vide la vue « en attente » y reste sans une ligne de code ; les compteurs sont des
+vérités serveur qu'un filtre client dédoublerait. Un statut trafiqué **retombe sur la liste
+complète** au lieu d'un 422 : ça arrive sur une navigation ordinaire, où une erreur de validation
+laisserait le gérant sur la page d'erreur non traduite de Q-02.
+
+`RegistrationSlat` est un frère de `RunnerSlat`, pas sa généralisation : D-26 sépare les deux jeux
+de statut, et les deux lattes évoluent en sens opposés — l'une vers le détail des boucles et
+l'animation de validation, l'autre vers les transitions. Ce qu'elles partagent vraiment est déjà
+factorisé : l'utilitaire `slats`, la cellule, l'échelle typographique.
+
+**Deux défauts d'accessibilité évités, à ne pas réintroduire.** Le lien n'entoure que le bloc
+d'identité : une latte entière en `<Link>` avec un bouton de transition dedans est du HTML invalide
+et un piège au tap comme au lecteur d'écran. Et le bouton de sortie du dialogue d'annulation
+s'appelle « ne rien changer » — deux « Annuler » de sens opposés dans la même boîte se cliquent de
+travers à 4 h du matin. Chaque formulaire de ligne porte son propre sac d'erreurs, sans quoi un
+refus sur une ligne s'affiche sous les quarante boutons.
+
+`BoardFilter` ne connaît ni `RegistrationStatus` ni `RunnerStatus` : il reçoit des options déjà
+construites par la page. BR-14 aura besoin de la même forme à quatre vues.

@@ -46,5 +46,6 @@ return [
     'manage' => [
         'title' => 'Gestion de la course',
         'event' => 'Configurer l’événement',
+        'registrations' => 'Gérer les inscriptions',
     ],
 ];
