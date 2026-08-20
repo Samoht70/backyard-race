@@ -1584,3 +1584,42 @@ base sans partir du bucket.
 `storage:ensure-bucket` crée le bucket quand il manque et ne fait rien sinon. Ce n'est pas une
 commande jetable : tout environnement neuf en a besoin, et BR-28 en aura besoin en production.
 Elle entre dans `composer setup`, avant les migrations.
+
+## D-53 — Le PPS est une forme contrôlée, pas une donnée vérifiée, et le gérant le lit sans le saisir
+
+Arrêté le 2026-08-20 par BR-34.
+
+### Le gérant lit, il ne saisit pas
+
+La fiche gérant annonce « le gérant peut tout corriger, à tout moment », et il corrige de fait le
+prénom, le nom, l'email et le téléphone. Le PPS échappe à cette règle : il est rendu verrouillé,
+comme l'heure de départ d'un événement lancé, et `Manage\RegistrationUpdateRequest` marque le champ
+`prohibited`.
+
+Ce n'est pas de la prudence sur une donnée de santé — il n'y en a pas ici, le numéro n'est ni lu ni
+vérifié. C'est que le PPS est une **déclaration** : un numéro corrigé par quelqu'un d'autre que son
+déclarant ne veut plus rien dire, et le gérant qui le retape n'a par construction aucune source pour
+le faire. Le champ verrouillé le dit à l'écran, ce qu'un champ désactivé n'aurait pas fait — et
+`disabled` aurait en prime retiré la valeur de la soumission.
+
+Corollaire à connaître : `EventField` verrouillé affiche son erreur. C'est ce qui rend le
+`prohibited` visible quand un onglet resté ouvert avant le verrou poste quand même le champ.
+
+### La normalisation vit dans la règle, jamais dans l'écran
+
+`pps 1234 5678` collé depuis un mail doit devenir `PPS12345678`, espace insécable finale comprise.
+Si cette mise en forme vivait dans l'écran, la saisie initiale et la correction divergeraient le jour
+où l'une des deux change — et il y a trois écrans, pas deux.
+
+`App\Support\PpsNumber` porte donc la forme (`PATTERN`) et la mise en forme (`normalise()`), et
+`RegistrationValidationRules` les distribue aux Form Requests qui reçoivent le champ. Le trait porte
+aussi le message d'erreur : `lang/fr/validation.php` n'a pas de clé `regex`, et un message générique
+n'aurait pas rappelé la forme attendue, ce que le critère d'acceptation exige.
+
+### Ce que le numéro ne fait pas
+
+Aucune unicité en base, aucun appel à un service tiers, aucune date de validité, aucun blocage : une
+inscription sans numéro est valide et reste confirmable. Un numéro inventé passe. C'est le périmètre
+arrêté avec le propriétaire — la pièce jointe justificative avait été retirée le même jour, avant
+l'implémentation, pour ne pas monter une collection Media Library, une route sous policy et une
+purge autour d'un document que personne n'allait ouvrir.

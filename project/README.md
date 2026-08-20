@@ -36,11 +36,11 @@ briefing. Ce qui manque tient en quatre entrées : trois stories et une reprise.
 |-------|----|-------|-----|----------------------|
 | ✅ | [BR-17](stories/BR-17-briefing.md) | Briefing éditable | 2 | Dit comment se déroule l'événement |
 | ✅ | [BR-18](stories/BR-18-documents.md) | Documents de l'événement, GPX compris | 4 | Règlement, consignes, logement, trace |
-| 1 | [BR-34](stories/BR-34-numero-pps.md) | Numéro PPS demandé à l'inscription | 2 | Le dernier champ qui manque au formulaire |
-| 2 | R-04 | Formulaire d'inscription en étapes | 5 | Reprise de l'écran de D-45, portée par [D-50](DECISIONS.md) |
-| 3 | [BR-33](stories/BR-33-acces-parcours-coureur.md) | Accès du coureur à son inscription | 5 | Branche le tout dans la navigation |
+| ✅ | [BR-34](stories/BR-34-numero-pps.md) | Numéro PPS demandé à l'inscription | 2 | Le dernier champ qui manque au formulaire |
+| 1 | R-04 | Formulaire d'inscription en étapes | 5 | Reprise de l'écran de D-45, portée par [D-50](DECISIONS.md) |
+| 2 | [BR-33](stories/BR-33-acces-parcours-coureur.md) | Accès du coureur à son inscription | 5 | Branche le tout dans la navigation |
 
-**18 pts, dont 6 livrés.** BR-34 passe avant R-04 pour que le découpage en étapes place un
+**18 pts, dont 8 livrés.** BR-34 est passée avant R-04 pour que le découpage en étapes place un
 formulaire déjà complet, plutôt que d'avoir à loger un champ de plus après coup. BR-33 ferme le lot
 plutôt qu'elle ne l'ouvre : c'est elle qui pose les entrées de navigation vers le briefing, les
 documents et l'inscription, et il serait absurde d'y revenir trois fois.
@@ -73,7 +73,7 @@ plateforme managée ferait tomber une vingtaine de ces points pour 30 à 60 €.
 | [BR-05](stories/BR-05-inscription.md) | Inscription d'un participant | 8 | ✅ Terminé |
 | [BR-06](stories/BR-06-gestion-inscriptions.md) | Gestion des inscriptions par le gérant | 5 | ✅ Terminé |
 | [BR-07](stories/BR-07-numero-dossard.md) | Attribution automatique du numéro de dossard | 5 | ✅ Terminé |
-| [BR-34](stories/BR-34-numero-pps.md) | Numéro PPS demandé à l'inscription | 2 | 🔥 Lot 1 |
+| [BR-34](stories/BR-34-numero-pps.md) | Numéro PPS demandé à l'inscription | 2 | ✅ Terminé |
 
 ### EPIC 2 — Moteur de course
 
@@ -143,13 +143,13 @@ pas de fichier de story : c'est la décision qui les porte, et elles prennent un
 | R-03 | Direction artistique « Tableau des départs » à la place de « Corral » | 8 | ✅ Livrée | [D-46](DECISIONS.md) |
 | R-04 | Formulaire d'inscription en quatre étapes au lieu d'une page scrollable | 5 | 🔥 Lot 1 | [D-50](DECISIONS.md) |
 
-**Total : 31 stories actives + 4 reprises · 227 pts · 88 pts livrés (39 %)**
+**Total : 31 stories actives + 4 reprises · 227 pts · 90 pts livrés (40 %)**
 
 **Hors périmètre : 4 stories abandonnées, 32 pts non engagés** — voir [D-47](DECISIONS.md).
 
 ## Ordre conseillé
 
-**Lot 1 — ouvrir les inscriptions (18 pts, BR-17 et BR-18 livrées)** — BR-34 → R-04 → BR-33
+**Lot 1 — ouvrir les inscriptions (18 pts, BR-17, BR-18 et BR-34 livrées)** — R-04 → BR-33
 
 **Lot 2 — mettre en ligne (44 pts)** — BR-26 → BR-27 → BR-28 → BR-29 → BR-30 → BR-31 → BR-32
 
@@ -159,10 +159,10 @@ BR-14 → BR-15 → BR-16 → BR-24 → BR-20 → BR-23
 Sept remarques sur cet ordre :
 
 - Les deux premiers lots livrent un produit **incomplet mais utile** : un coureur s'inscrit, lit le
-  briefing, télécharge le règlement et dépose son justificatif. Rien de la nuit de course n'existe
+  briefing, télécharge le règlement et déclare son numéro PPS. Rien de la nuit de course n'existe
   encore, et ça ne l'empêche pas d'ouvrir les inscriptions.
-- BR-33 vient en dernier de son lot parce qu'elle branche la navigation vers ce que BR-17, BR-18,
-  BR-34 et R-04 auront posé.
+- BR-33 vient en dernier de son lot parce qu'elle branche la navigation vers ce que BR-17, BR-18 et
+  BR-34 ont posé, et vers ce que R-04 aura remis en forme.
 - R-04 est une **reprise**, pas une story : elle refait l'écran que D-45 avait livré, donc elle vit
   dans une décision (D-50) et dans le tableau des reprises, comme R-01 à R-03.
 - BR-24 sort de la fin du backlog pour rejoindre les écrans de course : elle dépend de BR-08 et

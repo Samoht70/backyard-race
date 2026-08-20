@@ -27,7 +27,7 @@ class ParticipantSeeder extends Seeder
             ->whereDoesntHave('participant')
             ->get();
 
-        $this->register($event, $runners->take(self::CONFIRMED), Participant::factory()->confirmed());
+        $this->register($event, $runners->take(self::CONFIRMED), Participant::factory()->confirmed()->withPps());
         $this->register($event, $runners->skip(self::CONFIRMED), Participant::factory());
     }
 

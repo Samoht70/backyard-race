@@ -27,6 +27,7 @@ class ParticipantResource extends JsonResource
             'email' => $this->user->email,
             'phone' => $this->phone,
             'birth_date' => $this->birth_date->format('Y-m-d'),
+            'pps_number' => $this->pps_number,
             'emergency_contact_name' => $this->emergency_contact_name,
             'emergency_contact_phone' => $this->emergency_contact_phone,
             'notes' => $this->notes,

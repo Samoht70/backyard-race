@@ -28,4 +28,9 @@ class RegistrationUpdateRequest extends FormRequest
     {
         return $this->registrationRules();
     }
+
+    protected function prepareForValidation(): void
+    {
+        $this->normalisePpsNumber();
+    }
 }

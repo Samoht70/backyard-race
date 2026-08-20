@@ -40,6 +40,7 @@ return [
         'start_time' => 'heure du premier départ',
         'lap_distance_meters' => 'distance d’une boucle',
         'lap_duration_minutes' => 'durée d’une boucle',
+        'pps_number' => 'numéro PPS',
         'address' => 'adresse',
         'latitude' => 'latitude',
         'longitude' => 'longitude',

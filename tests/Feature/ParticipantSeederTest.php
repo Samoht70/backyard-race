@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Enums\RegistrationStatus;
 use App\Models\Participant;
 use App\Models\User;
+use App\Support\PpsNumber;
 use Database\Seeders\EventSeeder;
 use Database\Seeders\ParticipantSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
@@ -41,6 +42,23 @@ class ParticipantSeederTest extends TestCase
 
         $this->assertNotEmpty($pending);
         $this->assertCount($pending->count(), $pending->filter(fn (?int $number): bool => $number === null));
+    }
+
+    #[Test]
+    public function it_gives_every_confirmed_participant_a_declared_pps_number(): void
+    {
+        $this->seedRunners();
+
+        $numbers = Participant::query()
+            ->where('status', RegistrationStatus::Confirmed)
+            ->pluck('pps_number');
+
+        $this->assertNotEmpty($numbers);
+        $this->assertCount(
+            $numbers->count(),
+            $numbers->filter(fn (?string $number): bool => $number !== null
+                && preg_match(PpsNumber::PATTERN, $number) === 1),
+        );
     }
 
     #[Test]

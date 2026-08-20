@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Enums\RegistrationStatus;
+use App\Enums\RegistrationTransition;
 use App\Models\Event;
 use App\Models\Participant;
 use App\Models\User;
@@ -222,6 +223,71 @@ class RegistrationTest extends TestCase
                     ->where('registration.first_name', $runner->first_name)
                     ->where('canEdit', false),
             );
+    }
+
+    #[Test]
+    public function it_records_the_pps_number_declared_at_registration(): void
+    {
+        $this->openEvent();
+
+        $this->completeRegistration(self::EMAIL);
+
+        $this->assertSame('PPS12345678', Participant::query()->sole()->pps_number);
+    }
+
+    #[Test]
+    public function it_normalises_a_pps_number_typed_with_spaces(): void
+    {
+        $this->openEvent();
+
+        $this->completeRegistration(self::EMAIL, ['pps_number' => 'pps 1234 5678']);
+
+        $this->assertSame('PPS12345678', Participant::query()->sole()->pps_number);
+    }
+
+    #[Test]
+    public function it_refuses_a_pps_number_without_its_three_letters(): void
+    {
+        $this->assertRejects(['pps_number' => '12345678'], 'pps_number');
+    }
+
+    #[Test]
+    public function it_registers_a_runner_who_declares_no_pps_number(): void
+    {
+        $this->openEvent();
+
+        $this->completeRegistration(self::EMAIL, ['pps_number' => ''])
+            ->assertRedirect(route('account.show'));
+
+        $participant = Participant::query()->sole();
+
+        $this->assertNull($participant->pps_number);
+        $this->assertSame(RegistrationStatus::Pending, $participant->status);
+
+        $this->actingAs(User::factory()->manager()->create())
+            ->post(route('manage.registrations.transition', $participant), [
+                'transition' => RegistrationTransition::Confirm->value,
+            ])
+            ->assertSessionHasNoErrors();
+
+        $this->assertSame(RegistrationStatus::Confirmed, $participant->refresh()->status);
+    }
+
+    #[Test]
+    public function it_lets_a_runner_correct_a_pending_pps_number(): void
+    {
+        $event = $this->openEvent();
+        $runner = $this->runner();
+        Participant::factory()->withPps('PPS11111111')->create([
+            'event_id' => $event->id,
+            'user_id' => $runner->id,
+        ]);
+
+        $this->actingAs($runner)
+            ->put(route('registration.update'), $this->registrationPayload(['pps_number' => 'pps-9999-0000']))
+            ->assertRedirect(route('registration.show'));
+
+        $this->assertSame('PPS99990000', Participant::query()->sole()->pps_number);
     }
 
     #[Test]

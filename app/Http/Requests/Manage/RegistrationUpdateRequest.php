@@ -34,6 +34,7 @@ class RegistrationUpdateRequest extends FormRequest
         return [
             ...$this->profileRules($this->participant()->user_id),
             ...$this->registrationRules(),
+            'pps_number' => ['prohibited'],
         ];
     }
 }
