@@ -58,8 +58,23 @@ joignable depuis l'extérieur ; c'est la mise en ligne qui transforme « l'inscr
 développée » en « les inscriptions sont ouvertes ». D-19 rappelle qu'une plateforme managée ferait
 tomber une vingtaine de ces points pour 30 à 60 €.
 
-BR-26 ouvre le lot. BR-30 est la story à ne pas bâcler — sans worker en production, les
-éliminations automatiques ne tombent pas, et rien ne le signale à l'écran.
+| Ordre | ID | Story | Pts | Où ça se joue |
+|-------|----|-------|-----|----------------|
+| 1 | [BR-26](stories/BR-26-provisionner-vps-dokploy.md) | VPS et Dokploy | 9 | Sur la machine, à la main du propriétaire |
+| ✅ | [BR-27](stories/BR-27-image-docker-production.md) | Image et Compose de production | 9 | Dans le dépôt |
+| 3 | [BR-28](stories/BR-28-configuration-secrets-stockage.md) | Environnement, secrets, stockage objet | 5 | Les deux |
+| 4 | [BR-29](stories/BR-29-donnees-managees-sauvegardes.md) | MySQL, Redis, sauvegardes | 8 | Sur la machine |
+| 5 | [BR-30](stories/BR-30-workers-horizon-scheduler.md) | Files, Horizon, planificateur | 5 | Les deux |
+| 6 | [BR-31](stories/BR-31-domaine-https-supervision.md) | Domaine, HTTPS, supervision | 5 | Sur la machine |
+| 7 | [BR-32](stories/BR-32-deploiement-dokploy.md) | Déploiement depuis Dokploy | 3 | Les deux |
+
+**44 pts, dont 9 livrés.** BR-27 est passée avant BR-26 : elle est la seule story du lot qui
+s'écrive et se vérifie entièrement dans le dépôt, sans machine. Le reste attend un VPS, qui n'est
+pas commandé.
+
+BR-30 est la story à ne pas bâcler. Le README le disait des éliminations automatiques ; c'est vrai
+bien avant elles — `RegistrationLink` est `ShouldQueue`, donc **sans worker en production, personne
+ne peut créer de compte**. Le lot 1 en dépend déjà.
 
 ## Board
 
@@ -131,7 +146,7 @@ BR-26 ouvre le lot. BR-30 est la story à ne pas bâcler — sans worker en prod
 | ID | Story | Pts | Statut |
 |----|-------|-----|--------|
 | [BR-26](stories/BR-26-provisionner-vps-dokploy.md) | Provisionner le VPS et installer Dokploy | 9 | 🔥 Lot 2 |
-| [BR-27](stories/BR-27-image-docker-production.md) | Image et Compose de production | 9 | 🔥 Lot 2 |
+| [BR-27](stories/BR-27-image-docker-production.md) | Image et Compose de production | 9 | ✅ Terminé |
 | [BR-28](stories/BR-28-configuration-secrets-stockage.md) | Configurer environnement, secrets et stockage objet | 5 | 🔥 Lot 2 |
 | [BR-29](stories/BR-29-donnees-managees-sauvegardes.md) | MySQL, Redis et sauvegardes hors machine | 8 | 🔥 Lot 2 |
 | [BR-30](stories/BR-30-workers-horizon-scheduler.md) | Files, Horizon et planificateur en production | 5 | 🔥 Lot 2 |
@@ -150,7 +165,7 @@ pas de fichier de story : c'est la décision qui les porte, et elles prennent un
 | R-03 | Direction artistique « Tableau des départs » à la place de « Corral » | 8 | ✅ Livrée | [D-46](DECISIONS.md) |
 | R-04 | Formulaire d'inscription en quatre étapes au lieu d'une page scrollable | 5 | ✅ Livrée | [D-50](DECISIONS.md), D-54 |
 
-**Total : 31 stories actives + 4 reprises · 227 pts · 100 pts livrés (44 %)**
+**Total : 31 stories actives + 4 reprises · 227 pts · 109 pts livrés (48 %)**
 
 **Hors périmètre : 4 stories abandonnées, 32 pts non engagés** — voir [D-47](DECISIONS.md).
 
@@ -158,8 +173,8 @@ pas de fichier de story : c'est la décision qui les porte, et elles prennent un
 
 **Lot 1 — ouvrir les inscriptions (18 pts) — clos.**
 
-**Lot 2, en cours — mettre en ligne (44 pts)** — BR-26 → BR-27 → BR-28 → BR-29 → BR-30 → BR-31 →
-BR-32
+**Lot 2, en cours — mettre en ligne (44 pts)** — BR-27 (faite) → BR-26 → BR-28 → BR-29 → BR-30 →
+BR-31 → BR-32
 
 **Ensuite, le moteur et les écrans de course** — BR-08 → BR-09 → BR-10 → BR-11 → BR-12 → BR-13 →
 BR-14 → BR-15 → BR-16 → BR-24 → BR-20 → BR-23
