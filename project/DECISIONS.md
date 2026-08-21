@@ -16,6 +16,13 @@ PHP de l'hôte satisferait la contrainte de version.
 
 Les commandes npm tournent sur l'hôte (Node 22).
 
+**Constat de BR-03 :** il n'y a pas de Node sur l'hôte de développement actuel. Les commandes npm
+passent donc par Sail elles aussi (`./vendor/bin/sail npm run …`, Node 24 dans l'image). Deux
+pièges à connaître : un `npm install` lancé dans le conteneur réécrit le champ `name` du
+`package-lock.json` en `html`, d'après son répertoire de travail, et la CLI shadcn-vue en profite
+pour remonter des dépendances non demandées. Vérifier `git diff package.json package-lock.json`
+après toute commande npm qui touche aux manifestes.
+
 ## D-02 — Starter kit Vue officiel plutôt qu'un montage manuel
 
 Le projet est né de `laravel new --vue`, qui livre déjà Inertia 3, Vue 3 + TypeScript,
@@ -111,6 +118,19 @@ français, via les fichiers de traduction. `APP_LOCALE=fr`, `APP_TIMEZONE=Europe
 Le fuseau applicatif est Paris : les horaires de boucles sont manipulés en heure locale,
 ce qui évite un décalage de deux heures sur « premier départ 13:00 ».
 
+**Corrigé le 2026-08-19 par BR-03 : ce paragraphe était faux depuis le début.** `config/app.php`
+codait `'timezone' => 'UTC'` en dur — la valeur du squelette Laravel — donc `APP_TIMEZONE` du
+`.env` n'avait jamais eu le moindre effet et `now()` rendait de l'UTC, deux heures derrière la
+course. Personne ne l'avait vu : aucune donnée temporelle métier n'existait avant `first_start_at`.
+
+La ligne lit désormais `env('APP_TIMEZONE', 'UTC')`, `phpunit.xml` et le workflow d'intégration
+fixent `APP_TIMEZONE=Europe/Paris` — aucun des deux ne le faisait, la CI aurait donc divergé du
+poste en silence — et `tests/Unit/ApplicationTimezoneTest.php` épingle à la fois le fuseau effectif
+et le fait que la configuration le lise dans l'environnement.
+
+C'est exactement le décalage contre lequel BR-04 met en garde. Le corriger à l'arrivée de la
+première heure métier évitait d'avoir à migrer des horaires déjà saisis.
+
 ## D-16 — Aucun graphique : la page statistiques n'affiche que des chiffres
 
 Arbitré le 2026-08-18, en deux temps.
@@ -150,6 +170,140 @@ Fortify envoie en développement : réinitialisation de mot de passe, vérificat
 Aucun mail métier n'est prévu — pas de confirmation d'inscription, pas d'alerte d'élimination,
 conformément à D-15. Mailpit est un filet de développement, pas l'amorce d'une fonctionnalité.
 
+**Révision du 2026-08-20 (D-43) : l'application n'envoie plus aucun mail.** La vérification
+d'adresse et la réinitialisation de mot de passe sont supprimées, donc Mailpit n'intercepte plus
+rien. Il reste dans `compose.yaml` pour ne pas avoir à le recâbler si un mail apparaît, mais un
+Mailpit vide est désormais le comportement normal, pas le symptôme d'une panne.
+
+**Seconde révision du même jour (D-45) : le mail est de retour, et Mailpit redevient
+load-bearing.** Le lien d'inscription est le seul mail de l'application, et c'est le seul chemin
+pour créer un compte : si le mail ne part pas, personne ne s'inscrit. Mailpit n'est donc plus un
+filet mais l'outil de vérification du parcours en développement. `.env.example` porte encore
+`MAIL_MAILER=log` et `MAIL_PORT=2525` alors que Mailpit écoute sur `1025` — un poste qui veut voir
+le mail doit passer à `smtp` et `1025`.
+
+## D-29 — Le cycle de vie de l'événement vit dans des classes d'état
+
+Arrêté le 2026-08-19 par BR-03, avec le propriétaire du projet.
+
+`draft → registration → running → finished` est un vrai cycle de vie persisté. Les skills maison
+`laravel:status-lifecycle` et `design-patterns:state` en font une **règle dure** pour un cycle
+neuf : une classe par statut, les transitions illégales qui lèvent. On l'applique.
+
+**Le raisonnement de D-26 ne se transpose pas.** `RunnerStatus` est sans transitions parce qu'il
+est **dérivé** — jamais persisté, jamais franchi. `EventStatus` est l'inverse : une colonne que le
+gérant fait avancer. Le danger que D-26 combat n'est pas « mettre les transitions quelque part »,
+c'est **les déclarer deux fois**. Ici elles ne le sont qu'une : dans les états.
+
+**Variante linéaire, pas la forme canonique du skill.** La chaîne n'a aucun branchement, donc
+chaque état porte un seul `advance()` plutôt que trois méthodes de transition nommées dont neuf
+n'existeraient que pour lever. Ce que ça achète, et qui est le cœur de la story : le saut et le
+retour arrière ne sont pas *rejetés*, ils sont **inexprimables** — aucun appelant n'a d'API pour
+demander `running → registration`. Le `match` de `EventLifecycleFactory` est le seul du dépôt sur
+`EventStatus`, et il est exhaustif : un statut ajouté sans son état échoue à l'analyse statique,
+pas en production.
+
+Coût mesuré face à l'option « enum enrichi + service » : +5 fichiers, +170 lignes triviales,
+écrites une fois. L'option courte aurait listé les statuts dans cinq ou six `match` dont aucun
+n'est exhaustif, et le garde-fou le plus important du produit aurait reposé sur une vérification
+qu'on peut oublier. D-20 ne renverse pas l'arbitrage : ce n'est pas de la dette à amortir sur
+trois ans, c'est le prix d'une soirée où une course lancée par erreur ne se dé-lance pas.
+
+**Interdiction expresse** : ne jamais ajouter `next()` ni `canTransitionTo()` sur `App\Enums\EventStatus`.
+Ce serait la deuxième déclaration de la chaîne, et donc la dérive que tout ceci évite.
+
+## D-30 — Schéma de l'événement : unités entières et instant unique
+
+Arrêté le 2026-08-19 par BR-03.
+
+- **`first_start_at` est une seule colonne datetime**, pas une paire date + heure. BR-04 calcule
+  `premier départ + (N−1) × durée` : il lui faut un instant, et une paire ne dirait pas si le tour
+  12 tombe le 15 ou le 16. L'écran garde deux contrôles, fusionnés côté serveur.
+- **Distance en mètres entiers, durée en minutes entières.** La boucle canonique vaut 6 706 m, un
+  nombre rond en mètres et pas en kilomètres ; un `decimal` se caste en *string* en JSON et ferait
+  de la vitesse de BR-09 une division de flottants. Les deux colonnes sont `unsigned` avec un
+  minimum de 1, donc la distance nulle et la durée négative sont refusées par la colonne
+  elle-même, pas seulement par une règle.
+- **Coordonnées `decimal(10,7)` en base, castées `float`** : le cast `decimal:7` rendrait
+  `"45.7640000"`, que la carte de BR-19 recevrait tel quel. Vérifié par aller-retour en base :
+  aucune perte de précision, un `double` portant 15 à 17 chiffres significatifs pour 10 stockés.
+- **La date et l'heure se tiennent l'une l'autre à la saisie.** L'écran envoie deux contrôles pour
+  une seule colonne ; chacun est obligatoire dès que l'autre est rempli, et vider les deux efface
+  l'heure de premier départ. Sans cette réciprocité, une date saisie sans heure n'atteignait
+  aucune règle et disparaissait derrière un message de succès.
+- **`max_participants` nul signifie « pas de limite »**, jamais zéro. BR-05 doit le lire ainsi.
+- **Aucun index hors clé primaire** : la table porte une ligne (D-20). Ce n'est pas un oubli.
+- **`status` est absent de `#[Fillable]`**, et un test l'affirme : c'est la seule chose entre une
+  requête forgée et une course déclarée terminée. Le modèle porte aussi `draft` en attribut par
+  défaut — le défaut de colonne seul laissait un `firstOrNew()` non enregistré sans statut, et
+  l'écran de configuration tombait sur une base vierge.
+
+## D-31 — Un seul événement, donc un routage singleton
+
+Arrêté le 2026-08-19 par BR-03.
+
+Pas de segment `{event}`, pas de route model binding : `GET /event`, `GET|PUT /manage/event`,
+`POST /manage/event/advance`. L'événement est résolu à l'appel par `firstOrNew()` (l'écran de
+configuration doit fonctionner sur une base jamais semée) ou `firstOrFail()`.
+
+**Création et modification passent par le même `PUT`.** Un seul formulaire, une seule Form Request,
+un seul test. `updateOrCreate()` a été écarté : il court-circuite `#[Fillable]` et la Policy.
+
+**L'unicité est tenue par la base, pas par la convention.** Une revue adverse a relevé que tout le
+code lit l'événement avec `sole()` ou `firstOrFail()` — l'invariant était supposé partout et garanti
+nulle part, et deux premiers enregistrements concurrents auraient créé deux lignes. La table porte
+donc une colonne `singleton` à valeur unique, dont le seul rôle est de rendre la seconde ligne
+impossible.
+
+## D-32 — Un refus de transition est une erreur de validation, pas une exception rendue
+
+Arrêté le 2026-08-19 par BR-03.
+
+`NoTryCatchRule` interdit d'attraper l'exception de transition pour la convertir en erreur de
+formulaire, et Q-02 rappelle qu'aucune page d'erreur Inertia n'existe : un 409 sortirait sur la
+page Symfony par défaut, en anglais, hors de la SPA.
+
+D'où deux canaux, **une seule règle** :
+
+- le gérant qui clique reçoit un **422** — `EventAdvanceRequest::after()` interroge l'état et
+  ajoute les motifs aux erreurs de validation, en français, dans l'écran ;
+- tout appel hors formulaire (seeder, BR-20, onglet périmé côté serveur) reçoit un **409** —
+  `EventTransitionRefusedException` étend `ConflictHttpException`.
+
+La règle n'est pas dupliquée : la Form Request pose la question, l'état y répond, et `advance()`
+lève sur la même condition. L'exception est le filet, pas le canal.
+
+**L'écriture est conditionnelle, et c'est ce qui ferme la fenêtre.** La revue adverse a démontré
+qu'entre la vérification de la Form Request et l'écriture, une requête concurrente pouvait déplacer
+l'événement : le gérant demandait `registration`, la validation approuvait `registration`, et
+l'événement se retrouvait en `running`. `AdvanceEventStatus` reçoit désormais le `to` validé et
+écrit avec `where('status', <statut quitté>)` : zéro ligne touchée signifie que quelqu'un est passé
+avant, et le refus est levé. Aucune transition n'étant réversible, c'était le défaut le plus grave
+de la branche.
+
+Le champ `to` de la route d'avancement n'est pas décoratif : il nomme l'étape que le gérant croyait
+franchir, donc un double clic ou un onglet périmé est refusé au lieu de pousser la course un cran
+trop loin.
+
+**BR-03 ne ferme pas Q-02 et ne l'aggrave pas** : restent les 403 et 409 des chemins d'abus.
+
+## D-33 — `running → finished` est posée par BR-03, la clôture reste à BR-20
+
+Arrêté le 2026-08-19 avec le propriétaire du projet, en écart assumé au « Exclu » de BR-03.
+
+BR-03 rend `finished` atteignable et met l'événement en lecture seule, ce dont BR-17, BR-18 et
+BR-19 ont besoin pour leur règle « consultable dès que l'événement sort de `draft` ». Sans cela,
+`FinishedEventState` resterait sans couverture de bout en bout jusqu'à BR-20 et la Policy devrait
+être rouverte.
+
+Ce qui reste à BR-20, et qui est le vrai contenu de cette story : la confirmation explicite et le
+**classement figé**. BR-03 ne produit aucun classement.
+
+La transition vers `finished` exige `finish-event` ; les deux précédentes exigent `manage-event`.
+`finish-event`, créée sans consommateur par BR-01, en a donc un — sans changement de comportement,
+le rôle gérant portant les neuf permissions. Un test le vérifie avec un utilisateur ne portant que
+`manage-event`, faute de quoi aucun test bâti sur le rôle ne saurait distinguer les deux.
+
 ## D-15 — Hors périmètre, définitivement
 
 QR Code, export CSV/Excel, impression de listes, notifications, journal d'audit,
@@ -157,6 +311,12 @@ classement temps réel, WebSockets, compte à rebours intégré, validation d'un
 participant, saisie manuelle de l'heure de fin.
 
 Ces absences sont un choix, pas un oubli. Une demande d'ajout rouvre cette entrée.
+
+**Révision du 2026-08-20 (D-45) : « notifications » ne couvre plus le mail d'inscription.**
+Le propriétaire a demandé une inscription en deux temps, dont le premier temps est un lien envoyé
+par mail. Ce mail est le **seul** que l'application envoie, et il appartient au parcours de création
+de compte, pas à la course. Tout le reste de la liste tient : aucune alerte d'élimination, aucun
+récapitulatif, aucune relance.
 
 ## D-19 — Déploiement sur un petit VPS mensuel, avec Dokploy
 
@@ -292,3 +452,1440 @@ Deux réserves relevées à l'intégration, corrigées le 2026-08-19 :
 - Le rappel de documentation Bruno ne s'appliquait pas ici : pas de collection `bruno/`, et son
   message renvoyait à `app/Rest/`, c'est-à-dire à Lomkit, écarté en D-04. Le hook et son script
   sont supprimés.
+
+## D-24 — Direction artistique « Corral » : tokens Tailwind, aucune librairie ajoutée
+
+**Remplacée le 2026-08-20 par D-46.** Cette entrée ne décrit plus le produit : ni la police, ni
+l'accent, ni l'élément signature décrits ci-dessous ne sont dans le code. Elle est conservée
+comme journal de la charte précédente, et pour les règles que D-46 reprend telles quelles.
+
+Arrêtée le 2026-08-19 avec le propriétaire du projet.
+
+L'interface est un **tableau de chronométrage**, pas un back-office : dans un Backyard Ultra
+le tour est l'unité, on referme la boucle dans l'heure ou on est sorti.
+
+- **Surfaces** — clair : blanc pur, encre presque noire à reflet bleu, pour tenir le plein
+  soleil. Sombre : ardoise bleu profond, **jamais de noir pur** (le noir pur fait halo sur du
+  texte fin à la frontale).
+- **Un seul accent, l'outremer**, choisi délibérément *hors* du jeu sémantique : les quatre
+  statuts consomment déjà le vert, le rouge, l'ambre et l'ardoise.
+- **Une seule famille variable, Archivo**, trois voix par son axe de largeur (Expanded Black
+  pour les nombres, largeur normale pour le texte, Expanded capitales pour les micro-libellés).
+  **Auto-hébergée** depuis `resources/fonts/` via le fournisseur `local()` du plugin Vite :
+  les fournisseurs distants ne servent que l'axe de graisse, et l'événement se déroule dans un
+  champ sur une connexion dégradée. Aucune requête tierce ne subsiste.
+- **Élément signature : la bande de tour comme plaque typographique.** Pas de jauge, pas de
+  barre, pas d'horloge — voir D-25. Le numéro de tour et le nombre de coureurs restants sont
+  posés en corps d'affichage, en chiffres tabulaires.
+- **La note d'anniversaire** est un unique séparateur en rangée de points façon guirlande,
+  d'un seul ton en paliers d'opacité — aucun token supplémentaire, aucune collision sémantique.
+- **Aucune librairie de composants ajoutée** : les 22 dossiers shadcn-vue déjà présents
+  suffisent. Aucune primitive n'a eu besoin d'être ajoutée.
+  **Amendé le 2026-08-19 par BR-03 :** la 23ᵉ primitive, `textarea`, est arrivée avec le premier
+  champ multiligne du produit. « Aucune librairie ajoutée » reste vrai — la CLI shadcn-vue copie
+  de la source et n'ajoute rien à `package.json` ; le textarea n'utilise que `useVModel`, déjà
+  présent. La recopier à la main aurait dupliqué les quarante utilitaires d'`Input.vue`, dans un
+  fichier soumis au lint alors que `components/ui/*` en est exempté par contrat.
+- **Notation oklch**, pour viser AA au lieu de le deviner. La palette vit dans **trois**
+  endroits : `:root`, `.dark`, et le `<style>` anti-flash de `resources/views/app.blade.php`
+  que Blade ne peut pas lire depuis le CSS. Un test affirme que les trois concordent.
+- **L'accent tient désormais AA en texte normal.** Il n'était affirmé qu'à 3:1 (grand texte),
+  n'ayant servi qu'à du corps d'affichage ; la puce « inscriptions ouvertes » de BR-03 le porte en
+  `text-sm`. `primary` sur `background` et sur `card` sont passés à 4,5:1 dans le test, et la
+  palette est passée sans retouche — la valeur du token n'a pas bougé.
+- **AA est vérifié par un test, pas par la revue** : `tests/Unit/DesignSystem/PaletteContrastTest.php`
+  analyse les tokens, convertit oklch → sRGB et contrôle 65 couples dans les deux thèmes, plus
+  la présence de chaque token dans les deux (un token absent de `.dark` se figerait en silence
+  sur sa valeur claire). Aucune dépendance, aucune étape de CI en plus.
+- **Cibles tactiles** : 44 px de plancher, 72 px pour la validation d'une boucle. Pas de token —
+  l'intention vit dans les variantes nommées d'`ActionButton`.
+- Les tokens `--chart-1..5` sont **supprimés** : D-16 exclut tout graphique.
+
+Mesuré sur un viewport réel de 375 px : aucun débordement horizontal, aucune cible sous 44 px.
+La lisibilité en niveaux de gris est portée par le **pictogramme et le libellé**, pas par la
+couleur — les quatre encres doivent rester dans la bande AA, qui est trop étroite pour que la
+clarté suffise à les distinguer.
+
+## D-25 — Pas de compte à rebours, et pas de barre de progression
+
+Arrêté le 2026-08-19. D-15 excluait déjà le « compte à rebours intégré », BR-04 et BR-13 le
+répètent. Le propriétaire a confirmé : **un chronomètre physique s'en charge**.
+
+Étendu à la demande : **aucune barre de progression**, sous aucune forme. L'élément signature
+de la direction artistique a donc été réancré sur la typographie, et le lime haute visibilité —
+qui n'existait que pour cette barre — est sorti de la palette.
+
+Conséquences : **aucune horloge côté client** nulle part, donc aucune dérive avec l'heure
+serveur et aucun écran qui s'anime pendant quinze heures de nuit. Les horaires sont affichés
+comme des faits fixes venus du serveur.
+
+Seule exception, assumée : le **filet de chargement d'Inertia** en haut de l'écran, fourni par
+le starter kit. Ce n'est pas un élément de mise en page mais le seul retour visuel quand le
+réseau traîne, et le cas limite « jamais un écran figé » de BR-02 le réclame. Il est repeint en
+couleur de marque.
+
+## D-26 — Contrat de statut coureur : quatre statuts d'affichage, déclarés deux fois et vérifiés
+
+Arrêté le 2026-08-19, après lecture des stories aval.
+
+Les quatre statuts de BR-02 (en course, éliminé, abandon, terminé) sont un **jeu de
+présentation, pas une colonne** :
+
+- BR-08 ne modélise que deux états du participant ;
+- BR-10 et BR-11 aboutissent **tous deux** à `eliminated`, distingués par le seul motif —
+  « L'abandon et l'élimination automatique aboutissent au même statut mais pas au même motif » ;
+- le `finished` de BR-20 est le statut de l'**événement**, pas du coureur.
+
+Donc `App\Enums\RunnerStatus` est un enum **dérivé**, jamais persisté, et **strictement de
+données** : pas de `canTransitionTo()`, pas de transitions — le cycle de vie appartient à
+BR-08 → BR-11. La dérivation `RunnerStatus::for(Participant)` est à écrire **dans BR-08** :
+aucun modèle `Participant` n'existe encore. **BR-08 ne doit pas redéclarer un jeu concurrent.**
+
+Le motif de sortie (`Timeout` / `Withdrawal`) reste à BR-10/BR-11.
+
+### Pourquoi la carte est dupliquée côté TS
+
+Deux faits techniques ferment la discussion :
+
+- **Tailwind 4 ne génère que les classes présentes dans les sources analysées.** Une chaîne de
+  classe arrivant du PHP à l'exécution ne produit aucun CSS — les puces s'afficheraient nues.
+  Un fichier généré *gitignoré* ne serait pas analysé non plus.
+- **Une icône Lucide est un composant Vue**, importé statiquement pour être secoué à l'arbre.
+
+La répartition ne duplique donc **aucun fait** : PHP porte le jeu de valeurs et la clé de
+libellé, TypeScript porte l'icône et les classes de couleur. Un statut nouveau touche deux
+fichiers — ce n'est pas littéralement « un seul endroit », et aucune option ne l'est. Ce qui est
+acquis, c'est que la divergence **échoue en CI dans les deux sens** :
+
+- `tests/Unit/Enums/RunnerStatusParityTest.php` épingle les deux jeux de valeurs ;
+- `satisfies Record<RunnerStatus, …>` fait rejeter une carte incomplète par `vue-tsc`.
+
+Les deux ont été **vérifiés en les cassant volontairement**. Ne pas « corriger » cette
+duplication : le générateur Artisan est rejeté sur D-20 (une commande, un mode `--check` et une
+étape de CI pour maintenir quatre lignes qui ne changeront plus).
+
+Deux écarts délibérés aux skills maison, à ne pas rectifier :
+
+- **pas de `color()` ni d'`icon()` sur l'enum** — aucun consommateur PHP n'existe (tout est
+  Inertia + Vue), ce serait une troisième déclaration morte ;
+- **`label()` en `match` à clés littérales** plutôt qu'en clé interpolée : le collecteur de
+  Larastan n'inspecte que les littéraux, l'interpolation rendrait les clés invisibles à la
+  vérification.
+
+## D-27 — Traductions : groupes `lang/fr/`, livrés par un prop Inertia
+
+Arrêté le 2026-08-19. Le projet n'avait aucun fichier de traduction alors que D-14 impose
+l'interface en français « via les fichiers de traduction ».
+
+**Fichiers groupés `lang/fr/*.php`** — et non un `lang/fr.json` à clés plates — pour garder la
+porte ouverte à `lang/en/`.
+
+Le front ne pouvant pas importer du PHP, le dictionnaire est **résolu sur la locale courante et
+livré par un prop Inertia partagé** (`translations`, aplati en clés pointées par `Arr::dot`),
+lu par un `t()` de dix lignes dans `resources/js/lib/i18n.ts`. Passer à `lang/en/` ne touchera
+aucun fichier front. Aucun paquet npm, aucun runtime i18n.
+
+Les groupes partagés avec le front sont **une liste explicite** (`ui`, `race`) : les groupes que
+seul PHP rend — `validation`, mails — restent dehors, sinon chaque réponse embarquerait tous les
+messages du framework.
+
+**`checkMissingTranslations: true`** est activé dans `phpstan.neon` : une ligne, aucune étape de
+CI en plus, et toutes les clés `__()` littérales deviennent vérifiées par l'analyse statique
+déjà en place. Elle a immédiatement attrapé les deux toasts anglais hérités du starter kit,
+désormais en clés françaises.
+
+Réserve assumée : **aucune vérification statique des clés côté TS** — une faute de frappe
+affiche la clé brute. C'est le prix du choix multi-locale, et il est faible.
+
+**Complété le 2026-08-19 par BR-03**, sur deux points.
+
+Un **troisième groupe, `event`**, rejoint `ui` et `race` dans la liste partagée. Le découpage est
+par domaine — `ui` est le chrome, `race` la course vivante, `event` l'objet racine que reliront
+BR-04, BR-13, BR-20 et BR-23. La liste explicite de D-27 existe précisément pour qu'on y ajoute un
+groupe quand un domaine apparaît ; verser les quarante clés de BR-03 dans `ui` aurait fait du
+groupe « chrome » le fourre-tout du produit dès la troisième story.
+
+Et **`lang/fr/validation.php` existe enfin**. Le projet n'en avait aucun alors que
+`APP_FALLBACK_LOCALE=en` : personne ne l'avait vu parce qu'aucun écran n'avait encore affiché une
+erreur de règle. BR-03 en valide dix champs, et « The name field is required. » aurait été le
+premier message anglais du produit, contre D-14. Le fichier porte les règles réellement utilisées
+plus un bloc `attributes` avec les noms de champs français ; Laravel retombant sur l'anglais clé
+par clé, il n'a pas à être exhaustif.
+
+**Hors périmètre de BR-02** : les écrans hérités du starter kit (auth, réglages, 2FA, passkeys)
+restent en anglais. Voir la question ouverte dans [QUESTIONS.md](QUESTIONS.md).
+
+## D-28 — Contrat de permissions : neuf capacités, deux enums, une map partagée
+
+Arrêté le 2026-08-19 par BR-01, qui applique D-05 pour la première fois.
+
+`App\Enums\Permission` (neuf cases) et `App\Enums\Role` (deux cases) sont la **seule** déclaration
+des noms : le seeder, le middleware de route et le partage Inertia les lisent tous. Aucun `label()`
+sur ni l'un ni l'autre — les permissions ne sont jamais affichées et il n'y a pas d'écran
+d'administration des comptes, ce serait la troisième déclaration morte contre laquelle D-26 met en
+garde.
+
+**Le contrôle d'accès passe par `can:`**, pas par les alias `role:` / `permission:` de Spatie.
+`can` est déjà enregistré nativement par le framework et traverse le Gate que Spatie alimente via
+`register_permission_check_method` : un seul mécanisme pour le middleware de route, les Policies à
+venir et le prop partagé. Le refus est fermé par défaut — une capacité sans ligne en base n'a pas
+de callback dans le Gate et l'exception « permission inconnue » de Spatie est avalée en `false`.
+
+**Le front reçoit une map complète de booléens**, `auth.permissions`, et non la liste des
+permissions accordées. Chaque valeur est le résultat du même `can()` par lequel le serveur
+autorise : une Policy ajoutée plus tard ne peut pas faire diverger les boutons et les décisions.
+Un invité reçoit les neuf clés à `false`, donc aucun écran ne branche sur une clé absente. Le
+helper vit dans `resources/js/lib/permissions.ts`, à côté de `t()` — c'est une lecture pure d'un
+prop partagé, pas une composable, qui n'existerait que si elle possédait un `ref`.
+
+La liste des neuf noms est **dupliquée côté TS**, mais pas pour la raison de D-26 : TypeScript ne
+porte ici aucun fait propre, c'est un miroir acheté pour l'autocomplétion. Ce qui justifie le
+`tests/Unit/Enums/PermissionParityTest.php`, c'est le mode de panne : renommer une capacité côté
+PHP seul compile, résout `undefined`, tombe en falsy et **fait disparaître le bouton du gérant la
+nuit de la course**. Les deux sens ont été vérifiés en les cassant.
+
+**`hasRole()` n'apparaît qu'à un seul endroit du dépôt** : les assertions d'inscription de
+`tests/Feature/Auth/RegistrationTest.php`. Le critère d'acceptation dit littéralement « il porte le
+rôle "participant" » ; un test doit pouvoir énoncer ce fait. Partout ailleurs, D-05 s'applique sans
+exception.
+
+**La purge du cache Spatie est en tête du seeder, pas en queue**, et c'est la ligne porteuse :
+`Permission::findOrCreate()` résout contre le snapshot mémoïsé du registrar, pas contre la table.
+Un snapshot pris table vide fait insérer des doublons au second passage et casse sur l'index unique
+`(name, guard_name)`. `Role::findOrCreate` n'a pas ce défaut, il interroge directement — asymétrie
+Spatie à connaître. La purge utilise `PermissionRegistrar::forgetCachedPermissions()` et non un
+`Cache::forget('spatie.permission.cache')`, qui laisserait la propriété en mémoire du registrar
+pleine et taperait le mauvais store le jour où `permission.cache.store` sera explicite.
+
+**Dette assumée : le seed des rôles est une étape de déploiement obligatoire.** L'inscription
+appelle `assignRole`, qui lève si le rôle manque : un `migrate --force` sans `db:seed` fait tomber
+la première inscription en 500. L'alternative — les rôles en migration de données de référence,
+comme le suggère la convention maison de seeder — a été écartée : la story demande un seeder, et on
+perdrait le test « permissions absentes en base → refus », qui est le garde-fou du cas limite le
+plus dangereux. **BR-32 doit porter l'étape de seed dans son runbook.**
+
+**`finish-event` a obtenu son premier consommateur le 2026-08-19** (BR-03) :
+`EventPolicy::advance` l'exige pour la transition vers `finished`, les deux étapes précédentes se
+contentant de `manage-event`. Aucun changement de comportement — le rôle gérant porte les neuf —
+mais la distinction est désormais réelle, et un test la vérifie avec un utilisateur ne portant que
+`manage-event`, faute de quoi aucun test bâti sur le rôle ne saurait la voir.
+
+Enfin, les tests seedent **dans le corps de chaque test** qui en a besoin, jamais via
+`protected $seed`. `RefreshDatabase` ne lance `migrate:fresh --seed` qu'une fois, gardé par un
+static : si la première classe exécutée ne demande pas de seed, plus aucune ne seedera. Le résultat
+dépendrait de l'ordre des classes.
+
+## D-34 — Le tour de course s'appelle `Round`, la boucle individuelle restera `Lap`
+
+Arrêté le 2026-08-19 par BR-04. Le français dit « tour » pour l'objet collectif et « boucle » pour
+la performance d'un coureur ; l'anglais du code devait trancher, aucune story ne l'avait fait.
+
+`Round` porte le numéro, l'heure de départ et l'heure limite, communs à tout le monde. `Lap` reste
+réservé à BR-08 : une boucle par participant et par tour. Les colonnes de l'événement gardent leur
+nom — `lap_distance_meters`, `lap_duration_minutes` — où « lap » désigne la boucle canonique,
+celle que tout le monde court : deux mots pour deux niveaux, ce qui est l'intention.
+
+Conséquence immédiate : `LapHeader.vue`, livré par BR-02, affichait un tour et non une boucle. Il
+est renommé `RoundHeader.vue` et le bloc `race.lap.*` de `lang/fr/race.php` devient `race.round.*`,
+sans qu'un seul libellé français change. Le renommage était gratuit tant que le composant ne vivait
+que dans la galerie ; dès BR-08 il aurait été un piège permanent. `race.lap.*` est désormais libre
+pour les boucles individuelles.
+
+## D-35 — Les horaires de tour sont stockés en UTC, et une boucle dure une heure réelle
+
+Arrêté le 2026-08-19 par BR-04. C'est la décision la plus lourde de la story, et elle corrige un
+défaut qu'aucun test n'aurait attrapé par hasard.
+
+**Le piège, vérifié en base.** Une colonne `DATETIME` MySQL stocke une horloge murale sans décalage.
+La nuit du 25 octobre, l'heure locale 02:00 est vécue deux fois : les tours 14 et 15 écrivent tous
+les deux `"02:00:00"`, et le cast `immutable_datetime` par défaut relit le premier **une heure trop
+tard**. Mesuré : timestamp attendu 1792886400, relu 1792890000, soit exactement 3600 secondes. Un
+coureur hors délai aurait gagné une heure et l'élimination de BR-11 serait fausse, en silence, la
+seule nuit où ça compte.
+
+D'où `App\Casts\UtcDateTime` sur `rounds.starts_at` et `rounds.deadline_at` : écriture en UTC,
+lecture dans le fuseau applicatif. Un test le prouve en repassant par la base
+(`it_stores_an_ambiguous_round_start_without_losing_an_hour`) — il est rouge avec le cast par
+défaut, vert avec celui-ci.
+
+**Faux problème écarté :** `addMinutes()` et `addRealMinutes()` sont identiques pour les unités
+infra-journalières, `DateTimeImmutable::add()` travaillant sur le timestamp. On garde `addMinutes()`,
+réellement typée, plutôt que la méthode magique dont le nom rassure sans rien garantir. La sémantique
+est épinglée par un test sur les timestamps, pas par un nom de méthode.
+
+**Sémantique arrêtée :** la boucle dure une heure **réelle**, l'affichage est l'horloge murale, et
+l'horloge murale a le droit de se répéter. Le 25 octobre, l'entête affichera « Départ 02:00 — Limite
+02:00 » sur un tour, puis « Départ 02:00 — Limite 03:00 » sur le suivant. C'est correct : les
+coureurs partis à 02:00 heure d'été sont rentrés quand le chronomètre du gérant affichait de nouveau
+02:00. L'alternative — des boucles d'une heure murale, donc de 0 ou 120 minutes réelles — n'est pas
+une Backyard. On accepte l'entête ambigu plutôt qu'une mention conditionnelle pour un cas qui
+survient une fois dans la vie du produit.
+
+**La règle vaut pour tout instant métier, `events.first_start_at` comprise.** La première rédaction
+de cette entrée exemptait cette colonne — un départ à 02:30 la nuit de la bascule étant absurde. La
+revue de la story a renversé l'arbitrage, et elle avait raison sur les deux plans. Sur le fond : la
+garantie « les horaires de tour survivent à la bascule » n'était pas absolue mais **conditionnelle à
+son origine**, puisque `RoundSchedule::fromEvent()` lit `first_start_at` — et rien dans le code ne le
+disait. Sur le coût : **il est nul**. La colonne reste `DATETIME`, seule son interprétation change,
+et rien n'est déployé — il n'y a aucune donnée à reprendre. Une migration de reprise avait d'abord
+été écrite puis supprimée pour cette raison : elle n'aurait jamais eu de ligne à convertir.
+
+La règle est donc sans exception : **`UtcDateTime` sur tout instant métier**, `immutable_datetime`
+réservé aux `created_at` / `updated_at` que le framework possède. BR-08 (`laps.validated_at`) et
+BR-11 (l'heure d'élimination) n'ont plus à jouer leur cast à pile ou face.
+
+Un piège à connaître avant de toucher au cast : `set()` accepte **aussi une chaîne**, et ce n'est pas
+de la complaisance. `EventUpdateRequest::prepareForValidation()` fusionne les deux contrôles de
+l'écran en `"2026-09-12 13:00"` avant de remplir le modèle. Restreindre le cast à `DateTimeInterface`
+a été essayé : trois tests de BR-03 sont passés au rouge, la date arrivant `null` en base.
+
+## D-36 — La fenêtre d'un tour est semi-ouverte, la validation d'une boucle ne l'est pas
+
+Arrêté le 2026-08-19 par BR-04. Le tour N couvre `[départ(N), départ(N+1))` : à 14:00:00 pile, le
+tour courant est déjà le 2, pas le 1. C'est la lecture directe de « le tour N se termine au départ
+du tour N + 1 », et elle garantit qu'aucun instant n'appartient à deux tours.
+
+**Attention BR-09** : sa règle « validation à la seconde exacte de l'heure limite : acceptée » porte
+sur la **boucle** (`heure serveur <= limite de la boucle`, inclusif), pas sur le tour courant. À
+14:00:00, la boucle du tour 1 est encore validable alors que le tour courant est déjà le 2. Ce n'est
+pas une contradiction, ce sont deux prédicats distincts : BR-09 devra chercher la boucle par son
+tour, jamais par « le tour courant ». Un test de BR-04 nomme la borne pour que BR-09 la trouve.
+
+## D-37 — Les tours sont ouverts par une tâche planifiée, mais le tour affiché est recalculé
+
+Arrêté le 2026-08-19 par BR-04. Deux mécanismes distincts, et c'est délibéré.
+
+**L'écriture est planifiée.** `App\Actions\OpenDueRounds` matérialise tous les tours dus, et
+`race:open-rounds` l'appelle chaque minute (`routes/console.php`, premier planificateur du projet).
+La matérialisation paresseuse à la lecture a été écartée, et c'était la vraie tentation : dès BR-08,
+ouvrir un tour crée des boucles. Si une simple consultation de page ouvrait le tour N+1 **avant**
+que la tâche de BR-11 ait éliminé les retardataires du tour N, on donnerait une boucle à des coureurs
+qui doivent sortir. L'ordre élimination → ouverture est une règle de course : il ne peut pas dépendre
+de qui a rafraîchi son écran.
+
+**L'idempotence tient sur la base, pas sur la lecture.** La contrainte unique `(event_id, number)`
+ferme la fenêtre — même raisonnement qu'en D-32 : la vérification qui précède l'écriture est toujours
+périmée. `firstOrCreate` délègue à `createOrFirst`, qui attrape lui-même la violation d'unicité et
+relit la ligne gagnante ; le `try/catch` est dans le framework, pas dans notre code. Le rattrapage
+après une queue arrêtée tombe alors tout seul : les tours manquants sont créés **avec leurs horaires
+calculés, jamais l'heure d'exécution**, ce que BR-11 exige littéralement.
+
+**Écart assumé à `laravel:no-queries-in-loops`** : la boucle d'ouverture itère sur les tours
+*manquants*, donc zéro ou un en régime normal. L'alternative en une passe (`insertOrIgnore`,
+`upsert`) court-circuiterait le cast `UtcDateTime`, c'est-à-dire la correction de D-35 elle-même.
+
+**La lecture, elle, ne touche pas la base du tout.** `ResolveCurrentRound` recalcule le tour courant
+depuis l'heure serveur et rend un objet valeur `CurrentRound`, jamais un modèle. Quatre raisons : la
+règle métier dit « déterminé à partir de l'heure serveur », pas « depuis une table » ; un affichage
+lu en base serait en retard de 0 à 60 s à chaque changement de tour, sur le seul écran que le gérant
+regarde quinze heures durant ; le calcul répond avant que le planificateur ait jamais tourné ; et
+surtout un affichage lu en base **cacherait la panne** — planificateur mort, l'écran afficherait
+sereinement le tour 12 pendant que la course en est au 15. Recalculé, l'écran dit la vérité et
+l'écart avec `max(number)` devient le symptôme observable. Les deux entrées étant gelées en
+`running`, ligne persistée et calcul ne peuvent pas diverger ; un test l'épingle.
+
+**Pourquoi un objet valeur et pas un modèle `Round` non sauvegardé**, qui était la première écriture.
+Un modèle porte `save()`, `update()` et ses relations : BR-08 voudra « le tour courant » pour y
+rattacher des boucles, et un `$round->laps()->create(...)` sur un parent non sauvegardé produit soit
+une clé nulle, soit une sauvegarde implicite — qui ouvrirait un tour dans le dos de l'élimination.
+On avait fermé la porte de la lecture paresseuse et laissé la fenêtre ouverte. L'objet valeur rend
+le `save()` **inexprimable** plutôt que déconseillé : le raisonnement que D-29 applique déjà aux
+transitions. Bénéfice accessoire, la lecture ne coûte plus la requête que faisait le `firstOrNew`,
+et il n'y a plus deux sources pour la même valeur.
+
+**Reprise obligatoire par BR-11.** Sa tâche appellera l'élimination **puis** `OpenDueRounds`, et la
+ligne `Schedule::command(OpenDueRoundsCommand::class)` devra être **retirée** de `routes/console.php` :
+deux planificateurs indépendants qui écrivent des tours ne garantissent plus l'ordre. L'action est
+l'unité réutilisable, la commande est jetable par conception.
+
+**Ce qui arrive si le planificateur est mort la nuit de la course** : aucun tour matérialisé, donc
+aucune boucle ouverte par BR-08 et aucune élimination par BR-11, sans que rien ne l'affiche. C'est
+la panne silencieuse que BR-30 nomme. BR-04 y répond dans son budget par le rattrapage contigu et
+par l'affichage recalculé qui rend l'écart visible ; l'alerte reste à BR-30.
+
+## D-38 — L'identité du coureur vit sur le compte, scindée en prénom et nom
+
+Arrêté le 2026-08-19 avec le propriétaire du projet, par BR-05.
+
+Le « Inclus » de BR-05 liste prénom, nom et email parmi les champs du formulaire d'inscription.
+Les recopier dans `participants` aurait donné deux sources pour la même donnée : un coureur qui
+corrige son profil aurait laissé son ancien nom sur son dossard. `participants` porte donc le
+`user_id` et les seules données de course — téléphone, date de naissance, contact d'urgence,
+remarques — et l'identité se lit sur `users`.
+
+**`users.name` est scindé en `first_name` / `last_name`.** `RunnerCard`, écrit en BR-02, attend
+déjà `firstName` et `lastName` séparés, et BR-25 imprimera le dossard à partir des deux. Un nom
+complet ne se recoupe pas de façon fiable — un « Marie Claire Dupont » se scinde de trois façons.
+Un accesseur `name` (avec `$appends`) rend la concaténation, ce qui laisse l'avatar, le menu
+utilisateur et `getInitials()` intacts.
+
+La migration `create_users_table` a été **modifiée sur place** plutôt que doublée d'une migration
+de scission : rien n'est déployé, une reprise n'aurait eu aucune ligne à convertir. C'est le
+raisonnement qui avait déjà fait supprimer une migration en BR-04 (D-35).
+
+`profileRules()` renvoie désormais `first_name`, `last_name` et `email` ; l'écran de réglages et
+l'écran d'inscription y puisent tous les deux, donc ils ne peuvent pas diverger.
+
+## D-39 — La capacité se compte sur les inscriptions confirmées, la vraie course à la place est en BR-06
+
+Arrêté le 2026-08-19 avec le propriétaire du projet, par BR-05.
+
+BR-05 dit « quand le nombre d'inscriptions **confirmées** atteint le maximum, le formulaire
+n'accepte plus de nouvelle inscription ». On applique la lettre : `Event::isFull()` compte les
+`confirmed`, et `max_participants === null` signifie « pas de limite » (D-30), jamais zéro.
+
+**Conséquence assumée, à connaître avant d'écrire BR-06.** Comme une inscription naît en
+`pending`, le plafond n'est jamais atteint par une inscription. Le cas limite « deux inscriptions
+simultanées sur la dernière place » de BR-05 ne peut donc pas se produire ici : la vraie course à
+la dernière place se joue à la **confirmation**, et c'est BR-06 qui devra la fermer — vraisemblablement par une écriture conditionnelle, comme `AdvanceEventStatus` en D-32.
+
+La seule concurrence réelle de BR-05 est la double inscription d'un même compte, et elle est
+fermée par la base : `unique(['event_id', 'user_id'])`. Même doctrine qu'en D-31 et D-37 —
+l'invariant est tenu par le schéma, pas par un `if` qui lit puis écrit. Le 403 que reçoit un
+doublon passé par le contrôleur est une politesse ; l'index est la garantie, et un test l'attaque
+directement pour que ça reste vrai.
+
+`EventUpdateRequest` plafonne enfin `max_participants` par le bas au nombre de confirmés, la règle
+que BR-03 n'avait pas pu écrire faute de table `participants`.
+
+## D-40 — `RegistrationStatus` nomme les états, BR-06 possède les transitions
+
+Arrêté le 2026-08-19 par BR-05. Même partage qu'entre `EventStatus` et `App\Services\EventLifecycle`
+(D-29) : l'énumération porte les trois états persistés et leurs libellés, rien d'autre.
+
+Qui a le droit de passer `pending → confirmed` ou `pending → cancelled`, et par quel canal, est le
+sujet de BR-06. L'écrire ici aurait produit une règle sans consommateur, donc sans
+test, donc fausse au premier usage. La permission `manage-participants` existe depuis BR-01 et
+reste sans consommateur pour la même raison.
+
+Côté participant, la Policy dit la seule règle que BR-05 possède : une inscription `confirmed`
+n'est plus modifiable par son propriétaire.
+
+## D-41 — Le routage de l'inscription est un singleton, comme l'événement
+
+Arrêté le 2026-08-19 avec le propriétaire du projet, par BR-05.
+
+Un compte porte au plus une inscription sur l'unique événement : l'URL n'a donc pas d'identifiant
+à porter. `Route::singleton('registration', RegistrationController::class)->creatable()` produit
+exactement les cinq routes voulues — `registration/create`, `POST registration`, `registration`,
+`registration/edit`, `PUT registration` — sans segment `{registration}`.
+
+`Route::resource()` avait été proposé d'abord. Il aurait généré `GET /registration/{registration}`,
+donc un route model binding sur l'identifiant d'un autre coureur, à refuser ensuite par Policy.
+Le singleton supprime la question au lieu de la traiter : le contrôleur résout la fiche depuis
+`$request->user()->participant`, et il n'existe aucune URL désignant celle de quelqu'un d'autre.
+
+`destroy` est exclu : un coureur ne s'annule pas lui-même, c'est le gérant qui annule (BR-06).
+
+**Révision du 2026-08-20 (D-45) : `creatable()` tombe, le singleton se réduit à
+`->only(['show', 'edit', 'update'])`.** L'inscription ne se crée plus depuis un compte connecté
+mais dans le parcours public d'inscription ; il ne reste ici que la consultation et la correction.
+Le raisonnement sur `resource()` et le binding tient inchangé pour les trois routes restantes.
+
+La même déclaration a été passée sur l'événement, public comme géré : `Route::singleton('event', …)`
+remplace les trois routes unitaires qui les déclaraient, aux mêmes noms de route.
+
+## D-42 — Q-01 se ferme à moitié : les 7 écrans d'authentification passent en français
+
+Arrêté le 2026-08-19 avec le propriétaire du projet, par BR-05.
+
+Q-01 constatait qu'un coureur voit `/login` et `/register` en anglais avant d'atteindre le moindre
+écran BR-02. BR-05 est le foyer naturel du parcours d'inscription : les 7 pages `pages/auth/*`
+passent donc en français, via un nouveau groupe `lang/fr/auth.php` ajouté aux groupes partagés.
+
+Ce groupe porte **aussi** les clés que Laravel et Fortify lisent eux-mêmes — `failed`, `password`,
+`throttle` — donc un mot de passe erroné répond désormais en français, ce qu'aucune story n'avait
+prévu.
+
+Deux points techniques valent d'être connus :
+
+- le titre de la page d'authentification passe de `defineOptions({ layout: … })` à
+  `setLayoutProps()`. Une traduction lue à l'évaluation du module n'a pas encore de props de page
+  à lire — le titre serait sorti en clé brute. `TwoFactorChallenge` utilisait déjà `setLayoutProps`.
+- `t()` accepte désormais des remplacements (`t('registration.seats.counted', { count, max })`),
+  ce dont le compteur de places avait besoin.
+
+**Q-01 reste ouverte** pour les 3 pages `pages/settings/*` et les composants passkeys / 2FA, qui
+n'ont toujours pas de propriétaire.
+
+## D-43 — L'authentification se réduit à un mot de passe, les réglages à un profil
+
+Arrêté le 2026-08-19 par le propriétaire du projet.
+
+Le starter kit livrait quatre briques que le produit n'utilisera pas : 2FA (TOTP + codes de
+secours), passkeys (WebAuthn), vérification d'adresse email, et une page « Security » portant le
+changement de mot de passe. Toutes sont retirées.
+
+Ce qui reste du parcours d'authentification : inscription et connexion par mot de passe.
+`config/fortify.php` ne déclare plus que `registration()`, et `User` n'implémente plus
+`PasskeyUser` ni les traits Fortify associés.
+
+**Révision du 2026-08-20 (D-45) : `config/fortify.php` ne déclare plus aucune feature.**
+L'inscription quitte Fortify pour un parcours en deux temps porté par l'application, et le mot de
+passe devient un code d'inscription généré. Le reste de cette entrée ne bouge pas.
+
+Trois conséquences valent d'être connues :
+
+- **le changement de mot de passe connecté disparaît**, arbitré explicitement. C'était la seule
+  fonctionnalité de « Security » qui n'était ni 2FA ni passkey, et elle n'a pas été déplacée dans
+  le profil.
+- **`email_verified_at` quitte la table `users`**, et le middleware `verified` quitte les routes.
+  Les migrations `add_two_factor_columns_to_users_table` et `create_passkeys_table` sont supprimées
+  plutôt que compensées par une migration de retrait : aucune base de production n'existe encore.
+- **plus de section « Settings »** : `routes/settings.php` devient `routes/profile.php`, le
+  contrôleur remonte de `App\Http\Controllers\Settings\` à `App\Http\Controllers\`, la page passe
+  de `pages/settings/Profile.vue` à `pages/Profile.vue`, et le sous-layout à onglets
+  (`layouts/settings/Layout.vue`) disparaît avec ses deux autres onglets.
+
+Le routage suit D-41 : `Route::singleton('profile', …)->destroyable()->only([…])`, donc
+`/profile/edit`, `PATCH /profile`, `DELETE /profile`.
+
+**Q-01 se ferme entièrement.** Les écrans qui la maintenaient ouverte sont soit supprimés, soit
+traduits : `pages/Profile.vue` et `DeleteUser` lisent un nouveau groupe `ui.profile`, et le menu
+utilisateur passe par `ui.nav`. Plus un seul écran du produit n'est en anglais.
+
+**Révision du 2026-08-20 : la réinitialisation par email part aussi.** L'entrée disait d'abord que
+la récupération passerait par « mot de passe oublié » ; le propriétaire a ensuite retiré ce chemin.
+Sont donc supprimés `Features::resetPasswords()`, l'action `ResetUserPassword`, les deux vues
+Fortify (`ForgotPassword`, `ResetPassword`), le lien de la page de connexion, la table
+`password_reset_tokens`, le broker `passwords` de `config/auth.php` et `config/fortify.php`, les
+groupes de traduction `auth.forgot` / `auth.reset`, et `PasswordResetTest`.
+
+**Conséquence assumée : un mot de passe perdu n'a plus aucune récupération en libre-service.** Ni
+changement connecté, ni lien par email — il faut une intervention en base ou un nouveau compte. Le
+produit tient sur un événement d'une soirée et ~40 participants, ce qui rend le coût acceptable,
+mais c'est le seul point du parcours d'authentification qui n'a pas de porte de sortie.
+
+Reste debout sans utilisateur : les routes Fortify `user/confirm-password` et la page
+`auth/ConfirmPassword.vue`. Fortify les enregistre inconditionnellement, et plus aucune route
+n'utilise `RequirePassword` depuis que « Security » a disparu.
+
+## D-44 — Le thème vit dans la navbar, plus dans une page de réglages
+
+Corollaire de D-43, arrêté le même jour.
+
+La page « Appearance » et ses trois onglets (clair / sombre / système) sont remplacés par un bouton
+unique dans l'en-tête de l'application (`AppSidebarHeader`), présent sur tous les écrans connectés.
+
+Le bouton **bascule entre clair et sombre**, il ne propose plus « système ». `system` reste
+néanmoins la valeur par défaut du composable et du cookie : un visiteur qui n'a jamais cliqué suit
+sa préférence OS, et le premier clic fige un choix explicite. `useAppearance()` expose désormais
+`toggleAppearance()`, qui lit `resolvedAppearance` — donc le premier clic depuis `system` inverse ce
+que l'utilisateur voit, pas ce que le cookie contient.
+
+Le rendu serveur ne change pas : `HandleAppearance` partage toujours le cookie `appearance` et
+`app.blade.php` pose la classe `dark` avant le premier octet de JS.
+
+## D-45 — L'inscription se fait par mail, et le mot de passe est un code généré
+
+Arrêté le 2026-08-20 par le propriétaire du projet.
+
+L'inscription en un formulaire (nom, prénom, email, mot de passe, confirmation) est remplacée par le
+parcours des sites d'inscription à une course : **on saisit son adresse, on reçoit un lien, on
+remplit son inscription, et on reçoit un code**. Ce code est le mot de passe du compte.
+
+**Une seule inscription, pas deux.** BR-05 avait livré un second formulaire, atteignable une fois
+connecté, pour la participation elle-même — téléphone, date de naissance, contact d'urgence,
+remarques. Le coureur passait donc par trois moments : créer un compte, se connecter, s'inscrire.
+Les deux formulaires fusionnent : le lien du mail ouvre **un** écran qui porte l'identité et la
+participation, et sa validation crée `User` et `Participant` dans une transaction.
+
+Ce que ça achète : plus aucun mot de passe choisi par le coureur, donc plus de mot de passe faible,
+plus de mot de passe réutilisé, et une adresse email prouvée avant que le compte n'existe — sans
+remettre en service la vérification d'adresse supprimée par D-43, puisque la preuve est *dans* le
+parcours au lieu de le suivre.
+
+**Le parcours ne quitte pas Fortify pour la connexion, seulement pour l'inscription.**
+`config/fortify.php` ne déclare plus aucune feature ; `Features::registration()` disparaît avec
+l'action `CreateNewUser`. La connexion reste Fortify, mais passe par
+`Fortify::authenticateUsing()` — voir la normalisation plus bas.
+
+### Les cinq étapes tiennent dans un seul singleton
+
+Conformément à D-41, le parcours est déclaré en une ligne de ressource et non en liste de verbes :
+
+```php
+Route::singleton('account', AccountController::class)->creatable()->only([…])
+```
+
+Les cinq verbes du singleton portent exactement les cinq étapes : `create` (saisir l'adresse),
+`store` (envoyer le lien), `edit` (le formulaire d'inscription, derrière signature), `update`
+(créer le compte et l'inscription), `show` (afficher le code). Le préfixe est `account` et non
+`register` pour ne pas cohabiter avec `registration`, qui garde la consultation et la correction
+d'une inscription existante.
+
+**La fenêtre d'inscription remonte sur la création de compte.** Un compte n'existe que pour courir,
+donc les gardes qui protégeaient l'ancien formulaire — événement en statut `registration`, capacité
+non atteinte — gardent maintenant l'étape 1. Hors fenêtre ou complet, l'écran d'adresse affiche un
+refus et le compteur de places au lieu du champ, et `POST /account` refuse aussi côté serveur. Le
+coureur apprend le refus avant d'avoir un compte, au lieu de le découvrir après.
+
+Le refus voyage en erreur de validation sur un champ `event`, comme D-32 l'a établi, et non en 403.
+`Event::acceptsRegistrations()` réunit les deux conditions ; `refuseOutsideRegistrationWindow()`
+dans `RegistrationValidationRules` les applique aux deux requêtes qui en ont besoin — l'étape 1 et
+l'étape finale. La seconde vérification n'est pas redondante : entre le clic sur le lien et l'envoi
+du formulaire, les dernières places peuvent partir, et un test couvre ce cas.
+
+**Ce que la fusion supprime.** `registration/create` et `POST registration` quittent le routage,
+avec `RegistrationStoreRequest`, la page `registration/Create.vue`, le groupe de traduction
+`registration.create` et le bouton « S'inscrire » de l'écran d'événement.
+`ParticipantPolicy::create()` disparaît aussi, faute d'appelant : sa moitié « pas déjà inscrit »
+est désormais portée par la contrainte d'unicité sur `users.email`, et sa moitié « inscriptions
+ouvertes » par la fenêtre ci-dessus.
+
+**Un compte sans inscription n'a plus d'écran pour en créer une.** Le cas n'existe aujourd'hui que
+si BR-06 annule une inscription ; `registration.show` et `registration.edit` renvoient alors sur le
+tableau de bord. C'est un trou connu, laissé à BR-06 — voir Q-03.
+
+Tout le groupe est en `guest`. **Le nouveau coureur n'est pas connecté automatiquement** : il
+termine sur son code et s'en sert immédiatement pour se connecter. C'est le seul moment où le
+produit peut lui apprendre à quoi sert ce code, et le passage par le formulaire de connexion permet
+à un gestionnaire de mots de passe de l'enregistrer.
+
+### Aucune table de jetons
+
+Le lien est une `URL::temporarySignedRoute` de 48 heures portant l'adresse en paramètre, comme la
+vérification d'adresse de Laravel. Pas de table `pending_registrations`, pas de purge, pas de
+modèle. Le rejeu est fermé par la contrainte d'unicité sur `users.email`, pas par un jeton consommé.
+
+`edit` vérifie la signature **dans le contrôleur** (`hasValidSignature()`) au lieu du middleware
+`signed`. Le middleware répond 403, donc la page d'erreur Symfony en anglais que Q-02 décrit ;
+le contrôleur renvoie sur l'étape 1 avec un message français. Un lien périmé est le cas normal
+d'un mail vieux de trois jours, pas un abus.
+
+Entre `edit` et `update`, l'adresse voyage **en session**, pas dans le formulaire : `update` n'a
+aucun champ email, donc aucune requête ne peut créer un compte sur une adresse non prouvée.
+
+### Le code : 12 caractères, sans ambiguïté, normalisé à la lecture
+
+`App\Support\AccessCode` tire 12 caractères dans un alphabet de 32 (`ABCDEFGHJKLMNPQRSTUVWXYZ`
+plus `23456789` — ni `I`, ni `O`, ni `0`, ni `1`) et les groupe par quatre : `ABCD-EFGH-JKLM`.
+Soit 60 bits, face à un limiteur de 5 tentatives par minute et par couple adresse/IP.
+
+**`AccessCode::normalise()` est la raison du `Fortify::authenticateUsing()`.** Un code recopié
+depuis une capture d'écran arrive en minuscules, sans tirets, ou les deux ; un `Auth::attempt` brut
+le refuserait. La normalisation remet en majuscules, retire tout ce qui n'est pas dans l'alphabet et
+regroupe par quatre, des deux côtés — à la connexion et dans `ProfileDeleteRequest`, qui demande le
+code pour supprimer le compte.
+
+Le code n'est **jamais renvoyé** : `users.password` n'en contient que le hash, et l'écran qui
+l'affiche lit un flash de session, donc un rechargement le perd. Combiné à D-43, qui a retiré la
+réinitialisation, **un code perdu est un compte perdu** — le coureur doit se réinscrire avec une
+autre adresse, ou le propriétaire intervenir en base. C'est la conséquence assumée de la demande
+« un code qu'il ne doit pas perdre » ; l'envoyer aussi par mail est un changement d'une ligne si
+l'arbitrage change.
+
+### Le mail est une Notification, pas un Mailable
+
+Premier envoi du projet, donc premier arbitrage. C'est `Notification::route('mail', $email)` avec
+un `AnonymousNotifiable` : le destinataire n'a pas encore de compte, et c'est exactement la forme
+que Laravel utilise pour ses propres `VerifyEmail` et `ResetPassword`. Le `MailMessage` évite
+d'écrire une vue Blade, et le test assure sur `actionUrl` plutôt que sur du HTML rendu.
+
+La copie vit dans `lang/fr/mail.php`, hors des groupes partagés à Inertia. `lang/fr.json` traduit
+les deux chaînes que le gabarit du framework pose lui-même (« All rights reserved. » et le
+sous-texte du bouton), sans quoi un mail français se termine en anglais.
+
+## D-46 — Direction artistique « Tableau des départs », qui remplace « Corral »
+
+Arrêtée le 2026-08-20 par le propriétaire du projet, après maquettage de trois chartes complètes
+(`project/design/*.html`). Elle remplace D-24 en totalité, et le code était livré avant que cette
+entrée n'existe — c'est la correction de cet écart.
+
+**La métaphore est le panneau des départs d'une gare.** Le coureur n'est plus une carte mais une
+**latte** : `RunnerSlat` et `SlatCell` remplacent `RunnerCard`, empilées par l'utilitaire `slats`
+à 6 px, et un changement d'état s'annonce par `animate-flip` — un `scaleY` de 130 ms, le seul
+mouvement du produit. D-25 tient : pas d'horloge cliente, pas de barre de progression, et le filet
+de chargement d'Inertia reste la seule autre animation. `FestoonDivider` et la note d'anniversaire
+en guirlande sont supprimés.
+
+**Deux familles aux rôles séparés, plus une seule à trois voix.** Instrument Sans porte le texte,
+Martian Mono porte les chiffres en `tabular-nums` — c'est le monospace qui aligne les colonnes d'un
+tableau de départs, ce qu'un axe de largeur ne faisait pas. Les deux sont auto-hébergées dans
+`resources/fonts/` ; Archivo est retirée du dépôt. Aucune requête tierce, comme en D-24.
+
+**L'échelle typographique est nommée, en cinq crans** : `readout` (2,75 rem, le nombre qu'on lit de
+loin), `figure`, `title`, `data`, `label` (0,625 rem, capitales espacées). Une taille ne se choisit
+plus à l'usage, elle se nomme.
+
+**L'accent outremer disparaît, et c'est le changement le plus lourd.** `--primary` est désormais
+l'encre presque noire, donc la couleur ne sert plus **qu'aux quatre statuts**, chacun en triplet
+`ink / surface / foreground` — vert « en course », rouge « éliminé », ardoise « abandon », ambre
+« terminé ». Un écran de course est noir et blanc partout où aucun statut ne parle. Ce qui était le
+compromis de D-24 — un accent choisi hors du jeu sémantique pour ne pas le percuter — devient sans
+objet : il n'y a plus d'accent à placer.
+
+**Ce qui ne bouge pas de D-24** : notation oklch ; palette déclarée en trois endroits (`:root`,
+`.dark`, et le `<style>` anti-flash de `app.blade.php`) avec un test qui affirme leur concordance ;
+AA vérifié par `PaletteContrastTest` et non par la revue ; aucune librairie de composants ajoutée ;
+aucun graphique (D-16) ; plancher tactile de 44 px, porté par la variante `touch` d'`ActionButton`.
+
+**Un écart à surveiller, relevé en écrivant cette entrée.** D-24 exigeait 72 px pour la validation
+d'une boucle ; la variante `validate` d'`ActionButton` mesure aujourd'hui 50 px de haut sur 90 px
+de large. Le geste le plus répété de la nuit a donc perdu un tiers de sa hauteur, et aucun test ne
+le garde — les cibles n'ont jamais eu de token, leur intention vivait dans les variantes. À
+trancher dans BR-09 ou BR-13, qui sont les stories qui posent le bouton en situation réelle : soit
+la variante remonte, soit la règle des 72 px tombe explicitement.
+
+## D-47 — Élagage du backlog : quatre stories abandonnées, cinq redimensionnées
+
+Arrêté le 2026-08-20 avec le propriétaire du projet, après revue du backlog restant au regard de
+D-20 — un événement, une nuit, quarante coureurs, puis l'arrêt.
+
+Le critère appliqué n'est pas « est-ce utile » mais « est-ce que ça vaut ses heures pour un usage
+unique, sachant qu'un outil gratuit ou une feuille de papier fait parfois le travail ». Quatre
+stories ne passent pas ce filtre, cinq en sortent redimensionnées. **42 points quittent le
+périmètre**, sur les 185 qui restaient : 32 points de stories abandonnées, 13 points de réductions,
+moins les 3 points que BR-23 gagne en absorbant BR-21.
+
+**Abandonnées.** Leur fichier reste dans `stories/`, au statut `⛔ Abandonné`, et porte la raison :
+un backlog qui perd une story sans dire pourquoi la voit revenir.
+
+- **BR-22 — Galerie photos (8 pts).** La seule story qu'un outil gratuit fait mieux : le dépôt
+  était réservé au gérant, donc les coureurs ne pouvaient pas contribuer, alors qu'un album partagé
+  reçoit les photos de tout le monde. Elle emportait des vignettes, des conversions Horizon et du
+  volume de stockage objet, la semaine où le worker sert à éliminer les coureurs.
+- **BR-19 — Parcours GPX et carte (8 pts).** Leaflet, tuiles tierces, analyse XML d'un fichier
+  fourni de l'extérieur et extraction de dénivelé en tâche de fond, pour une boucle unique et
+  balisée que personne ne consulte en courant. Le GPX devient un document de BR-18.
+- **BR-25 — Dossard imprimable (8 pts).** Quarante impressions sur autant d'imprimantes
+  familiales, avec un fond calibré pour le papier : le produit maîtrisait un rendu qu'il ne voit
+  jamais. D-15 excluait déjà l'impression de listes.
+- **BR-21 — Statistiques (8 pts).** Doublon de BR-23, qui annonçait déjà les mêmes chiffres
+  collectifs. Deux pages d'après-course pour un événement qui sert une fois.
+
+**Redimensionnées.**
+
+- **BR-23 : 5 → 8 pts.** Absorbe les indicateurs et le tableau par tour de BR-21, et devient la
+  seule page d'après-course. Ses dépendances tombent à BR-20 seul.
+- **BR-18 : 8 → 4 pts.** La visibilité par document et la date de publication sont retirées : tout
+  le monde ici est inscrit, il n'y a personne à qui cacher le règlement. Reçoit en échange le GPX
+  et une capture du tracé, comme deux fichiers ordinaires. La route de téléchargement contrôlée
+  reste, non plus pour cacher un document mais pour que le bucket n'ait aucun accès anonyme (D-08).
+- **BR-15 : 5 → 2 pts.** Chaque validation recharge déjà la page par Inertia ; ce qui manquait
+  n'est qu'un `router.reload()` périodique, suspendu sur onglet masqué.
+- **BR-16 : 5 → 2 pts.** Le détail d'un coureur se déplie dans le tableau de BR-14 au lieu d'être
+  un écran et une route de plus. Une main occupée à 4 h du matin ne quitte pas la liste.
+- **BR-17 : 5 → 2 pts.** Le briefing se saisit en Markdown dans un `textarea`. Il ne changera pas
+  dix fois ; le nettoyage à l'entrée, lui, reste non négociable.
+
+**Ce que cet élagage ne touche pas.** Le moteur de course (BR-06 à BR-14) est intégral, **BR-12**
+compris — le filet contre l'appui perdu est la story la moins visible et la plus rentable de la
+nuit. BR-29 garde sa restauration réellement exécutée et BR-30 ses trois processus : sans worker ni
+planificateur, les éliminations ne tombent pas et rien ne le signale.
+
+**L'epic 7 n'est pas arbitré ici.** D-19 reconnaît qu'une plateforme managée ferait presque
+disparaître BR-26 et réduirait BR-29 à une vérification, soit environ 20 points de moins pour 30 à
+60 € — le meilleur rapport du backlog. Le choix « payer moins et faire le travail » reste celui du
+propriétaire et n'est pas rouvert par cette entrée ; il est simplement chiffré une fois de plus,
+pour qu'il soit tenu en connaissance de cause plutôt que par inertie.
+
+## D-48 — Le cycle de vie de l'inscription est un graphe, et la confirmation est le point de bascule
+
+Arrêté le 2026-08-20 par BR-06, avec le propriétaire du projet pour la branche de Q-03.
+
+D-40 avait laissé les transitions à cette story. Elles vivent dans
+`App\Services\RegistrationLifecycle`, jamais sur `App\Enums\RegistrationStatus` — même interdiction
+expresse que pour `EventStatus`.
+
+**La forme canonique du State s'applique ici, pas la variante linéaire de D-29.** D-29 justifiait
+son `advance()` unique par l'absence de branchement : la chaîne de l'événement n'en a aucun. Le
+graphe de l'inscription en a trois — `pending → confirmed`, `pending → cancelled`,
+`confirmed → cancelled`, `cancelled → pending`, et `cancelled → confirmed` interdit. Chaque état
+porte donc `confirm()`, `cancel()` et `reopen()`, et les cinq transitions illégales lèvent. Ce que
+ça achète est le même bénéfice qu'en D-29, obtenu par l'autre bout : un appelant ne peut pas
+demander une confirmation directe depuis `cancelled`, la méthode n'a pas d'autre corps qu'un
+`throw`.
+
+`allowedTransitions()` s'ajoute aux trois méthodes parce que **deux appelants réels** doivent
+énumérer ce qu'une ligne permet : la Form Request qui refuse en français, et les boutons du gérant.
+Trois prédicats booléens auraient été la deuxième déclaration du graphe que D-29 interdit. Le risque
+résiduel — la liste et les méthodes qui divergent dans un même état — n'est pas promis mais
+**vérifié** : `it_agrees_with_its_own_allowed_transitions` confronte les deux lectures sur les neuf
+couples état/transition. `RegistrationTransition::apply()` porte un `match`, mais il ne sait pas ce
+qui est légal : il traduit un nom d'action HTTP en appel de méthode.
+
+### La course à la dernière place se joue ici, et le verrou n'est pas un confort
+
+D-39 l'avait annoncé : une inscription naît `pending`, donc le plafond n'est jamais atteint par une
+inscription. `TransitionRegistration` prend un verrou de ligne sur l'événement, compte les confirmés
+dessous, puis écrit **conditionnellement** sur le statut quitté — patron d'`AdvanceEventStatus`
+(D-32). Zéro ligne touchée signifie que quelqu'un est passé avant.
+
+Les deux alternatives sont fermées par l'outillage, pas par le goût :
+
+- **réessayer sur violation d'unicité** — `NoTryCatchRule` interdit le `try/catch` que ça exige ;
+- **une sous-requête conditionnelle** — MySQL refuse une sous-requête sur la table cible d'un
+  `UPDATE` (erreur 1093), et le compteur de capacité n'est pas sur la ligne écrite.
+
+Le verrou porte sur une table d'une seule ligne, pour une quarantaine de confirmations en une
+soirée. **Ce qu'il ne fait pas** : garantir en base que les confirmés ne dépassent jamais le
+plafond. Aucune contrainte SQL ne l'exprime ici ; la garantie vaut la transaction, pas plus, et
+c'est dit plutôt que promis.
+
+**Le double clic voit deux choses selon le cas, et les deux canaux restent d'accord** : deux clics
+séquentiels sont refusés en 422 par la Form Request, deux clics concurrents par l'écriture
+conditionnelle en 409. Dans les deux cas rien n'est écrit deux fois. Le 409 reste sur le chemin
+d'onglet périmé que Q-02 couvre déjà pour l'événement — BR-06 ne l'aggrave pas.
+
+**Écart assumé avec BR-05 :** la confirmation ne consulte pas `allowsRegistration()`. BR-06 exige
+qu'un retardataire soit confirmable course lancée, alors que le parcours d'inscription se ferme dès
+`running`. Deux chemins, deux règles, volontairement — un test tient chacune, pour que
+l'incohérence apparente ne se fasse pas « corriger ».
+
+### Première ressource plurielle, et deux groupes de permissions frères
+
+L'argument de D-31 et D-41 — « pas d'identifiant à porter » — ne se transpose pas côté gérant : il
+regarde quarante fiches, l'identifiant *est* l'information. `Route::resource('registrations', …)`
+avec `->parameters(['registrations' => 'participant'])` garde le style déclaratif et le nom du
+modèle dans l'URL.
+
+Le groupe `manage` se scinde en **deux groupes frères** plutôt qu'imbriqués : le hub et l'événement
+sous `manage-event`, les inscriptions sous `manage-participants`. Imbriquer aurait exigé les deux
+capacités et laissé la distinction de D-28 invisible aux tests. `manage-participants` a enfin son
+premier consommateur depuis BR-01, et un test le voit avec un utilisateur ne portant que lui.
+
+`ParticipantPolicy` gagne `manage()` et ne touche pas à `update()`. Les deux règles sont des
+conditions contradictoires sur le même verbe — « le propriétaire, tant que c'est en attente » contre
+« n'importe qui d'habilité, à tout moment ». Fusionnées dans un `||`, la garantie « une inscription
+confirmée est en lecture seule pour son coureur » serait devenue la branche gauche d'une
+alternative, et le `canEdit` de l'écran coureur aurait dépendu d'une permission qui ne le concerne
+pas. Le `status === Pending` de la Policy laisse place à `isEditableByRunner()` : c'était le dernier
+test de statut hors des états.
+
+### Q-03 se ferme sur la branche 1 plus la branche 3, sans ressusciter d'écran
+
+Le coureur voit son inscription annulée **en lecture seule**, avec un message qui dit ce qui s'est
+passé ; il ne regagne aucun pouvoir de création. Le **gérant** peut la remettre en `pending`, et
+rien de ce que le coureur avait saisi n'est perdu dans l'aller-retour — un test le vérifie sur le
+téléphone et le contact d'urgence.
+
+D-45 tient donc intégralement : le second formulaire qu'il avait supprimé ne revient pas. Ce que la
+fusion avait laissé ouvert était un compte sans écran, pas un compte sans données.
+
+Défaut de copie corrigé au passage : l'annulation étant jusqu'ici inatteignable, une inscription
+annulée tombait sur `registration.show.locked`, qui annonce « ton inscription est confirmée ».
+L'écran a maintenant trois branches explicites.
+
+### Le filtre voyage dans l'URL
+
+Trois raisons, par poids décroissant : BR-14 exige un filtrage serveur pour le tableau des coureurs,
+donc un filtre client ici tiendrait deux idiomes pour un geste ; une transition redirige, donc le
+gérant qui vide la vue « en attente » y reste sans une ligne de code ; les compteurs sont des
+vérités serveur qu'un filtre client dédoublerait. Un statut trafiqué **retombe sur la liste
+complète** au lieu d'un 422 : ça arrive sur une navigation ordinaire, où une erreur de validation
+laisserait le gérant sur la page d'erreur non traduite de Q-02.
+
+`RegistrationSlat` est un frère de `RunnerSlat`, pas sa généralisation : D-26 sépare les deux jeux
+de statut, et les deux lattes évoluent en sens opposés — l'une vers le détail des boucles et
+l'animation de validation, l'autre vers les transitions. Ce qu'elles partagent vraiment est déjà
+factorisé : l'utilitaire `slats`, la cellule, l'échelle typographique.
+
+**Deux défauts d'accessibilité évités, à ne pas réintroduire.** Le lien n'entoure que le bloc
+d'identité : une latte entière en `<Link>` avec un bouton de transition dedans est du HTML invalide
+et un piège au tap comme au lecteur d'écran. Et le bouton de sortie du dialogue d'annulation
+s'appelle « ne rien changer » — deux « Annuler » de sens opposés dans la même boîte se cliquent de
+travers à 4 h du matin. Chaque formulaire de ligne porte son propre sac d'erreurs, sans quoi un
+refus sur une ligne s'affiche sous les quarante boutons.
+
+`BoardFilter` ne connaît ni `RegistrationStatus` ni `RunnerStatus` : il reçoit des options déjà
+construites par la page. BR-14 aura besoin de la même forme à quatre vues.
+
+## D-49 — Le dossard : verrou plutôt que réessai, unicité en base, formatage en PHP
+
+Arrêté le 2026-08-20 par BR-07.
+
+**Le numéro voyage dans le même `UPDATE` que le statut.** C'est ce qui rend un second dossard
+impossible sans un second changement de statut : pas une vérification, l'atomicité de l'écriture.
+Il est lu sous le verrou de ligne que `TransitionRegistration` tient déjà (D-48), donc deux
+confirmations concurrentes ne peuvent pas tirer le même numéro.
+
+**Les deux autres stratégies sont fermées par l'outillage, pas par le goût :**
+
+- `max + 1` puis **réessai sur violation d'unicité** — `NoTryCatchRule` interdit le `try/catch`
+  que ça exige. La règle n'admet pas d'exception, et c'est heureux : le réessai aurait masqué la
+  vraie cause d'une collision.
+- **insertion conditionnelle** — MySQL refuse une sous-requête portant sur la table cible d'un
+  `UPDATE` (erreur 1093).
+
+`unique(['event_id', 'bib_number'])`, sur le patron de `unique(['event_id','number'])` de `rounds`,
+reste **la** garantie — BR-07 l'exige littéralement, « garanti en base et pas seulement dans le
+code ». Un test l'attaque directement par une écriture forcée, au lieu de supposer qu'elle tient.
+
+**La colonne est nullable, et c'est la sémantique, pas une tolérance.** Une inscription est numérotée
+à la confirmation et jamais avant ; MySQL considère les `NULL` comme distincts, donc les vingt-huit
+inscriptions en attente cohabitent sous l'index unique.
+
+### `max + 1` égale « le plus petit non utilisé », mais seulement parce qu'on ne supprime jamais
+
+BR-07 dit « le plus petit entier positif non encore utilisé » en règle métier et « le premier libre
+au-delà du plus grand attribué » en critère d'acceptation. Les deux lectures coïncident **parce que
+BR-06 interdit la suppression** : une inscription annulée garde sa ligne et son numéro, donc le plus
+grand attribué est aussi le plus grand utilisé.
+
+C'est un équilibre à connaître : une story qui supprimerait un participant casserait la règle métier
+sans faire rougir un test. Le jour où ça arrive, c'est ici qu'il faut revenir.
+
+### Le formatage vit en PHP, contrairement à la carte de statuts
+
+Le raisonnement de D-26 — Tailwind ne voit pas une classe venue du PHP, une icône Lucide est un
+composant Vue — **ne s'applique pas** à un remplissage de zéros. TypeScript ne porterait ici aucun
+fait propre : ce serait une seconde déclaration gratuite, donc un second test de parité à écrire
+pour rien.
+
+`App\Support\BibNumber::label()` est donc l'unique déclaration, sur le patron d'`App\Support\AccessCode`,
+et les Resources exposent **les deux** : `bib_number` pour trier et comparer, `bib_label` pour
+afficher. Le cas limite « au-delà de la centaine » est gratuit. La planche de galerie perd son
+`padStart` codé en dur, qui était le seul appelant concurrent.
+
+Écarté au passage : un accessor sur `Participant` (`no-fat-models` — c'est de la présentation) et un
+value object avec cast Eloquent (l'invariant est déjà tenu par la colonne et l'index ; le seul fait
+partagé est le format, donc une fonction pure suffit).
+
+### L'invariant « confirmé ⇒ numéroté » est celui de l'action, pas du schéma
+
+`ParticipantFactory::confirmed()` numérote ce qu'elle crée, sinon la trentaine de tests qui
+fabriquent un confirmé le feraient sans numéro et l'invariant serait faux dès le premier. L'état
+`withBib()` reste prioritaire — la garde `bib_number !== null` est là pour ça, et deux tests
+combinent les deux. `ParticipantSeeder` n'a rien à changer : il passe déjà par `confirmed()`, donc
+la base de développement reste cohérente.
+
+Ce que ça ne garantit pas : rien n'empêche une écriture à la main de laisser un confirmé sans
+numéro. La colonne reste nullable, l'invariant vaut l'action. C'est dit plutôt que promis.
+
+### Pas de test de concurrence réelle, et c'est délibéré
+
+PHPUnit avec `RefreshDatabase` tourne sur une connexion unique, dans une transaction : un test à deux
+connexions serait soit sauté, soit vert sans avoir rien exercé — le pire des cas, un garde-fou qui
+rassure sans mesurer. Les deux mécanismes sont testés séparément et pour de vrai : l'écriture
+conditionnelle par `it_refuses_a_registration_someone_else_already_moved`, l'index unique par
+`it_lets_the_database_refuse_a_duplicate_number`.
+
+## D-50 — Le formulaire d'inscription se remplit en étapes, sans rien stocker entre elles
+
+Arrêté le 2026-08-20 par le propriétaire du projet. Porté par la reprise **R-04**.
+
+D-45 a fusionné les deux formulaires en un seul écran, `auth/register/Complete.vue`, derrière le
+lien signé. Le résultat empile quatre groupes de champs — identité, coureur, contact d'urgence,
+remarques — soit une dizaine de saisies obligatoires d'affilée. Sur le téléphone où l'inscription se
+fera réellement, le coureur voit une page qui n'en finit pas avant d'avoir tapé son prénom.
+
+L'écran devient donc un formulaire en **quatre étapes** :
+
+1. **Identité** — prénom, nom, l'adresse déjà prouvée affichée sans être modifiable.
+2. **Coureur** — téléphone, date de naissance, numéro PPS (BR-34).
+3. **Contact d'urgence** — nom et téléphone.
+4. **Remarques** — le champ libre, puis la validation.
+
+### Les étapes sont une mise en scène, pas un état
+
+Elles vivent **côté client, pour une seule soumission**. D-45 avait fermé la porte à toute table
+d'état intermédiaire — pas de `pending_registrations`, pas de purge, le lien signé porte tout. Un
+POST par étape rouvrirait exactement cette porte : il faudrait stocker une inscription à moitié
+saisie, décider de sa durée de vie et la nettoyer. `account.update` reçoit donc la totalité en une
+fois et crée `User` et `Participant` dans la même transaction qu'aujourd'hui. Rien ne change côté
+serveur, ni route, ni Form Request, ni transaction.
+
+### Ce qui est réellement le travail : ramener le coureur sur son erreur
+
+La validation serveur reste globale, et elle a le dernier mot. Une erreur 422 sur `birth_date`
+pendant que le coureur est à l'étape 4 doit le **ramener à l'étape 2**, sur le champ fautif, focus
+posé. Sans ça il voit une soumission refusée et aucune erreur : le message existe, il est simplement
+sur un écran qu'il ne regarde pas. C'est le seul endroit où cette reprise peut échouer
+silencieusement, et c'est là que les tests comptent.
+
+L'erreur `event` — fenêtre fermée, dernières places parties entre le clic sur le lien et la
+soumission (D-45) — n'appartient à aucune étape. Elle s'affiche là où le coureur se trouve et coupe
+le parcours. Le compteur de places reste visible à toutes les étapes, pas seulement à la première.
+
+Le `required` natif garde le passage à l'étape suivante : il évite l'aller-retour serveur sur un
+champ vide, sans jamais remplacer la validation serveur, qui reste la seule autorité.
+
+### La correction reste une page unique
+
+`registration/Edit.vue` ne bouge pas. Les étapes servent la première saisie, où la longueur
+intimide ; un coureur qui vient corriger son numéro de téléphone n'a pas à traverser quatre écrans
+pour ça. `RegistrationFields` reste le composant partagé par les deux écrans — il rend ses groupes
+d'affilée dans la correction, un par étape dans la saisie initiale.
+
+C'est un écart assumé : deux présentations pour les mêmes champs. L'alternative — un parcours unique
+partout — punissait le geste le plus fréquent pour uniformiser le plus rare.
+
+### Ce que l'écran doit dire à chaque étape
+
+La position (« 2 sur 4 »), un retour arrière qui ne perd rien de ce qui est déjà saisi, le focus
+déplacé en tête d'étape au changement pour que le lecteur d'écran suive, et des cibles tactiles au
+plancher de 44 px (D-46). Une étape qui avance sans annoncer où l'on en est est une page longue
+déguisée.
+
+## D-51 — Le briefing stocke du Markdown nettoyé, et le rend en HTML à chaque affichage
+
+Arrêté le 2026-08-20 par BR-17, avec le propriétaire du projet pour les deux arbitrages d'écran.
+
+Le briefing est le seul endroit du produit où du texte mis en forme entre par un formulaire et
+ressort dans une page. D-47 avait réduit la story à 2 points en tranchant « Markdown dans un
+`textarea` », en maintenant que « le nettoyage à l'entrée reste non négociable ». Voici comment.
+
+### La colonne stocke la source, jamais le rendu
+
+`events.briefing` porte le Markdown, et `Str::markdown()` produit le HTML à chaque affichage. Deux
+raisons, et la seconde est la vraie :
+
+- le gérant réédite le texte qu'il a tapé. Une colonne de HTML aurait exigé un dé-rendu
+  HTML → Markdown, ou un `textarea` où le gérant relit `<h1>Consignes</h1>` ;
+- une option de sécurité qui change demain couvre alors **tout** l'existant. Du HTML stocké est
+  figé au jour de son écriture : plus filtrable, et plus rien à faire sans migration de données.
+
+Pas de colonne `briefing_html`, pas de cache : une ligne, une page, quarante lecteurs.
+
+### Deux barrières, deux rôles distincts
+
+`Briefing::clean()` à l'entrée garantit ce que le critère d'acceptation demande littéralement — la
+**colonne** ne contient aucune balise. `html_input=strip` et `allow_unsafe_links=false` au rendu
+garantissent qu'aucun HTML ni URL exécutable ne **sort**, y compris sur les variantes que le
+nettoyage d'entrée ne prétend pas voir (`JaVaScRiPt:` en casse mélangée, entités déjà encodées).
+Le nettoyage rend `strip` sans effet sur les contenus neufs : c'est voulu, la barrière de rendu est
+le filet, pas le mécanisme.
+
+Trois détails du nettoyage sont load-bearing, chacun tenu par un test :
+
+- l'élément à contenu brut part **avec son corps**. `strip_tags` seul rend `alert(1)` en texte
+  visible — la balise disparaît, le script reste lisible dans la page ;
+- la balise **non refermée** est couverte, sinon `<script>alert(1)` sans fermeture traverse ;
+- une balise n'est reconnue que sur `<` suivi d'une **lettre**, donc `3 < 5`, `x <= 10` et `j <3`
+  reviennent octet pour octet. Et les entités ne sont **jamais** décodées : décoder
+  `&lt;script&gt;` refabriquerait la balise qu'on vient d'interdire.
+
+Aucun paquet n'a été ajouté : `league/commonmark` arrive avec le framework, et le HTML autorisé est
+l'ensemble vide — HTMLPurifier n'aurait rien à autoriser.
+
+### Le nettoyage vit dans le Form Request, pas dans un cast
+
+Un cast aurait couvert tous les chemins d'écriture, seeder et `tinker` compris. Il aurait aussi
+nettoyé **après** la validation, donc `required` et `max:` auraient compté un contenu que personne
+ne stocke. Dans `prepareForValidation()`, un envoi qui n'était *que* du script est refusé au lieu
+d'être stocké vide — c'est cette règle, et non le repli d'affichage, qui empêche une page blanche
+côté gérant. Le repli `Briefing::orDefault()` couvre l'autre moitié : un événement créé par l'écran
+de configuration n'a pas de briefing du tout.
+
+Le contenu initial vit donc dans `lang/fr/briefing.php`, lu par `EventFactory` — le seeder le livre
+sans une ligne de changement — et comme repli. Ce groupe n'est **pas** partagé au front : c'est du
+contenu résolu côté serveur, qui arrive par les props.
+
+### La colonne reste hors `#[Fillable]`
+
+Le jeu fillable de l'événement est le formulaire de configuration : `EventUpdateRequest::rules()` le
+reflète, `EVENT_FIELDS` le reflète côté TypeScript, et `EventLifecycleTest` assère
+`getFillable() === frozenAttributes()`. Le briefing répond à une **autre** permission ; l'y ajouter
+aurait ouvert un chemin d'écriture par `fill()` depuis l'écran de configuration, et fait grossir la
+liste des champs gelés d'un champ que ce formulaire ne rend pas. Il s'écrit donc par affectation
+directe, comme `status`.
+
+### Deux écrans, et le gel à « terminé »
+
+Deux arbitrages du propriétaire, contre la lettre du critère d'acceptation (« le gérant sur la page
+briefing ») :
+
+- **deux écrans**, `/briefing` en lecture et `/manage/briefing` en édition, parce que le produit
+  sépare partout la consultation de la gestion et qu'un écran mixte aurait été le seul du lot ;
+- **le briefing se gèle quand l'événement est `finished`**, comme la configuration. `manage-event`
+  et `manage-documents` obéissent alors à la même règle de fin de course, et l'écran d'édition rend
+  le briefing au lieu du formulaire.
+
+`manage-documents` a enfin un consommateur : elle ferme la route par middleware et la requête par
+`EventPolicy::updateBriefing`, exactement comme `manage-event` sur la configuration. La lecture, en
+revanche, n'a demandé aucune ligne d'autorisation : `EventPolicy::view` donnait déjà « refusé en
+`draft`, visible au gérant ».
+
+### Ce que le HTML rendu emporte, et ce qu'on ne bride pas
+
+`Str::markdown` utilise le convertisseur GitHub : tables, autolinks et cases à cocher passent en
+plus des « titres, listes, gras, émoji » de la story. Surensemble inoffensif, non bridé. Le rendu
+est injecté par un composant unique, pour que l'unique `v-html` du front ait un seul point à
+relire, et il est stylé par un bloc `@utility briefing` dans la feuille de style — un plugin
+`@tailwindcss/typography` et sa configuration de thème ne se paient pas pour une page, et le bloc
+parle les tokens du projet.
+
+## D-52 — Les documents sont un modèle éditorial et une URL signée, sans route de téléchargement
+
+Arrêté le 2026-08-20 par BR-18, avec le propriétaire du projet.
+
+### Un modèle `Document`, malgré D-09
+
+D-09 interdit « une table de fichiers maison ». La table `documents` n'en est pas une : elle porte
+un titre et une description, jamais un chemin, une taille ni un type. Le fichier reste entièrement
+à Media Library, dans une collection `file` en `singleFile()`.
+
+Deux raisons ont fait renoncer à tout poser sur `Event` via `name` et `custom_properties`, qui était
+l'option la plus économe :
+
+- **le titre est éditorial**. « Règlement de la course » se lit dans une liste ; `reglement-v3-final.pdf`
+  non. Les deux doivent coexister, et `usingName()` aurait fait porter au média un nom d'affichage
+  en plus de son nom de fichier, ce qui brouille les deux ;
+- **l'événement est un singleton**. Accrocher tous les médias dessus donne un sac plat, sans
+  propriétaire par document, où la suppression d'un fichier vise un `Media` par identifiant plutôt
+  qu'une ligne à soi.
+
+### Pas de route de téléchargement : une URL signée, valable sept jours
+
+La story écrivait « le téléchargement passe par une route contrôlée ». Elle ne l'est plus. Le média
+signe son URL — `App\Models\Media` étend celui de Spatie et expose `temporary_url` et `download_url`,
+le second ajoutant le `ResponseContentDisposition` qui fait enregistrer le fichier sous son nom
+d'origine. L'URL n'est fabriquée que dans un contrôleur ayant déjà passé la policy : en `draft`, un
+participant n'en obtient aucune.
+
+**L'écart à D-08 est réel et assumé** : une URL présignée est un accès anonyme, borné dans le temps
+et non devinable, là où D-08 demandait « aucun accès anonyme au bucket ». Ce qui l'achète, c'est que
+l'application ne relaie plus d'octets qu'elle n'a pas besoin de toucher, et que la durée retenue —
+sept jours, le plafond de SigV4 — couvre largement une page laissée ouverte.
+
+**La conséquence à connaître avant de déboguer un lien mort.** SigV4 signe l'en-tête `Host`. Le
+conteneur et le navigateur doivent donc désigner le stockage par le même `hôte:port`, sinon toute
+signature est rejetée — RustFS répond alors `InvalidAccessKeyId`, ce qui envoie chercher un problème
+de clés qui n'existe pas. En développement, cela demande deux choses : RustFS écoute désormais, dans
+le réseau Docker, sur le port qu'il publie (`FORWARD_RUSTFS_PORT` pilote les deux), et **chaque poste
+doit résoudre `rustfs` vers `127.0.0.1`**.
+
+Cette entrée va dans le fichier hosts du **système qui fait tourner le navigateur** — sous WSL, celui
+de Windows (`C:\Windows\System32\drivers\etc\hosts`), pas le `/etc/hosts` de la distribution.
+WSL en hérite de toute façon : son `resolv.conf` pointe sur le proxy DNS de Windows, qui lit ce même
+fichier. Le poste du propriétaire la portait déjà, posée par un projet antérieur, ce qui a fait
+passer la contrainte inaperçue à la livraison.
+
+En production, un endpoint public unique rend la question sans objet.
+
+### Une règle de validation maison plutôt que `mimes:`
+
+Le GPX est du XML sur le disque. `mimes:gpx` refuserait une trace légitime, `mimetypes:` seule
+laisserait passer un XML renommé `.pdf`. `App\Rules\DocumentFile` porte donc une carte unique
+`extension → types MIME réels admis`, lue deux fois : par la règle, et par la collection Media
+Library qui refuse le reste. Le contrôle porte sur `getMimeType()`, résolu par `finfo` sur le
+fichier temporaire — jamais sur l'extension annoncée.
+
+Corollaire pour les tests : `Illuminate\Http\Testing\File::getMimeType()` renvoie le type qu'on lui
+a déclaré, jamais celui qu'il détecte. Un `UploadedFile::fake()` ne peut donc pas prouver le critère
+« fichier renommé ». Les fixtures du seeder — un vrai PDF, une vraie trace GPX — servent aussi de
+fixtures de test, ce qui donne un seul jeu de fichiers à maintenir.
+
+### Le dépôt gèle quand l'événement est terminé
+
+La story ne le demandait pas. Le briefing le fait (D-51), et un document qui pourrait encore
+apparaître après la course quand le briefing ne le peut plus aurait été une incohérence que personne
+n'aurait su expliquer. `DocumentPolicy::create` exige donc la permission **et** `isEditable()`.
+
+### La suppression passe par Eloquent
+
+`onDelete('cascade')` est exclu : Media Library supprime le fichier stocké depuis l'événement
+`deleted` du modèle propriétaire, qu'une cascade SQL ferait taire. Le fichier partirait alors de la
+base sans partir du bucket.
+
+### Le bucket se provisionne par commande
+
+`storage:ensure-bucket` crée le bucket quand il manque et ne fait rien sinon. Ce n'est pas une
+commande jetable : tout environnement neuf en a besoin, et BR-28 en aura besoin en production.
+Elle entre dans `composer setup`, avant les migrations.
+
+## D-53 — Le PPS est une forme contrôlée, pas une donnée vérifiée, et le gérant le lit sans le saisir
+
+Arrêté le 2026-08-20 par BR-34.
+
+### Le gérant lit, il ne saisit pas
+
+La fiche gérant annonce « le gérant peut tout corriger, à tout moment », et il corrige de fait le
+prénom, le nom, l'email et le téléphone. Le PPS échappe à cette règle : il est rendu verrouillé,
+comme l'heure de départ d'un événement lancé, et `Manage\RegistrationUpdateRequest` marque le champ
+`prohibited`.
+
+Ce n'est pas de la prudence sur une donnée de santé — il n'y en a pas ici, le numéro n'est ni lu ni
+vérifié. C'est que le PPS est une **déclaration** : un numéro corrigé par quelqu'un d'autre que son
+déclarant ne veut plus rien dire, et le gérant qui le retape n'a par construction aucune source pour
+le faire. Le champ verrouillé le dit à l'écran, ce qu'un champ désactivé n'aurait pas fait — et
+`disabled` aurait en prime retiré la valeur de la soumission.
+
+Corollaire à connaître : `EventField` verrouillé affiche son erreur. C'est ce qui rend le
+`prohibited` visible quand un onglet resté ouvert avant le verrou poste quand même le champ.
+
+### La normalisation vit dans la règle, jamais dans l'écran
+
+`pps 1234 5678` collé depuis un mail doit devenir `PPS12345678`, espace insécable finale comprise.
+Si cette mise en forme vivait dans l'écran, la saisie initiale et la correction divergeraient le jour
+où l'une des deux change — et il y a trois écrans, pas deux.
+
+`App\Support\PpsNumber` porte donc la forme (`PATTERN`) et la mise en forme (`normalise()`), et
+`RegistrationValidationRules` les distribue aux Form Requests qui reçoivent le champ. Le trait porte
+aussi le message d'erreur : `lang/fr/validation.php` n'a pas de clé `regex`, et un message générique
+n'aurait pas rappelé la forme attendue, ce que le critère d'acceptation exige.
+
+### Ce que le numéro ne fait pas
+
+Aucune unicité en base, aucun appel à un service tiers, aucune date de validité, aucun blocage : une
+inscription sans numéro est valide et reste confirmable. Un numéro inventé passe. C'est le périmètre
+arrêté avec le propriétaire — la pièce jointe justificative avait été retirée le même jour, avant
+l'implémentation, pour ne pas monter une collection Media Library, une route sous policy et une
+purge autour d'un document que personne n'allait ouvrir.
+
+## D-54 — Les quatre étapes sont un seul formulaire, et le remappage d'erreur est la seule chose testée
+
+Arrêté le 2026-08-20 par la reprise **R-04**, qui met D-50 en œuvre. Deux points ont été arbitrés
+avec le propriétaire : la stratégie de test front et la forme de l'indicateur d'étape.
+
+### Rien n'est démonté, donc rien n'est perdu
+
+`Complete.vue` n'a aucun état réactif, et ce n'est pas un oubli : le composant `<Form>` d'Inertia
+sérialise les inputs natifs du DOM au moment du submit, et aucun écran du projet n'utilise
+`useForm`. Les valeurs vivent donc dans le DOM, nulle part ailleurs.
+
+Une étape masquée par `v-if` serait démontée, et la saisie partirait avec elle. Les quatre étapes
+restent **montées en permanence** dans un `<Form>` unique et sont révélées par `v-show`. C'est ce qui
+rend le retour arrière gratuit — il n'y a rien à restaurer — et c'est ce qui garde la soumission
+unique qu'exige D-50 : les huit champs sont là, visibles ou non, quand le coureur valide.
+
+L'alternative — un objet réactif et un `v-if` par étape — aurait dupliqué l'état de huit champs et
+forcé `RegistrationFields` à fonctionner dans deux régimes, alors que trois écrans le partagent.
+
+### `novalidate`, parce qu'un `required` masqué refuse la soumission sans le dire
+
+Un contrôle `required` vide dans une étape en `display: none` fait échouer la validation native du
+navigateur, qui ne peut pas y poser le focus : le submit est abandonné, la console reçoit un
+avertissement, et l'écran ne dit rien. C'est exactement l'échec silencieux que D-50 désigne comme le
+risque de cette reprise, et il serait arrivé par la porte de derrière.
+
+Le formulaire porte donc `novalidate`, et le passage à l'étape suivante appelle `reportValidity()`
+sur les seuls contrôles de l'étape courante. Le `required` natif garde le passage d'étape — il évite
+l'aller-retour serveur sur un champ vide — et ne garde plus jamais la soumission. La validation
+serveur reste la seule autorité, ce qui était déjà le contrat.
+
+### Le remappage sort du composant, et c'est la seule chose testée
+
+Une erreur 422 sur `birth_date` pendant que le coureur est à l'étape 4 doit le ramener à l'étape 2,
+sur le champ fautif. `resources/js/lib/registrationSteps.ts` porte ce calcul en deux fonctions pures
+— quelle étape, puis quel champ — et `Complete.vue` ne fait que les brancher sur le hook `@error`
+du `<Form>`.
+
+Le dépôt n'avait aucune infra de test front. Elle entre ici, réduite au strict nécessaire :
+`vitest`, **sans jsdom et sans `@vue/test-utils`**, parce qu'il n'y a rien à monter. Le calcul
+risqué est du TypeScript sans DOM ; ce qui l'entoure — `v-show`, focus, `reportValidity()` — demande
+un harnais de rendu dont le coût ne se justifie pas pour un écran. `npm run test` rejoint
+`ci:check` dans `composer.json`, donc la CI l'exécute sans que le workflow change.
+
+Ce qui reste non couvert est nommé : le déplacement du focus et la révélation d'étape se vérifient
+à la main.
+
+### Des repères, pas une barre
+
+La charte « Tableau des départs » interdit toute barre de progression. La position s'affiche donc en
+quatre repères numérotés, portant `aria-current="step"` sur l'étape courante, doublés d'une ligne
+« Étape 2 sur 4 ». Les étapes déjà franchies sont cliquables et ramènent en arrière ; les suivantes
+sont inertes, parce qu'y sauter contournerait le seul garde-fou client.
+
+Le titre long de chaque étape n'est pas répété dans l'indicateur : c'est l'en-tête `EventFieldset`
+du groupe qui le porte, comme dans les deux écrans de correction.
+
+### Ce que la reprise n'a pas touché, et ce qu'elle a débordé
+
+Aucune ligne de serveur : ni route, ni contrôleur, ni Form Request, ni transaction. Aucun test PHP
+modifié. `RegistrationFields` gagne une prop `section` **optionnelle** — sans valeur, il rend ses
+trois groupes d'affilée comme avant, donc `registration/Edit.vue` et
+`manage/registrations/Edit.vue` ne bougent pas.
+
+Deux débords assumés, tous deux au service du même objectif — que le coureur lise son erreur.
+`lang/fr/validation.php` déclarait le nom français de trois champs sur huit : les cinq manquants sont
+ajoutés, faute de quoi le message ramené à l'écran parle de `emergency_contact_phone`. Et la
+description de l'écran annonce désormais les quatre étapes, puisque c'est la première chose que le
+coureur doit savoir avant de commencer.
+
+## D-55 — La navigation lit une décision d'accès partagée, et la barre basse s'arrête à quatre entrées
+
+Arrêté le 2026-08-20 par **BR-33**. Deux points ont été arbitrés avec le propriétaire : quelle
+entrée cède sa place dans la barre basse, et le renommage de l'entrée d'accueil.
+
+### Une prop d'accès, sur le patron de `auth.permissions`
+
+La navigation devait apprendre deux faits qu'aucun écran ne portait : l'utilisateur connecté tient-il
+une inscription, et l'événement est-il sorti de `draft`. Les deux partent en prop partagée, dans un
+nœud `access`, construit exactement comme `auth.permissions` l'est depuis BR-01 — **chaque valeur est
+le résultat du même `Gate` que le serveur applique**, jamais une relecture du statut. Une entrée
+apparaît donc si et seulement si l'écran derrière elle serait autorisé, et les deux lectures ne
+peuvent pas diverger.
+
+L'alternative était d'exposer le statut brut de l'événement et de laisser `mainNavItems()` tester
+`!== 'draft'`. C'est la deuxième déclaration de la règle que D-29 interdit : le jour où un état
+supplémentaire cesse d'être visible aux participants, `EventPolicy::view()` le sait et la navigation
+l'ignore.
+
+`access` est un nœud **racine**, pas `auth.access` : `auth` porte l'identité et les capacités du
+compte, quand ces trois valeurs dépendent du compte **et** de l'état de l'événement. Et le nœud ne
+pouvait pas s'appeler `event` — `pages/Event.vue` et `pages/manage/Event.vue` reçoivent déjà une prop
+de page de ce nom, qui écrase une prop partagée homonyme dans `page.props`. Le défaut aurait été
+silencieux et local à deux écrans.
+
+`documents` reste séparé de `event` bien que `DocumentPolicy::viewAny()` et `EventPolicy::view()` se
+lisent identiquement aujourd'hui. Ce sont deux policies, et rien ne promet qu'elles restent en phase.
+
+L'événement se lit avec `first()`, jamais `firstOrFail()` : une prop partagée ne doit pas
+transformer une base vide en 404 sur toutes les pages. Un invité sort avant les deux requêtes, ce qui
+laisse la page publique, l'écran de connexion et tout le parcours `account/*` à coût nul.
+
+### La barre basse tient quatre entrées, et l'ordre décide du repli
+
+`AppBottomNav` rendait toutes les entrées en `flex-1`. À l'échelle `text-label` — 10 px mono,
+`letter-spacing: 0.14em`, `px-2` — une cellule portant « INSCRIPTION » demande ~95 px : un écran de
+375 px en tient quatre, plus le bouton « … ». BR-33 en produit cinq pour un coureur et six pour un
+gérant.
+
+`BOTTOM_NAV_LIMIT` nomme le plafond et `AppBottomNav` y tronque, tandis que la sidebar et le tiroir
+mobile continuent de rendre la liste entière : ce qui dépasse est **replié, jamais retiré**. Aucun
+écran ne devient injoignable.
+
+C'est « Événement » qui cède chez le coureur : l'accueil porte déjà son statut et le briefing porte
+le déroulé de la nuit, donc `/event` n'ajoute que le nom, les places et le résumé. Et **la gestion
+passe devant l'inscription du gérant** — un gérant qui court aussi garde son hub sous le pouce, la
+story n'exigeant que « les deux jeux d'entrées », pas leur rang.
+
+`BOTTOM_NAV_LIMIT` porte un test, parce que Q-04 est le procès-verbal de ce qui arrive à une valeur
+de mise en page que rien ne garde : la charte l'a déplacée d'un tiers en silence.
+
+### « Coureurs » est retirée, pas laissée à pointer nulle part
+
+L'entrée pointait sur `dashboard()` faute de destination. Elle attend BR-14, et une entrée qui ne
+mène pas où elle annonce apprend au coureur que les entrées ne mènent nulle part. Sa clé de
+traduction reste. Même raisonnement en creux pour « Course », qui cède la place à « Accueil » :
+l'écran ne parle pas de la course tant que le moteur n'existe pas, et BR-24 remplacera son contenu
+sans retoucher le libellé. `ui.nav.race` reste en place pour BR-13.
+
+### L'accueil quitte `Route::inertia`, et lit `first()` là où ses voisines lisent `firstOrFail()`
+
+Une route sans contrôleur ne peut porter aucune prop : c'est ce qui maintenait l'écran à un libellé.
+Elle gagne un contrôleur à action unique, sur le patron de `DesignSystemController`.
+
+La projection est **plus étroite que `ParticipantResource`** : la ressource emporte téléphone, date
+de naissance, numéro PPS et contact d'urgence, et rien de tout cela n'a de raison de voyager vers un
+écran qui affiche un statut et un dossard. `EventResource` est écarté au même titre — l'accueil n'a
+que faire de la latitude, de la longitude et de la capacité.
+
+`/event`, `/briefing` et `/documents` renvoient 404 sur une base sans événement ; l'accueil répond
+200. Ces trois écrans **parlent de** l'événement, donc son absence est bien un 404. L'accueil parle
+de la personne, et il a quelque chose à dire avant que le gérant ait créé quoi que ce soit.
+
+Aucune redirection non plus : `RegistrationController` renvoie déjà vers l'accueil l'utilisateur sans
+inscription, donc un accueil qui pousserait vers l'inscription refermerait la boucle sur lui. La
+branche annulée reprend la copie de `registration/Show` plutôt que de la réécrire — D-48 a arrêté ce
+qu'on dit à un coureur dont l'inscription est retirée, et le redire en deux formulations est la façon
+dont les deux se désalignent.
+
+### Ce que BR-33 ne fait pas
+
+Aucune action sur l'inscription depuis l'accueil : on y navigue, on n'y modifie rien. Aucun chiffre
+de course — boucles, distance, prochain départ appartiennent à BR-24, qui hérite de cette route, de
+ce contrôleur et de cette navigation au lieu de les reposer.
+
+**Q-02 reste ouverte.** La navigation masque l'entrée qui serait refusée ; elle ne répare pas le
+refus. Un participant qui atteint `/briefing` à la main sur un événement en `draft` reçoit toujours un
+403 sur la page Symfony non traduite. BR-13 en reste le porteur.
+
+Aucun composant nouveau : `RegistrationStatusBadge`, `EmptyState`, `StatCounter` et `Alert`
+couvraient les quatre branches. En revanche la chaîne de classes du lien pleine largeur est
+désormais déclarée dans **trois** écrans — `Event.vue`, `registration/Show.vue` et `Dashboard.vue`.
+Le troisième exemplaire est le seuil où l'extraction se justifie ; elle n'est pas faite ici pour ne
+pas déborder sur deux écrans qui ne sont pas de cette story.
+
+## D-56 — L'image de production sert avec FrankenPHP, et son build embarque Node parce que Vite appelle PHP
+
+Arrêté le 2026-08-21 par BR-27, avec le propriétaire du projet. C'est la première fois que le
+projet produit un artefact déployable : jusqu'ici, « faire tourner l'application » voulait dire
+Sail.
+
+**Le conteneur web sert avec FrankenPHP**, en mode classique — le mode worker reste désactivé.
+La branche écartée est nginx + php-fpm + supervisor, qui reproduit la forme de l'image Sail mais
+demande trois briques et un superviseur pour les tenir. FrankenPHP est un seul binaire et un seul
+processus : il n'y a ni socket FastCGI à câbler, ni superviseur à surveiller, et le Caddyfile
+fourni par l'image convient tel quel (`{$SERVER_NAME}`, racine `public/`). Le mode worker aurait
+gardé l'application en mémoire entre les requêtes ; on ne prend pas ce risque pour quarante
+coureurs sur une nuit, alors qu'il change le cycle de vie des singletons.
+
+**FrankenPHP ne sert que le HTTP.** Les files ne passent pas par lui : le worker et le
+planificateur sont deux conteneurs de la même image, avec `php artisan horizon` et
+`php artisan schedule:work` en guise de commande. Le point d'entrée reçoit un rôle — `web`,
+`worker`, `scheduler` — et rien d'autre ne distingue les trois services.
+
+### Le build des assets a besoin de PHP, ce qui décide du découpage
+
+`vite.config.ts` charge `wayfinder({formVariants: true})`. Ce greffon exécute
+`php artisan wayfinder:generate --with-form` dans son hook `buildStart` et fait échouer le build
+s'il n'aboutit pas ; les dossiers qu'il produit sous `resources/js` sont hors dépôt. L'étape qui
+lance `npm run build` doit donc disposer de PHP **et** des dépendances Composer.
+
+D'où une étape de build unique où Node est copié depuis `node:22-bookworm-slim` dans une image qui
+est déjà celle de PHP — même Debian des deux côtés, donc même glibc. Les deux contournements
+possibles ont été écartés : neutraliser le greffon depuis `vite.config.ts` ferait dépendre le
+fichier de build de l'application d'une variable propre à Docker, et poser un faux binaire `php`
+laisserait passer un build dont les types de routes sont faux. Les deux échangent un problème
+d'outillage contre un écart entre le développement et la production, ce que la story cherchait
+précisément à supprimer.
+
+### Cinq étapes, et une suppression qui n'est pas au bon endroit par hasard
+
+`base` porte le runtime, `vendor` les dépendances Composer, `assets` la compilation front, `prune`
+la suppression des sources front, `final` l'image livrée. La suppression vit dans son étape à elle
+parce qu'un `rm` dans l'étape finale ne fait qu'ajouter une couche d'effacement **au-dessus** d'une
+couche qui contient encore les fichiers : `docker export` les ressort. En supprimant dans `prune`,
+le `COPY --from=prune` ne voit jamais `node_modules` ni `resources/js`. Vérifié sur le système de
+fichiers aplati : zéro entrée.
+
+### Non-root sans capability, en écoutant sur 8080
+
+L'application tourne sous l'utilisateur `app`. Plutôt que de compter sur la capability
+`CAP_NET_BIND_SERVICE` du binaire pour tenir le port 80, le serveur écoute sur **8080** : un port
+au-dessus de 1024 n'en réclame aucune, ce qui laisse poser `no-new-privileges` sans y réfléchir.
+Le port n'est de toute façon jamais publié — Traefik joint le conteneur par le réseau de Dokploy.
+Caddy écrit dans `/data/caddy` et `/config/caddy` au démarrage : ces deux répertoires changent de
+propriétaire avant le `USER app`, faute de quoi le conteneur s'arrête sur un refus d'écriture.
+
+### Le nom de projet Compose est explicite, et ce n'est pas cosmétique
+
+`compose.prod.yaml` déclare `name: backyard-race-production`. Sans lui, Compose déduit le nom du
+répertoire — le même que celui de Sail — et monter la pile de production **remplace les conteneurs
+MySQL et Redis du développement**. C'est arrivé pendant la vérification de la story. Les volumes
+diffèrent (`sail-mysql` contre `mysql-data`), donc les données de développement ont survécu, mais
+les conteneurs avaient bien été repris.
+
+### Le planificateur n'a pas de contrôle de santé
+
+L'image porte un `HEALTHCHECK` HTTP sur `/up`, juste pour le rôle `web`. Le worker le remplace par
+`horizon:status`. Le planificateur, lui, le **désactive** : il n'écoute sur rien, et le contrôle
+hérité le déclarerait mort en permanence. Lui inventer une sonde qui ne prouverait que le
+démarrage d'`artisan` serait une garantie sans exécution derrière. Surveiller que le planificateur
+tourne encore est un sujet de supervision, et il appartient à BR-30.
+
+### Ce que BR-27 ne fait pas
+
+Pas de `artisan optimize` au démarrage (BR-28), pas de migrations au déploiement (BR-29), pas
+d'orchestration ni d'accès Horizon (BR-30), pas de domaine ni de HTTPS (BR-31). Le point d'entrée
+valide l'environnement puis passe la main au rôle : c'est là que BR-28 branchera la mise en cache,
+entre la validation et l'aiguillage.
+
+## D-57 — L'application fait confiance au proxy, sinon un seul coureur épuise le quota de tous
+
+Arrêté le 2026-08-21 par BR-27. `bootstrap/app.php` n'avait aucun `trustProxies`, et Laravel 11+
+ne fait confiance à aucun proxy par défaut.
+
+Derrière le Traefik de Dokploy, qui termine TLS, l'application voit `http` là où le coureur voit
+`https`, et voit l'adresse du frontal à la place de celle du coureur. Le dégât mesurable est le
+second : `RateLimiter::for('registration')` compte `Limit::perMinute(6)->by($request->ip())`.
+Toutes les inscriptions partageant la même adresse, **le septième coureur d'une même minute est
+refusé, quel que soit son poste**. Le soir de l'ouverture, c'est une panne. Le limiteur de
+connexion, lui, mêle l'adresse à l'e-mail, donc il ne tombe pas — il devient seulement moins fin.
+
+Les deux tests de `TrustedProxyTest` gardent exactement ces deux points : le lien d'inscription
+part en `https`, et deux coureurs derrière le même frontal ont chacun leur quota. Retirer le
+`trustProxies` fait passer les deux au rouge, dont le second sur un 429.
+
+`at: '*'` est retenu plutôt qu'une liste d'adresses. Le conteneur ne publie aucun port et n'est
+joignable que depuis le réseau de Dokploy : le seul client possible est Traefik. Une liste
+d'adresses aurait à suivre celle d'un frontal qu'on ne maîtrise pas.
+
+**Ce que cette décision ne règle pas** : `SESSION_SECURE_COOKIE` n'est pas posé, donc Laravel le
+déduit du schéma de la requête. La déduction est désormais juste, mais le rendre explicite
+appartient à BR-28. En revanche, ce qu'on craignait sur les liens signés n'existait pas : sans
+`trustProxies`, la signature était produite et vérifiée sur le même schéma, donc cohérente. Le lien
+partait simplement en clair dans le mail.

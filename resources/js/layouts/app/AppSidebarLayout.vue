@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AppBottomNav from '@/components/AppBottomNav.vue';
 import AppContent from '@/components/AppContent.vue';
 import AppShell from '@/components/AppShell.vue';
 import AppSidebar from '@/components/AppSidebar.vue';
@@ -16,12 +17,18 @@ withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-    <AppShell variant="sidebar">
+    <AppShell>
         <AppSidebar />
-        <AppContent variant="sidebar" class="overflow-x-hidden">
+        <AppContent>
             <AppSidebarHeader :breadcrumbs="breadcrumbs" />
-            <slot />
+            <div
+                scroll-region
+                class="min-h-0 flex-1 overflow-y-auto overscroll-contain"
+            >
+                <slot />
+            </div>
+            <AppBottomNav class="md:hidden" />
         </AppContent>
-        <Toaster />
+        <Toaster position="top-center" />
     </AppShell>
 </template>

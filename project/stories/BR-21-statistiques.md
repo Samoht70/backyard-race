@@ -3,9 +3,21 @@
 | | |
 |---|---|
 | **Epic** | 5 — Après-course |
-| **Statut** | À faire |
-| **Estimation** | 8 pts |
+| **Statut** | ⛔ Abandonné |
+| **Estimation** | 8 pts, non engagés |
 | **Dépend de** | BR-20 |
+
+## Pourquoi cette story n'est pas faite
+
+Abandonnée le 2026-08-20, à l'élagage du backlog (voir D-47).
+
+Le périmètre recoupait celui de BR-23, qui annonce déjà « participants, boucles réalisées,
+kilomètres parcourus ». Deux pages d'après-course pour les mêmes chiffres, sur un événement qui
+sert une fois, c'est une page de trop.
+
+Le contenu n'est pas perdu : les indicateurs et le tableau par tour — boucles terminées, coureurs
+restants, abandons et hors délai — sont repris par BR-23, qui passe de 5 à 8 points. Les règles
+d'agrégation en base et le calcul de la distance totale y valent inchangées.
 
 ## User story
 

@@ -1,0 +1,1913 @@
+<title>Charte Backyard Race</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@400..800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400..800&family=Spline+Sans+Mono:wght@400;500;600&display=swap">
+
+<style>
+    :root {
+        --j-ground: #EDF1EA;
+        --j-surface: #FDFEFC;
+        --j-ink: #0F1D19;
+        --j-ink-2: #3C4B45;
+        --j-slate: #5C6B66;
+        --j-line: #CBD5C9;
+        --j-brand: #D6006A;
+        --j-brand-ink: #FFFFFF;
+        --j-run: #0C6E43;
+        --j-run-surface: #DFEFE6;
+        --j-out: #B4301A;
+        --j-out-surface: #F9E6E0;
+        --j-quit: #5C6B66;
+        --j-quit-surface: #E5EAE4;
+        --j-done: #8A5B00;
+        --j-done-surface: #F7EBD2;
+
+        --n-ground: #0F1D19;
+        --n-surface: #172823;
+        --n-ink: #EDF1EA;
+        --n-ink-2: #B6C4BD;
+        --n-slate: #93A39C;
+        --n-line: #2C3F38;
+        --n-brand: #FF3D8F;
+        --n-brand-ink: #0F1D19;
+        --n-run: #58D9A0;
+        --n-run-surface: #16352A;
+        --n-out: #FF8A62;
+        --n-out-surface: #3A2018;
+        --n-quit: #93A39C;
+        --n-quit-surface: #232F2B;
+        --n-done: #F0BE4A;
+        --n-done-surface: #35290F;
+
+        --ground: var(--j-ground);
+        --surface: var(--j-surface);
+        --ink: var(--j-ink);
+        --ink-2: var(--j-ink-2);
+        --slate: var(--j-slate);
+        --line: var(--j-line);
+        --brand: var(--j-brand);
+        --brand-ink: var(--j-brand-ink);
+        --run: var(--j-run);
+        --run-surface: var(--j-run-surface);
+        --out: var(--j-out);
+        --out-surface: var(--j-out-surface);
+        --quit: var(--j-quit);
+        --quit-surface: var(--j-quit-surface);
+        --done: var(--j-done);
+        --done-surface: var(--j-done-surface);
+
+        --display: 'Big Shoulders Display', 'Archivo Narrow', 'Arial Narrow', sans-serif;
+        --body: 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif;
+        --data: 'Spline Sans Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+        --step-1: 4px;
+        --step-2: 8px;
+        --step-3: 12px;
+        --step-4: 16px;
+        --step-5: 24px;
+        --step-6: 32px;
+        --step-7: 48px;
+        --step-8: 64px;
+
+        --cut: 2px;
+        --pill: 999px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+            --ground: var(--n-ground);
+            --surface: var(--n-surface);
+            --ink: var(--n-ink);
+            --ink-2: var(--n-ink-2);
+            --slate: var(--n-slate);
+            --line: var(--n-line);
+            --brand: var(--n-brand);
+            --brand-ink: var(--n-brand-ink);
+            --run: var(--n-run);
+            --run-surface: var(--n-run-surface);
+            --out: var(--n-out);
+            --out-surface: var(--n-out-surface);
+            --quit: var(--n-quit);
+            --quit-surface: var(--n-quit-surface);
+            --done: var(--n-done);
+            --done-surface: var(--n-done-surface);
+        }
+    }
+
+    :root[data-theme="dark"] {
+        --ground: var(--n-ground);
+        --surface: var(--n-surface);
+        --ink: var(--n-ink);
+        --ink-2: var(--n-ink-2);
+        --slate: var(--n-slate);
+        --line: var(--n-line);
+        --brand: var(--n-brand);
+        --brand-ink: var(--n-brand-ink);
+        --run: var(--n-run);
+        --run-surface: var(--n-run-surface);
+        --out: var(--n-out);
+        --out-surface: var(--n-out-surface);
+        --quit: var(--n-quit);
+        --quit-surface: var(--n-quit-surface);
+        --done: var(--n-done);
+        --done-surface: var(--n-done-surface);
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        background: var(--ground);
+        color: var(--ink);
+        font-family: var(--body);
+        font-size: 17px;
+        line-height: 1.55;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    .wrap {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: var(--step-7) var(--step-5) var(--step-8);
+        display: flex;
+        flex-direction: column;
+        gap: var(--step-8);
+    }
+
+    .eyebrow {
+        font-family: var(--body);
+        font-size: 0.6875rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--brand);
+        margin: 0;
+    }
+
+    .eyebrow--quiet {
+        color: var(--slate);
+    }
+
+    h1, h2, h3 {
+        font-family: var(--display);
+        font-weight: 800;
+        text-transform: uppercase;
+        margin: 0;
+        text-wrap: balance;
+        letter-spacing: 0.005em;
+    }
+
+    h1 {
+        font-size: clamp(2.75rem, 8vw, 5rem);
+        line-height: 0.88;
+    }
+
+    h2 {
+        font-size: clamp(1.75rem, 4vw, 2.5rem);
+        line-height: 0.94;
+    }
+
+    h3 {
+        font-size: 1.25rem;
+        line-height: 1.05;
+        font-weight: 700;
+    }
+
+    p {
+        margin: 0;
+        max-width: 66ch;
+    }
+
+    .lede {
+        font-size: 1.1875rem;
+        color: var(--ink-2);
+    }
+
+    .muted {
+        color: var(--slate);
+    }
+
+    .hero {
+        display: flex;
+        flex-direction: column;
+        gap: var(--step-5);
+    }
+
+    .hero__deck {
+        display: grid;
+        gap: var(--step-5);
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    @media (min-width: 900px) {
+        .hero__deck {
+            grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+            align-items: end;
+            gap: var(--step-7);
+        }
+    }
+
+    .section {
+        display: flex;
+        flex-direction: column;
+        gap: var(--step-5);
+    }
+
+    .section__head {
+        display: flex;
+        flex-direction: column;
+        gap: var(--step-2);
+        border-top: 2px solid var(--ink);
+        padding-top: var(--step-3);
+    }
+
+    .grid {
+        display: grid;
+        gap: var(--step-4);
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .grid--wide {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: var(--step-5);
+    }
+
+    .grid--screens {
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: var(--step-7);
+        justify-items: center;
+    }
+
+    .panel {
+        background: var(--surface);
+        border: 2px solid var(--ink);
+        border-radius: var(--cut);
+        padding: var(--step-5);
+        display: flex;
+        flex-direction: column;
+        gap: var(--step-3);
+    }
+
+    .panel__title {
+        font-family: var(--body);
+        font-size: 0.9375rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .panel__note {
+        font-size: 0.9375rem;
+        color: var(--slate);
+        margin: 0;
+    }
+
+    .cartouche {
+        display: inline-flex;
+        flex-direction: column;
+        gap: var(--step-2);
+        border-left: 6px solid var(--brand);
+        padding-left: var(--step-4);
+    }
+
+    .cartouche__hours {
+        display: flex;
+        align-items: baseline;
+        gap: var(--step-3);
+        font-family: var(--display);
+        font-weight: 800;
+        line-height: 0.8;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .cartouche--xl .cartouche__hours {
+        font-size: clamp(4.5rem, 17vw, 9rem);
+    }
+
+    .cartouche--md .cartouche__hours {
+        font-size: 3.5rem;
+    }
+
+    .cartouche--sm .cartouche__hours {
+        font-size: 1.75rem;
+    }
+
+    .cartouche__to {
+        font-family: var(--body);
+        font-weight: 700;
+        font-size: 0.6875rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--slate);
+        align-self: center;
+    }
+
+    .hollow {
+        color: var(--slate);
+    }
+
+    @supports (-webkit-text-stroke: 2px currentColor) {
+        .hollow {
+            color: var(--ink);
+            -webkit-text-fill-color: transparent;
+            -webkit-text-stroke: 2px var(--ink);
+        }
+
+        .cartouche--xl .hollow {
+            -webkit-text-stroke-width: 3px;
+        }
+
+        .cartouche--sm .hollow {
+            -webkit-text-fill-color: var(--slate);
+            -webkit-text-stroke-width: 0;
+        }
+    }
+
+    .swatches {
+        display: grid;
+        gap: var(--step-3);
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+
+    .swatch {
+        border: 2px solid var(--ink);
+        border-radius: var(--cut);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .swatch__chip {
+        height: 84px;
+        display: flex;
+        align-items: flex-end;
+        padding: var(--step-2);
+        font-family: var(--data);
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+
+    .swatch__meta {
+        background: var(--surface);
+        border-top: 2px solid var(--ink);
+        padding: var(--step-2) var(--step-3) var(--step-3);
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .swatch__name {
+        font-family: var(--body);
+        font-weight: 700;
+        font-size: 0.875rem;
+    }
+
+    .swatch__role {
+        font-size: 0.8125rem;
+        color: var(--slate);
+        line-height: 1.35;
+    }
+
+    .specimen {
+        display: flex;
+        flex-direction: column;
+        gap: var(--step-2);
+        border-top: 1px solid var(--line);
+        padding-top: var(--step-3);
+    }
+
+    .specimen__label {
+        font-family: var(--data);
+        font-size: 0.75rem;
+        color: var(--slate);
+    }
+
+    .specimen__stamp {
+        font-family: var(--display);
+        font-weight: 800;
+        font-size: clamp(3rem, 10vw, 5.5rem);
+        line-height: 0.82;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .specimen__metric {
+        font-family: var(--display);
+        font-weight: 700;
+        font-size: 2.25rem;
+        line-height: 1;
+    }
+
+    .specimen__title {
+        font-family: var(--body);
+        font-weight: 700;
+        font-size: 1.375rem;
+        line-height: 1.2;
+    }
+
+    .specimen__body {
+        font-size: 1rem;
+    }
+
+    .specimen__data {
+        font-family: var(--data);
+        font-weight: 500;
+        font-size: 0.9375rem;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .scale {
+        display: flex;
+        flex-direction: column;
+        gap: var(--step-2);
+    }
+
+    .scale__row {
+        display: flex;
+        align-items: center;
+        gap: var(--step-3);
+    }
+
+    .scale__bar {
+        height: 14px;
+        background: var(--brand);
+        border-radius: var(--cut);
+    }
+
+    .scale__value {
+        font-family: var(--data);
+        font-size: 0.8125rem;
+        color: var(--slate);
+    }
+
+    .badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--step-2);
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px 6px 9px;
+        border-radius: var(--pill);
+        font-family: var(--body);
+        font-size: 0.8125rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+    }
+
+    .badge svg {
+        width: 15px;
+        height: 15px;
+        flex: none;
+    }
+
+    .badge--run {
+        background: var(--run-surface);
+        color: var(--run);
+    }
+
+    .badge--out {
+        background: var(--out-surface);
+        color: var(--out);
+    }
+
+    .badge--quit {
+        background: var(--quit-surface);
+        color: var(--quit);
+    }
+
+    .badge--done {
+        background: var(--done-surface);
+        color: var(--done);
+    }
+
+    .greyscale {
+        filter: grayscale(1);
+    }
+
+    .btn {
+        font-family: var(--body);
+        font-weight: 700;
+        font-size: 1rem;
+        border: 2px solid var(--ink);
+        border-radius: var(--pill);
+        padding: 14px 22px;
+        cursor: pointer;
+        background: var(--brand);
+        color: var(--brand-ink);
+        box-shadow: 3px 3px 0 var(--ink);
+        transition: transform 90ms ease, box-shadow 90ms ease;
+    }
+
+    .btn:active {
+        transform: translate(3px, 3px);
+        box-shadow: 0 0 0 var(--ink);
+    }
+
+    .btn--ghost {
+        background: transparent;
+        color: var(--ink);
+        box-shadow: none;
+    }
+
+    .btn--done {
+        background: var(--run-surface);
+        color: var(--run);
+        box-shadow: none;
+        cursor: default;
+    }
+
+    button:focus-visible,
+    a:focus-visible {
+        outline: 3px solid var(--brand);
+        outline-offset: 3px;
+    }
+
+    .stack {
+        display: flex;
+        flex-direction: column;
+        gap: var(--step-3);
+    }
+
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--step-3);
+        align-items: center;
+    }
+
+    .refuse {
+        display: grid;
+        gap: var(--step-3);
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .refuse li {
+        border-left: 4px solid var(--out);
+        padding-left: var(--step-3);
+        font-size: 0.9375rem;
+        color: var(--ink-2);
+    }
+
+    .refuse strong {
+        display: block;
+        font-family: var(--body);
+        color: var(--ink);
+    }
+
+    pre {
+        margin: 0;
+        overflow-x: auto;
+        background: var(--surface);
+        border: 2px solid var(--ink);
+        border-radius: var(--cut);
+        padding: var(--step-4);
+        font-family: var(--data);
+        font-size: 0.8125rem;
+        line-height: 1.6;
+        color: var(--ink-2);
+    }
+
+    .phone {
+        width: 100%;
+        max-width: 390px;
+        border: 10px solid var(--ink);
+        border-radius: 34px;
+        overflow: hidden;
+        background: var(--ground);
+    }
+
+    .phone__caption {
+        margin-top: var(--step-3);
+        font-family: var(--body);
+        font-size: 0.875rem;
+        font-weight: 700;
+        text-align: center;
+    }
+
+    .phone__caption span {
+        display: block;
+        font-weight: 400;
+        color: var(--slate);
+    }
+
+    .device {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        max-width: 390px;
+    }
+
+    .mock {
+        font-family: var(--body);
+        background: var(--ground);
+        color: var(--ink);
+        display: flex;
+        flex-direction: column;
+        min-height: 640px;
+    }
+
+    .mock--jour {
+        --ground: var(--j-ground);
+        --surface: var(--j-surface);
+        --ink: var(--j-ink);
+        --ink-2: var(--j-ink-2);
+        --slate: var(--j-slate);
+        --line: var(--j-line);
+        --brand: var(--j-brand);
+        --brand-ink: var(--j-brand-ink);
+        --run: var(--j-run);
+        --run-surface: var(--j-run-surface);
+        --out: var(--j-out);
+        --out-surface: var(--j-out-surface);
+        --quit: var(--j-quit);
+        --quit-surface: var(--j-quit-surface);
+        --done: var(--j-done);
+        --done-surface: var(--j-done-surface);
+    }
+
+    .mock--nuit {
+        --ground: var(--n-ground);
+        --surface: var(--n-surface);
+        --ink: var(--n-ink);
+        --ink-2: var(--n-ink-2);
+        --slate: var(--n-slate);
+        --line: var(--n-line);
+        --brand: var(--n-brand);
+        --brand-ink: var(--n-brand-ink);
+        --run: var(--n-run);
+        --run-surface: var(--n-run-surface);
+        --out: var(--n-out);
+        --out-surface: var(--n-out-surface);
+        --quit: var(--n-quit);
+        --quit-surface: var(--n-quit-surface);
+        --done: var(--n-done);
+        --done-surface: var(--n-done-surface);
+    }
+
+    .m-band {
+        background: var(--surface);
+        border-bottom: 2px solid var(--ink);
+        padding: 16px 16px 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .m-band__event {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--slate);
+    }
+
+    .m-counters {
+        display: flex;
+        gap: 10px;
+        padding: 14px 16px;
+    }
+
+    .m-counter {
+        flex: 1;
+        background: var(--surface);
+        border: 2px solid var(--ink);
+        border-radius: var(--cut);
+        padding: 10px 12px;
+    }
+
+    .m-counter__value {
+        font-family: var(--display);
+        font-weight: 800;
+        font-size: 40px;
+        line-height: 0.9;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .m-counter__label {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--slate);
+    }
+
+    .m-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 0 16px 16px;
+    }
+
+    .m-listhead {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        padding: 4px 16px 8px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--slate);
+    }
+
+    .m-runner {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--surface);
+        border: 2px solid var(--ink);
+        border-left-width: 8px;
+        border-radius: var(--cut);
+        padding: 10px 10px 10px 12px;
+        min-height: 72px;
+    }
+
+    .m-runner--run {
+        border-left-color: var(--run);
+    }
+
+    .m-runner--out {
+        border-left-color: var(--out);
+    }
+
+    .m-runner--quit {
+        border-left-color: var(--quit);
+    }
+
+    .m-runner--done {
+        border-left-color: var(--done);
+    }
+
+    .m-runner__bib {
+        font-family: var(--data);
+        font-weight: 600;
+        font-size: 15px;
+        color: var(--slate);
+        font-variant-numeric: tabular-nums;
+        min-width: 34px;
+    }
+
+    .m-runner__id {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .m-runner__name {
+        font-weight: 700;
+        font-size: 16px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .m-runner__meta {
+        font-family: var(--data);
+        font-size: 12px;
+        color: var(--slate);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .m-runner__meta svg {
+        width: 13px;
+        height: 13px;
+        flex: none;
+    }
+
+    .m-validate {
+        font-family: var(--body);
+        font-weight: 700;
+        font-size: 14px;
+        line-height: 1.15;
+        text-align: left;
+        border: 2px solid var(--ink);
+        border-radius: var(--pill);
+        background: var(--brand);
+        color: var(--brand-ink);
+        box-shadow: 3px 3px 0 var(--ink);
+        padding: 12px 16px;
+        min-height: 56px;
+        min-width: 104px;
+        cursor: pointer;
+        transition: transform 90ms ease, box-shadow 90ms ease;
+    }
+
+    .m-validate:active {
+        transform: translate(3px, 3px);
+        box-shadow: 0 0 0 var(--ink);
+    }
+
+    .m-stamped {
+        font-family: var(--data);
+        font-weight: 600;
+        font-size: 18px;
+        color: var(--run);
+        text-align: right;
+        min-width: 104px;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .m-stamped span {
+        display: block;
+        font-family: var(--body);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--slate);
+    }
+
+    .m-tabs {
+        display: flex;
+        gap: 6px;
+        padding: 14px 16px;
+        overflow-x: auto;
+    }
+
+    .m-tab {
+        font-family: var(--body);
+        font-size: 13px;
+        font-weight: 700;
+        white-space: nowrap;
+        border: 2px solid var(--ink);
+        border-radius: var(--pill);
+        background: transparent;
+        color: var(--ink);
+        padding: 8px 14px;
+        min-height: 40px;
+        cursor: pointer;
+    }
+
+    .m-tab--on {
+        background: var(--ink);
+        color: var(--ground);
+    }
+
+    .m-nav {
+        margin-top: auto;
+        display: flex;
+        border-top: 2px solid var(--ink);
+        background: var(--surface);
+    }
+
+    .m-nav__item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        padding: 10px 4px 14px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--slate);
+        text-decoration: none;
+    }
+
+    .m-nav__item svg {
+        width: 22px;
+        height: 22px;
+    }
+
+    .m-nav__item--on {
+        color: var(--brand);
+    }
+
+    .m-figures {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        padding: 14px 16px;
+    }
+
+    .m-figure {
+        background: var(--surface);
+        border: 2px solid var(--ink);
+        border-radius: var(--cut);
+        padding: 12px;
+    }
+
+    .m-figure__value {
+        font-family: var(--display);
+        font-weight: 800;
+        font-size: 44px;
+        line-height: 0.86;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .m-figure__value--data {
+        font-family: var(--data);
+        font-weight: 600;
+        font-size: 30px;
+        letter-spacing: -0.02em;
+    }
+
+    .m-figure__label {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--slate);
+        margin-top: 4px;
+    }
+
+    .m-links {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 0 16px 16px;
+    }
+
+    .m-link {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        min-height: 56px;
+        padding: 12px 14px;
+        border: 2px solid var(--ink);
+        border-radius: var(--cut);
+        background: var(--surface);
+        color: var(--ink);
+        font-weight: 700;
+        font-size: 15px;
+        text-decoration: none;
+    }
+
+    .m-link svg {
+        width: 20px;
+        height: 20px;
+        color: var(--slate);
+        flex: none;
+    }
+
+    .m-bib {
+        margin: 16px;
+        border: 3px solid var(--ink);
+        border-radius: var(--cut);
+        background: var(--surface);
+        padding: 18px 16px 22px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        text-align: center;
+    }
+
+    .m-bib__event {
+        font-family: var(--body);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--brand);
+    }
+
+    .m-bib__number {
+        font-family: var(--display);
+        font-weight: 800;
+        font-size: 132px;
+        line-height: 0.78;
+        letter-spacing: 0.01em;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .m-bib__name {
+        font-family: var(--display);
+        font-weight: 700;
+        font-size: 30px;
+        line-height: 0.95;
+        text-transform: uppercase;
+    }
+
+    .m-bib__rule {
+        width: 64px;
+        height: 4px;
+        background: var(--brand);
+        margin: 6px 0;
+    }
+
+    .m-bib__foot {
+        font-family: var(--data);
+        font-size: 11px;
+        color: var(--slate);
+    }
+
+    .m-state {
+        margin: 16px;
+        border: 2px dashed var(--line);
+        border-radius: var(--cut);
+        padding: 24px 18px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        text-align: center;
+    }
+
+    .m-state svg {
+        width: 30px;
+        height: 30px;
+        color: var(--slate);
+    }
+
+    .m-state__title {
+        font-family: var(--display);
+        font-weight: 700;
+        font-size: 24px;
+        text-transform: uppercase;
+        line-height: 1;
+    }
+
+    .m-state__text {
+        font-size: 14px;
+        color: var(--slate);
+        max-width: 34ch;
+    }
+
+    .m-skeleton {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 0 16px 16px;
+    }
+
+    .m-skeleton__row {
+        height: 72px;
+        border: 2px solid var(--line);
+        border-left: 8px solid var(--line);
+        border-radius: var(--cut);
+        background: var(--surface);
+    }
+
+    .foot {
+        border-top: 2px solid var(--ink);
+        padding-top: var(--step-4);
+        font-size: 0.9375rem;
+        color: var(--slate);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        * {
+            transition: none !important;
+        }
+    }
+</style>
+
+<div class="wrap">
+    <header class="hero">
+        <p class="eyebrow">Direction artistique — proposition</p>
+        <h1>L'appli a l'allure de l'affiche de la fête</h1>
+        <div class="hero__deck">
+            <p class="lede">
+                Une Backyard, c'est une heure qui recommence. On part à l'heure pleine, on doit être
+                rentré avant la suivante, sinon c'est terminé. Cette direction met cet intervalle au
+                centre de chaque écran, en typographie de signalétique : lisible à bout de bras en
+                plein soleil, lisible d'une seule main à quatre heures du matin.
+            </p>
+            <div class="cartouche cartouche--xl">
+                <p class="eyebrow eyebrow--quiet">Tour 06</p>
+                <div class="cartouche__hours">
+                    <span>18:00</span>
+                    <span class="cartouche__to">avant</span>
+                    <span class="hollow">19:00</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="section">
+        <div class="section__head">
+            <p class="eyebrow">La thèse</p>
+            <h2>Trois partis pris, et rien d'autre</h2>
+        </div>
+        <div class="grid">
+            <div class="panel">
+                <h3>L'heure est le héros</h3>
+                <p class="panel__note">
+                    Le chiffre le plus gros de l'écran est toujours une heure ou un nombre de boucles.
+                    Pas un logo, pas un titre de page, pas une illustration.
+                </p>
+            </div>
+            <div class="panel">
+                <h3>L'affiche est carrée, les boutons sont pour les pouces</h3>
+                <p class="panel__note">
+                    Les blocs sont coupés net à 2 px d'arrondi. Tout ce qui se touche est une pastille
+                    complètement ronde, d'au moins 44 px, et le bouton de validation fait 56 px.
+                </p>
+            </div>
+            <div class="panel">
+                <h3>Le jour et la nuit sont deux moitiés de course</h3>
+                <p class="panel__note">
+                    Le thème sombre n'est pas une préférence, c'est la seconde moitié de l'événement.
+                    Les deux palettes sont dessinées ensemble, avec les mêmes contrastes.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section__head">
+            <p class="eyebrow">L'élément signature</p>
+            <h2>Le cartouche horaire</h2>
+        </div>
+        <p class="lede">
+            Une seule forme porte la règle du jeu : le numéro du tour en filet, l'heure de départ
+            pleine, l'heure limite en creux. Le passage du plein au creux dit ce qu'il faut faire sans
+            compte à rebours, sans barre de progression et sans horloge côté client — l'heure est un
+            fait envoyé par le serveur, pas une animation.
+        </p>
+        <div class="grid--wide grid">
+            <div class="panel">
+                <p class="panel__title">Bandeau d'écran</p>
+                <div class="cartouche cartouche--md">
+                    <p class="eyebrow eyebrow--quiet">Tour 06</p>
+                    <div class="cartouche__hours">
+                        <span>18:00</span>
+                        <span class="cartouche__to">avant</span>
+                        <span class="hollow">19:00</span>
+                    </div>
+                </div>
+                <p class="panel__note">Collé en haut, il reste visible pendant le défilement des 40 coureurs.</p>
+            </div>
+            <div class="panel">
+                <p class="panel__title">Ligne de liste</p>
+                <div class="cartouche cartouche--sm">
+                    <p class="eyebrow eyebrow--quiet">Tour 06</p>
+                    <div class="cartouche__hours">
+                        <span>18:00</span>
+                        <span class="cartouche__to">avant</span>
+                        <span class="hollow">19:00</span>
+                    </div>
+                </div>
+                <p class="panel__note">En creux, le filet magenta suffit : à cette taille, le contour disparaît au profit du gris.</p>
+            </div>
+            <div class="panel">
+                <p class="panel__title">Dossard imprimé</p>
+                <div class="specimen">
+                    <span class="specimen__label">La même forme, au service du numéro</span>
+                    <span class="specimen__stamp">012</span>
+                </div>
+                <p class="panel__note">Trois chiffres, la plus grande taille de la page, filet magenta sous le nom.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section__head">
+            <p class="eyebrow">Palette</p>
+            <h2>Deux sols, une marque, quatre statuts</h2>
+        </div>
+        <p class="lede">
+            Le sol clair est une craie légèrement verte, pas un blanc d'écran : il tient le plein
+            soleil sans éblouir. Le sol sombre est un vert-noir de jardin de nuit. Le magenta est la
+            couleur de la fête et ne sert qu'à une chose : l'action.
+        </p>
+        <div class="swatches">
+            <div class="swatch">
+                <div class="swatch__chip" style="background: #EDF1EA; color: #0F1D19;">#EDF1EA</div>
+                <div class="swatch__meta">
+                    <span class="swatch__name">Craie</span>
+                    <span class="swatch__role">Sol de jour. Encre en mode nuit.</span>
+                </div>
+            </div>
+            <div class="swatch">
+                <div class="swatch__chip" style="background: #0F1D19; color: #EDF1EA;">#0F1D19</div>
+                <div class="swatch__meta">
+                    <span class="swatch__name">Nuit</span>
+                    <span class="swatch__role">Encre de jour, sol de nuit. Toutes les bordures.</span>
+                </div>
+            </div>
+            <div class="swatch">
+                <div class="swatch__chip" style="background: #D6006A; color: #FFFFFF;">#D6006A</div>
+                <div class="swatch__meta">
+                    <span class="swatch__name">Fanion</span>
+                    <span class="swatch__role">Action, filets de marque, focus. Nuit : #FF3D8F.</span>
+                </div>
+            </div>
+            <div class="swatch">
+                <div class="swatch__chip" style="background: #0C6E43; color: #FFFFFF;">#0C6E43</div>
+                <div class="swatch__meta">
+                    <span class="swatch__name">Pelouse</span>
+                    <span class="swatch__role">En course. Nuit : #58D9A0.</span>
+                </div>
+            </div>
+            <div class="swatch">
+                <div class="swatch__chip" style="background: #B4301A; color: #FFFFFF;">#B4301A</div>
+                <div class="swatch__meta">
+                    <span class="swatch__name">Braise</span>
+                    <span class="swatch__role">Éliminé, hors délai. Nuit : #FF8A62.</span>
+                </div>
+            </div>
+            <div class="swatch">
+                <div class="swatch__chip" style="background: #5C6B66; color: #FFFFFF;">#5C6B66</div>
+                <div class="swatch__meta">
+                    <span class="swatch__name">Ardoise</span>
+                    <span class="swatch__role">Abandon, et tout texte secondaire. Nuit : #93A39C.</span>
+                </div>
+            </div>
+            <div class="swatch">
+                <div class="swatch__chip" style="background: #8A5B00; color: #FFFFFF;">#8A5B00</div>
+                <div class="swatch__meta">
+                    <span class="swatch__name">Guirlande</span>
+                    <span class="swatch__role">Terminé, vainqueur. Nuit : #F0BE4A.</span>
+                </div>
+            </div>
+        </div>
+        <div class="panel">
+            <p class="panel__title">Contrastes mesurés</p>
+            <p class="panel__note">
+                Texte principal 15,2:1 sur les deux sols. Le plus faible rapport de la palette est
+                4,5:1 — chaque couleur de statut reste conforme AA sur son sol comme sur sa surface de
+                badge, en clair comme en sombre. Aucune ombre douce : en plein soleil elle disparaît,
+                donc la séparation passe par une bordure de 2 px d'encre.
+            </p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section__head">
+            <p class="eyebrow">Typographie</p>
+            <h2>Une face de signalétique, une face de lecture, une face de chiffres</h2>
+        </div>
+        <div class="grid--wide grid">
+            <div class="panel">
+                <p class="panel__title">Big Shoulders Display</p>
+                <p class="panel__note">
+                    Condensée, issue de la signalétique civique de Chicago. Réservée aux chiffres et aux
+                    titres courts au-dessus de 20 px : c'est elle qui rend l'heure lisible à cinq mètres.
+                </p>
+                <div class="specimen">
+                    <span class="specimen__label">Heure · dossard · compteur</span>
+                    <span class="specimen__stamp">18:00</span>
+                </div>
+                <div class="specimen">
+                    <span class="specimen__label">Boucles validées</span>
+                    <span class="specimen__metric">7 boucles</span>
+                </div>
+            </div>
+            <div class="panel">
+                <p class="panel__title">Schibsted Grotesk</p>
+                <p class="panel__note">
+                    Solide, un peu caractérielle, taillée pour les petites tailles. Elle porte les noms,
+                    les libellés, le briefing et toutes les phrases.
+                </p>
+                <div class="specimen">
+                    <span class="specimen__label">Titre de section</span>
+                    <span class="specimen__title">Coureurs encore en course</span>
+                </div>
+                <div class="specimen">
+                    <span class="specimen__label">Texte courant</span>
+                    <span class="specimen__body">
+                        Une boucle de 6 km, un départ toutes les heures, tout le monde repart ensemble.
+                        Boucle non terminée dans l'heure, c'est fini. Lampe frontale à partir de 21 h.
+                    </span>
+                </div>
+            </div>
+            <div class="panel">
+                <p class="panel__title">Spline Sans Mono</p>
+                <p class="panel__note">
+                    Mécanique, chiffres de largeur fixe. Elle porte tout ce qui s'aligne en colonne :
+                    durées, vitesses, numéros de dossard dans une liste.
+                </p>
+                <div class="specimen">
+                    <span class="specimen__label">Durée de boucle</span>
+                    <span class="specimen__metric" style="font-family: var(--data); font-weight: 600;">48:32</span>
+                </div>
+                <div class="specimen">
+                    <span class="specimen__label">Allure et distance</span>
+                    <span class="specimen__data">7,57 km/h · 42 km · dossard 012</span>
+                </div>
+            </div>
+        </div>
+        <div class="panel">
+            <p class="panel__title">Échelle</p>
+            <p class="panel__note">
+                Sept tailles, pas huit. Cartouche 88 px · Chiffre 44 px · Compteur 40 px · Titre 22 px ·
+                Texte 16 px · Donnée 15 px · Filet 11 px en capitales, interlettrage 0,1 em.
+            </p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section__head">
+            <p class="eyebrow">Formes et rythme</p>
+            <h2>Coupé net, espacé par quatre</h2>
+        </div>
+        <div class="grid--wide grid">
+            <div class="panel">
+                <p class="panel__title">Échelle d'espacement</p>
+                <div class="scale">
+                    <div class="scale__row"><span class="scale__bar" style="width: 4px;"></span><span class="scale__value">4 — filets, écarts d'icône</span></div>
+                    <div class="scale__row"><span class="scale__bar" style="width: 8px;"></span><span class="scale__value">8 — entre deux lignes de liste</span></div>
+                    <div class="scale__row"><span class="scale__bar" style="width: 12px;"></span><span class="scale__value">12 — intérieur d'une carte</span></div>
+                    <div class="scale__row"><span class="scale__bar" style="width: 16px;"></span><span class="scale__value">16 — gouttière d'écran</span></div>
+                    <div class="scale__row"><span class="scale__bar" style="width: 24px;"></span><span class="scale__value">24 — entre deux blocs</span></div>
+                    <div class="scale__row"><span class="scale__bar" style="width: 32px;"></span><span class="scale__value">32 — entre deux sections</span></div>
+                    <div class="scale__row"><span class="scale__bar" style="width: 48px;"></span><span class="scale__value">48 — respiration de page</span></div>
+                </div>
+            </div>
+            <div class="panel">
+                <p class="panel__title">Arrondis et relief</p>
+                <p class="panel__note">
+                    Deux valeurs seulement : 2 px pour tout ce qui est structure, pastille complète pour
+                    tout ce qui se touche. Aucune ombre portée douce ; le seul relief est une ombre dure
+                    de 3 px, décalée, réservée au bouton d'action — elle survit au soleil et donne au
+                    doigt un appui visible.
+                </p>
+                <div class="row">
+                    <button type="button" class="btn">Valider la boucle</button>
+                    <button type="button" class="btn btn--ghost">Déclarer un abandon</button>
+                </div>
+            </div>
+            <div class="panel">
+                <p class="panel__title">Cibles tactiles</p>
+                <p class="panel__note">
+                    44 px minimum partout, 56 px pour la validation — le geste le plus répété de la
+                    soirée, plusieurs centaines de fois, debout, une main occupée. Les actions vivent en
+                    bas de l'écran, à portée du pouce.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section__head">
+            <p class="eyebrow">Statuts</p>
+            <h2>Quatre états, jamais portés par la seule couleur</h2>
+        </div>
+        <p class="lede">
+            Chaque statut a une couleur, un pictogramme et un libellé, stables dans toute
+            l'application. Le liséré de 8 px sur le bord gauche d'une ligne de liste porte la même
+            information une troisième fois, ce qui la rend lisible du coin de l'œil.
+        </p>
+        <div class="grid--wide grid">
+            <div class="panel">
+                <p class="panel__title">En couleur</p>
+                <div class="badges">
+                    <span class="badge badge--run">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M8.5 12h6"></path><path d="M12 9.5l3 2.5-3 2.5"></path></svg>
+                        En course
+                    </span>
+                    <span class="badge badge--out">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l2.5 1.75"></path><path d="M5 5l14 14"></path></svg>
+                        Éliminé
+                    </span>
+                    <span class="badge badge--quit">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v9"></path><path d="M8.5 9.5L12 13l3.5-3.5"></path><path d="M5 19h14"></path></svg>
+                        Abandon
+                    </span>
+                    <span class="badge badge--done">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8v4.5a4 4 0 0 1-8 0z"></path><path d="M8 5.5H5.5a3 3 0 0 0 3 3"></path><path d="M16 5.5h2.5a3 3 0 0 1-3 3"></path><path d="M12 12.5V16"></path><path d="M8.5 20h7"></path></svg>
+                        Terminé
+                    </span>
+                </div>
+            </div>
+            <div class="panel">
+                <p class="panel__title">La même chose en niveaux de gris</p>
+                <div class="badges greyscale">
+                    <span class="badge badge--run">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M8.5 12h6"></path><path d="M12 9.5l3 2.5-3 2.5"></path></svg>
+                        En course
+                    </span>
+                    <span class="badge badge--out">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l2.5 1.75"></path><path d="M5 5l14 14"></path></svg>
+                        Éliminé
+                    </span>
+                    <span class="badge badge--quit">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v9"></path><path d="M8.5 9.5L12 13l3.5-3.5"></path><path d="M5 19h14"></path></svg>
+                        Abandon
+                    </span>
+                    <span class="badge badge--done">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8v4.5a4 4 0 0 1-8 0z"></path><path d="M8 5.5H5.5a3 3 0 0 0 3 3"></path><path d="M16 5.5h2.5a3 3 0 0 1-3 3"></path><path d="M12 12.5V16"></path><path d="M8.5 20h7"></path></svg>
+                        Terminé
+                    </span>
+                </div>
+                <p class="panel__note">
+                    Quatre silhouettes distinctes : une flèche qui avance, une horloge barrée, une flèche
+                    qui redescend, une coupe. L'information passe encore.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section__head">
+            <p class="eyebrow">Composants</p>
+            <h2>Ce que les écrans réutilisent</h2>
+        </div>
+        <div class="grid--wide grid">
+            <div class="panel">
+                <p class="panel__title">Ligne de coureur, avant et après validation</p>
+                <div class="mock mock--jour" style="min-height: 0; padding: 12px; border-radius: 2px;">
+                    <div class="m-list" style="padding: 0;">
+                        <div class="m-runner m-runner--run">
+                            <span class="m-runner__bib">007</span>
+                            <span class="m-runner__id">
+                                <span class="m-runner__name">Camille Berthier</span>
+                                <span class="m-runner__meta">6 boucles · 36 km</span>
+                            </span>
+                            <button type="button" class="m-validate">Valider la boucle</button>
+                        </div>
+                        <div class="m-runner m-runner--run">
+                            <span class="m-runner__bib">012</span>
+                            <span class="m-runner__id">
+                                <span class="m-runner__name">Thomas Poirey</span>
+                                <span class="m-runner__meta">7 boucles · 42 km</span>
+                            </span>
+                            <span class="m-stamped">48:32<span>Rentré</span></span>
+                        </div>
+                    </div>
+                </div>
+                <p class="panel__note">
+                    Le coureur validé ne disparaît pas : son bouton est remplacé par son temps, pour que
+                    le gérant voie ce qu'il vient de faire.
+                </p>
+            </div>
+            <div class="panel">
+                <p class="panel__title">Compteurs</p>
+                <div class="mock mock--jour" style="min-height: 0; padding: 12px; border-radius: 2px;">
+                    <div class="m-counters" style="padding: 0;">
+                        <div class="m-counter">
+                            <div class="m-counter__value">24</div>
+                            <div class="m-counter__label">En course</div>
+                        </div>
+                        <div class="m-counter">
+                            <div class="m-counter__value">13</div>
+                            <div class="m-counter__label">Sortis</div>
+                        </div>
+                    </div>
+                </div>
+                <p class="panel__note">Deux chiffres, calculés par le serveur. Aucun total, aucun pourcentage, aucune jauge.</p>
+            </div>
+            <div class="panel">
+                <p class="panel__title">États d'écran</p>
+                <div class="mock mock--jour" style="min-height: 0; padding: 12px; border-radius: 2px;">
+                    <div class="m-state" style="margin: 0 0 8px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 4v4"></path><path d="M12 16v4"></path><path d="M4 12h4"></path><path d="M16 12h4"></path></svg>
+                        <span class="m-state__title">Chargement</span>
+                        <span class="m-state__text">On récupère l'état de la course.</span>
+                    </div>
+                    <div class="m-state" style="margin: 0 0 8px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 18h16"></path><path d="M7 18V9"></path><path d="M12 18V6"></path><path d="M17 18v-6"></path></svg>
+                        <span class="m-state__title">Personne n'est rentré</span>
+                        <span class="m-state__text">Le tour vient de partir. Les temps s'afficheront ici.</span>
+                    </div>
+                    <div class="m-state" style="margin: 0;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l9 16H3z"></path><path d="M12 10v4"></path><path d="M12 17h.01"></path></svg>
+                        <span class="m-state__title">Course indisponible</span>
+                        <span class="m-state__text">Le réseau n'a pas répondu.</span>
+                        <button type="button" class="btn" style="font-size: 14px; padding: 10px 18px;">Réessayer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section__head">
+            <p class="eyebrow">Écrans</p>
+            <h2>La même grille, du plein soleil à quatre heures du matin</h2>
+        </div>
+        <div class="grid grid--screens">
+            <div class="device">
+                <div class="phone">
+                    <div class="mock mock--jour">
+                        <div class="m-band">
+                            <span class="m-band__event">La Backyard de Thomas</span>
+                            <div class="cartouche cartouche--md">
+                                <p class="eyebrow eyebrow--quiet">Tour 06</p>
+                                <div class="cartouche__hours">
+                                    <span>18:00</span>
+                                    <span class="cartouche__to">avant</span>
+                                    <span class="hollow">19:00</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="m-counters">
+                            <div class="m-counter">
+                                <div class="m-counter__value">24</div>
+                                <div class="m-counter__label">En course</div>
+                            </div>
+                            <div class="m-counter">
+                                <div class="m-counter__value">13</div>
+                                <div class="m-counter__label">Sortis</div>
+                            </div>
+                        </div>
+                        <div class="m-listhead">
+                            <span>Arrivées du tour 06</span>
+                            <span>3 / 24</span>
+                        </div>
+                        <div class="m-list">
+                            <div class="m-runner m-runner--run">
+                                <span class="m-runner__bib">012</span>
+                                <span class="m-runner__id">
+                                    <span class="m-runner__name">Thomas Poirey</span>
+                                    <span class="m-runner__meta">7 boucles · 42 km</span>
+                                </span>
+                                <span class="m-stamped">48:32<span>Rentré</span></span>
+                            </div>
+                            <div class="m-runner m-runner--run">
+                                <span class="m-runner__bib">007</span>
+                                <span class="m-runner__id">
+                                    <span class="m-runner__name">Camille Berthier</span>
+                                    <span class="m-runner__meta">6 boucles · 36 km</span>
+                                </span>
+                                <button type="button" class="m-validate">Valider la boucle</button>
+                            </div>
+                            <div class="m-runner m-runner--run">
+                                <span class="m-runner__bib">021</span>
+                                <span class="m-runner__id">
+                                    <span class="m-runner__name">Nadia Lemarchand</span>
+                                    <span class="m-runner__meta">6 boucles · 36 km</span>
+                                </span>
+                                <button type="button" class="m-validate">Valider la boucle</button>
+                            </div>
+                            <div class="m-runner m-runner--run">
+                                <span class="m-runner__bib">034</span>
+                                <span class="m-runner__id">
+                                    <span class="m-runner__name">Yanis Beaufort-Delcourt</span>
+                                    <span class="m-runner__meta">6 boucles · 36 km</span>
+                                </span>
+                                <button type="button" class="m-validate">Valider la boucle</button>
+                            </div>
+                        </div>
+                        <nav class="m-nav">
+                            <a class="m-nav__item m-nav__item--on" href="#course">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l3 2"></path></svg>
+                                Course
+                            </a>
+                            <a class="m-nav__item" href="#coureurs">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16"></path><path d="M4 12h16"></path><path d="M4 18h10"></path></svg>
+                                Coureurs
+                            </a>
+                            <a class="m-nav__item" href="#infos">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 4v6c0 4-3.5 7-8 8-4.5-1-8-4-8-8V7z"></path></svg>
+                                Infos
+                            </a>
+                        </nav>
+                    </div>
+                </div>
+                <p class="phone__caption">Course, en plein soleil<span>Le gérant valide les arrivées du tour</span></p>
+            </div>
+
+            <div class="device">
+                <div class="phone">
+                    <div class="mock mock--nuit">
+                        <div class="m-band">
+                            <span class="m-band__event">La Backyard de Thomas</span>
+                            <div class="cartouche cartouche--md">
+                                <p class="eyebrow eyebrow--quiet">Tour 14</p>
+                                <div class="cartouche__hours">
+                                    <span>02:00</span>
+                                    <span class="cartouche__to">avant</span>
+                                    <span class="hollow">03:00</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="m-counters">
+                            <div class="m-counter">
+                                <div class="m-counter__value">6</div>
+                                <div class="m-counter__label">En course</div>
+                            </div>
+                            <div class="m-counter">
+                                <div class="m-counter__value">31</div>
+                                <div class="m-counter__label">Sortis</div>
+                            </div>
+                        </div>
+                        <div class="m-listhead">
+                            <span>Arrivées du tour 14</span>
+                            <span>1 / 6</span>
+                        </div>
+                        <div class="m-list">
+                            <div class="m-runner m-runner--run">
+                                <span class="m-runner__bib">012</span>
+                                <span class="m-runner__id">
+                                    <span class="m-runner__name">Thomas Poirey</span>
+                                    <span class="m-runner__meta">14 boucles · 84 km</span>
+                                </span>
+                                <span class="m-stamped">52:07<span>Rentré</span></span>
+                            </div>
+                            <div class="m-runner m-runner--run">
+                                <span class="m-runner__bib">003</span>
+                                <span class="m-runner__id">
+                                    <span class="m-runner__name">Paul Vasseur</span>
+                                    <span class="m-runner__meta">13 boucles · 78 km</span>
+                                </span>
+                                <button type="button" class="m-validate">Valider la boucle</button>
+                            </div>
+                            <div class="m-runner m-runner--run">
+                                <span class="m-runner__bib">018</span>
+                                <span class="m-runner__id">
+                                    <span class="m-runner__name">Julie Marchetti</span>
+                                    <span class="m-runner__meta">13 boucles · 78 km</span>
+                                </span>
+                                <button type="button" class="m-validate">Valider la boucle</button>
+                            </div>
+                        </div>
+                        <div class="m-skeleton">
+                            <div class="m-skeleton__row"></div>
+                            <div class="m-skeleton__row"></div>
+                        </div>
+                        <nav class="m-nav">
+                            <a class="m-nav__item m-nav__item--on" href="#course">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l3 2"></path></svg>
+                                Course
+                            </a>
+                            <a class="m-nav__item" href="#coureurs">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16"></path><path d="M4 12h16"></path><path d="M4 18h10"></path></svg>
+                                Coureurs
+                            </a>
+                            <a class="m-nav__item" href="#infos">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 4v6c0 4-3.5 7-8 8-4.5-1-8-4-8-8V7z"></path></svg>
+                                Infos
+                            </a>
+                        </nav>
+                    </div>
+                </div>
+                <p class="phone__caption">Course, à deux heures du matin<span>Six coureurs restent, et les lignes en attente</span></p>
+            </div>
+
+            <div class="device">
+                <div class="phone">
+                    <div class="mock mock--jour">
+                        <div class="m-band">
+                            <span class="m-band__event">La Backyard de Thomas</span>
+                            <h3 style="font-size: 34px;">Les coureurs</h3>
+                        </div>
+                        <div class="m-tabs">
+                            <button type="button" class="m-tab m-tab--on">Tous</button>
+                            <button type="button" class="m-tab">En course</button>
+                            <button type="button" class="m-tab">Sortis</button>
+                            <button type="button" class="m-tab">Tour courant</button>
+                        </div>
+                        <div class="m-list">
+                            <div class="m-runner m-runner--run">
+                                <span class="m-runner__bib">012</span>
+                                <span class="m-runner__id">
+                                    <span class="m-runner__name">Thomas Poirey</span>
+                                    <span class="m-runner__meta">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M8.5 12h6"></path><path d="M12 9.5l3 2.5-3 2.5"></path></svg>
+                                        En course
+                                    </span>
+                                </span>
+                                <span class="m-stamped" style="color: var(--ink);">7<span>Boucles</span></span>
+                            </div>
+                            <div class="m-runner m-runner--run">
+                                <span class="m-runner__bib">003</span>
+                                <span class="m-runner__id">
+                                    <span class="m-runner__name">Paul Vasseur</span>
+                                    <span class="m-runner__meta">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M8.5 12h6"></path><path d="M12 9.5l3 2.5-3 2.5"></path></svg>
+                                        En course
+                                    </span>
+                                </span>
+                                <span class="m-stamped" style="color: var(--ink);">7<span>Boucles</span></span>
+                            </div>
+                            <div class="m-runner m-runner--out">
+                                <span class="m-runner__bib">029</span>
+                                <span class="m-runner__id">
+                                    <span class="m-runner__name">Farid Benazzouz</span>
+                                    <span class="m-runner__meta">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l2.5 1.75"></path><path d="M5 5l14 14"></path></svg>
+                                        Hors délai au tour 05 · 17:00
+                                    </span>
+                                </span>
+                                <span class="m-stamped" style="color: var(--slate);">4<span>Boucles</span></span>
+                            </div>
+                            <div class="m-runner m-runner--quit">
+                                <span class="m-runner__bib">016</span>
+                                <span class="m-runner__id">
+                                    <span class="m-runner__name">Marion Le Guennec</span>
+                                    <span class="m-runner__meta">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v9"></path><path d="M8.5 9.5L12 13l3.5-3.5"></path><path d="M5 19h14"></path></svg>
+                                        Abandon au tour 04 · 16:12
+                                    </span>
+                                </span>
+                                <span class="m-stamped" style="color: var(--slate);">3<span>Boucles</span></span>
+                            </div>
+                            <div class="m-runner m-runner--out">
+                                <span class="m-runner__bib">041</span>
+                                <span class="m-runner__id">
+                                    <span class="m-runner__name">Chloé Vandenbrouck</span>
+                                    <span class="m-runner__meta">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l2.5 1.75"></path><path d="M5 5l14 14"></path></svg>
+                                        Hors délai au tour 03 · 15:00
+                                    </span>
+                                </span>
+                                <span class="m-stamped" style="color: var(--slate);">2<span>Boucles</span></span>
+                            </div>
+                        </div>
+                        <nav class="m-nav">
+                            <a class="m-nav__item" href="#course">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l3 2"></path></svg>
+                                Course
+                            </a>
+                            <a class="m-nav__item m-nav__item--on" href="#coureurs">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16"></path><path d="M4 12h16"></path><path d="M4 18h10"></path></svg>
+                                Coureurs
+                            </a>
+                            <a class="m-nav__item" href="#infos">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 4v6c0 4-3.5 7-8 8-4.5-1-8-4-8-8V7z"></path></svg>
+                                Infos
+                            </a>
+                        </nav>
+                    </div>
+                </div>
+                <p class="phone__caption">Les coureurs<span>Qui court encore, qui est sorti, et pourquoi</span></p>
+            </div>
+
+            <div class="device">
+                <div class="phone">
+                    <div class="mock mock--jour">
+                        <div class="m-band">
+                            <span class="m-band__event">Dossard 012 · Thomas</span>
+                            <div class="cartouche cartouche--md">
+                                <p class="eyebrow eyebrow--quiet">Prochain départ · tour 08</p>
+                                <div class="cartouche__hours">
+                                    <span>20:00</span>
+                                    <span class="cartouche__to">avant</span>
+                                    <span class="hollow">21:00</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="m-figures">
+                            <div class="m-figure">
+                                <div class="m-figure__value">7</div>
+                                <div class="m-figure__label">Boucles</div>
+                            </div>
+                            <div class="m-figure">
+                                <div class="m-figure__value">42</div>
+                                <div class="m-figure__label">Kilomètres</div>
+                            </div>
+                            <div class="m-figure">
+                                <div class="m-figure__value m-figure__value--data">48:32</div>
+                                <div class="m-figure__label">Dernière boucle</div>
+                            </div>
+                            <div class="m-figure">
+                                <div class="m-figure__value m-figure__value--data">7,57</div>
+                                <div class="m-figure__label">km/h moyens</div>
+                            </div>
+                        </div>
+                        <div class="m-links">
+                            <a class="m-link" href="#dossard">
+                                Mon dossard
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+                            </a>
+                            <a class="m-link" href="#parcours">
+                                Le parcours
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+                            </a>
+                            <a class="m-link" href="#briefing">
+                                Le briefing
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+                            </a>
+                        </div>
+                        <nav class="m-nav">
+                            <a class="m-nav__item m-nav__item--on" href="#macourse">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l3 2"></path></svg>
+                                Ma course
+                            </a>
+                            <a class="m-nav__item" href="#coureurs">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16"></path><path d="M4 12h16"></path><path d="M4 18h10"></path></svg>
+                                Coureurs
+                            </a>
+                            <a class="m-nav__item" href="#infos">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 4v6c0 4-3.5 7-8 8-4.5-1-8-4-8-8V7z"></path></svg>
+                                Infos
+                            </a>
+                        </nav>
+                    </div>
+                </div>
+                <p class="phone__caption">Ma course<span>Quatre chiffres et l'heure du prochain départ</span></p>
+            </div>
+
+            <div class="device">
+                <div class="phone">
+                    <div class="mock mock--jour">
+                        <div class="m-band">
+                            <span class="m-band__event">Mon dossard</span>
+                        </div>
+                        <div class="m-bib">
+                            <span class="m-bib__event">La Backyard de Thomas</span>
+                            <span class="m-bib__number">012</span>
+                            <span class="m-bib__rule"></span>
+                            <span class="m-bib__name">Thomas Poirey</span>
+                            <span class="m-bib__foot">Une boucle de 6 km, chaque heure, jusqu'au dernier</span>
+                        </div>
+                        <div class="m-links">
+                            <button type="button" class="btn" style="width: 100%;">Imprimer mon dossard</button>
+                        </div>
+                        <nav class="m-nav">
+                            <a class="m-nav__item m-nav__item--on" href="#macourse">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l3 2"></path></svg>
+                                Ma course
+                            </a>
+                            <a class="m-nav__item" href="#coureurs">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16"></path><path d="M4 12h16"></path><path d="M4 18h10"></path></svg>
+                                Coureurs
+                            </a>
+                            <a class="m-nav__item" href="#infos">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 4v6c0 4-3.5 7-8 8-4.5-1-8-4-8-8V7z"></path></svg>
+                                Infos
+                            </a>
+                        </nav>
+                    </div>
+                </div>
+                <p class="phone__caption">Mon dossard<span>À l'impression, il ne reste que le dossard sur une A4 portrait</span></p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section__head">
+            <p class="eyebrow">Ce que la direction refuse</p>
+            <h2>Les absences sont des choix</h2>
+        </div>
+        <ul class="refuse">
+            <li><strong>Aucun compte à rebours, aucune barre de progression</strong>Un chronomètre physique s'en charge. Les horaires sont des faits venus du serveur.</li>
+            <li><strong>Aucune horloge côté client</strong>Rien ne dérive, rien ne s'anime pendant quinze heures de nuit.</li>
+            <li><strong>Aucun classement pendant la course</strong>La question est « qui est encore debout », pas « qui est premier ».</li>
+            <li><strong>Aucun dégradé, aucune ombre douce, aucune texture</strong>Le soleil les efface. La séparation passe par la bordure et l'espace.</li>
+            <li><strong>Aucune donnée personnelle dans une liste</strong>Téléphone, date de naissance et contact d'urgence n'apparaissent jamais devant un autre coureur.</li>
+            <li><strong>Aucune couleur seule porteuse de sens</strong>Toujours un pictogramme et un libellé avec elle.</li>
+        </ul>
+    </section>
+
+    <section class="section">
+        <div class="section__head">
+            <p class="eyebrow">Mise en œuvre</p>
+            <h2>Les jetons, prêts à poser</h2>
+        </div>
+        <p class="lede">
+            Les noms de jetons du projet ne changent pas : seules leurs valeurs et les trois familles
+            de caractères bougent. Les composants du starter kit suivent sans modification ; les
+            composants de course reçoivent en plus le cartouche, le liséré de statut et l'ombre dure.
+        </p>
+        <pre>:root {
+    --font-display: 'Big Shoulders Display';
+    --font-sans: 'Schibsted Grotesk';
+    --font-data: 'Spline Sans Mono';
+
+    --radius: 2px;
+    --radius-pill: 999px;
+
+    --background: #EDF1EA;
+    --card: #FDFEFC;
+    --foreground: #0F1D19;
+    --muted-foreground: #5C6B66;
+    --border: #0F1D19;
+    --primary: #D6006A;
+    --primary-foreground: #FFFFFF;
+
+    --status-running: #0C6E43;
+    --status-running-surface: #DFEFE6;
+    --status-eliminated: #B4301A;
+    --status-eliminated-surface: #F9E6E0;
+    --status-abandoned: #5C6B66;
+    --status-abandoned-surface: #E5EAE4;
+    --status-finished: #8A5B00;
+    --status-finished-surface: #F7EBD2;
+}
+
+.dark {
+    --background: #0F1D19;
+    --card: #172823;
+    --foreground: #EDF1EA;
+    --muted-foreground: #93A39C;
+    --border: #EDF1EA;
+    --primary: #FF3D8F;
+    --primary-foreground: #0F1D19;
+
+    --status-running: #58D9A0;
+    --status-running-surface: #16352A;
+    --status-eliminated: #FF8A62;
+    --status-eliminated-surface: #3A2018;
+    --status-abandoned: #93A39C;
+    --status-abandoned-surface: #232F2B;
+    --status-finished: #F0BE4A;
+    --status-finished-surface: #35290F;
+}</pre>
+    </section>
+
+    <footer class="foot">
+        Proposition de direction artistique pour La Backyard de Thomas — une boucle de 6 km, chaque
+        heure, jusqu'au dernier.
+    </footer>
+</div>

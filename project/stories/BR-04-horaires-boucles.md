@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Epic** | 1 — Fondations |
-| **Statut** | À faire |
+| **Statut** | ✅ Terminé |
 | **Estimation** | 5 pts |
 | **Dépend de** | BR-03 |
 
@@ -78,7 +78,7 @@ fuseau ici décalerait toute la course de deux heures, et donc toutes les élimi
 
 ## Tâches
 
-- [ ] **T1** — Migration et modèle du tour de course, unicité du numéro par événement `1 pt`
-- [ ] **T2** — Service de calcul des horaires et de résolution du tour courant `2 pts`
-- [ ] **T3** — Ouverture du tour suivant à échéance du précédent `1 pt`
-- [ ] **T4** — Tests du calcul : premier départ, tour courant, durée non horaire, avant course `2 pts`
+- [x] **T1** — Migration et modèle du tour de course, unicité du numéro par événement `1 pt`
+- [x] **T2** — Service de calcul des horaires et de résolution du tour courant `2 pts`
+- [x] **T3** — Ouverture du tour suivant à échéance du précédent `1 pt`
+- [x] **T4** — Tests du calcul : premier départ, tour courant, durée non horaire, avant course `2 pts`

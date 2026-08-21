@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Epic** | 1 — Fondations |
-| **Statut** | À faire |
+| **Statut** | ✅ Terminé |
 | **Estimation** | 13 pts |
 | **Dépend de** | BR-00 |
 
@@ -32,6 +32,10 @@ stories d'écran réutilisent — la faire tard reviendrait à repasser sur chaq
 **Exclu**
 - Le contenu métier des écrans : chaque story d'écran l'apporte.
 - Toute librairie de composants supplémentaire : Tailwind et les composants du starter kit suffisent.
+- La traduction des écrans hérités du starter kit (auth, réglages, 2FA, passkeys) : BR-02
+  établit la convention et l'applique à ce qu'elle écrit, sans passe d'i18n sur l'existant.
+  Voir Q-01 dans QUESTIONS.md.
+- Tout compte à rebours et toute barre de progression, voir D-25.
 
 **Dépendances** — BR-00.
 
@@ -72,14 +76,26 @@ Alors les contrastes de texte restent conformes AA
 ## Impacts techniques
 
 Les couleurs et pictogrammes de statut deviennent une donnée partagée entre le back
-(qui produit le statut) et le front (qui l'affiche). Un statut ajouté plus tard devra être
-déclaré à un seul endroit.
+(qui produit le statut) et le front (qui l'affiche).
+
+**Les quatre statuts sont un jeu d'affichage, pas une colonne.** BR-08 ne modélise que deux
+états du participant, BR-10 et BR-11 aboutissent tous deux à `eliminated` en ne différant que
+par le motif, et le `finished` de BR-20 est le statut de l'événement. `App\Enums\RunnerStatus`
+est donc un enum **dérivé et strictement de données** — aucune transition. La dérivation
+`RunnerStatus::for(Participant)` appartient à **BR-08**, qui ne doit pas redéclarer un jeu de
+statuts concurrent.
+
+Sur « déclaré à un seul endroit » : ce n'est pas atteignable et ce n'était pas atteint. Tailwind
+ne génère que les classes qu'il voit dans les sources, et une icône Lucide est un composant Vue
+importé statiquement — PHP ne peut porter ni l'une ni l'autre. Le contrat retenu ne duplique
+**aucun fait** (le libellé une fois, la couleur une fois, l'icône une fois, le jeu de valeurs
+une fois) et fait échouer la CI dans les deux sens en cas de dérive. Voir D-26.
 
 ## Tâches
 
-- [ ] **T1** — Arrêter la direction artistique avec le skill frontend-design, la valider avec le propriétaire du projet `3 pts`
-- [ ] **T2** — Traduire la palette et la typographie en tokens Tailwind, clair et sombre `2 pts`
-- [ ] **T3** — Construire le layout mobile-first commun et sa navigation `3 pts`
-- [ ] **T4** — Créer les composants récurrents : carte coureur, badge de statut, bouton d'action large, compteur, entête de tour `3 pts`
-- [ ] **T5** — Créer les états de chargement, vide et erreur réutilisables `1 pt`
-- [ ] **T6** — Vérifier contrastes et cibles tactiles, corriger les écarts `1 pt`
+- [x] **T1** — Arrêter la direction artistique avec le skill frontend-design, la valider avec le propriétaire du projet `3 pts`
+- [x] **T2** — Traduire la palette et la typographie en tokens Tailwind, clair et sombre `2 pts`
+- [x] **T3** — Construire le layout mobile-first commun et sa navigation `3 pts`
+- [x] **T4** — Créer les composants récurrents : carte coureur, badge de statut, bouton d'action large, compteur, entête de tour `3 pts`
+- [x] **T5** — Créer les états de chargement, vide et erreur réutilisables `1 pt`
+- [x] **T6** — Vérifier contrastes et cibles tactiles, corriger les écarts `1 pt`

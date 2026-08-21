@@ -1,0 +1,17 @@
+# Deny-by-default: le graphe ne couvre que app/, resources/ et database/.
+/*
+
+!/app/
+!/app/**
+!/resources/
+!/resources/**
+!/database/
+!/database/**
+
+# Code genere (wayfinder, routes, actions) - gitignore, jamais architecturalement utile
+/resources/js/actions
+/resources/js/routes
+/resources/js/wayfinder
+
+# Licences de polices - du texte, pas du code
+/resources/fonts

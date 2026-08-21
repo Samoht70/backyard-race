@@ -5,7 +5,7 @@
 | **Epic** | 6 — Expérience participant |
 | **Statut** | À faire |
 | **Estimation** | 8 pts |
-| **Dépend de** | BR-02, BR-08 |
+| **Dépend de** | BR-02, BR-08, BR-33 |
 
 ## User story
 
@@ -19,17 +19,24 @@ Le coureur n'a pas besoin du tableau de bord du gérant : il veut son nombre de 
 distance, son dernier temps et l'heure du prochain départ. Un écran, quatre chiffres, quelques
 raccourcis.
 
+## Frontière avec BR-33
+
+BR-33 a livré l'accueil d'avant-course — statut d'inscription, dossard, raccourcis — et la
+navigation qui y mène. Cette story **remplace le contenu de cet écran** par les chiffres de course
+dès que le moteur existe ; elle ne repose ni une route, ni une entrée de menu, ni un second tableau
+de bord.
+
 ## Périmètre fonctionnel
 
 **Inclus**
 - Son prénom, son numéro de dossard, son statut de course.
 - Ses boucles réalisées, sa distance totale, la durée de sa dernière boucle.
 - Le prochain départ : numéro du tour et heure.
-- Les raccourcis vers son dossard, le parcours, le briefing et les documents.
+- Les raccourcis vers le briefing et les documents.
 
 **Exclu**
 - Toute action sur la course : le coureur ne valide rien et n'abandonne pas lui-même.
-- Le détail boucle par boucle : c'est la fiche coureur (BR-16).
+- Le détail boucle par boucle : il se déplie dans le tableau des coureurs (BR-14, BR-16).
 - Tout compte à rebours (voir D-15).
 
 **Dépendances** — BR-02, BR-08.

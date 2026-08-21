@@ -50,6 +50,7 @@
             "composer install",
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
             "@php artisan key:generate",
+            "@php artisan storage:ensure-bucket",
             "@php artisan migrate --force",
             "npm install",
             "npm run build"
@@ -69,6 +70,7 @@
             "npm run lint:check",
             "npm run format:check",
             "npm run types:check",
+            "npm run test",
             "@test"
         ],
         "types:check": [

@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Epic** | 7 — Déploiement |
-| **Statut** | À faire |
+| **Statut** | ✅ Terminé |
 | **Estimation** | 9 pts |
 | **Dépend de** | BR-26 |
 
@@ -91,9 +91,9 @@ comportement se manifestent ici plutôt qu'en production si l'image est testée 
 
 ## Tâches
 
-- [ ] **T1** — `Dockerfile` de production multi-étapes : dépendances, assets, image finale `3 pts`
-- [ ] **T2** — Configuration PHP de production : OPcache, limites, journalisation `2 pts`
-- [ ] **T3** — Point d'entrée de démarrage et point de contrôle de santé `2 pts`
-- [ ] **T4** — `.dockerignore` : exclure secrets, tests, node_modules, vendor `1 pt`
-- [ ] **T5** — Fichier Compose de production : application, worker, planificateur, MySQL, Redis `1 pt`
-- [ ] **T6** — Vérifier l'image localement : santé, absence de root, absence de secrets `2 pts`
+- [x] **T1** — `Dockerfile` de production multi-étapes : dépendances, assets, image finale `3 pts`
+- [x] **T2** — Configuration PHP de production : OPcache, limites, journalisation `2 pts`
+- [x] **T3** — Point d'entrée de démarrage et point de contrôle de santé `2 pts`
+- [x] **T4** — `.dockerignore` : exclure secrets, tests, node_modules, vendor `1 pt`
+- [x] **T5** — Fichier Compose de production : application, worker, planificateur, MySQL, Redis `1 pt`
+- [x] **T6** — Vérifier l'image localement : santé, absence de root, absence de secrets `2 pts`

@@ -3,9 +3,21 @@
 | | |
 |---|---|
 | **Epic** | 4 — Informations événement |
-| **Statut** | À faire |
-| **Estimation** | 8 pts |
+| **Statut** | ⛔ Abandonné |
+| **Estimation** | 8 pts, non engagés |
 | **Dépend de** | BR-03 |
+
+## Pourquoi cette story n'est pas faite
+
+Abandonnée le 2026-08-20, à l'élagage du backlog (voir D-47).
+
+La boucle est unique, balisée sur le terrain et reconnue à pied avant la course. La carte
+interactive apportait Leaflet, un fond de tuiles tiers, un parseur GPX et une extraction de
+dénivelé en tâche de fond — huit points pour un tracé que personne ne consulte en courant.
+
+Ce qui survit passe dans BR-18 : le fichier GPX est déposé comme un document téléchargeable, et
+une capture du tracé tient le rôle de la carte. La distance de boucle reste celle que le gérant
+saisit en BR-03 ; elle ne dépendait déjà pas du GPX (voir D-17).
 
 ## User story
 

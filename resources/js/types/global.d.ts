@@ -1,3 +1,4 @@
+import type { Access } from '@/types/access';
 import type { Auth } from '@/types/auth';
 
 // Extend ImportMeta interface for Vite...
@@ -18,7 +19,9 @@ declare module '@inertiajs/core' {
         sharedPageProps: {
             name: string;
             auth: Auth;
+            access: Access;
             sidebarOpen: boolean;
+            translations: Record<string, string>;
             [key: string]: unknown;
         };
     }

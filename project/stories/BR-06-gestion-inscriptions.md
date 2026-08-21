@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Epic** | 1 — Fondations |
-| **Statut** | À faire |
+| **Statut** | ✅ Terminé |
 | **Estimation** | 5 pts |
 | **Dépend de** | BR-05 |
 
@@ -81,7 +81,26 @@ fait entrer le coureur dans les effectifs de la course.
 
 ## Tâches
 
-- [ ] **T1** — Actions de confirmation et d'annulation, avec leurs garde-fous de transition `2 pts`
-- [ ] **T2** — Écran gérant : liste filtrable, compteur de places, actions `2 pts`
-- [ ] **T3** — Modification d'une fiche participant par le gérant `1 pt`
-- [ ] **T4** — Tests : transitions valides et invalides, capacité, idempotence de la confirmation `2 pts`
+- [x] **T1** — Actions de confirmation et d'annulation, avec leurs garde-fous de transition `2 pts`
+- [x] **T2** — Écran gérant : liste filtrable, compteur de places, actions `2 pts`
+- [x] **T3** — Modification d'une fiche participant par le gérant `1 pt`
+- [x] **T4** — Tests : transitions valides et invalides, capacité, idempotence de la confirmation `2 pts`
+
+## Ce qui a été tranché avant de commencer (Q-03, fermée le 2026-08-20)
+
+L'inscription et la création de compte avaient fusionné : une inscription naît dans le parcours par
+mail, et `registration/create` n'existe plus. Cette story est la première à rendre atteignable le cas
+d'un compte sans inscription, puisqu'elle donne au gérant le pouvoir d'annuler.
+
+**Branche retenue avec le propriétaire : la première combinée à la troisième.** Le coureur voit son
+inscription annulée en lecture seule, avec un message qui dit ce qui s'est passé, et il ne regagne
+aucun pouvoir de création. C'est le gérant qui remet l'inscription en attente, et rien de ce que le
+coureur avait saisi n'est perdu dans l'aller-retour. Aucun écran de création ne revient côté
+connecté : D-45 tient intégralement.
+
+Voir [D-48](../DECISIONS.md).
+
+## Ce que cette story ne livre pas
+
+Le critère « et un numéro de dossard lui est attribué » appartient à BR-07, livrée juste après sur
+sa propre branche. La confirmation pose le point de branchement ; l'attribution s'y greffe.

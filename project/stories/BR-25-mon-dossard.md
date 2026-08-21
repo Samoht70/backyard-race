@@ -3,9 +3,22 @@
 | | |
 |---|---|
 | **Epic** | 6 — Expérience participant |
-| **Statut** | À faire |
-| **Estimation** | 8 pts |
+| **Statut** | ⛔ Abandonné |
+| **Estimation** | 8 pts, non engagés |
 | **Dépend de** | BR-02, BR-07 |
+
+## Pourquoi cette story n'est pas faite
+
+Abandonnée le 2026-08-20, à l'élagage du backlog (voir D-47).
+
+Quarante impressions sur autant d'imprimantes familiales, avec un fond graphique calibré pour le
+papier et une taille de police qui s'adapte aux noms longs : la story demandait au produit de
+maîtriser un rendu qu'il ne voit jamais. D-15 exclut déjà « l'impression de listes » — la même
+logique vaut pour un dossard à l'unité.
+
+Le numéro reste porté par BR-07, attribué à la confirmation, et affiché en grand sur le tableau
+de bord du coureur (BR-24). Le gérant qui veut du papier a le tableau des coureurs de BR-14 sous
+les yeux et l'impression de son navigateur.
 
 ## User story
 

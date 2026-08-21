@@ -1,0 +1,67 @@
+<?php
+
+return [
+    'failed' => 'Ces identifiants ne correspondent à aucun compte.',
+    'password' => 'Le mot de passe est incorrect.',
+    'throttle' => 'Trop de tentatives. Réessaie dans :seconds secondes.',
+
+    'login' => [
+        'title' => 'Se connecter',
+        'description' => 'Entre ton adresse email et ton code d’inscription.',
+        'email' => 'Adresse email',
+        'password' => 'Code d’inscription',
+        'remember' => 'Se souvenir de moi',
+        'submit' => 'Se connecter',
+        'no_account' => 'Pas encore de compte ?',
+        'register' => 'S’inscrire',
+    ],
+    'register' => [
+        'start' => [
+            'title' => 'S’inscrire à la course',
+            'description' => 'Entre ton adresse email : tu recevras un lien pour remplir ton inscription.',
+            'email' => 'Adresse email',
+            'submit' => 'Recevoir le lien',
+            'closed' => 'Les inscriptions ne sont pas ouvertes. Reviens quand le gérant les aura lancées.',
+            'has_account' => 'Tu as déjà un compte ?',
+            'login' => 'Se connecter',
+        ],
+        'complete' => [
+            'title' => 'Ton inscription',
+            'description' => 'Quatre étapes, et c’est fait : ton inscription part en attente et le gérant la confirme ensuite.',
+            'identity' => 'Toi',
+            'email' => 'Adresse email',
+            'first_name' => 'Prénom',
+            'last_name' => 'Nom',
+            'nav' => 'Étapes de l’inscription',
+            'position' => 'Étape :current sur :total',
+            'go_to' => 'Revenir à l’étape :position',
+            'back' => 'Retour',
+            'next' => 'Suivant',
+            'step' => [
+                'identity' => 'Toi',
+                'runner' => 'Coureur',
+                'emergency' => 'Pépin',
+                'notes' => 'Signaler',
+            ],
+            'submit' => 'Envoyer mon inscription',
+        ],
+        'code' => [
+            'title' => 'Ton code d’inscription',
+            'description' => 'Note-le maintenant, il ne sera plus affiché.',
+            'warning_title' => 'Ce code est ton mot de passe',
+            'warning' => 'Il te servira à te connecter avec ton adresse email. Il n’est affiché qu’une seule fois et ne peut pas être renvoyé : copie-le et garde-le.',
+            'copy' => 'Copier le code',
+            'copied' => 'Code copié',
+            'login' => 'Se connecter avec ce code',
+        ],
+        'link_sent' => 'Un lien vient d’être envoyé à cette adresse. Il est valable :hours heures.',
+        'link_invalid' => 'Ce lien d’inscription n’est plus valable. Redemande-en un.',
+        'already_registered' => 'Cette adresse est déjà inscrite. Connecte-toi avec ton code d’inscription.',
+    ],
+    'confirm' => [
+        'title' => 'Confirmer le mot de passe',
+        'description' => 'Cette zone est protégée : confirme ton mot de passe pour continuer.',
+        'password' => 'Mot de passe',
+        'submit' => 'Confirmer',
+    ],
+];

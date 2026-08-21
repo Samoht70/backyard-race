@@ -3,8 +3,9 @@
 | | |
 |---|---|
 | **Epic** | 4 — Informations événement |
-| **Statut** | À faire |
-| **Estimation** | 5 pts |
+| **Statut** | ✅ Terminé |
+| **Estimation** | 2 pts |
+| **Révisée** | 2026-08-20 — réduite de 5 à 2 pts (voir D-47) |
 | **Dépend de** | BR-03 |
 
 ## User story
@@ -24,10 +25,11 @@ compétition.
 
 **Inclus**
 - Une page briefing consultable par tous les participants.
-- Édition du contenu par le gérant, avec mise en forme simple.
+- Édition du contenu par le gérant, dans un champ de texte, en Markdown restreint.
 - Un contenu initial reprenant les règles ci-dessus.
 
 **Exclu**
+- Tout éditeur riche : le briefing se saisit en Markdown dans un `textarea` (voir D-47).
 - L'historique des versions du briefing.
 - Toute règle interdisant l'alcool pendant la course : elle ne doit pas figurer au briefing.
 
@@ -38,7 +40,7 @@ compétition.
 - Le briefing est unique pour l'événement.
 - Seul le porteur de la permission `manage-documents` peut le modifier.
 - Il est consultable par tout utilisateur connecté dès que l'événement sort du statut `draft`.
-- Le contenu accepte une mise en forme simple : titres, listes, gras, émoji.
+- Le contenu accepte du Markdown restreint : titres, listes, gras, émoji.
 - Le contenu soumis est nettoyé avant enregistrement : aucun script, aucun HTML arbitraire.
 
 ## Critères d'acceptation
@@ -79,8 +81,7 @@ nettoyage à l'entrée n'est pas optionnel.
 
 ## Tâches
 
-- [ ] **T1** — Stockage du contenu du briefing rattaché à l'événement `1 pt`
-- [ ] **T2** — Nettoyage du contenu à l'enregistrement `1 pt`
-- [ ] **T3** — Contenu initial en seeder, ton convivial `1 pt`
-- [ ] **T4** — Page de consultation et écran d'édition `2 pts`
-- [ ] **T5** — Tests : consultation, édition, refus participant, nettoyage `1 pt`
+- [x] **T1** — Colonne de briefing sur l'événement, nettoyage à l'enregistrement, contenu
+  initial en seeder `1 pt`
+- [x] **T2** — Page de consultation, `textarea` d'édition, et tests : consultation, édition,
+  refus participant, nettoyage `1 pt`

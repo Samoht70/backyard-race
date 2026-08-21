@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Epic** | 1 — Fondations |
-| **Statut** | À faire |
+| **Statut** | ✅ Terminé |
 | **Estimation** | 8 pts |
 | **Dépend de** | BR-00 |
 
@@ -82,8 +82,28 @@ conditionnel est un confort : la décision reste côté serveur.
 
 ## Tâches
 
-- [ ] **T1** — Ajouter le trait `HasRoles` au modèle `User` `1 pt`
-- [ ] **T2** — Écrire le seeder des rôles et des neuf permissions, idempotent, avec purge du cache Spatie `2 pts`
-- [ ] **T3** — Seeder un compte gérant et quelques comptes participants pour le développement `1 pt`
-- [ ] **T4** — Exposer les capacités de l'utilisateur dans le partage Inertia et les typer côté TypeScript `2 pts`
-- [ ] **T5** — Tests : refus pour un participant, succès pour un gérant, rôle par défaut à l'inscription `2 pts`
+- [x] **T1** — Ajouter le trait `HasRoles` au modèle `User` `1 pt`
+- [x] **T2** — Écrire le seeder des rôles et des neuf permissions, idempotent, avec purge du cache Spatie `2 pts`
+- [x] **T3** — Seeder un compte gérant et quelques comptes participants pour le développement `1 pt`
+- [x] **T4** — Exposer les capacités de l'utilisateur dans le partage Inertia et les typer côté TypeScript `2 pts`
+- [x] **T5** — Tests : refus pour un participant, succès pour un gérant, rôle par défaut à l'inscription `2 pts`
+
+## Notes d'implémentation
+
+Le cloisonnement s'exprime en `can:` sur le Gate que Spatie alimente, jamais par les alias
+`role:` / `permission:` : un seul mécanisme pour le middleware, les Policies à venir et le prop
+partagé. Voir D-28 pour le contrat complet.
+
+Trois écarts au périmètre littéral, tous arbitrés avec le propriétaire :
+
+- **Un embryon de route `/manage`** est livré, avec un écran placeholder. Sans lui, le critère
+  « il appelle une route d'administration → refus » n'aurait été vérifiable que par un harnais de
+  test. BR-13 étoffe l'écran, pas le cloisonnement.
+- **La navigation porte déjà une entrée « Gestion » filtrée**, pour que le helper `can()` ait un
+  consommateur réel plutôt que d'arriver en code mort. La barre basse est à quatre onglets, son
+  plafond pratique à 375 px.
+- **La page d'erreur Inertia est hors périmètre** : un 403 sort aujourd'hui sur la page Symfony par
+  défaut. Voir Q-02.
+
+Dette portée par cette story : l'inscription dépend du seeder des rôles. Un `migrate --force` sans
+`db:seed` fait tomber la première inscription en 500 — **BR-32 doit porter l'étape de seed**.

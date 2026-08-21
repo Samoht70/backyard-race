@@ -1,0 +1,44 @@
+<?php
+
+namespace App\Policies;
+
+use App\Enums\EventStatus;
+use App\Enums\Permission;
+use App\Models\Event;
+use App\Models\User;
+
+class EventPolicy
+{
+    public function view(User $user, Event $event): bool
+    {
+        return $event->lifecycle()->isVisibleToParticipants()
+            || $user->can(Permission::ManageEvent->value);
+    }
+
+    public function update(User $user, Event $event): bool
+    {
+        return $user->can(Permission::ManageEvent->value)
+            && $event->lifecycle()->isEditable();
+    }
+
+    public function updateBriefing(User $user, Event $event): bool
+    {
+        return $user->can(Permission::ManageDocuments->value)
+            && $event->lifecycle()->isEditable();
+    }
+
+    public function advance(User $user, Event $event): bool
+    {
+        $next = $event->lifecycle()->nextStatus();
+
+        if ($next === null) {
+            return false;
+        }
+
+        if ($next === EventStatus::Finished) {
+            return $user->can(Permission::FinishEvent->value);
+        }
+
+        return $user->can(Permission::ManageEvent->value);
+    }
+}

@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Epic** | 1 — Fondations |
-| **Statut** | À faire |
+| **Statut** | ✅ Terminé |
 | **Estimation** | 8 pts |
 | **Dépend de** | BR-01, BR-03 |
 
@@ -42,6 +42,12 @@ et particularités du coureur.
 - Les inscriptions ne sont ouvertes que si l'événement est en `registration`.
 - Quand le nombre d'inscriptions confirmées atteint le maximum, le formulaire n'accepte plus
   de nouvelle inscription.
+- **Hérité de BR-03, à ne pas oublier :** un plafond `max_participants` nul signifie « pas de
+  limite », jamais zéro (D-30). Et la règle « on ne peut pas fixer un plafond inférieur au nombre
+  de confirmés » n'a pas pu être écrite en BR-03 faute de table `participants` : elle appartient à
+  cette story, dans `EventUpdateRequest`.
+- L'ouverture des inscriptions se lit via `$event->lifecycle()->allowsRegistration()`, jamais en
+  recomparant `$event->status` à `EventStatus::Registration` (D-29).
 - Le contact d'urgence et son téléphone sont obligatoires. Les informations complémentaires
   sont libres.
 - Un participant ne voit et ne modifie que sa propre inscription.
@@ -89,9 +95,9 @@ coureurs, y compris sur le tableau public des participants.
 
 ## Tâches
 
-- [ ] **T1** — Migration et modèle `Participant`, énumération de statut, lien vers `User` `2 pts`
-- [ ] **T2** — Factory et seeder d'une trentaine de participants pour le développement `1 pt`
-- [ ] **T3** — Form Request de validation, y compris capacité et unicité `2 pts`
-- [ ] **T4** — Contrôleur d'inscription, Policy « ma propre inscription » `2 pts`
-- [ ] **T5** — Écran d'inscription et écran de consultation de son inscription `3 pts`
-- [ ] **T6** — Tests : nominal, doublon, complet, cloisonnement entre participants `2 pts`
+- [x] **T1** — Migration et modèle `Participant`, énumération de statut, lien vers `User` `2 pts`
+- [x] **T2** — Factory et seeder d'une trentaine de participants pour le développement `1 pt`
+- [x] **T3** — Form Request de validation, y compris capacité et unicité `2 pts`
+- [x] **T4** — Contrôleur d'inscription, Policy « ma propre inscription » `2 pts`
+- [x] **T5** — Écran d'inscription et écran de consultation de son inscription `3 pts`
+- [x] **T6** — Tests : nominal, doublon, complet, cloisonnement entre participants `2 pts`

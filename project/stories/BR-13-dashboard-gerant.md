@@ -28,7 +28,7 @@ ce qui n'est pas « quel tour, qui est encore là, qui vient de rentrer » l'enc
 
 **Exclu**
 - Tout compte à rebours (voir D-15).
-- Les statistiques et les classements : ils ont leurs propres pages.
+- Les résultats et le classement : ils ont leur propre page (BR-20, BR-23).
 - La configuration de l'événement.
 
 **Dépendances** — BR-02, BR-09, BR-10.

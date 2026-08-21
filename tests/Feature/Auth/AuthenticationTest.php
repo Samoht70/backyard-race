@@ -3,9 +3,10 @@
 namespace Tests\Feature\Auth;
 
 use App\Models\User;
+use Database\Factories\UserFactory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\RateLimiter;
-use Laravel\Fortify\Features;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class AuthenticationTest extends TestCase
@@ -25,32 +26,11 @@ class AuthenticationTest extends TestCase
 
         $response = $this->post(route('login.store'), [
             'email' => $user->email,
-            'password' => 'password',
+            'password' => UserFactory::ACCESS_CODE,
         ]);
 
         $this->assertAuthenticated();
         $response->assertRedirect(route('dashboard', absolute: false));
-    }
-
-    public function test_users_with_two_factor_enabled_are_redirected_to_two_factor_challenge()
-    {
-        $this->skipUnlessFortifyHas(Features::twoFactorAuthentication());
-
-        Features::twoFactorAuthentication([
-            'confirm' => true,
-            'confirmPassword' => true,
-        ]);
-
-        $user = User::factory()->withTwoFactor()->create();
-
-        $response = $this->post(route('login'), [
-            'email' => $user->email,
-            'password' => 'password',
-        ]);
-
-        $response->assertRedirect(route('two-factor.login'));
-        $response->assertSessionHas('login.id', $user->id);
-        $this->assertGuest();
     }
 
     public function test_users_can_not_authenticate_with_invalid_password()
@@ -59,10 +39,23 @@ class AuthenticationTest extends TestCase
 
         $this->post(route('login.store'), [
             'email' => $user->email,
-            'password' => 'wrong-password',
+            'password' => 'ZZZZ-ZZZZ-ZZZZ',
         ]);
 
         $this->assertGuest();
+    }
+
+    #[Test]
+    public function it_accepts_a_code_typed_without_its_dashes_or_capitals(): void
+    {
+        $user = User::factory()->create();
+
+        $this->post(route('login.store'), [
+            'email' => $user->email,
+            'password' => strtolower(str_replace('-', '', UserFactory::ACCESS_CODE)),
+        ]);
+
+        $this->assertAuthenticated();
     }
 
     public function test_users_can_logout()
@@ -84,7 +77,7 @@ class AuthenticationTest extends TestCase
 
         $response = $this->post(route('login.store'), [
             'email' => $user->email,
-            'password' => 'wrong-password',
+            'password' => 'ZZZZ-ZZZZ-ZZZZ',
         ]);
 
         $response->assertTooManyRequests();

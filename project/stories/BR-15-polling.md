@@ -4,7 +4,8 @@
 |---|---|
 | **Epic** | 3 — Interface de course |
 | **Statut** | À faire |
-| **Estimation** | 5 pts |
+| **Estimation** | 2 pts |
+| **Révisée** | 2026-08-20 — réduite de 5 à 2 pts (voir D-47) |
 | **Dépend de** | BR-13, BR-14 |
 
 ## User story
@@ -19,6 +20,10 @@ Le tour change toutes les heures et les éliminations tombent côté serveur. Un
 ouvert dix minutes ment. Un rafraîchissement périodique léger suffit : ni WebSocket, ni
 infrastructure temps réel.
 
+Chaque validation de boucle recharge déjà la page par Inertia : ce qui manque n'est qu'un
+`router.reload()` périodique pour l'écran qu'on ne touche pas. D'où la réduction à deux points —
+le mécanisme est une dizaine de lignes, pas une brique.
+
 ## Périmètre fonctionnel
 
 **Inclus**
@@ -28,7 +33,7 @@ infrastructure temps réel.
 
 **Exclu**
 - Tout WebSocket ou diffusion d'événements (voir D-15).
-- Le rafraîchissement des pages statiques : briefing, documents, parcours.
+- Le rafraîchissement des pages statiques : briefing et documents.
 
 **Dépendances** — BR-13, BR-14.
 
@@ -76,7 +81,7 @@ renvoie aux choix faits en BR-13 et BR-14.
 
 ## Tâches
 
-- [ ] **T1** — Composable de rafraîchissement périodique, fréquence centralisée `2 pts`
-- [ ] **T2** — Suspension sur onglet masqué, préservation de l'état de l'écran `2 pts`
-- [ ] **T3** — Branchement sur le dashboard gérant et le tableau des coureurs `1 pt`
-- [ ] **T4** — Tests : réseau coupé, session expirée, onglet masqué `1 pt`
+- [ ] **T1** — Composable de rafraîchissement : `router.reload()` périodique, fréquence unique,
+  suspension sur onglet masqué `1 pt`
+- [ ] **T2** — Branchement sur le dashboard gérant et le tableau des coureurs, avec les tests
+  d'onglet masqué et de session expirée `1 pt`

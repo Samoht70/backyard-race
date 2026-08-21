@@ -13,6 +13,8 @@ parameters:
 
     level: 7
 
+    checkMissingTranslations: true
+
     ignoreErrors:
         -
             identifier: xefi.maxLinePerMethod
