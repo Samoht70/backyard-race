@@ -53,8 +53,8 @@ les informations de la course ; il ne voit encore aucune boucle, parce qu'aucune
 
 ### Lot 2 — mettre en ligne · en cours
 
-L'epic 7 de bout en bout, BR-26 → BR-32, 44 pts. Le lot 1 n'a aucune valeur tant que rien n'est
-joignable depuis l'extérieur ; c'est la mise en ligne qui transforme « l'inscription est
+L'epic 7 de bout en bout, BR-26 → BR-32 plus BR-35, 47 pts. Le lot 1 n'a aucune valeur tant que
+rien n'est joignable depuis l'extérieur ; c'est la mise en ligne qui transforme « l'inscription est
 développée » en « les inscriptions sont ouvertes ». D-19 rappelle qu'une plateforme managée ferait
 tomber une vingtaine de ces points pour 30 à 60 €.
 
@@ -62,15 +62,20 @@ tomber une vingtaine de ces points pour 30 à 60 €.
 |-------|----|-------|-----|----------------|
 | 1 | [BR-26](stories/BR-26-provisionner-vps-dokploy.md) | VPS et Dokploy | 9 | Sur la machine, à la main du propriétaire |
 | ✅ | [BR-27](stories/BR-27-image-docker-production.md) | Image et Compose de production | 9 | Dans le dépôt |
+| 2 | [BR-35](stories/BR-35-compte-organisateur-en-commande.md) | Compte organisateur en une commande | 3 | Dans le dépôt |
 | 3 | [BR-28](stories/BR-28-configuration-secrets-stockage.md) | Environnement, secrets, stockage objet | 5 | Les deux |
 | 4 | [BR-29](stories/BR-29-donnees-managees-sauvegardes.md) | MySQL, Redis, sauvegardes | 8 | Sur la machine |
 | 5 | [BR-30](stories/BR-30-workers-horizon-scheduler.md) | Files, Horizon, planificateur | 5 | Les deux |
 | 6 | [BR-31](stories/BR-31-domaine-https-supervision.md) | Domaine, HTTPS, supervision | 5 | Sur la machine |
 | 7 | [BR-32](stories/BR-32-deploiement-dokploy.md) | Déploiement depuis Dokploy | 3 | Les deux |
 
-**44 pts, dont 9 livrés.** BR-27 est passée avant BR-26 : elle est la seule story du lot qui
-s'écrive et se vérifie entièrement dans le dépôt, sans machine. Le reste attend un VPS, qui n'est
-pas commandé.
+**47 pts, dont 9 livrés.** BR-27 est passée avant BR-26 : elle est la seule story du lot qui
+s'écrive et se vérifie entièrement dans le dépôt, sans machine. Le reste attend un VPS.
+
+BR-35 est entrée dans le lot le 2026-08-21, relevée sur la machine : la base était migrée et il
+n'existait aucun moyen d'entrer dans l'application. Elle prend le rang 2 parce qu'elle bloque tout
+ce qui se vérifie par l'écran — la course elle-même naît de l'écran d'organisation, donc derrière
+l'authentification.
 
 BR-30 est la story à ne pas bâcler. Le README le disait des éliminations automatiques ; c'est vrai
 bien avant elles — `RegistrationLink` est `ShouldQueue`, donc **sans worker en production, personne
@@ -152,6 +157,7 @@ ne peut créer de compte**. Le lot 1 en dépend déjà.
 | [BR-30](stories/BR-30-workers-horizon-scheduler.md) | Files, Horizon et planificateur en production | 5 | 🔥 Lot 2 |
 | [BR-31](stories/BR-31-domaine-https-supervision.md) | Domaine, HTTPS et supervision | 5 | 🔥 Lot 2 |
 | [BR-32](stories/BR-32-deploiement-dokploy.md) | Déploiement depuis Dokploy et branche develop | 3 | 🔥 Lot 2 |
+| [BR-35](stories/BR-35-compte-organisateur-en-commande.md) | Créer le compte organisateur en une commande | 3 | 🔥 Lot 2 |
 
 ### Reprises hors backlog
 
@@ -165,7 +171,7 @@ pas de fichier de story : c'est la décision qui les porte, et elles prennent un
 | R-03 | Direction artistique « Tableau des départs » à la place de « Corral » | 8 | ✅ Livrée | [D-46](DECISIONS.md) |
 | R-04 | Formulaire d'inscription en quatre étapes au lieu d'une page scrollable | 5 | ✅ Livrée | [D-50](DECISIONS.md), D-54 |
 
-**Total : 31 stories actives + 4 reprises · 227 pts · 109 pts livrés (48 %)**
+**Total : 32 stories actives + 4 reprises · 230 pts · 109 pts livrés (47 %)**
 
 **Hors périmètre : 4 stories abandonnées, 32 pts non engagés** — voir [D-47](DECISIONS.md).
 
@@ -173,13 +179,13 @@ pas de fichier de story : c'est la décision qui les porte, et elles prennent un
 
 **Lot 1 — ouvrir les inscriptions (18 pts) — clos.**
 
-**Lot 2, en cours — mettre en ligne (44 pts)** — BR-27 (faite) → BR-26 → BR-28 → BR-29 → BR-30 →
-BR-31 → BR-32
+**Lot 2, en cours — mettre en ligne (47 pts)** — BR-27 (faite) → BR-26 → BR-35 → BR-28 → BR-29 →
+BR-30 → BR-31 → BR-32
 
 **Ensuite, le moteur et les écrans de course** — BR-08 → BR-09 → BR-10 → BR-11 → BR-12 → BR-13 →
 BR-14 → BR-15 → BR-16 → BR-24 → BR-20 → BR-23
 
-Sept remarques sur cet ordre :
+Huit remarques sur cet ordre :
 
 - Les deux premiers lots livrent un produit **incomplet mais utile** : un coureur s'inscrit, lit le
   briefing, télécharge le règlement et déclare son numéro PPS. Rien de la nuit de course n'existe
@@ -194,6 +200,9 @@ Sept remarques sur cet ordre :
 - BR-09 et BR-11 restent le cœur métier — c'est là que les tests comptent le plus.
 - BR-13 est le porteur naturel de **Q-02** (page d'erreur Inertia) et de **Q-04**, l'écart de cible
   tactile relevé en D-46 : le bouton de validation a perdu un tiers de sa hauteur.
+- BR-35 passe tôt parce qu'elle est la porte d'entrée : sans compte organisateur, aucun écran du
+  lot 1 ne se vérifie en production, et la course n'existe pas — c'est l'écran d'organisation qui
+  la crée. Elle tient dans le dépôt, comme BR-27, donc elle n'attend rien.
 - BR-30 est la story du lot 2 à ne pas bâcler — sans worker en production, les éliminations
   automatiques ne tombent pas, et rien ne le signale à l'écran.
 
