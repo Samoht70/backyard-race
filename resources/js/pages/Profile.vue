@@ -18,7 +18,7 @@ const user = computed(() => usePage().props.auth.user);
     <Head :title="t('ui.profile.title')" />
 
     <BoardPage>
-        <div class="grid max-w-3xl gap-6">
+        <div class="grid max-w-4xl gap-6">
             <header class="flex flex-col gap-2">
                 <h1 class="text-title">{{ t('ui.profile.title') }}</h1>
                 <p class="text-sm text-muted-foreground">
@@ -31,8 +31,8 @@ const user = computed(() => usePage().props.auth.user);
                 class="grid gap-6"
                 v-slot="{ errors, processing }"
             >
-                <div class="grid gap-4 sm:grid-cols-6">
-                    <div class="grid gap-2 sm:col-span-3">
+                <div class="@container grid gap-4 @min-[52rem]:grid-cols-6">
+                    <div class="grid gap-2 @min-[52rem]:col-span-3">
                         <Label for="first_name">{{
                             t('ui.profile.first_name')
                         }}</Label>
@@ -47,7 +47,7 @@ const user = computed(() => usePage().props.auth.user);
                         <InputError :message="errors.first_name" />
                     </div>
 
-                    <div class="grid gap-2 sm:col-span-3">
+                    <div class="grid gap-2 @min-[52rem]:col-span-3">
                         <Label for="last_name">{{
                             t('ui.profile.last_name')
                         }}</Label>
@@ -62,7 +62,7 @@ const user = computed(() => usePage().props.auth.user);
                         <InputError :message="errors.last_name" />
                     </div>
 
-                    <div class="grid gap-2 sm:col-span-4">
+                    <div class="grid gap-2 @min-[52rem]:col-span-4">
                         <Label for="email">{{ t('ui.profile.email') }}</Label>
                         <Input
                             id="email"

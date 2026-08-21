@@ -1929,7 +1929,8 @@ bureau, deux colonnes égales en tablette, une au téléphone) et dans `EventFie
 grille de six colonnes où chaque `EventField` déclare son `span` — la naissance en prend deux,
 l'e-mail quatre, les remarques six. La largeur de lecture du briefing est bornée à 68 caractères
 sur tous les écrans. La densité suit le pointeur : 44 px au doigt, 40 à la souris, par
-`sm:min-h-10` et `sm:[&_input]:h-10`.
+`sm:min-h-10` et `sm:[&_input]:h-10`. *Corrigé par D-59 : les trois seuils étaient posés à `sm`,
+soit 640 px, et la grille de champs se déclenchait sur la largeur de l'écran au lieu de la sienne.*
 
 **L'échelle typographique gagne un sixième cran, `marquee`** (5,5 rem). D-46 impose qu'une taille
 se nomme au lieu de se choisir ; le dossard héroïque du bureau n'entrait dans aucun des cinq.
@@ -1992,3 +1993,30 @@ la seule sortie était le rail. Sur l'accueil, un compte qui tient `manage-event
 lisait « Tu n'es pas encore inscrit » — une invitation adressée à quelqu'un qui ne court pas. Il
 lit maintenant son poste de gestion. La branche s'appuie sur `auth.permissions.manage-event`, déjà
 partagé, et `DashboardTest` verrouille le contrat côté serveur.
+
+**Le seuil des deux dimensions passe de 640 px à la largeur réellement disponible.** Deuxième
+tour du même essai : sur téléphone et sur tablette, le formulaire d'inscription et la fiche du
+coureur tronquaient. Trois causes, un seul défaut de raisonnement — la mise en page à deux
+dimensions se déclenchait à `sm`, c'est-à-dire 640 px, qui est un grand téléphone et pas un
+bureau. `BoardColumns` posait ses deux colonnes égales dès 640 px, si bien qu'une tablette lisait
+la fiche dans la moitié de sa largeur ; il attend maintenant `lg`. `BoardRow` mettait l'étiquette
+et la valeur sur la même ligne au même seuil ; il les empile jusqu'à `lg`, l'étiquette au-dessus
+comme sur le bandeau, et la valeur peut désormais se couper (`min-w-0`, `break-words`).
+
+**La grille de champs interroge son conteneur, pas la fenêtre.** C'est le cas qui tranche le
+débat : `auth/register/Complete.vue` — le formulaire d'inscription du coureur — vit dans la carte
+`max-w-sm` d'`AuthSimpleLayout`, soit 384 px, à toutes les tailles d'écran. Un seuil de fenêtre y
+posait trois champs de front dans 384 px dès qu'on ouvrait la page sur un écran large. Aucune
+valeur de `sm`, `md` ou `lg` ne pouvait avoir raison, parce que la question n'est pas la taille de
+l'écran mais celle de la place disponible. `EventFieldset` devient donc un `@container` et les
+`span` d'`EventField` des variantes de conteneur, franchies à 52 rem. La carte d'inscription reste
+en colonne partout, `registration/Edit` et les écrans de gestion en `max-w-4xl` (56 rem) passent à
+six colonnes au bureau, et la fiche imbriquée dans le volet 7/12 de `manage/registrations/Edit`
+reste en colonne tant que ce volet ne dépasse pas 52 rem. Le seuil est posé sous les 56 rem des
+conteneurs réels pour ne pas se jouer sur une égalité stricte. `Profile.vue` suit la même règle et
+passe de `max-w-3xl` à `max-w-4xl` pour y entrer.
+
+**La densité suit le pointeur pour de bon.** D-58 énonçait 44 px au doigt et 40 à la souris, puis
+plaçait la bascule à 640 px — où l'on est encore au doigt. `ActionButton` et la hauteur des champs
+d'`EventField` passent à `lg`. Ce qui reste à `sm` est la largeur des boutons : un bouton
+dimensionné par son texte ne tronque rien, et c'est la demande d'origine.

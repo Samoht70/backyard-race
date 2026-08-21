@@ -32,10 +32,10 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const spans = {
-    2: 'sm:col-span-2',
-    3: 'sm:col-span-3',
-    4: 'sm:col-span-4',
-    6: 'sm:col-span-6',
+    2: '@min-[52rem]:col-span-2',
+    3: '@min-[52rem]:col-span-3',
+    4: '@min-[52rem]:col-span-4',
+    6: '@min-[52rem]:col-span-6',
 };
 
 const spanClass = computed(() => spans[props.span]);
@@ -66,7 +66,7 @@ const spanClass = computed(() => spans[props.span]);
 
     <div
         v-else
-        class="grid content-start gap-2 [&_input]:h-11 sm:[&_input]:h-10 [&_textarea]:min-h-24"
+        class="grid content-start gap-2 [&_input]:h-11 lg:[&_input]:h-10 [&_textarea]:min-h-24"
         :class="spanClass"
     >
         <Label :for="name">

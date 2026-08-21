@@ -36,7 +36,7 @@ const actionButtonVariants = cva(
     {
         variants: {
             size: {
-                touch: 'min-h-11 px-4 text-xs sm:min-h-10',
+                touch: 'min-h-11 px-4 text-xs lg:min-h-10',
                 validate: 'min-h-[3.125rem] min-w-[5.625rem] px-5 text-sm',
             },
             tone: {

@@ -7,11 +7,11 @@ defineProps<Props>();
 </script>
 
 <template>
-    <section class="flex flex-col gap-4">
+    <section class="@container flex flex-col gap-4">
         <h2 class="font-mono text-label text-muted-foreground uppercase">
             {{ title }}
         </h2>
-        <div class="grid gap-4 sm:grid-cols-6">
+        <div class="grid gap-4 @min-[52rem]:grid-cols-6">
             <slot />
         </div>
     </section>
