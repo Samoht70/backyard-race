@@ -16,6 +16,11 @@
     );
     --font-mono: var(--font-martian-mono, ui-monospace, monospace);
 
+    --text-marquee: 5.5rem;
+    --text-marquee--line-height: 0.85;
+    --text-marquee--font-weight: 700;
+    --text-marquee--letter-spacing: -0.07em;
+
     --text-readout: 2.75rem;
     --text-readout--line-height: 1;
     --text-readout--font-weight: 700;
@@ -93,15 +98,6 @@
     --color-status-finished: var(--status-finished);
     --color-status-finished-surface: var(--status-finished-surface);
     --color-status-finished-foreground: var(--status-finished-foreground);
-
-    --color-sidebar: var(--sidebar-background);
-    --color-sidebar-foreground: var(--sidebar-foreground);
-    --color-sidebar-primary: var(--sidebar-primary);
-    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-    --color-sidebar-accent: var(--sidebar-accent);
-    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-    --color-sidebar-border: var(--sidebar-border);
-    --color-sidebar-ring: var(--sidebar-ring);
 }
 
 /*
@@ -124,6 +120,15 @@
 
 @utility pb-safe {
     padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+}
+
+@utility scroll-rail {
+    overflow-x: auto;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
 }
 
 @utility slats {
@@ -293,14 +298,6 @@
     --status-finished: oklch(0.4463 0.0913 86.9);
     --status-finished-surface: oklch(0.9416 0.0334 88.1);
     --status-finished-foreground: oklch(1 0 0);
-    --sidebar-background: oklch(0.9602 0.0034 247.9);
-    --sidebar-foreground: oklch(0.1998 0.0086 264.4);
-    --sidebar-primary: oklch(0.1998 0.0086 264.4);
-    --sidebar-primary-foreground: oklch(1 0 0);
-    --sidebar-accent: oklch(0.9048 0.007 247.9);
-    --sidebar-accent-foreground: oklch(0.1998 0.0086 264.4);
-    --sidebar-border: oklch(0.7718 0.0124 240);
-    --sidebar-ring: oklch(0.1998 0.0086 264.4);
 }
 
 .dark {
@@ -338,14 +335,6 @@
     --status-finished: oklch(0.834 0.1408 87);
     --status-finished-surface: oklch(0.2759 0.0467 86.1);
     --status-finished-foreground: oklch(0.1998 0.0086 264.4);
-    --sidebar-background: oklch(0.1395 0.0048 262.8);
-    --sidebar-foreground: oklch(0.9579 0.0029 264.5);
-    --sidebar-primary: oklch(0.8131 0.165 75);
-    --sidebar-primary-foreground: oklch(0.1998 0.0086 264.4);
-    --sidebar-accent: oklch(0.2671 0.0126 258.4);
-    --sidebar-accent-foreground: oklch(0.9579 0.0029 264.5);
-    --sidebar-border: oklch(0.3041 0.0138 261.7);
-    --sidebar-ring: oklch(0.8131 0.165 75);
 }
 
 @layer base {

@@ -24,6 +24,8 @@ class DashboardController extends Controller
                 'status' => $participant->status->value,
                 'status_label' => $participant->status->label(),
                 'bib_label' => BibNumber::label($participant->bib_number),
+                'submitted_on' => $participant->created_at?->translatedFormat('d.m.Y'),
+                'editable' => $participant->lifecycle()->isEditableByRunner(),
             ],
         ]);
     }

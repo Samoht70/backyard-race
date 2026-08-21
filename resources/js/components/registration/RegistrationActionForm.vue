@@ -112,7 +112,7 @@ const errorBag = computed(() => `registration-${props.registrationId}`);
         v-bind="RegistrationTransitionController.form(registrationId)"
         :error-bag="errorBag"
         :options="{ preserveScroll: true }"
-        class="flex flex-col items-end gap-1"
+        class="flex w-full flex-col items-stretch gap-1 sm:w-auto"
         v-slot="{ errors, processing }"
     >
         <input type="hidden" name="transition" :value="transition" />

@@ -1,17 +1,25 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import { CalendarOff, Ticket } from '@lucide/vue';
+import { CalendarOff, SlidersHorizontal, Ticket } from '@lucide/vue';
 import { computed } from 'vue';
-import StatCounter from '@/components/race/StatCounter.vue';
+import ActionBar from '@/components/board/ActionBar.vue';
+import BoardColumns from '@/components/board/BoardColumns.vue';
+import BoardPage from '@/components/board/BoardPage.vue';
+import BoardRow from '@/components/board/BoardRow.vue';
+import BoardRows from '@/components/board/BoardRows.vue';
+import BoardSection from '@/components/board/BoardSection.vue';
+import ActionButton from '@/components/race/ActionButton.vue';
+import BibDisplay from '@/components/race/BibDisplay.vue';
 import RegistrationStatusBadge from '@/components/registration/RegistrationStatusBadge.vue';
 import EmptyState from '@/components/state/EmptyState.vue';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { canReach } from '@/lib/access';
 import { t } from '@/lib/i18n';
-import { dashboard } from '@/routes';
+import { can } from '@/lib/permissions';
 import { show as showBriefing } from '@/routes/briefing';
 import { index as showDocuments } from '@/routes/documents';
 import { show as showEvent } from '@/routes/event';
+import { index as showManage } from '@/routes/manage';
 import { show as showRegistration } from '@/routes/registration';
 import type { RegistrationStatus } from '@/types/registration';
 
@@ -21,43 +29,23 @@ type Props = {
         status: RegistrationStatus;
         status_label: string;
         bib_label: string | null;
+        submitted_on: string | null;
+        editable: boolean;
     } | null;
 };
 
 const props = defineProps<Props>();
 
-defineOptions({
-    layout: {
-        breadcrumbs: [
-            {
-                title: 'Accueil',
-                href: dashboard(),
-            },
-        ],
-    },
-});
-
-const primaryLinkClasses =
-    'inline-flex min-h-11 w-full touch-manipulation items-center justify-center border border-primary bg-primary text-xs font-bold tracking-widest text-primary-foreground uppercase';
-const outlineLinkClasses =
-    'inline-flex min-h-11 w-full touch-manipulation items-center justify-center border border-foreground text-xs font-bold tracking-widest uppercase';
-
 const title = computed(() => props.event?.name ?? t('ui.dashboard.title'));
 const status = computed(() => props.registration?.status ?? null);
+const isConfirmed = computed(() => status.value === 'confirmed');
+const isManager = computed(() => can('manage-event'));
 </script>
 
 <template>
     <Head :title="title" />
 
-    <div class="flex flex-col gap-6 p-4">
-        <header class="flex flex-col items-center gap-2 text-center">
-            <h1 class="text-title">{{ title }}</h1>
-            <RegistrationStatusBadge
-                v-if="registration"
-                :status="registration.status"
-            />
-        </header>
-
+    <BoardPage>
         <EmptyState
             v-if="event === null"
             :icon="CalendarOff"
@@ -66,23 +54,45 @@ const status = computed(() => props.registration?.status ?? null);
         />
 
         <EmptyState
+            v-else-if="registration === null && isManager"
+            :icon="SlidersHorizontal"
+            :title="t('ui.dashboard.manager_title')"
+            :description="t('ui.dashboard.manager_description')"
+        >
+            <template #action>
+                <ActionButton as-child>
+                    <Link :href="showManage()">
+                        {{ t('ui.dashboard.manager_action') }}
+                    </Link>
+                </ActionButton>
+            </template>
+        </EmptyState>
+
+        <EmptyState
             v-else-if="registration === null"
             :icon="Ticket"
             :title="t('ui.dashboard.no_registration_title')"
             :description="t('ui.dashboard.no_registration_description')"
         >
             <template #action>
-                <Link
-                    v-if="canReach('event')"
-                    :href="showEvent()"
-                    :class="primaryLinkClasses"
-                >
-                    {{ t('ui.dashboard.no_registration_action') }}
-                </Link>
+                <ActionButton v-if="canReach('event')" as-child>
+                    <Link :href="showEvent()">
+                        {{ t('ui.dashboard.no_registration_action') }}
+                    </Link>
+                </ActionButton>
             </template>
         </EmptyState>
 
-        <template v-else>
+        <BoardColumns v-else>
+            <template #lead>
+                <BibDisplay
+                    v-if="isConfirmed"
+                    :value="registration.bib_label"
+                    :label="t('registration.field.bib')"
+                />
+                <RegistrationStatusBadge :status="registration.status" />
+            </template>
+
             <Alert v-if="status === 'cancelled'" variant="destructive">
                 <AlertTitle>
                     {{ t('registration.show.cancelled_title') }}
@@ -92,53 +102,56 @@ const status = computed(() => props.registration?.status ?? null);
                 </AlertDescription>
             </Alert>
 
-            <StatCounter
-                v-else-if="status === 'confirmed'"
-                :value="registration.bib_label"
-                :label="t('registration.field.bib')"
-                size="lg"
-            />
+            <BoardSection :title="t('ui.dashboard.my_registration')">
+                <BoardRows>
+                    <BoardRow
+                        v-if="registration.submitted_on"
+                        :label="t('ui.dashboard.submitted_on')"
+                        mono
+                    >
+                        {{ registration.submitted_on }}
+                    </BoardRow>
+                    <BoardRow :label="t('ui.dashboard.editable')">
+                        {{
+                            registration.editable
+                                ? t('ui.dashboard.editable_yes')
+                                : t('ui.dashboard.editable_no')
+                        }}
+                    </BoardRow>
+                </BoardRows>
+            </BoardSection>
 
-            <p v-else class="text-center text-sm text-muted-foreground">
-                {{ t('ui.dashboard.pending') }}
-            </p>
+            <ActionBar>
+                <template #note>
+                    {{
+                        isConfirmed
+                            ? t('ui.dashboard.confirmed')
+                            : t('ui.dashboard.pending')
+                    }}
+                </template>
 
-            <p
-                v-if="status === 'confirmed'"
-                class="text-center text-sm text-muted-foreground"
-            >
-                {{ t('ui.dashboard.confirmed') }}
-            </p>
+                <ActionButton v-if="canReach('event')" tone="quiet" as-child>
+                    <Link :href="showBriefing()">
+                        {{ t('ui.nav.briefing') }}
+                    </Link>
+                </ActionButton>
 
-            <Link :href="showRegistration()" :class="primaryLinkClasses">
-                {{ t('registration.show.call_to_action') }}
-            </Link>
-        </template>
+                <ActionButton
+                    v-if="canReach('documents')"
+                    tone="quiet"
+                    as-child
+                >
+                    <Link :href="showDocuments()">
+                        {{ t('ui.nav.documents') }}
+                    </Link>
+                </ActionButton>
 
-        <nav
-            v-if="canReach('event') || canReach('documents')"
-            :aria-label="t('ui.dashboard.practical')"
-            class="flex flex-col gap-2"
-        >
-            <p class="font-mono text-label text-muted-foreground uppercase">
-                {{ t('ui.dashboard.practical') }}
-            </p>
-
-            <Link
-                v-if="canReach('event')"
-                :href="showBriefing()"
-                :class="outlineLinkClasses"
-            >
-                {{ t('ui.nav.briefing') }}
-            </Link>
-
-            <Link
-                v-if="canReach('documents')"
-                :href="showDocuments()"
-                :class="outlineLinkClasses"
-            >
-                {{ t('ui.nav.documents') }}
-            </Link>
-        </nav>
-    </div>
+                <ActionButton as-child>
+                    <Link :href="showRegistration()">
+                        {{ t('registration.show.call_to_action') }}
+                    </Link>
+                </ActionButton>
+            </ActionBar>
+        </BoardColumns>
+    </BoardPage>
 </template>

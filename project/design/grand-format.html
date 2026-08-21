@@ -1,0 +1,1988 @@
+<title>Le Grand Panneau</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400..700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Martian+Mono:wght@400..700&display=swap">
+
+<style>
+    :root {
+        --d-board: #FFFFFF;
+        --d-slat: #DCE0E4;
+        --d-alt: #CFD5DA;
+        --d-ink: #14161A;
+        --d-ink-2: #3A3F47;
+        --d-muted: #474D56;
+        --d-line: #AEB6BC;
+        --d-line-soft: #C6CDD3;
+        --d-keyline: #14161A;
+        --d-action: #14161A;
+        --d-action-ink: #FFFFFF;
+        --d-run: #0A6135;
+        --d-run-s: #E0EFE6;
+        --d-out: #A1221B;
+        --d-out-s: #FBE4E2;
+        --d-quit: #474D56;
+        --d-quit-s: #E8EAED;
+        --d-done: #6A5000;
+        --d-done-s: #F5EBD3;
+
+        --n-board: #0C0E11;
+        --n-slat: #191C21;
+        --n-alt: #22262C;
+        --n-ink: #F0F1F3;
+        --n-ink-2: #C3C7CE;
+        --n-muted: #949AA3;
+        --n-line: #2B2F36;
+        --n-line-soft: #313640;
+        --n-keyline: #F0F1F3;
+        --n-action: #FFB020;
+        --n-action-ink: #14161A;
+        --n-run: #5CD494;
+        --n-run-s: #14301F;
+        --n-out: #FF8A72;
+        --n-out-s: #331A16;
+        --n-quit: #949AA3;
+        --n-quit-s: #23272D;
+        --n-done: #F0C24E;
+        --n-done-s: #322609;
+
+        --board: var(--d-board);
+        --slat: var(--d-slat);
+        --alt: var(--d-alt);
+        --ink: var(--d-ink);
+        --ink-2: var(--d-ink-2);
+        --muted: var(--d-muted);
+        --line: var(--d-line);
+        --line-soft: var(--d-line-soft);
+        --keyline: var(--d-keyline);
+        --action: var(--d-action);
+        --action-ink: var(--d-action-ink);
+        --run: var(--d-run);
+        --run-s: var(--d-run-s);
+        --out: var(--d-out);
+        --out-s: var(--d-out-s);
+        --quit: var(--d-quit);
+        --quit-s: var(--d-quit-s);
+        --done: var(--d-done);
+        --done-s: var(--d-done-s);
+
+        --sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+        --mono: 'Martian Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+        --s1: 4px;
+        --s2: 8px;
+        --s3: 12px;
+        --s4: 16px;
+        --s5: 24px;
+        --s6: 32px;
+        --s7: 48px;
+        --s8: 72px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+            --board: var(--n-board);
+            --slat: var(--n-slat);
+            --alt: var(--n-alt);
+            --ink: var(--n-ink);
+            --ink-2: var(--n-ink-2);
+            --muted: var(--n-muted);
+            --line: var(--n-line);
+            --line-soft: var(--n-line-soft);
+            --keyline: var(--n-keyline);
+            --action: var(--n-action);
+            --action-ink: var(--n-action-ink);
+            --run: var(--n-run);
+            --run-s: var(--n-run-s);
+            --out: var(--n-out);
+            --out-s: var(--n-out-s);
+            --quit: var(--n-quit);
+            --quit-s: var(--n-quit-s);
+            --done: var(--n-done);
+            --done-s: var(--n-done-s);
+        }
+    }
+
+    :root[data-theme="dark"] {
+        --board: var(--n-board);
+        --slat: var(--n-slat);
+        --alt: var(--n-alt);
+        --ink: var(--n-ink);
+        --ink-2: var(--n-ink-2);
+        --muted: var(--n-muted);
+        --line: var(--n-line);
+        --line-soft: var(--n-line-soft);
+        --keyline: var(--n-keyline);
+        --action: var(--n-action);
+        --action-ink: var(--n-action-ink);
+        --run: var(--n-run);
+        --run-s: var(--n-run-s);
+        --out: var(--n-out);
+        --out-s: var(--n-out-s);
+        --quit: var(--n-quit);
+        --quit-s: var(--n-quit-s);
+        --done: var(--n-done);
+        --done-s: var(--n-done-s);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        background: var(--board);
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: 16px;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: var(--s7) var(--s5) var(--s8);
+    }
+
+    .lbl {
+        font-family: var(--mono);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        line-height: 1;
+    }
+
+    .tnum { font-variant-numeric: tabular-nums; }
+
+    a { color: inherit; }
+
+    /* ---------- chrome du document ---------- */
+
+    .top {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: var(--s4);
+        border-bottom: 3px solid var(--keyline);
+        padding-bottom: var(--s3);
+    }
+
+    .top h1 {
+        margin: 0;
+        font-size: clamp(1.75rem, 5vw, 2.75rem);
+        font-weight: 700;
+        letter-spacing: -0.04em;
+        line-height: 1.02;
+        text-wrap: balance;
+    }
+
+    .top .lbl { color: var(--muted); margin-bottom: 6px; display: block; }
+
+    .ctrls { display: flex; gap: var(--s2); flex-wrap: wrap; }
+
+    .swap {
+        border: 1px solid var(--ink);
+        background: transparent;
+        color: var(--ink);
+        padding: 10px var(--s3);
+        min-height: 40px;
+        cursor: pointer;
+        font-family: var(--mono);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+    }
+
+    .swap:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+    .swap[aria-pressed="true"] { background: var(--ink); color: var(--board); }
+
+    .lede {
+        max-width: 68ch;
+        margin: var(--s5) 0 0;
+        font-size: 1.0625rem;
+    }
+
+    .lede strong { font-weight: 700; }
+
+    h2.sec {
+        margin: var(--s8) 0 0;
+        border-top: 3px solid var(--keyline);
+        padding-top: var(--s4);
+        font-size: 1.625rem;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+    }
+
+    .sec-lede { max-width: 68ch; margin: var(--s3) 0 0; }
+
+    h3.sub {
+        margin: var(--s6) 0 0;
+        font-size: 1.1875rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+    }
+
+    .diag {
+        margin: var(--s5) 0 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 1px;
+        background: var(--line);
+        border: 1px solid var(--line);
+    }
+
+    .diag li { background: var(--board); padding: var(--s3) var(--s4); }
+    .diag b { display: block; font-family: var(--mono); font-size: 12px; letter-spacing: -0.02em; margin-bottom: 3px; }
+    .diag span { color: var(--muted); font-size: 0.9375rem; }
+    .diag code { font-family: var(--mono); font-size: 0.75rem; background: var(--slat); padding: 1px 4px; }
+
+    .rules { margin: var(--s5) 0 0; padding: 0; list-style: none; display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+    .rules li { background: var(--board); padding: var(--s4); display: grid; grid-template-columns: 40px 1fr; gap: var(--s4); align-items: start; }
+    .rules .no { font-family: var(--mono); font-size: 1.25rem; font-weight: 700; letter-spacing: -0.05em; color: var(--muted); line-height: 1.1; }
+    .rules b { display: block; font-size: 1rem; margin-bottom: 3px; }
+    .rules span { color: var(--muted); font-size: 0.9375rem; }
+    .rules code { font-family: var(--mono); font-size: 0.75rem; background: var(--slat); padding: 1px 4px; }
+
+    .bp { width: 100%; border-collapse: collapse; margin: var(--s5) 0 0; font-size: 0.9375rem; }
+    .bp th, .bp td { border: 1px solid var(--line); padding: var(--s2) var(--s3); text-align: left; }
+    .bp th { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+    .bp td:first-child { font-family: var(--mono); font-size: 0.8125rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .bp-wrap { overflow-x: auto; }
+
+    .facts { display: grid; gap: var(--s4); grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); margin: var(--s5) 0 0; }
+    .facts > div { border-top: 1px solid var(--line); padding-top: var(--s2); }
+    .facts h4 { margin: 0 0 4px; font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+    .facts p { margin: 0; font-size: 0.9375rem; }
+    .facts code { font-family: var(--mono); font-size: 0.75rem; }
+
+    .risk { margin: var(--s5) 0 0; border-left: 3px solid var(--out); padding-left: var(--s3); max-width: 66ch; }
+    .risk h4 { margin: 0 0 2px; font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--out); }
+    .risk p { margin: 0; font-size: 0.9375rem; }
+
+    /* ---------- bancs d'essai ---------- */
+
+    .bench { margin: var(--s5) 0 0; }
+
+    .bench-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--s3); margin-bottom: var(--s3); }
+    .bench-head b { font-family: var(--mono); font-size: 12px; font-weight: 700; letter-spacing: -0.02em; }
+    .bench-head span { color: var(--muted); font-size: 0.875rem; }
+
+    .rigs { display: flex; gap: var(--s4); align-items: flex-start; overflow-x: auto; padding-bottom: var(--s3); }
+
+    figure.rig { margin: 0; flex: 0 0 auto; }
+
+    .rig-box {
+        width: calc(var(--w) * var(--k));
+        height: calc(var(--h) * var(--k));
+        overflow: hidden;
+        border: 1px solid var(--line);
+        background: var(--board);
+    }
+
+    .rig-in {
+        width: var(--w);
+        height: var(--h);
+        transform: scale(var(--k));
+        transform-origin: top left;
+    }
+
+    .rig figcaption { margin-top: var(--s2); max-width: calc(var(--w) * var(--k)); }
+    .rig figcaption b { display: block; font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+    .rig figcaption span { display: block; color: var(--muted); font-size: 0.8125rem; line-height: 1.4; margin-top: 2px; }
+
+    .rig-lg { --w: 1280px; --h: 800px; --k: 0.66; }
+    .rig-md { --w: 834px; --h: 800px; --k: 0.66; }
+    .rig-sm { --w: 390px; --h: 800px; --k: 0.66; }
+
+    @media (max-width: 1080px) { .rig-lg, .rig-md, .rig-sm { --k: 0.5; } }
+    @media (max-width: 720px) { .rig-lg, .rig-md, .rig-sm { --k: 0.38; } }
+
+    :focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+    :root[data-scale="real"] .rig-lg,
+    :root[data-scale="real"] .rig-md,
+    :root[data-scale="real"] .rig-sm { --k: 1; }
+</style>
+
+<style>
+    /* ---------- l'application ---------- */
+
+    .screen {
+        container-type: inline-size;
+        container-name: sc;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        background: var(--board);
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: 15px;
+        line-height: 1.5;
+    }
+
+    .screen[data-scheme="dark"] {
+        --board: var(--n-board); --slat: var(--n-slat); --alt: var(--n-alt);
+        --ink: var(--n-ink); --ink-2: var(--n-ink-2); --muted: var(--n-muted);
+        --line: var(--n-line); --line-soft: var(--n-line-soft); --keyline: var(--n-keyline);
+        --action: var(--n-action); --action-ink: var(--n-action-ink);
+        --run: var(--n-run); --run-s: var(--n-run-s); --out: var(--n-out); --out-s: var(--n-out-s);
+        --quit: var(--n-quit); --quit-s: var(--n-quit-s); --done: var(--n-done); --done-s: var(--n-done-s);
+    }
+
+    .screen[data-scheme="light"] {
+        --board: var(--d-board); --slat: var(--d-slat); --alt: var(--d-alt);
+        --ink: var(--d-ink); --ink-2: var(--d-ink-2); --muted: var(--d-muted);
+        --line: var(--d-line); --line-soft: var(--d-line-soft); --keyline: var(--d-keyline);
+        --action: var(--d-action); --action-ink: var(--d-action-ink);
+        --run: var(--d-run); --run-s: var(--d-run-s); --out: var(--d-out); --out-s: var(--d-out-s);
+        --quit: var(--d-quit); --quit-s: var(--d-quit-s); --done: var(--d-done); --done-s: var(--d-done-s);
+    }
+
+    /* --- BoardBand : le bandeau de quai --- */
+
+    .band {
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: var(--s2);
+        padding: var(--s3) var(--s4);
+        border-bottom: 2px solid var(--keyline);
+    }
+
+    .band-name {
+        font-size: 1rem;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        line-height: 1.1;
+        margin: 0;
+    }
+
+    .band-facts { display: flex; gap: var(--s4); overflow-x: auto; }
+
+    .band-fact { flex: 0 0 auto; }
+    .band-fact .k { display: block; font-family: var(--mono); font-size: 9px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); line-height: 1; margin-bottom: 3px; }
+    .band-fact .v { display: block; font-family: var(--mono); font-size: 0.9375rem; font-weight: 700; letter-spacing: -0.04em; line-height: 1; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .band-fact .v em { font-style: normal; color: var(--muted); font-size: 0.75rem; font-weight: 400; letter-spacing: 0; }
+
+    @container sc (min-width: 640px) {
+        .band {
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--s5);
+            padding: 0 var(--s5);
+            height: 60px;
+        }
+        .band-name { font-size: 1.0625rem; }
+        .band-facts { gap: 0; overflow: visible; }
+        .band-fact { padding: 0 var(--s4); border-left: 1px solid var(--line); }
+        .band-fact:first-child { border-left: 0; }
+        .band-fact:last-child { padding-right: 0; }
+    }
+
+    @container sc (min-width: 1024px) {
+        .band { height: 68px; padding: 0 var(--s6); }
+        .band-name { font-size: 1.25rem; }
+        .band-fact .v { font-size: 1.0625rem; }
+    }
+
+    /* --- BoardRail : le rail d'onglets --- */
+
+    .rail {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: stretch;
+        gap: 0;
+        border-bottom: 1px solid var(--line);
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+    .rail::-webkit-scrollbar { display: none; }
+
+    .rail-nav { display: flex; align-items: stretch; flex: 1 1 auto; }
+
+    .tab {
+        flex: 0 0 auto;
+        display: inline-flex;
+        align-items: center;
+        padding: 0 var(--s3);
+        height: 44px;
+        font-family: var(--mono);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--muted);
+        text-decoration: none;
+        border-bottom: 3px solid transparent;
+        white-space: nowrap;
+    }
+
+    .tab.on { color: var(--ink); border-bottom-color: var(--keyline); }
+
+    .rail-end { flex: 0 0 auto; display: none; align-items: center; gap: var(--s3); padding-left: var(--s4); }
+    .rail-end .who { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+    .rail-end .glyph { width: 26px; height: 26px; border: 1px solid var(--line); display: grid; place-items: center; font-family: var(--mono); font-size: 10px; font-weight: 700; }
+
+    @container sc (min-width: 640px) {
+        .rail { padding: 0 var(--s5); }
+        .tab { padding: 0 var(--s4); }
+        .rail-end { display: flex; }
+    }
+
+    @container sc (min-width: 1024px) {
+        .rail { padding: 0 var(--s6); }
+        .tab { height: 46px; }
+    }
+
+    /* --- la zone de contenu --- */
+
+    .wrap {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow: hidden;
+        padding: var(--s4);
+    }
+
+    @container sc (min-width: 640px) { .wrap { padding: var(--s5); } }
+    @container sc (min-width: 1024px) { .wrap { padding: var(--s6); } }
+
+    .wrap-max { max-width: 1440px; margin: 0 auto; height: 100%; }
+
+    /* --- la grille --- */
+
+    .cols { display: grid; gap: var(--s5); align-items: start; }
+
+    @container sc (min-width: 640px) { .cols { gap: var(--s5); grid-template-columns: 1fr 1fr; } }
+    @container sc (min-width: 1024px) { .cols { gap: var(--s7); grid-template-columns: 5fr 7fr; } }
+
+    .stack { display: grid; gap: var(--s5); align-content: start; }
+
+    /* --- BoardRow : la ligne libellé / valeur --- */
+
+    .blk { display: grid; gap: var(--s2); align-content: start; }
+    .blk > h3 { margin: 0; font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+
+    .rows { display: grid; }
+
+    .row {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: var(--s4);
+        padding: 9px 0;
+        border-bottom: 1px solid var(--line-soft);
+    }
+
+    .row:first-child { border-top: 1px solid var(--line); }
+    .row .k { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); flex: 0 0 auto; }
+    .row .v { font-size: 0.9375rem; text-align: right; font-variant-numeric: tabular-nums; }
+    .row .v.num { font-family: var(--mono); letter-spacing: -0.03em; }
+
+    @container sc (min-width: 1024px) {
+        .row { padding: 7px 0; }
+        .row .v { font-size: 0.875rem; }
+    }
+
+    /* --- le dossard --- */
+
+    .bib { display: grid; gap: var(--s3); justify-items: start; }
+    .bib .k { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+    .bib .n {
+        font-family: var(--mono);
+        font-size: 5.5rem;
+        font-weight: 700;
+        letter-spacing: -0.07em;
+        line-height: 0.82;
+        font-variant-numeric: tabular-nums;
+        margin: 0;
+    }
+    .bib .who { font-size: 1.125rem; font-weight: 700; letter-spacing: -0.02em; margin: 0; }
+
+    @container sc (min-width: 1024px) {
+        .bib .n { font-size: 8.5rem; }
+        .bib .who { font-size: 1.375rem; }
+    }
+
+    .stamp {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border: 2px solid currentColor;
+        padding: 4px 7px;
+        font-family: var(--mono);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        line-height: 1;
+        text-transform: uppercase;
+    }
+    .stamp-run { color: var(--run); }
+    .stamp-quit { color: var(--quit); }
+    .stamp-out { color: var(--out); }
+    .stamp-done { color: var(--done); }
+
+    .sq { width: 9px; height: 9px; flex: 0 0 auto; }
+    .sq-run { background: var(--run); }
+    .sq-out { background: var(--out); }
+    .sq-quit { background: var(--quit); }
+    .sq-done { background: var(--done); }
+
+    /* --- le bouton : largeur de son texte, jamais plus --- */
+
+    .acts { display: flex; flex-direction: column; gap: var(--s2); }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--s2);
+        width: 100%;
+        min-height: 44px;
+        padding: 0 var(--s5);
+        border: 1px solid var(--action);
+        background: transparent;
+        color: var(--ink);
+        font-family: var(--mono);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        text-decoration: none;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    .btn-p { background: var(--action); color: var(--action-ink); border-color: var(--action); }
+    .btn-q { border-color: var(--line); color: var(--muted); }
+
+    @container sc (min-width: 640px) {
+        .acts { flex-direction: row; justify-content: flex-end; align-items: center; gap: var(--s3); }
+        .btn { width: auto; min-height: 38px; }
+    }
+
+    @container sc (min-width: 1024px) {
+        .btn { min-height: 36px; padding: 0 var(--s4); }
+    }
+
+    .note { margin: 0; font-size: 0.875rem; color: var(--muted); }
+    .note strong { font-weight: 700; color: var(--ink); }
+</style>
+
+<style>
+    /* --- le formulaire : chaque champ à la largeur de sa donnée --- */
+
+    .fields { display: grid; gap: var(--s3) var(--s4); grid-template-columns: 1fr; }
+
+    @container sc (min-width: 640px) { .fields { grid-template-columns: repeat(6, 1fr); } }
+
+    .f { display: grid; gap: 5px; grid-column: span 1; }
+    .f > label { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+    .f > .in {
+        border: 1px solid var(--line);
+        background: var(--board);
+        min-height: 40px;
+        display: flex;
+        align-items: center;
+        padding: 0 var(--s3);
+        font-size: 0.9375rem;
+        font-variant-numeric: tabular-nums;
+    }
+    .f > .in.mono { font-family: var(--mono); font-size: 0.875rem; letter-spacing: -0.03em; }
+    .f > .in.area { min-height: 76px; align-items: flex-start; padding-top: 9px; line-height: 1.45; }
+    .f > .in.lock { background: var(--slat); color: var(--muted); border-style: dashed; }
+
+    @container sc (min-width: 640px) {
+        .f-2 { grid-column: span 2; }
+        .f-3 { grid-column: span 3; }
+        .f-4 { grid-column: span 4; }
+        .f-6 { grid-column: span 6; }
+    }
+
+    /* --- le tableau dense --- */
+
+    .tbl-wrap { overflow: hidden; border-top: 1px solid var(--line); }
+    .tbl { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    .tbl th {
+        font-family: var(--mono); font-size: 9px; font-weight: 700; letter-spacing: 0.12em;
+        text-transform: uppercase; color: var(--muted); text-align: left;
+        padding: 7px var(--s3); border-bottom: 1px solid var(--line); white-space: nowrap;
+    }
+    .tbl td { padding: 0 var(--s3); height: 38px; border-bottom: 1px solid var(--line-soft); vertical-align: middle; }
+    .tbl tr.on td { background: var(--slat); }
+    .tbl .c-bib { font-family: var(--mono); font-weight: 700; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; width: 1%; white-space: nowrap; }
+    .tbl .c-name { font-weight: 700; letter-spacing: -0.01em; }
+    .tbl .c-num { font-family: var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -0.03em; text-align: right; width: 1%; white-space: nowrap; }
+    .tbl .c-meta { color: var(--muted); font-size: 0.8125rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .tbl .c-do { width: 1%; text-align: right; white-space: nowrap; }
+    .tbl .c-state { width: 1%; white-space: nowrap; }
+
+    .mini {
+        display: inline-flex; align-items: center; justify-content: center;
+        height: 28px; padding: 0 var(--s3);
+        border: 1px solid var(--action); background: transparent; color: var(--ink);
+        font-family: var(--mono); font-size: 9px; font-weight: 700; letter-spacing: 0.1em;
+        text-transform: uppercase; cursor: pointer; white-space: nowrap;
+    }
+    .mini-p { background: var(--action); color: var(--action-ink); }
+
+    @container sc (max-width: 639px) {
+        .tbl .hide-sm { display: none; }
+        .tbl td { height: 52px; }
+        .mini { height: 40px; }
+    }
+
+    /* --- les filtres à compteur --- */
+
+    .chips { display: flex; gap: 0; overflow-x: auto; border-bottom: 1px solid var(--line); scrollbar-width: none; }
+    .chips::-webkit-scrollbar { display: none; }
+    .chip {
+        flex: 0 0 auto; display: inline-flex; align-items: baseline; gap: var(--s2);
+        padding: 9px var(--s4) 9px 0; margin-right: var(--s4);
+        border-bottom: 3px solid transparent; margin-bottom: -1px;
+        font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+        text-transform: uppercase; color: var(--muted); text-decoration: none; white-space: nowrap;
+    }
+    .chip .n { font-size: 0.9375rem; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+    .chip.on { color: var(--ink); border-bottom-color: var(--keyline); }
+
+    /* --- console : liste + panneau --- */
+
+    .console { display: grid; gap: 0; height: 100%; grid-template-columns: 1fr; }
+
+    @container sc (min-width: 1024px) {
+        .console { grid-template-columns: 1fr 380px; }
+        .console > .pane { border-left: 1px solid var(--line); padding-left: var(--s5); }
+    }
+
+    .pane { display: none; align-content: start; gap: var(--s4); }
+    @container sc (min-width: 1024px) { .pane { display: grid; } }
+
+    .pane-head { display: grid; gap: var(--s2); justify-items: start; }
+    .pane-head .n { font-family: var(--mono); font-size: 2rem; font-weight: 700; letter-spacing: -0.06em; line-height: 1; font-variant-numeric: tabular-nums; }
+    .pane-head .who { font-size: 1.0625rem; font-weight: 700; letter-spacing: -0.02em; }
+
+    /* --- briefing : prose et sommaire --- */
+
+    .read { display: grid; gap: var(--s5); }
+    @container sc (min-width: 1024px) { .read { grid-template-columns: 200px minmax(0, 68ch); gap: var(--s7); } }
+
+    .toc { display: none; align-content: start; gap: 1px; position: sticky; top: 0; }
+    @container sc (min-width: 1024px) { .toc { display: grid; } }
+    .toc a {
+        font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+        text-transform: uppercase; color: var(--muted); text-decoration: none;
+        padding: 7px 0 7px var(--s3); border-left: 2px solid var(--line);
+    }
+    .toc a.on { color: var(--ink); border-left-color: var(--keyline); }
+
+    .prose { display: grid; gap: var(--s5); align-content: start; }
+    .prose section { display: grid; gap: var(--s2); }
+    .prose h3 { margin: 0; font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+    .prose p { margin: 0; font-size: 0.9375rem; line-height: 1.6; }
+
+    /* --- documents --- */
+
+    .docs { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+    @container sc (min-width: 640px) { .docs { grid-template-columns: repeat(3, 1fr); } }
+    .doc { background: var(--board); padding: var(--s3) var(--s4); display: flex; align-items: center; justify-content: space-between; gap: var(--s3); }
+    .doc .t { display: grid; gap: 3px; }
+    .doc .t b { font-size: 0.9375rem; font-weight: 700; letter-spacing: -0.01em; }
+    .doc .t span { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+    .doc .g { font-family: var(--mono); font-size: 1rem; font-weight: 700; }
+
+    /* --- avis --- */
+
+    .avis { border-left: 3px solid var(--line); padding: var(--s2) 0 var(--s2) var(--s3); font-size: 0.875rem; color: var(--muted); }
+    .avis.warn { border-left-color: var(--out); }
+</style>
+
+<style>
+    /* ---------- la signature : l'afficheur a lattes ---------- */
+
+    @keyframes flip {
+        from { transform: scaleY(0.1); opacity: 0.4; }
+        to { transform: scaleY(1); opacity: 1; }
+    }
+
+    .flaps { display: flex; gap: 5px; }
+
+    .flap {
+        position: relative;
+        display: grid;
+        place-items: center;
+        background: var(--slat);
+        font-family: var(--mono);
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: -0.06em;
+        line-height: 1;
+        transform-origin: center;
+    }
+
+    .flap::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 50%;
+        height: 1px;
+        background: var(--board);
+    }
+
+    .flaps.go .flap { animation: flip 130ms ease-out both; animation-delay: calc(var(--i) * 60ms); }
+
+    .flap-xl { width: 58px; height: 86px; font-size: 3.25rem; }
+
+    @container sc (min-width: 1024px) {
+        .flap-xl { width: 86px; height: 128px; font-size: 5rem; }
+    }
+
+    /* --- le panneau de nuit : des lattes, pas des filets --- */
+
+    .slats { display: flex; flex-direction: column; gap: 6px; }
+
+    .slat-row {
+        display: grid;
+        grid-template-columns: 62px 1fr 116px 78px 62px 96px;
+        align-items: center;
+        gap: var(--s3);
+        background: var(--slat);
+        padding: 0 var(--s3);
+        height: 40px;
+        transform-origin: center;
+    }
+
+    .slats.go .slat-row { animation: flip 130ms ease-out both; animation-delay: calc(var(--i) * 40ms); }
+
+    .slat-row .c-bib { font-family: var(--mono); font-size: 1rem; font-weight: 700; letter-spacing: -0.05em; font-variant-numeric: tabular-nums; }
+    .slat-row .c-name { font-weight: 700; letter-spacing: -0.01em; font-size: 0.9375rem; }
+    .slat-row .c-meta { font-family: var(--mono); font-size: 0.8125rem; color: var(--muted); font-variant-numeric: tabular-nums; text-align: right; }
+    .slat-row .c-num { font-family: var(--mono); font-size: 0.9375rem; font-weight: 700; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; text-align: right; }
+    .slat-row .c-do { text-align: right; }
+
+    .slat-head {
+        display: grid;
+        grid-template-columns: 62px 1fr 116px 78px 62px 96px;
+        align-items: center;
+        gap: var(--s3);
+        padding: 0 var(--s3) 7px;
+    }
+
+    .slat-head span {
+        font-family: var(--mono); font-size: 9px; font-weight: 700; letter-spacing: 0.12em;
+        text-transform: uppercase; color: var(--muted);
+    }
+
+    .slat-head span.r { text-align: right; }
+
+    @container sc (max-width: 639px) {
+        .slat-row { grid-template-columns: 48px 1fr 92px; height: 52px; }
+        .slat-head { grid-template-columns: 48px 1fr 92px; }
+        .slat-row .c-meta, .slat-row .c-num, .slat-head span.drop { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .flaps.go .flap,
+        .slats.go .slat-row { animation: none; }
+    }
+</style>
+
+<div class="page">
+
+<header class="top">
+    <div>
+        <span class="lbl">Backyard Race · refonte, seconde passe</span>
+        <h1>Le Grand Panneau</h1>
+    </div>
+    <div class="ctrls">
+        <button class="swap" id="scale" type="button" aria-pressed="false">Taille réelle</button>
+        <button class="swap" id="theme" type="button">Passer en nuit</button>
+    </div>
+</header>
+
+<p class="lede">
+    La charte ne bouge pas d'un cran : <strong>Instrument Sans</strong> pour les mots,
+    <strong>Martian Mono</strong> pour les chiffres, zéro arrondi, une encre presque noire,
+    l'ambre réservé à l'action de nuit et quatre statuts pour toute la couleur. Ce qui
+    change, c'est l'écran de référence. La première passe dessinait un téléphone qu'on
+    élargissait ; celle-ci dessine <strong>un panneau qu'on replie</strong>. Un panneau des
+    départs, ça se lit de loin et en large — la charte demandait le grand écran depuis le début.
+</p>
+
+<p class="lede">
+    Sous l'apparence, rien n'est réécrit à la main : la coquille est montée sur les
+    primitives <strong>reka-ui</strong> déjà installées, qui portent le clavier, le focus
+    et les rôles. Et une chose bouge, une seule — la latte.
+</p>
+
+<h2 class="sec">Ce que le mobile-first a coûté au bureau</h2>
+
+<p class="sec-lede">
+    Quatre défauts, tous visibles sur un 1920 et tous invisibles sur un 390. Ils ne viennent
+    pas d'un manque de soin : ils viennent d'avoir pris le téléphone comme mètre étalon.
+</p>
+
+<ul class="diag">
+    <li>
+        <b>Le bouton s'étire jusqu'au bord</b>
+        <span>
+            <code>ActionButton</code> porte <code>w-full</code> dans sa base
+            <code>cva</code>, ce qui étire ses quatre-vingt-douze usages depuis un seul
+            endroit. Là où il fallait un lien plutôt qu'un bouton, <code>Dashboard.vue</code>
+            l'a contourné en recopiant <code>primaryLinkClasses</code> et
+            <code>outlineLinkClasses</code>. Sur un écran de 1920, « Voir mon inscription »
+            mesure 1 900 pixels de large pour vingt caractères.
+        </span>
+    </li>
+    <li>
+        <b>Rien ne borne la largeur du texte</b>
+        <span>
+            Le contenu part en <code>p-4</code> sans largeur maximale. Une ligne de briefing
+            traverse l'écran entier : au-delà de 90 caractères, l'œil perd le début de la
+            ligne suivante.
+        </span>
+    </li>
+    <li>
+        <b>Une seule colonne, quelle que soit la place</b>
+        <span>
+            Le dossard, l'événement et l'inscription se suivent verticalement même quand
+            deux tiers de l'écran restent vides à droite. Empiler n'est pas une mise en
+            page, c'est l'absence de mise en page.
+        </span>
+    </li>
+    <li>
+        <b>La cible du doigt est imposée à la souris</b>
+        <span>
+            <code>min-h-11</code> et <code>touch-manipulation</code> partout : 44 pixels de
+            haut par ligne, y compris là où l'on pointe au pixel près. La liste des quarante
+            inscriptions tient sur un écran et demi alors qu'elle tiendrait sur un demi-écran.
+        </span>
+    </li>
+</ul>
+
+<h2 class="sec">Six règles pour le grand format</h2>
+
+<p class="sec-lede">
+    Elles se lisent dans les deux sens : chacune dit ce que fait le bureau, et ce qui reste
+    vrai au téléphone. Aucune ne demande un écran séparé.
+</p>
+
+<ol class="rules">
+    <li>
+        <span class="no">01</span>
+        <div>
+            <b>Un bouton fait la largeur de son texte</b>
+            <span>
+                <code>width: auto</code> dès 640 px, aligné à droite de son bloc. En dessous,
+                et en dessous seulement, il reprend toute la largeur — parce qu'au pouce c'est
+                la bonne cible. La règle tient en une ligne de conteneur, pas en une classe
+                recopiée dans six pages.
+            </span>
+        </div>
+    </li>
+    <li>
+        <span class="no">02</span>
+        <div>
+            <b>Trois largeurs, choisies selon ce qu'on lit</b>
+            <span>
+                Pleine largeur pour les tableaux, qui gagnent à chaque colonne visible.
+                1440 px pour les grilles. 68 caractères pour la prose du briefing, quel que
+                soit l'écran. Une page mélange les trois sans complexe.
+            </span>
+        </div>
+    </li>
+    <li>
+        <span class="no">03</span>
+        <div>
+            <b>La densité suit le pointeur, pas la marque</b>
+            <span>
+                44 px de haut par ligne au doigt, 36 à 38 à la souris. Ce n'est pas du
+                tassement : c'est vingt-huit coureurs lisibles d'un coup au lieu de huit, la
+                nuit, quand le gérant cherche un dossard.
+            </span>
+        </div>
+    </li>
+    <li>
+        <span class="no">04</span>
+        <div>
+            <b>Deux colonnes exigent une raison</b>
+            <span>
+                Le dossard et les faits de l'événement se répondent : on vérifie l'un en
+                lisant l'autre. Le briefing et les documents ne se répondent pas — ils
+                restent l'un sous l'autre, même sur 1920.
+            </span>
+        </div>
+    </li>
+    <li>
+        <span class="no">05</span>
+        <div>
+            <b>Le champ a la largeur de sa donnée</b>
+            <span>
+                Un code postal n'occupe pas la même place qu'une adresse e-mail. Sur une
+                grille de six colonnes, la date de naissance en prend deux, l'e-mail quatre,
+                les remarques six. Un formulaire de bureau se lit en Z, pas en I.
+            </span>
+        </div>
+    </li>
+    <li>
+        <span class="no">06</span>
+        <div>
+            <b>Le survol existe, et il ne remplace rien</b>
+            <span>
+                Au bureau, la ligne survolée s'éclaire et l'action apparaît. Au doigt, il n'y
+                a pas de survol : l'action est là en permanence. Jamais une information
+                seulement accessible au survol.
+            </span>
+        </div>
+    </li>
+</ol>
+
+<h3 class="sub">Les points de rupture</h3>
+
+<div class="bp-wrap">
+<table class="bp">
+    <thead>
+        <tr>
+            <th>Largeur</th>
+            <th>Appareil</th>
+            <th>Coquille</th>
+            <th>Contenu</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>&lt; 640</td>
+            <td>Téléphone</td>
+            <td>Bandeau sur deux lignes, rail défilant</td>
+            <td>Une colonne, bouton pleine largeur, lignes de 44 px</td>
+        </tr>
+        <tr>
+            <td>640 – 1023</td>
+            <td>Tablette</td>
+            <td>Bandeau sur une ligne, rail complet</td>
+            <td>Deux colonnes égales, bouton à droite, grille de formulaire à six</td>
+        </tr>
+        <tr>
+            <td>≥ 1024</td>
+            <td>Bureau</td>
+            <td>Bandeau haut, compte et thème au bout du rail</td>
+            <td>Grille 5/7, panneau de détail, lignes de 38 px</td>
+        </tr>
+        <tr>
+            <td>≥ 1440</td>
+            <td>Grand bureau</td>
+            <td>Identique</td>
+            <td>La grille se centre, le tableau garde la pleine largeur</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+
+<p class="note" style="margin-top: var(--s3)">
+    Ces seuils sont des <strong>container queries</strong>, pas des media queries : les
+    écrans ci-dessous sont écrits une fois et rendus à trois largeurs. Ce que tu vois en
+    tablette est le même balisage que le bureau, replié par le conteneur.
+</p>
+
+<h2 class="sec">La coquille</h2>
+
+<p class="sec-lede">
+    Un bandeau, un rail, rien d'autre. Le bandeau porte la seule vérité de l'événement et
+    ne quitte jamais le haut de l'écran. Le rail porte les six destinations — au bureau
+    elles tiennent toutes, ce qui règle sans discussion le <code>BOTTOM_NAV_LIMIT&nbsp;=&nbsp;4</code>
+    qui tronquait la barre basse. Au téléphone, le rail défile ; il ne tronque plus rien.
+</p>
+
+<template data-screen="a1">
+    <div class="screen">
+        <div class="band">
+            <p class="band-name">Backyard des Coteaux</p>
+            <div class="band-facts">
+                <div class="band-fact">
+                    <span class="k">Places</span>
+                    <span class="v tnum">32/40</span>
+                </div>
+                <div class="band-fact">
+                    <span class="k">Premier départ</span>
+                    <span class="v tnum">13:00 <em>sam 12 sept</em></span>
+                </div>
+            </div>
+        </div>
+        <nav class="rail">
+            <div class="rail-nav">
+                <a class="tab on" href="#">Accueil</a>
+                <a class="tab" href="#">Mon inscription</a>
+                <a class="tab" href="#">Briefing</a>
+                <a class="tab" href="#">Documents</a>
+                <a class="tab" href="#">Événement</a>
+            </div>
+            <div class="rail-end">
+                <span class="who">C. Roussel</span>
+                <span class="glyph" aria-hidden="true">☾</span>
+            </div>
+        </nav>
+        <div class="wrap">
+            <div class="wrap-max">
+                <div class="cols">
+                    <div class="bib">
+                        <span class="k">Dossard</span>
+                        <p class="flaps" data-flip aria-label="Dossard 014">
+                            <span class="flap flap-xl" style="--i:0" aria-hidden="true">0</span>
+                            <span class="flap flap-xl" style="--i:1" aria-hidden="true">1</span>
+                            <span class="flap flap-xl" style="--i:2" aria-hidden="true">4</span>
+                        </p>
+                        <p class="who">Camille Roussel</p>
+                        <span class="stamp stamp-run"><span class="sq sq-run"></span>Confirmée</span>
+                    </div>
+                    <div class="stack">
+                        <div class="blk">
+                            <h3>L'événement</h3>
+                            <div class="rows">
+                                <div class="row"><span class="k">Lieu</span><span class="v">Saint-Clément (69)</span></div>
+                                <div class="row"><span class="k">Boucle</span><span class="v num">6,706 km</span></div>
+                                <div class="row"><span class="k">Format</span><span class="v">Une boucle par heure</span></div>
+                                <div class="row"><span class="k">Rassemblement</span><span class="v num">12:40</span></div>
+                            </div>
+                        </div>
+                        <div class="blk">
+                            <h3>Mon inscription</h3>
+                            <div class="rows">
+                                <div class="row"><span class="k">Déposée le</span><span class="v num">04.08.2026</span></div>
+                                <div class="row"><span class="k">Modifiable</span><span class="v">Non, elle est confirmée</span></div>
+                            </div>
+                        </div>
+                        <div class="acts">
+                            <a class="btn btn-q" href="#">Briefing</a>
+                            <a class="btn btn-p" href="#">Voir mon inscription</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<div class="bench">
+    <div class="bench-head">
+        <b>A1 · Accueil coureur</b>
+        <span>Le même balisage, trois conteneurs.</span>
+    </div>
+    <div class="rigs">
+        <figure class="rig rig-lg">
+            <div class="rig-box"><div class="rig-in" data-use="a1"></div></div>
+            <figcaption>
+                <b>Bureau · 1280</b>
+                <span>Le dossard prend cinq douzièmes, les faits sept. Les deux boutons se rangent à droite, à la largeur de leur texte.</span>
+            </figcaption>
+        </figure>
+        <figure class="rig rig-md">
+            <div class="rig-box"><div class="rig-in" data-use="a1"></div></div>
+            <figcaption>
+                <b>Tablette · 834</b>
+                <span>Colonnes égales, dossard réduit. Le bandeau tient encore sur une ligne.</span>
+            </figcaption>
+        </figure>
+        <figure class="rig rig-sm">
+            <div class="rig-box"><div class="rig-in" data-use="a1"></div></div>
+            <figcaption>
+                <b>Téléphone · 390</b>
+                <span>Une colonne, bandeau sur deux lignes, boutons pleine largeur — ici c'est la bonne cible.</span>
+            </figcaption>
+        </figure>
+    </div>
+</div>
+
+<div class="facts">
+    <div>
+        <h4>Le bandeau</h4>
+        <p>Invariant. Pendant la course il bascule sur le tour en cours, par <code>animate-flip</code> de 130 ms — la seule animation de l'application.</p>
+    </div>
+    <div>
+        <h4>Le rail</h4>
+        <p>Alimenté par <code>mainNavItems()</code> tel quel, sans une icône. Six entrées au bureau, défilant au téléphone.</p>
+    </div>
+    <div>
+        <h4>Le dossard</h4>
+        <p>Trois lattes de Martian Mono. C'est la seule chose qu'un coureur vient chercher : elle occupe la place que ça mérite.</p>
+    </div>
+    <div>
+        <h4>Les actions</h4>
+        <p>Rangées à droite du bloc auquel elles appartiennent, jamais au milieu de la page ni sur toute sa largeur.</p>
+    </div>
+</div>
+
+<h2 class="sec">La latte</h2>
+
+<p class="sec-lede">
+    <code>--animate-flip: flip 130ms ease-out</code> et
+    <code>@utility slats { gap: 6px }</code> sont dans <code>app.css</code> depuis D-46, mais
+    la bascule ne sert qu'à un endroit — <code>SlatCell</code>, sur changement d'état — et la
+    latte reste cantonnée aux listes. La charte annonce un panneau des départs sans jamais
+    l'afficher en grand. C'est le seul endroit où je propose d'aller plus loin que la première
+    passe : pas en ajoutant un effet, en étendant celui qui est déjà écrit aux chiffres qui
+    font autorité.
+</p>
+
+<div class="facts">
+    <div>
+        <h4>Le dossard bascule</h4>
+        <p>Trois lattes, 130 ms chacune, décalées de 60 ms. Une fois, à l'arrivée sur l'écran. Le numéro se pose comme sur un panneau de gare.</p>
+    </div>
+    <div>
+        <h4>Le panneau de nuit est en lattes</h4>
+        <p>Quatorze lignes séparées par 6 px de fond, pas par un filet. La liste ressemble à ce qu'elle est : un affichage, pas un tableur.</p>
+    </div>
+    <div>
+        <h4>Le bandeau bascule au tour</h4>
+        <p>Une seule fois par heure, quand la fenêtre change. C'est l'unique animation en cours de session — le reste de l'application est immobile.</p>
+    </div>
+    <div>
+        <h4>Les garde-fous</h4>
+        <p>Jamais en boucle, jamais sur du texte, uniquement sur les chiffres qui font autorité. <code>prefers-reduced-motion</code> la coupe net, sans dégrader la lecture.</p>
+    </div>
+</div>
+
+<p class="note" style="margin-top: var(--s4)">
+    Fais défiler jusqu'au panneau de nuit plus bas : les lattes se posent à l'entrée dans le
+    champ de vision. C'est exactement le déclenchement proposé pour l'application — à
+    l'arrivée sur l'écran, pas à chaque rafraîchissement de données.
+</p>
+
+<h2 class="sec">Le formulaire au bureau</h2>
+
+<p class="sec-lede">
+    C'est là que le mobile-first fait le plus de dégâts : onze champs pleine largeur empilés
+    donnent un couloir de 1 500 pixels qu'on parcourt au scroll. Sur une grille de six
+    colonnes, chaque champ prend la largeur de la donnée qu'il attend, et les onze tiennent
+    sans défilement.
+</p>
+
+<template data-screen="a2">
+    <div class="screen">
+        <div class="band">
+            <p class="band-name">Backyard des Coteaux</p>
+            <div class="band-facts">
+                <div class="band-fact"><span class="k">Places</span><span class="v tnum">32/40</span></div>
+                <div class="band-fact"><span class="k">Premier départ</span><span class="v tnum">13:00 <em>sam 12 sept</em></span></div>
+            </div>
+        </div>
+        <nav class="rail">
+            <div class="rail-nav">
+                <a class="tab" href="#">Accueil</a>
+                <a class="tab on" href="#">Mon inscription</a>
+                <a class="tab" href="#">Briefing</a>
+                <a class="tab" href="#">Documents</a>
+                <a class="tab" href="#">Événement</a>
+            </div>
+            <div class="rail-end">
+                <span class="who">C. Roussel</span>
+                <span class="glyph" aria-hidden="true">☾</span>
+            </div>
+        </nav>
+        <div class="wrap">
+            <div class="wrap-max">
+                <div class="stack">
+                    <div class="blk">
+                        <h3>Le coureur</h3>
+                        <div class="fields">
+                            <div class="f f-2"><label>Nom</label><div class="in">Roussel</div></div>
+                            <div class="f f-2"><label>Prénom</label><div class="in">Camille</div></div>
+                            <div class="f f-2"><label>Naissance</label><div class="in mono">14.03.1991</div></div>
+                            <div class="f f-2"><label>Téléphone</label><div class="in mono">06 42 88 17 05</div></div>
+                            <div class="f f-4"><label>Email</label><div class="in">camille.roussel@mailo.fr</div></div>
+                            <div class="f f-3"><label>Numéro PPS</label><div class="in mono">PPS40218837</div></div>
+                        </div>
+                    </div>
+                    <div class="blk">
+                        <h3>En cas de pépin</h3>
+                        <div class="fields">
+                            <div class="f f-3"><label>Personne à prévenir</label><div class="in">Léa Roussel</div></div>
+                            <div class="f f-3"><label>Son téléphone</label><div class="in mono">06 11 54 90 22</div></div>
+                        </div>
+                    </div>
+                    <div class="blk">
+                        <h3>À signaler</h3>
+                        <div class="fields">
+                            <div class="f f-6"><label>Remarques</label><div class="in area">Allergie aux fruits à coque. Je dors dans une voiture garée au camp de base.</div></div>
+                        </div>
+                    </div>
+                    <div class="acts">
+                        <p class="note" style="margin-right:auto">Modifiable jusqu'à la confirmation par le gérant.</p>
+                        <button class="btn btn-q" type="button">Annuler mon inscription</button>
+                        <button class="btn btn-p" type="button">Enregistrer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<div class="bench">
+    <div class="bench-head">
+        <b>A2 · Mon inscription, modifiable</b>
+        <span>Onze champs, aucun défilement au bureau.</span>
+    </div>
+    <div class="rigs">
+        <figure class="rig rig-lg">
+            <div class="rig-box"><div class="rig-in" data-use="a2"></div></div>
+            <figcaption>
+                <b>Bureau · 1280</b>
+                <span>Nom, prénom et naissance sur une ligne : c'est ainsi qu'on les relit. L'e-mail prend quatre colonnes parce qu'une adresse est longue.</span>
+            </figcaption>
+        </figure>
+        <figure class="rig rig-md">
+            <div class="rig-box"><div class="rig-in" data-use="a2"></div></div>
+            <figcaption>
+                <b>Tablette · 834</b>
+                <span>La grille de six tient encore. Les actions restent en bas à droite, la mention explicative à gauche.</span>
+            </figcaption>
+        </figure>
+        <figure class="rig rig-sm">
+            <div class="rig-box"><div class="rig-in" data-use="a2"></div></div>
+            <figcaption>
+                <b>Téléphone · 390</b>
+                <span>La grille tombe à une colonne et les boutons s'empilent pleine largeur. Le couloir vertical redevient légitime.</span>
+            </figcaption>
+        </figure>
+    </div>
+</div>
+
+<h2 class="sec">La prose garde sa largeur</h2>
+
+<p class="sec-lede">
+    Le briefing est le seul écran qu'on lit vraiment, et à quatre heures du matin. Sa colonne
+    est bornée à 68 caractères sur tous les écrans — le bureau ne l'élargit pas, il lui ajoute
+    un sommaire collant à gauche. Les documents restent en pied, sur trois colonnes.
+</p>
+
+<template data-screen="a3">
+    <div class="screen">
+        <div class="band">
+            <p class="band-name">Backyard des Coteaux</p>
+            <div class="band-facts">
+                <div class="band-fact"><span class="k">Places</span><span class="v tnum">32/40</span></div>
+                <div class="band-fact"><span class="k">Premier départ</span><span class="v tnum">13:00 <em>sam 12 sept</em></span></div>
+            </div>
+        </div>
+        <nav class="rail">
+            <div class="rail-nav">
+                <a class="tab" href="#">Accueil</a>
+                <a class="tab" href="#">Mon inscription</a>
+                <a class="tab on" href="#">Briefing</a>
+                <a class="tab" href="#">Documents</a>
+                <a class="tab" href="#">Événement</a>
+            </div>
+            <div class="rail-end">
+                <span class="who">C. Roussel</span>
+                <span class="glyph" aria-hidden="true">☾</span>
+            </div>
+        </nav>
+        <div class="wrap">
+            <div class="wrap-max">
+                <div class="read">
+                    <nav class="toc">
+                        <a class="on" href="#">Le départ</a>
+                        <a href="#">La boucle</a>
+                        <a href="#">Le camp de base</a>
+                        <a href="#">L'élimination</a>
+                    </nav>
+                    <div class="prose">
+                        <section>
+                            <h3>Le départ</h3>
+                            <p>Rassemblement à 12:40 sous le chapiteau. Un coup de corne trois minutes avant chaque départ, puis un au départ. Le tour se referme à l'heure pile, sans exception.</p>
+                        </section>
+                        <section>
+                            <h3>La boucle</h3>
+                            <p>6,706 km, un seul sens, rubalise blanche aux intersections. Deux passages à gué : prévoyez des chaussures qui sèchent vite.</p>
+                        </section>
+                        <section>
+                            <h3>Le camp de base</h3>
+                            <p>Une table par coureur, à l'arrivée du chapiteau. Eau et ravitaillement salé en continu. Groupe électrogène coupé de 01:00 à 05:00.</p>
+                        </section>
+                        <section>
+                            <h3>L'élimination</h3>
+                            <p>Ne pas franchir la ligne avant l'heure pile met fin à la course. Le gérant l'annonce à voix haute avant de la saisir.</p>
+                        </section>
+                        <section>
+                            <h3>À télécharger</h3>
+                            <div class="docs">
+                                <div class="doc"><span class="t"><b>Règlement 2026</b><span>PDF · 240 ko</span></span><span class="g">↓</span></div>
+                                <div class="doc"><span class="t"><b>Consignes camp</b><span>PDF · 88 ko</span></span><span class="g">↓</span></div>
+                                <div class="doc"><span class="t"><b>Trace de la boucle</b><span>GPX · 12 ko</span></span><span class="g">↓</span></div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<div class="bench">
+    <div class="bench-head">
+        <b>A3 · Briefing</b>
+        <span>La largeur de lecture ne dépend pas de l'écran.</span>
+    </div>
+    <div class="rigs">
+        <figure class="rig rig-lg">
+            <div class="rig-box"><div class="rig-in" data-use="a3"></div></div>
+            <figcaption>
+                <b>Bureau · 1280</b>
+                <span>Le sommaire remplace le défilement à l'aveugle. Les titres de niveau 3 du Markdown tombent en libellés mono.</span>
+            </figcaption>
+        </figure>
+        <figure class="rig rig-sm">
+            <div class="rig-box"><div class="rig-in" data-use="a3"></div></div>
+            <figcaption>
+                <b>Téléphone · 390</b>
+                <span>Le sommaire disparaît, la prose garde exactement la même mesure.</span>
+            </figcaption>
+        </figure>
+    </div>
+</div>
+
+<h2 class="sec">La console du gérant</h2>
+
+<p class="sec-lede">
+    Quarante décisions à prendre à la chaîne. C'est l'écran qui gagne le plus au grand
+    format : la liste garde la pleine largeur, le détail s'ouvre à droite sans jamais la
+    quitter. On confirme une inscription en gardant les trente-neuf autres sous les yeux.
+</p>
+
+<template data-screen="a4">
+    <div class="screen">
+        <div class="band">
+            <p class="band-name">Backyard des Coteaux</p>
+            <div class="band-facts">
+                <div class="band-fact"><span class="k">Places</span><span class="v tnum">32/40</span></div>
+                <div class="band-fact"><span class="k">En attente</span><span class="v tnum">06</span></div>
+                <div class="band-fact"><span class="k">Premier départ</span><span class="v tnum">13:00 <em>sam 12 sept</em></span></div>
+            </div>
+        </div>
+        <nav class="rail">
+            <div class="rail-nav">
+                <a class="tab" href="#">Accueil</a>
+                <a class="tab on" href="#">Inscriptions</a>
+                <a class="tab" href="#">Événement</a>
+                <a class="tab" href="#">Briefing</a>
+                <a class="tab" href="#">Documents</a>
+            </div>
+            <div class="rail-end">
+                <span class="who">Gérant</span>
+                <span class="glyph" aria-hidden="true">☾</span>
+            </div>
+        </nav>
+        <div class="wrap">
+            <div class="console">
+                <div>
+                    <nav class="chips">
+                        <a class="chip on" href="#">Toutes <span class="n">40</span></a>
+                        <a class="chip" href="#">En attente <span class="n">06</span></a>
+                        <a class="chip" href="#">Confirmées <span class="n">32</span></a>
+                        <a class="chip" href="#">Annulées <span class="n">02</span></a>
+                    </nav>
+                    <div class="tbl-wrap">
+                        <table class="tbl">
+                            <thead>
+                                <tr>
+                                    <th>Dossard</th>
+                                    <th>Coureur</th>
+                                    <th class="hide-sm">Déposée</th>
+                                    <th class="hide-sm">Âge</th>
+                                    <th>Statut</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="on">
+                                    <td class="c-bib">—</td>
+                                    <td class="c-name">Yanis Belkacem</td>
+                                    <td class="c-meta hide-sm">06.08</td>
+                                    <td class="c-num hide-sm">34</td>
+                                    <td class="c-state"><span class="stamp stamp-quit"><span class="sq sq-quit"></span>Attente</span></td>
+                                    <td class="c-do"><button class="mini mini-p" type="button">Confirmer</button></td>
+                                </tr>
+                                <tr>
+                                    <td class="c-bib">—</td>
+                                    <td class="c-name">Fanny Le Guen</td>
+                                    <td class="c-meta hide-sm">06.08</td>
+                                    <td class="c-num hide-sm">41</td>
+                                    <td class="c-state"><span class="stamp stamp-quit"><span class="sq sq-quit"></span>Attente</span></td>
+                                    <td class="c-do"><button class="mini" type="button">Confirmer</button></td>
+                                </tr>
+                                <tr>
+                                    <td class="c-bib">—</td>
+                                    <td class="c-name">Naïm Sadaoui</td>
+                                    <td class="c-meta hide-sm">07.08</td>
+                                    <td class="c-num hide-sm">29</td>
+                                    <td class="c-state"><span class="stamp stamp-quit"><span class="sq sq-quit"></span>Attente</span></td>
+                                    <td class="c-do"><button class="mini" type="button">Confirmer</button></td>
+                                </tr>
+                                <tr>
+                                    <td class="c-bib">014</td>
+                                    <td class="c-name">Camille Roussel</td>
+                                    <td class="c-meta hide-sm">04.08</td>
+                                    <td class="c-num hide-sm">35</td>
+                                    <td class="c-state"><span class="stamp stamp-run"><span class="sq sq-run"></span>Confirmée</span></td>
+                                    <td class="c-do"><button class="mini" type="button">Ouvrir</button></td>
+                                </tr>
+                                <tr>
+                                    <td class="c-bib">003</td>
+                                    <td class="c-name">Théo Marchand</td>
+                                    <td class="c-meta hide-sm">04.08</td>
+                                    <td class="c-num hide-sm">27</td>
+                                    <td class="c-state"><span class="stamp stamp-run"><span class="sq sq-run"></span>Confirmée</span></td>
+                                    <td class="c-do"><button class="mini" type="button">Ouvrir</button></td>
+                                </tr>
+                                <tr>
+                                    <td class="c-bib">005</td>
+                                    <td class="c-name">Bruno Kessler</td>
+                                    <td class="c-meta hide-sm">05.08</td>
+                                    <td class="c-num hide-sm">52</td>
+                                    <td class="c-state"><span class="stamp stamp-run"><span class="sq sq-run"></span>Confirmée</span></td>
+                                    <td class="c-do"><button class="mini" type="button">Ouvrir</button></td>
+                                </tr>
+                                <tr>
+                                    <td class="c-bib">008</td>
+                                    <td class="c-name">Julien Perret</td>
+                                    <td class="c-meta hide-sm">05.08</td>
+                                    <td class="c-num hide-sm">44</td>
+                                    <td class="c-state"><span class="stamp stamp-run"><span class="sq sq-run"></span>Confirmée</span></td>
+                                    <td class="c-do"><button class="mini" type="button">Ouvrir</button></td>
+                                </tr>
+                                <tr>
+                                    <td class="c-bib">017</td>
+                                    <td class="c-name">Marion Chatel</td>
+                                    <td class="c-meta hide-sm">05.08</td>
+                                    <td class="c-num hide-sm">38</td>
+                                    <td class="c-state"><span class="stamp stamp-run"><span class="sq sq-run"></span>Confirmée</span></td>
+                                    <td class="c-do"><button class="mini" type="button">Ouvrir</button></td>
+                                </tr>
+                                <tr>
+                                    <td class="c-bib">021</td>
+                                    <td class="c-name">Awa Diomandé</td>
+                                    <td class="c-meta hide-sm">06.08</td>
+                                    <td class="c-num hide-sm">31</td>
+                                    <td class="c-state"><span class="stamp stamp-run"><span class="sq sq-run"></span>Confirmée</span></td>
+                                    <td class="c-do"><button class="mini" type="button">Ouvrir</button></td>
+                                </tr>
+                                <tr>
+                                    <td class="c-bib">—</td>
+                                    <td class="c-name">Élodie Vasseur</td>
+                                    <td class="c-meta hide-sm">07.08</td>
+                                    <td class="c-num hide-sm">37</td>
+                                    <td class="c-state"><span class="stamp stamp-out"><span class="sq sq-out"></span>Annulée</span></td>
+                                    <td class="c-do"><button class="mini" type="button">Ouvrir</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <aside class="pane">
+                    <div class="pane-head">
+                        <span class="n tnum">—</span>
+                        <span class="who">Yanis Belkacem</span>
+                        <span class="stamp stamp-quit"><span class="sq sq-quit"></span>En attente</span>
+                    </div>
+                    <div class="rows">
+                        <div class="row"><span class="k">Naissance</span><span class="v num">22.11.1991</span></div>
+                        <div class="row"><span class="k">Téléphone</span><span class="v num">06 78 21 44 09</span></div>
+                        <div class="row"><span class="k">Email</span><span class="v">y.belkacem@mailo.fr</span></div>
+                        <div class="row"><span class="k">PPS</span><span class="v num">PPS39104772</span></div>
+                        <div class="row"><span class="k">À prévenir</span><span class="v">Sofia Belkacem</span></div>
+                        <div class="row"><span class="k">Son téléphone</span><span class="v num">06 55 30 18 62</span></div>
+                        <div class="row"><span class="k">Déposée le</span><span class="v num">06.08.2026</span></div>
+                    </div>
+                    <p class="avis">Aucune remarque signalée.</p>
+                    <div class="acts">
+                        <button class="btn btn-q" type="button">Refuser</button>
+                        <button class="btn btn-p" type="button">Confirmer</button>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </div>
+</template>
+
+<div class="bench">
+    <div class="bench-head">
+        <b>A4 · Gestion des inscriptions</b>
+        <span>La liste ne se quitte jamais.</span>
+    </div>
+    <div class="rigs">
+        <figure class="rig rig-lg">
+            <div class="rig-box"><div class="rig-in" data-use="a4"></div></div>
+            <figcaption>
+                <b>Bureau · 1280</b>
+                <span>Dix lignes visibles au lieu de quatre, le détail à droite, les filtres portant leur compteur. Confirmer ne change pas d'écran.</span>
+            </figcaption>
+        </figure>
+        <figure class="rig rig-md">
+            <div class="rig-box"><div class="rig-in" data-use="a4"></div></div>
+            <figcaption>
+                <b>Tablette · 834</b>
+                <span>Le panneau se retire, la liste prend toute la place et le détail redevient une page.</span>
+            </figcaption>
+        </figure>
+        <figure class="rig rig-sm">
+            <div class="rig-box"><div class="rig-in" data-use="a4"></div></div>
+            <figcaption>
+                <b>Téléphone · 390</b>
+                <span>Date et âge se retirent, la ligne repasse à 52 px et le bouton d'action grandit avec elle.</span>
+            </figcaption>
+        </figure>
+    </div>
+</div>
+
+<h2 class="sec">La nuit de course</h2>
+
+<p class="sec-lede">
+    L'écran de BR-13, prospectif, monté sur la même coquille. C'est la démonstration la plus
+    nette du grand format : vingt-huit coureurs d'un seul coup d'œil, à deux heures du matin,
+    quand le gérant valide un passage toutes les quinze secondes. L'ambre ne sert qu'à l'action.
+</p>
+
+<template data-screen="a5">
+    <div class="screen" data-scheme="dark">
+        <div class="band">
+            <p class="band-name">Backyard des Coteaux</p>
+            <div class="band-facts">
+                <div class="band-fact"><span class="k">Tour</span><span class="v tnum">07</span></div>
+                <div class="band-fact"><span class="k">Fenêtre</span><span class="v tnum">20:00 → 21:00</span></div>
+                <div class="band-fact"><span class="k">En course</span><span class="v tnum">28</span></div>
+            </div>
+        </div>
+        <nav class="rail">
+            <div class="rail-nav">
+                <a class="tab on" href="#">Course</a>
+                <a class="tab" href="#">Coureurs</a>
+                <a class="tab" href="#">Inscriptions</a>
+                <a class="tab" href="#">Briefing</a>
+                <a class="tab" href="#">Documents</a>
+            </div>
+            <div class="rail-end">
+                <span class="who">Gérant</span>
+                <span class="glyph" aria-hidden="true">☀</span>
+            </div>
+        </nav>
+        <div class="wrap">
+            <div>
+                <div class="slat-head">
+                    <span>Dossard</span>
+                    <span>Coureur</span>
+                    <span>État</span>
+                    <span class="r drop">Rentré à</span>
+                    <span class="r drop">Boucles</span>
+                    <span></span>
+                </div>
+                <div class="slats" data-flip>
+                        <div class="slat-row" style="--i:0">
+                            <span class="c-bib">003</span>
+                            <span class="c-name">Théo Marchand</span>
+                            <span class="c-state"><span class="stamp stamp-run"><span class="sq sq-run"></span>En boucle</span></span>
+                            <span class="c-meta">—</span>
+                            <span class="c-num">06</span>
+                            <span class="c-do"><button class="mini mini-p" type="button">Valider</button></span>
+                        </div>
+                        <div class="slat-row" style="--i:1">
+                            <span class="c-bib">021</span>
+                            <span class="c-name">Awa Diomandé</span>
+                            <span class="c-state"><span class="stamp stamp-run"><span class="sq sq-run"></span>En boucle</span></span>
+                            <span class="c-meta">—</span>
+                            <span class="c-num">06</span>
+                            <span class="c-do"><button class="mini mini-p" type="button">Valider</button></span>
+                        </div>
+                        <div class="slat-row" style="--i:2">
+                            <span class="c-bib">011</span>
+                            <span class="c-name">Naïm Sadaoui</span>
+                            <span class="c-state"><span class="stamp stamp-run"><span class="sq sq-run"></span>En boucle</span></span>
+                            <span class="c-meta">—</span>
+                            <span class="c-num">06</span>
+                            <span class="c-do"><button class="mini mini-p" type="button">Valider</button></span>
+                        </div>
+                        <div class="slat-row" style="--i:3">
+                            <span class="c-bib">030</span>
+                            <span class="c-name">Yanis Belkacem</span>
+                            <span class="c-state"><span class="stamp stamp-run"><span class="sq sq-run"></span>En boucle</span></span>
+                            <span class="c-meta">—</span>
+                            <span class="c-num">06</span>
+                            <span class="c-do"><button class="mini mini-p" type="button">Valider</button></span>
+                        </div>
+                        <div class="slat-row" style="--i:4">
+                            <span class="c-bib">014</span>
+                            <span class="c-name">Camille Roussel</span>
+                            <span class="c-state"><span class="stamp stamp-run"><span class="sq sq-run"></span>Rentrée</span></span>
+                            <span class="c-meta">51:12</span>
+                            <span class="c-num">07</span>
+                            <span class="c-do"></span>
+                        </div>
+                        <div class="slat-row" style="--i:5">
+                            <span class="c-bib">006</span>
+                            <span class="c-name">Lucie Bonnard</span>
+                            <span class="c-state"><span class="stamp stamp-run"><span class="sq sq-run"></span>Rentrée</span></span>
+                            <span class="c-meta">49:58</span>
+                            <span class="c-num">07</span>
+                            <span class="c-do"></span>
+                        </div>
+                        <div class="slat-row" style="--i:6">
+                            <span class="c-bib">024</span>
+                            <span class="c-name">Élodie Vasseur</span>
+                            <span class="c-state"><span class="stamp stamp-run"><span class="sq sq-run"></span>Rentrée</span></span>
+                            <span class="c-meta">52:31</span>
+                            <span class="c-num">07</span>
+                            <span class="c-do"></span>
+                        </div>
+                        <div class="slat-row" style="--i:7">
+                            <span class="c-bib">009</span>
+                            <span class="c-name">Inès Fournier</span>
+                            <span class="c-state"><span class="stamp stamp-run"><span class="sq sq-run"></span>Rentrée</span></span>
+                            <span class="c-meta">53:47</span>
+                            <span class="c-num">07</span>
+                            <span class="c-do"></span>
+                        </div>
+                        <div class="slat-row" style="--i:8">
+                            <span class="c-bib">019</span>
+                            <span class="c-name">Sacha Nguyen</span>
+                            <span class="c-state"><span class="stamp stamp-run"><span class="sq sq-run"></span>Rentré</span></span>
+                            <span class="c-meta">54:03</span>
+                            <span class="c-num">07</span>
+                            <span class="c-do"></span>
+                        </div>
+                        <div class="slat-row" style="--i:9">
+                            <span class="c-bib">028</span>
+                            <span class="c-name">Rémi Chauveau</span>
+                            <span class="c-state"><span class="stamp stamp-run"><span class="sq sq-run"></span>Rentré</span></span>
+                            <span class="c-meta">56:12</span>
+                            <span class="c-num">07</span>
+                            <span class="c-do"></span>
+                        </div>
+                        <div class="slat-row" style="--i:10">
+                            <span class="c-bib">008</span>
+                            <span class="c-name">Julien Perret</span>
+                            <span class="c-state"><span class="stamp stamp-run"><span class="sq sq-run"></span>Rentré</span></span>
+                            <span class="c-meta">57:40</span>
+                            <span class="c-num">07</span>
+                            <span class="c-do"></span>
+                        </div>
+                        <div class="slat-row" style="--i:11">
+                            <span class="c-bib">002</span>
+                            <span class="c-name">Fanny Le Guen</span>
+                            <span class="c-state"><span class="stamp stamp-run"><span class="sq sq-run"></span>Rentrée</span></span>
+                            <span class="c-meta">58:55</span>
+                            <span class="c-num">07</span>
+                            <span class="c-do"></span>
+                        </div>
+                        <div class="slat-row" style="--i:12">
+                            <span class="c-bib">017</span>
+                            <span class="c-name">Marion Chatel</span>
+                            <span class="c-state"><span class="stamp stamp-out"><span class="sq sq-out"></span>Éliminée</span></span>
+                            <span class="c-meta">Tour 06</span>
+                            <span class="c-num">06</span>
+                            <span class="c-do"></span>
+                        </div>
+                        <div class="slat-row" style="--i:13">
+                            <span class="c-bib">005</span>
+                            <span class="c-name">Bruno Kessler</span>
+                            <span class="c-state"><span class="stamp stamp-quit"><span class="sq sq-quit"></span>Abandon</span></span>
+                            <span class="c-meta">Tour 04</span>
+                            <span class="c-num">04</span>
+                            <span class="c-do"></span>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<div class="bench">
+    <div class="bench-head">
+        <b>A5 · Nuit de course · prospectif BR-13</b>
+        <span>Toujours en nuit, quel que soit le thème du document.</span>
+    </div>
+    <div class="rigs">
+        <figure class="rig rig-lg">
+            <div class="rig-box"><div class="rig-in" data-use="a5"></div></div>
+            <figcaption>
+                <b>Bureau · 1280</b>
+                <span>Quatorze lignes ici, vingt-huit sur un écran de bureau réel. Le bandeau bascule à chaque tour.</span>
+            </figcaption>
+        </figure>
+        <figure class="rig rig-sm">
+            <div class="rig-box"><div class="rig-in" data-use="a5"></div></div>
+            <figcaption>
+                <b>Téléphone · 390</b>
+                <span>Le gérant garde son téléphone en secours : la même table, sans l'heure de retour, en lignes de 52 px.</span>
+            </figcaption>
+        </figure>
+    </div>
+</div>
+
+<h2 class="sec">Sur quoi c'est construit</h2>
+
+<p class="sec-lede">
+    <strong>reka-ui 2.10.3</strong> est déjà dans le projet, et les vingt-trois familles de
+    <code>components/ui/</code> sont ses habillages. Une refonte qui repartirait de
+    <code>&lt;div&gt;</code> nues rejetterait le comportement — le clavier, le focus piégé,
+    les rôles ARIA, la fermeture au geste — pour ne garder que l'apparence. La coquille
+    ci-dessus prend l'inverse : reka-ui porte le comportement, la charte porte tout le reste.
+</p>
+
+<div class="bp-wrap">
+<table class="bp">
+    <thead>
+        <tr>
+            <th>Pièce de la refonte</th>
+            <th>Primitive reka-ui</th>
+            <th>État</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>BoardRail</td>
+            <td><code>NavigationMenuRoot / List / Item / Link</code>, chaque lien en <code>as-child</code> autour du <code>&lt;Link&gt;</code> d'Inertia</td>
+            <td>Installé</td>
+        </tr>
+        <tr>
+            <td>BoardBand</td>
+            <td><code>Separator</code> entre les faits, <code>Tooltip</code> sur l'heure de fermeture</td>
+            <td>Installé</td>
+        </tr>
+        <tr>
+            <td>DetailPane</td>
+            <td>Statique au-dessus de 1024. En dessous, le même contenu passe dans <code>Sheet</code>, qui est <code>DialogRoot</code> en tiroir : focus piégé, fermeture à l'échappement, retour du focus à la ligne.</td>
+            <td>Installé</td>
+        </tr>
+        <tr>
+            <td>Filtres à compteur</td>
+            <td><code>NavigationMenuLink</code> — le filtre est une URL servie par <code>RegistrationIndexRequest</code>, donc des liens, pas des onglets</td>
+            <td>Installé</td>
+        </tr>
+        <tr>
+            <td>ActionBar et boutons</td>
+            <td><code>Primitive</code> via <code>ui/button</code> et son <code>as-child</code></td>
+            <td>Installé</td>
+        </tr>
+        <tr>
+            <td>FieldGrid</td>
+            <td><code>Label</code> reka lié au champ, <code>Select</code> pour les listes, <code>Checkbox</code> pour les acquittements</td>
+            <td>Installé</td>
+        </tr>
+        <tr>
+            <td>Compte et thème au bout du rail</td>
+            <td><code>DropdownMenu</code>, déjà employé par <code>AppearanceToggle</code> et <code>NavUser</code></td>
+            <td>Installé</td>
+        </tr>
+        <tr>
+            <td>Sections pliées du briefing</td>
+            <td><code>Collapsible</code>, si les sections deviennent pliables plutôt que continues</td>
+            <td>Installé</td>
+        </tr>
+        <tr>
+            <td>Confirmer ou annuler une inscription</td>
+            <td><code>AlertDialog</code> — une action irréversible mérite mieux qu'un <code>Dialog</code> ordinaire : le focus part sur l'action sûre et l'échappement annule</td>
+            <td><strong>À ajouter</strong></td>
+        </tr>
+        <tr>
+            <td>Le panneau de nuit</td>
+            <td>Aucune primitive de tableau chez reka-ui. Les lattes restent du balisage propre ; seules les actions de ligne passent par <code>ui/button</code>.</td>
+            <td>—</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+
+<p class="note" style="margin-top: var(--s4)">
+    Une seule primitive manque à l'appel, <code>AlertDialog</code>, et elle s'ajoute par la
+    CLI shadcn-vue comme les autres. Les habillages arrivent avec quelques classes Tailwind
+    par défaut — <code>rounded-sm</code>, <code>transition</code>, <code>ring</code> — mais la
+    charte les neutralise déjà : <code>--radius: 0px</code> traverse tout le mapping
+    <code>--radius-sm</code> à <code>--radius-2xl</code>. Il n'y a donc rien à déshabiller,
+    seulement à ne pas rajouter.
+</p>
+
+<h2 class="sec">Ce que ça change dans le code</h2>
+
+<h3 class="sub">Ce qui ne bouge pas</h3>
+
+<div class="facts">
+    <div>
+        <h4>La charte</h4>
+        <p><code>resources/css/app.css</code> intégralement : jetons, échelle nommée, quatre statuts, <code>animate-flip</code>, <code>--radius: 0px</code>.</p>
+    </div>
+    <div>
+        <h4>Les fontes</h4>
+        <p>Les deux familles auto-hébergées et <code>PaletteContrastTest</code>, inchangés.</p>
+    </div>
+    <div>
+        <h4>Tout le back</h4>
+        <p>Contrôleurs, props Inertia, policies, traductions, <code>mainNavItems()</code>. Aucune route ne change.</p>
+    </div>
+    <div>
+        <h4>Les composants métier</h4>
+        <p><code>StatusBadge</code>, <code>StatCounter</code>, <code>SlatCell</code>, les états vides.</p>
+    </div>
+</div>
+
+<h3 class="sub">Ce qui naît</h3>
+
+<ul class="diag">
+    <li>
+        <b>BoardBand</b>
+        <span>Le bandeau. Une prop de lecture, un slot d'appoint pour la bascule de tour. Remplace <code>AppSidebarHeader</code> et <code>Breadcrumbs</code>.</span>
+    </li>
+    <li>
+        <b>BoardRail</b>
+        <span>Les onglets sur <code>NavigationMenu</code>, alimentés par <code>mainNavItems()</code> sans les icônes, plus le compte et la bascule de thème au bout. Remplace <code>AppSidebar</code>, <code>NavMain</code> et <code>AppBottomNav</code> — trois composants pour un, et la navigation au clavier vient de la primitive au lieu d'être réécrite.</span>
+    </li>
+    <li>
+        <b>BoardRow</b>
+        <span>La ligne libellé / valeur. Remplace les listes de définitions recopiées dans six pages.</span>
+    </li>
+    <li>
+        <b>BoardGrid et FieldGrid</b>
+        <span>La grille 5/7 du contenu et la grille de six colonnes du formulaire. C'est là que vivent les points de rupture, une fois pour toutes.</span>
+    </li>
+    <li>
+        <b>ActionBar</b>
+        <span>La barre d'actions. Elle porte la règle de largeur — auto au-dessus de 640, pleine en dessous — pour que plus aucune page ne la réécrive.</span>
+    </li>
+    <li>
+        <b>DataTable et DetailPane</b>
+        <span>Le tableau dense et le panneau de détail de la console, ce dernier basculant dans <code>Sheet</code> sous 1024. Ils n'existent aujourd'hui sous aucune forme.</span>
+    </li>
+</ul>
+
+<h3 class="sub">Ce qui sort</h3>
+
+<ul class="diag">
+    <li>
+        <b>La coquille SaaS</b>
+        <span><code>AppSidebar</code>, <code>AppSidebarHeader</code>, <code>AppSidebarLayout</code>, <code>Breadcrumbs</code>, <code>AppBottomNav</code>, <code>NavMain</code>, <code>NavFooter</code>.</span>
+    </li>
+    <li>
+        <b>Trois habillages, et aucune primitive</b>
+        <span>
+            Sortent <code>ui/sidebar</code>, <code>ui/breadcrumb</code> et <code>ui/card</code>.
+            Aucun des trois n'est une primitive reka-ui : <code>sidebar</code> est un assemblage
+            shadcn qui emprunte <code>Sheet</code>, <code>Tooltip</code> et <code>Separator</code> —
+            tous trois conservés et davantage employés — tandis que <code>breadcrumb</code> et
+            <code>card</code> ne prennent que <code>Primitive</code>, le polymorphe
+            <code>as</code>. <code>ui/navigation-menu</code>, lui, reste : c'est la primitive
+            complète, et c'est elle qui porte le rail.
+        </span>
+    </li>
+    <li>
+        <b>Les chaînes de classes recopiées</b>
+        <span><code>primaryLinkClasses</code> et <code>outlineLinkClasses</code>, partout où elles ont été collées. Elles deviennent <code>ActionButton</code> en <code>as-child</code> autour d'un <code>&lt;Link&gt;</code>, dans une <code>ActionBar</code> — et le <code>w-full</code> quitte la base <code>cva</code> pour devenir <code>w-full sm:w-auto</code>.</span>
+    </li>
+    <li>
+        <b>La limite de la barre basse</b>
+        <span><code>BOTTOM_NAV_LIMIT</code> et son test dans <code>mainNav.spec.ts</code> : le rail défile, il ne tronque plus. Le test change de sujet — il vérifiera que les six entrées sortent, pas qu'on en coupe deux.</span>
+    </li>
+</ul>
+
+<h2 class="sec">Deux points à trancher</h2>
+
+<div class="risk">
+    <h4>La cible de validation, la nuit</h4>
+    <p>
+        D-46 exigeait 72 px de haut pour le bouton « Valider » de la nuit de course, main
+        fatiguée et gant mouillé. La ligne de bureau à 38 px ne les donne pas. Deux sorties :
+        soit la règle devient conditionnelle au pointeur — 72 px au doigt, 38 à la souris,
+        via <code>@media (pointer: coarse)</code> — soit la console de nuit garde une densité
+        propre, plus large que les autres tableaux. Dans les deux cas, la règle doit être
+        réécrite noir sur blanc et couverte par un test, pas héritée par accident.
+    </p>
+</div>
+
+<div class="risk" style="margin-top: var(--s4)">
+    <h4>Le survol comme seule affordance</h4>
+    <p>
+        Sur la console, l'action « Confirmer » n'apparaît aujourd'hui qu'au survol dans les
+        maquettes ci-dessus — elle est en réalité affichée en permanence sur la ligne
+        sélectionnée. Il faut décider si l'action reste visible sur les quarante lignes, ce
+        qui charge l'écran, ou seulement sur la ligne active, ce qui demande un clic de plus.
+        Ma préférence va au second, avec la ligne active pilotable au clavier.
+    </p>
+</div>
+
+<h2 class="sec">Ce que je propose de faire ensuite</h2>
+
+<p class="sec-lede">
+    Si cette direction te convient, l'ordre le moins risqué est celui-ci : la coquille
+    d'abord — <code>BoardBand</code>, <code>BoardRail</code>, le layout — parce qu'elle est
+    commune à toutes les pages et que son remplacement se voit immédiatement. Puis
+    <code>ActionBar</code> et <code>BoardRow</code>, qui font disparaître les chaînes de
+    classes recopiées. Les écrans suivent un par un, en commençant par l'accueil coureur,
+    qui est le plus visible, et en finissant par la console, qui est le plus long — c'est
+    au moment de la console qu'il faudra ajouter <code>AlertDialog</code>, la seule
+    primitive manquante. Le back ne bouge à aucun moment.
+</p>
+
+</div>
+
+<script>
+    (function () {
+        var root = document.documentElement;
+
+        document.querySelectorAll('.rig-in[data-use]').forEach(function (host) {
+            var tpl = document.querySelector('template[data-screen="' + host.dataset.use + '"]');
+            if (tpl) {
+                host.appendChild(tpl.content.cloneNode(true));
+                host.setAttribute('inert', '');
+            }
+        });
+
+        var watch = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('go');
+                    watch.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.35 });
+
+        document.querySelectorAll('[data-flip]').forEach(function (el) {
+            watch.observe(el);
+        });
+
+        function current() {
+            if (root.dataset.theme) {
+                return root.dataset.theme;
+            }
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+
+        var theme = document.getElementById('theme');
+
+        function paintTheme() {
+            theme.textContent = current() === 'dark' ? 'Passer en jour' : 'Passer en nuit';
+        }
+
+        theme.addEventListener('click', function () {
+            root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+            paintTheme();
+        });
+
+        paintTheme();
+
+        var scale = document.getElementById('scale');
+
+        scale.addEventListener('click', function () {
+            var real = root.dataset.scale === 'real';
+            if (real) {
+                delete root.dataset.scale;
+            } else {
+                root.dataset.scale = 'real';
+            }
+            scale.setAttribute('aria-pressed', String(!real));
+            scale.textContent = real ? 'Taille réelle' : 'Taille ajustée';
+        });
+    })();
+</script>

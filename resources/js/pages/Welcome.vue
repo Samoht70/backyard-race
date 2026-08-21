@@ -21,16 +21,16 @@ import { create as register } from '@/routes/account';
         </div>
 
         <div class="flex w-full max-w-xs flex-col gap-2">
-            <Link v-if="$page.props.auth.user" :href="dashboard()">
-                <ActionButton>Ouvrir la course</ActionButton>
-            </Link>
+            <ActionButton v-if="$page.props.auth.user" block as-child>
+                <Link :href="dashboard()">Ouvrir la course</Link>
+            </ActionButton>
             <template v-else>
-                <Link :href="login()">
-                    <ActionButton>Se connecter</ActionButton>
-                </Link>
-                <Link :href="register()">
-                    <ActionButton tone="quiet">S’inscrire</ActionButton>
-                </Link>
+                <ActionButton block as-child>
+                    <Link :href="login()">Se connecter</Link>
+                </ActionButton>
+                <ActionButton tone="quiet" block as-child>
+                    <Link :href="register()">S’inscrire</Link>
+                </ActionButton>
             </template>
         </div>
     </div>

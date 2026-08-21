@@ -7,17 +7,17 @@ import AlertError from '@/components/AlertError.vue';
 import EventStatusBadge from '@/components/event/EventStatusBadge.vue';
 import InputError from '@/components/InputError.vue';
 import ActionButton from '@/components/race/ActionButton.vue';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@/components/ui/dialog';
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import {
     eventStatusIcons,
     eventStatusLabelKey,
@@ -47,14 +47,12 @@ const isBlocked = computed(() => props.transition.refusals.length > 0);
 </script>
 
 <template>
-    <Card>
-        <CardHeader>
-            <CardTitle class="font-mono text-label uppercase">
-                {{ t('event.status.section_title') }}
-            </CardTitle>
-        </CardHeader>
+    <section class="grid gap-4 border border-border bg-card p-4">
+        <h2 class="font-mono text-label text-muted-foreground uppercase">
+            {{ t('event.status.section_title') }}
+        </h2>
 
-        <CardContent class="flex flex-col gap-4">
+        <div class="flex flex-col gap-4">
             <ol class="flex flex-col gap-2">
                 <li
                     v-for="step in steps"
@@ -119,8 +117,8 @@ const isBlocked = computed(() => props.transition.refusals.length > 0);
                     :errors="transition.refusals"
                 />
 
-                <Dialog>
-                    <DialogTrigger as-child>
+                <AlertDialog>
+                    <AlertDialogTrigger as-child>
                         <ActionButton
                             :disabled="isBlocked"
                             :aria-describedby="
@@ -129,9 +127,9 @@ const isBlocked = computed(() => props.transition.refusals.length > 0);
                         >
                             {{ t(eventTransitionLabelKey(transition.next)) }}
                         </ActionButton>
-                    </DialogTrigger>
+                    </AlertDialogTrigger>
 
-                    <DialogContent>
+                    <AlertDialogContent>
                         <Form
                             v-bind="AdvanceEventController.form()"
                             :options="{ preserveScroll: true }"
@@ -144,8 +142,8 @@ const isBlocked = computed(() => props.transition.refusals.length > 0);
                                 :value="transition.next"
                             />
 
-                            <DialogHeader class="space-y-3">
-                                <DialogTitle>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>
                                     {{
                                         t(
                                             eventTransitionLabelKey(
@@ -153,35 +151,37 @@ const isBlocked = computed(() => props.transition.refusals.length > 0);
                                             ),
                                         )
                                     }}
-                                </DialogTitle>
-                                <DialogDescription>
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
                                     {{
                                         t(
                                             'event.transition.confirm_irreversible',
                                         )
                                     }}
-                                </DialogDescription>
-                            </DialogHeader>
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
 
                             <InputError :message="errors.to" />
 
-                            <DialogFooter class="gap-2">
-                                <DialogClose as-child>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel as-child>
                                     <ActionButton tone="quiet">
                                         {{ t('event.transition.cancel') }}
                                     </ActionButton>
-                                </DialogClose>
-                                <ActionButton
-                                    type="submit"
-                                    :loading="processing"
-                                >
-                                    {{ t('event.transition.confirm') }}
-                                </ActionButton>
-                            </DialogFooter>
+                                </AlertDialogCancel>
+                                <AlertDialogAction as-child>
+                                    <ActionButton
+                                        type="submit"
+                                        :loading="processing"
+                                    >
+                                        {{ t('event.transition.confirm') }}
+                                    </ActionButton>
+                                </AlertDialogAction>
+                            </AlertDialogFooter>
                         </Form>
-                    </DialogContent>
-                </Dialog>
+                    </AlertDialogContent>
+                </AlertDialog>
             </template>
-        </CardContent>
-    </Card>
+        </div>
+    </section>
 </template>

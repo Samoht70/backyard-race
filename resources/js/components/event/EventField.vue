@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Lock } from '@lucide/vue';
+import { computed } from 'vue';
 import InputError from '@/components/InputError.vue';
 import { Label } from '@/components/ui/label';
 
@@ -22,17 +23,29 @@ type Props = {
     locked?: boolean;
     lockedReason?: string;
     value?: string;
+    span?: 2 | 3 | 4 | 6;
 };
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
     locked: false,
+    span: 6,
 });
+
+const spans = {
+    2: '@min-[52rem]:col-span-2',
+    3: '@min-[52rem]:col-span-3',
+    4: '@min-[52rem]:col-span-4',
+    6: '@min-[52rem]:col-span-6',
+};
+
+const spanClass = computed(() => spans[props.span]);
 </script>
 
 <template>
     <div
         v-if="locked"
-        class="grid gap-1 rounded-lg border border-border bg-muted/40 px-3 py-2"
+        class="grid gap-1 border border-border bg-muted/40 px-3 py-2"
+        :class="spanClass"
     >
         <p class="font-mono text-label text-muted-foreground uppercase">
             {{ label }}
@@ -51,7 +64,11 @@ withDefaults(defineProps<Props>(), {
         <InputError :message="error" />
     </div>
 
-    <div v-else class="grid gap-2 [&_input]:h-11 [&_textarea]:min-h-24">
+    <div
+        v-else
+        class="grid content-start gap-2 [&_input]:h-11 lg:[&_input]:h-10 [&_textarea]:min-h-24"
+        :class="spanClass"
+    >
         <Label :for="name">
             {{ label }}
             <span v-if="unit" class="text-muted-foreground">({{ unit }})</span>

@@ -2,24 +2,14 @@
 import { Form, Head, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import ProfileController from '@/actions/App/Http/Controllers/ProfileController';
+import ActionBar from '@/components/board/ActionBar.vue';
+import BoardPage from '@/components/board/BoardPage.vue';
 import DeleteUser from '@/components/DeleteUser.vue';
 import InputError from '@/components/InputError.vue';
-import { Button } from '@/components/ui/button';
+import ActionButton from '@/components/race/ActionButton.vue';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { t } from '@/lib/i18n';
-import { edit } from '@/routes/profile';
-
-defineOptions({
-    layout: {
-        breadcrumbs: [
-            {
-                title: 'Profil',
-                href: edit(),
-            },
-        ],
-    },
-});
 
 const user = computed(() => usePage().props.auth.user);
 </script>
@@ -27,68 +17,78 @@ const user = computed(() => usePage().props.auth.user);
 <template>
     <Head :title="t('ui.profile.title')" />
 
-    <div class="mx-auto flex max-w-xl flex-col gap-6 p-4">
-        <header class="flex flex-col gap-2">
-            <h1 class="text-title">{{ t('ui.profile.title') }}</h1>
-            <p class="text-sm text-muted-foreground">
-                {{ t('ui.profile.description') }}
-            </p>
-        </header>
+    <BoardPage>
+        <div class="grid max-w-4xl gap-6">
+            <header class="flex flex-col gap-2">
+                <h1 class="text-title">{{ t('ui.profile.title') }}</h1>
+                <p class="text-sm text-muted-foreground">
+                    {{ t('ui.profile.description') }}
+                </p>
+            </header>
 
-        <Form
-            v-bind="ProfileController.update.form()"
-            class="flex flex-col gap-6"
-            v-slot="{ errors, processing }"
-        >
-            <div class="grid gap-2">
-                <Label for="first_name">{{ t('ui.profile.first_name') }}</Label>
-                <Input
-                    id="first_name"
-                    name="first_name"
-                    :default-value="user.first_name"
-                    required
-                    autocomplete="given-name"
-                    :placeholder="t('ui.profile.first_name')"
-                />
-                <InputError :message="errors.first_name" />
-            </div>
-
-            <div class="grid gap-2">
-                <Label for="last_name">{{ t('ui.profile.last_name') }}</Label>
-                <Input
-                    id="last_name"
-                    name="last_name"
-                    :default-value="user.last_name"
-                    required
-                    autocomplete="family-name"
-                    :placeholder="t('ui.profile.last_name')"
-                />
-                <InputError :message="errors.last_name" />
-            </div>
-
-            <div class="grid gap-2">
-                <Label for="email">{{ t('ui.profile.email') }}</Label>
-                <Input
-                    id="email"
-                    type="email"
-                    name="email"
-                    :default-value="user.email"
-                    required
-                    autocomplete="username"
-                    :placeholder="t('ui.profile.email')"
-                />
-                <InputError :message="errors.email" />
-            </div>
-
-            <Button
-                type="submit"
-                :disabled="processing"
-                data-test="update-profile-button"
+            <Form
+                v-bind="ProfileController.update.form()"
+                class="grid gap-6"
+                v-slot="{ errors, processing }"
             >
-                {{ t('ui.profile.save') }}
-            </Button>
-        </Form>
+                <div class="@container grid gap-4 @min-[52rem]:grid-cols-6">
+                    <div class="grid gap-2 @min-[52rem]:col-span-3">
+                        <Label for="first_name">{{
+                            t('ui.profile.first_name')
+                        }}</Label>
+                        <Input
+                            id="first_name"
+                            name="first_name"
+                            :default-value="user.first_name"
+                            required
+                            autocomplete="given-name"
+                            :placeholder="t('ui.profile.first_name')"
+                        />
+                        <InputError :message="errors.first_name" />
+                    </div>
 
-        <DeleteUser />
-    </div>
+                    <div class="grid gap-2 @min-[52rem]:col-span-3">
+                        <Label for="last_name">{{
+                            t('ui.profile.last_name')
+                        }}</Label>
+                        <Input
+                            id="last_name"
+                            name="last_name"
+                            :default-value="user.last_name"
+                            required
+                            autocomplete="family-name"
+                            :placeholder="t('ui.profile.last_name')"
+                        />
+                        <InputError :message="errors.last_name" />
+                    </div>
+
+                    <div class="grid gap-2 @min-[52rem]:col-span-4">
+                        <Label for="email">{{ t('ui.profile.email') }}</Label>
+                        <Input
+                            id="email"
+                            type="email"
+                            name="email"
+                            :default-value="user.email"
+                            required
+                            autocomplete="username"
+                            :placeholder="t('ui.profile.email')"
+                        />
+                        <InputError :message="errors.email" />
+                    </div>
+                </div>
+
+                <ActionBar>
+                    <ActionButton
+                        type="submit"
+                        :loading="processing"
+                        data-test="update-profile-button"
+                    >
+                        {{ t('ui.profile.save') }}
+                    </ActionButton>
+                </ActionBar>
+            </Form>
+
+            <DeleteUser />
+        </div>
+    </BoardPage>
 </template>

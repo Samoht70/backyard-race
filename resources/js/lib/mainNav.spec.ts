@@ -8,7 +8,7 @@ vi.mock('@inertiajs/vue3', () => ({
     usePage: () => page,
 }));
 
-const { BOTTOM_NAV_LIMIT, mainNavItems } = await import('@/lib/mainNav');
+const { mainNavItems } = await import('@/lib/mainNav');
 const { toUrl } = await import('@/lib/utils');
 
 type Areas = {
@@ -36,10 +36,6 @@ function titles(): string[] {
     return mainNavItems().map((item) => item.title);
 }
 
-function bottomBarTitles(): string[] {
-    return titles().slice(0, BOTTOM_NAV_LIMIT);
-}
-
 describe('mainNavItems', () => {
     beforeEach(() => {
         page.props = {};
@@ -54,17 +50,6 @@ describe('mainNavItems', () => {
             'ui.nav.briefing',
             'ui.nav.documents',
             'ui.nav.event',
-        ]);
-    });
-
-    it('folds the event entry out of a registered runner bottom bar', () => {
-        signIn({ event: true, documents: true, registration: true });
-
-        expect(bottomBarTitles()).toEqual([
-            'ui.nav.home',
-            'ui.nav.registration',
-            'ui.nav.briefing',
-            'ui.nav.documents',
         ]);
     });
 
@@ -85,14 +70,15 @@ describe('mainNavItems', () => {
         ]);
     });
 
-    it('keeps the management hub in a manager bottom bar', () => {
+    it('opens a manager rail on the management hub', () => {
         signIn({ event: true, documents: true }, ['manage-event']);
 
-        expect(bottomBarTitles()).toEqual([
+        expect(titles()).toEqual([
             'ui.nav.home',
             'ui.nav.manage',
             'ui.nav.briefing',
             'ui.nav.documents',
+            'ui.nav.event',
         ]);
     });
 
@@ -101,11 +87,13 @@ describe('mainNavItems', () => {
             'manage-event',
         ]);
 
-        expect(bottomBarTitles()).toEqual([
+        expect(titles()).toEqual([
             'ui.nav.home',
             'ui.nav.manage',
             'ui.nav.registration',
             'ui.nav.briefing',
+            'ui.nav.documents',
+            'ui.nav.event',
         ]);
     });
 

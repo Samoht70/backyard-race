@@ -1889,3 +1889,134 @@ déduit du schéma de la requête. La déduction est désormais juste, mais le r
 appartient à BR-28. En revanche, ce qu'on craignait sur les liens signés n'existait pas : sans
 `trustProxies`, la signature était produite et vérifiée sur le même schéma, donc cohérente. Le lien
 partait simplement en clair dans le mail.
+
+## D-58 — Le grand format : la coquille passe du téléphone élargi au panneau replié
+
+Arrêtée le 2026-08-21 avec le propriétaire du projet, après maquettage de la refonte
+(`project/design/grand-format.html`). Elle ne touche ni la palette, ni les familles, ni les quatre
+statuts : D-46 tient en totalité. Ce qui change est l'écran de référence.
+
+**Le mobile-first coûtait au bureau, et la cause tenait en une ligne.** `ActionButton` portait
+`w-full` dans sa base `cva`, donc ses quatre-vingt-douze usages s'étiraient jusqu'au bord sur tout
+écran. Là où il fallait un lien plutôt qu'un bouton, `Dashboard.vue` l'avait contourné en recopiant
+`primaryLinkClasses` et `outlineLinkClasses` — le symptôme, pas la maladie. La base perd `w-full`
+au profit de `w-full sm:w-auto`, et le composant gagne `as-child` sur la primitive `Primitive` de
+reka-ui : un `<Link>` d'Inertia entre désormais dans un `ActionButton` sans recopier une classe.
+Le contournement disparaît, et avec lui l'imbrication `<button>` dans `<a>` de `Welcome.vue`, qui
+était du HTML invalide.
+
+**La coquille SaaS sort, le panneau la remplace.** `BoardBand` porte les faits de l'événement,
+partagés par Inertia via `BoardResource` — un seul `Event::query()->first()` mémoïsé sert le
+bandeau et `access()`. `BoardRail` porte les six destinations de `mainNavItems()`, ce qui règle
+`BOTTOM_NAV_LIMIT` : le rail défile au téléphone au lieu de tronquer à quatre, et son test change
+de sujet plutôt que de disparaître. Sortent `AppSidebar`, `AppSidebarHeader`, `AppSidebarLayout`,
+`AppShell`, `AppContent`, `AppBottomNav`, `NavMain`, `NavFooter`, `NavUser`, `Breadcrumbs`, et les
+habillages `ui/sidebar`, `ui/breadcrumb`, `ui/card`. Les tokens `--sidebar-*` partent avec eux, des
+deux blocs de `app.css` et des deux paires de `PaletteContrastTest`.
+
+**Aucune primitive reka-ui n'est perdue dans l'opération, et une est gagnée.** `ui/sidebar`
+n'était pas une primitive — reka-ui n'en a pas — mais un assemblage shadcn empruntant `Sheet`,
+`Tooltip`, `Separator` et `Primitive`, tous conservés. `breadcrumb` et `card` ne prenaient que
+`Primitive`. Le rail est monté directement sur `NavigationMenuRoot / List / Item / Link` plutôt que
+sur l'habillage `ui/navigation-menu`, dont les `rounded-sm`, `bg-accent` et le viewport des
+sous-menus auraient été annulés ligne à ligne pour une charte sans arrondi ni sous-menu.
+`AlertDialog` est ajouté et remplace le `Dialog` d'`EventStatusPanel` : une transition
+irréversible mérite le focus sur l'action sûre et pas de fermeture au clic extérieur.
+
+**Trois règles portées par des composants, pas par des classes recopiées.** La largeur du bouton
+vit dans `ActionButton` et `ActionBar`. Les points de rupture vivent dans `BoardColumns` (5/7 au
+bureau, deux colonnes égales en tablette, une au téléphone) et dans `EventFieldset`, passé en
+grille de six colonnes où chaque `EventField` déclare son `span` — la naissance en prend deux,
+l'e-mail quatre, les remarques six. La largeur de lecture du briefing est bornée à 68 caractères
+sur tous les écrans. La densité suit le pointeur : 44 px au doigt, 40 à la souris, par
+`sm:min-h-10` et `sm:[&_input]:h-10`. *Corrigé par D-59 : les trois seuils étaient posés à `sm`,
+soit 640 px, et la grille de champs se déclenchait sur la largeur de l'écran au lieu de la sienne.*
+
+**L'échelle typographique gagne un sixième cran, `marquee`** (5,5 rem). D-46 impose qu'une taille
+se nomme au lieu de se choisir ; le dossard héroïque du bureau n'entrait dans aucun des cinq.
+`BibDisplay` pose chaque chiffre sur sa latte et étend `animate-flip` — jusqu'ici cantonné à
+`SlatCell` — aux chiffres qui font autorité, décalés de 60 ms, une fois à l'affichage,
+`motion-reduce` respecté. C'est le seul mouvement ajouté, et D-25 tient : pas d'horloge, pas de
+barre de progression.
+
+**Ce que cette décision ne règle pas.** Le master/detail de la console — la liste des quarante qui
+garde le détail à droite au lieu de changer d'écran — n'est pas livré : il déplace un flux, pas une
+mise en page. La liste reste une page, la fiche une autre. *Corrigé par D-59 : la raison invoquée
+ici — « demande une visite partielle Inertia » — était fausse, l'index expédie déjà la fiche
+complète de chaque inscrit.* L'écart des 72 px relevé par D-46 sur la variante `validate` n'est
+pas tranché non plus : il
+appartient toujours à BR-09 ou BR-13, qui posent le bouton en situation réelle. La refonte n'y
+touche pas, mais elle en rend le choix plus net — une règle conditionnelle au pointeur
+(`pointer: coarse`) rendrait les 72 px au doigt sans imposer la même hauteur à la souris.
+
+## D-59 — Le retour de terrain sur le grand format
+
+Arrêtée le 2026-08-21 après essai du panneau sur téléphone et sur ordinateur. Six écarts relevés
+par le propriétaire du projet, tous portés par un composant plutôt que par un écran.
+
+**Le master/detail de la console arrive, et il ne coûte rien au serveur.** D-58 l'avait écarté au
+motif qu'il demandait une visite partielle Inertia. C'était faux :
+`Manage\RegistrationController@index` sérialise déjà la `RegistrationResource` entière de chaque
+inscrit, coordonnées d'urgence et transitions autorisées comprises. La sélection est donc un `ref`
+local, la fiche une dérivation de la liste déjà en mémoire, et le back ne bouge pas d'une ligne.
+Au-dessus de 1024 px la liste tient cinq colonnes sur douze et `RegistrationDossier` occupe les
+sept autres en `sticky`. En dessous, la même fiche s'ouvre dans un `Sheet` monté sur le `Dialog`
+de reka-ui, glissé par la droite.
+
+**Le glissement demandé sur la latte est rendu par le volet, pas par un geste.** La question posée
+était : faire glisser la carte à gauche ou à droite pour révéler ses actions. Un tel geste n'a pas
+de primitive dans reka-ui, ne s'annonce pas à l'œil, et n'a pas d'équivalent au clavier. Le volet
+qui glisse tient le même besoin — plus de gros bouton dans la ligne, donc plus de bord droit
+rogné — en restant découvrable et accessible au clavier. La latte perd son `#cell` sur cet écran
+et devient un `button` entier, marqué à la sélection par un filet gauche et le fond `accent`.
+
+**La navigation du téléphone cesse de cacher sa fin.** Le rail défilait sans le dire : les
+destinations passées la sixième n'existaient pas pour qui ne devinait pas le geste. En dessous de
+768 px le rail laisse la place à un `Sheet` gauche qui liste les destinations verticalement, une
+par ligne, l'active marquée par `aria-current`. Au-dessus, le rail horizontal reste : six libellés
+en `text-label` mono tiennent sous 700 px, contrôles compris. `scroll-rail` reste en garde-fou.
+
+**Un dossard absent ne se dessine pas avec un tiret.** `BibDisplay` traçait la pliure de la latte
+en `after:top-1/2`, et le `—` du dossard non attribué tombait pile dessus : la pliure coupait le
+tiret en deux. Trois lattes vides remplacent le tiret. C'est ce que montre un panneau de gare qui
+n'a rien à afficher, et la pliure redevient ce qu'elle est.
+
+**Deux actions du même groupe ont désormais la même largeur.** Une transition qui demande
+confirmation posait l'`ActionButton` directement dans le groupe flex ; une transition directe
+l'enveloppait dans un `<Form>` sans largeur, qui se réduisait à son contenu. D'où « Confirmer »
+plus étroit qu'« Annuler » au téléphone, pour une raison purement structurelle. Le `<Form>` prend
+`w-full sm:w-auto`, la largeur que l'`ActionButton` porte déjà dans l'autre branche.
+
+**La fiche gagne son retour, et l'accueil du gérant cesse de lui parler d'inscription.**
+`manage/registrations/{id}/edit` s'atteint depuis le volet et depuis un lien direct : sans retour,
+la seule sortie était le rail. Sur l'accueil, un compte qui tient `manage-event` sans inscription
+lisait « Tu n'es pas encore inscrit » — une invitation adressée à quelqu'un qui ne court pas. Il
+lit maintenant son poste de gestion. La branche s'appuie sur `auth.permissions.manage-event`, déjà
+partagé, et `DashboardTest` verrouille le contrat côté serveur.
+
+**Le seuil des deux dimensions passe de 640 px à la largeur réellement disponible.** Deuxième
+tour du même essai : sur téléphone et sur tablette, le formulaire d'inscription et la fiche du
+coureur tronquaient. Trois causes, un seul défaut de raisonnement — la mise en page à deux
+dimensions se déclenchait à `sm`, c'est-à-dire 640 px, qui est un grand téléphone et pas un
+bureau. `BoardColumns` posait ses deux colonnes égales dès 640 px, si bien qu'une tablette lisait
+la fiche dans la moitié de sa largeur ; il attend maintenant `lg`. `BoardRow` mettait l'étiquette
+et la valeur sur la même ligne au même seuil ; il les empile jusqu'à `lg`, l'étiquette au-dessus
+comme sur le bandeau, et la valeur peut désormais se couper (`min-w-0`, `break-words`).
+
+**La grille de champs interroge son conteneur, pas la fenêtre.** C'est le cas qui tranche le
+débat : `auth/register/Complete.vue` — le formulaire d'inscription du coureur — vit dans la carte
+`max-w-sm` d'`AuthSimpleLayout`, soit 384 px, à toutes les tailles d'écran. Un seuil de fenêtre y
+posait trois champs de front dans 384 px dès qu'on ouvrait la page sur un écran large. Aucune
+valeur de `sm`, `md` ou `lg` ne pouvait avoir raison, parce que la question n'est pas la taille de
+l'écran mais celle de la place disponible. `EventFieldset` devient donc un `@container` et les
+`span` d'`EventField` des variantes de conteneur, franchies à 52 rem. La carte d'inscription reste
+en colonne partout, `registration/Edit` et les écrans de gestion en `max-w-4xl` (56 rem) passent à
+six colonnes au bureau, et la fiche imbriquée dans le volet 7/12 de `manage/registrations/Edit`
+reste en colonne tant que ce volet ne dépasse pas 52 rem. Le seuil est posé sous les 56 rem des
+conteneurs réels pour ne pas se jouer sur une égalité stricte. `Profile.vue` suit la même règle et
+passe de `max-w-3xl` à `max-w-4xl` pour y entrer.
+
+**La densité suit le pointeur pour de bon.** D-58 énonçait 44 px au doigt et 40 à la souris, puis
+plaçait la bascule à 640 px — où l'on est encore au doigt. `ActionButton` et la hauteur des champs
+d'`EventField` passent à `lg`. Ce qui reste à `sm` est la largeur des boutons : un bouton
+dimensionné par son texte ne tronque rien, et c'est la demande d'origine.
