@@ -1940,8 +1940,55 @@ barre de progression.
 
 **Ce que cette décision ne règle pas.** Le master/detail de la console — la liste des quarante qui
 garde le détail à droite au lieu de changer d'écran — n'est pas livré : il déplace un flux, pas une
-mise en page, et demande une visite partielle Inertia. La liste reste une page, la fiche une autre.
-L'écart des 72 px relevé par D-46 sur la variante `validate` n'est pas tranché non plus : il
+mise en page. La liste reste une page, la fiche une autre. *Corrigé par D-59 : la raison invoquée
+ici — « demande une visite partielle Inertia » — était fausse, l'index expédie déjà la fiche
+complète de chaque inscrit.* L'écart des 72 px relevé par D-46 sur la variante `validate` n'est
+pas tranché non plus : il
 appartient toujours à BR-09 ou BR-13, qui posent le bouton en situation réelle. La refonte n'y
 touche pas, mais elle en rend le choix plus net — une règle conditionnelle au pointeur
 (`pointer: coarse`) rendrait les 72 px au doigt sans imposer la même hauteur à la souris.
+
+## D-59 — Le retour de terrain sur le grand format
+
+Arrêtée le 2026-08-21 après essai du panneau sur téléphone et sur ordinateur. Six écarts relevés
+par le propriétaire du projet, tous portés par un composant plutôt que par un écran.
+
+**Le master/detail de la console arrive, et il ne coûte rien au serveur.** D-58 l'avait écarté au
+motif qu'il demandait une visite partielle Inertia. C'était faux :
+`Manage\RegistrationController@index` sérialise déjà la `RegistrationResource` entière de chaque
+inscrit, coordonnées d'urgence et transitions autorisées comprises. La sélection est donc un `ref`
+local, la fiche une dérivation de la liste déjà en mémoire, et le back ne bouge pas d'une ligne.
+Au-dessus de 1024 px la liste tient cinq colonnes sur douze et `RegistrationDossier` occupe les
+sept autres en `sticky`. En dessous, la même fiche s'ouvre dans un `Sheet` monté sur le `Dialog`
+de reka-ui, glissé par la droite.
+
+**Le glissement demandé sur la latte est rendu par le volet, pas par un geste.** La question posée
+était : faire glisser la carte à gauche ou à droite pour révéler ses actions. Un tel geste n'a pas
+de primitive dans reka-ui, ne s'annonce pas à l'œil, et n'a pas d'équivalent au clavier. Le volet
+qui glisse tient le même besoin — plus de gros bouton dans la ligne, donc plus de bord droit
+rogné — en restant découvrable et accessible au clavier. La latte perd son `#cell` sur cet écran
+et devient un `button` entier, marqué à la sélection par un filet gauche et le fond `accent`.
+
+**La navigation du téléphone cesse de cacher sa fin.** Le rail défilait sans le dire : les
+destinations passées la sixième n'existaient pas pour qui ne devinait pas le geste. En dessous de
+768 px le rail laisse la place à un `Sheet` gauche qui liste les destinations verticalement, une
+par ligne, l'active marquée par `aria-current`. Au-dessus, le rail horizontal reste : six libellés
+en `text-label` mono tiennent sous 700 px, contrôles compris. `scroll-rail` reste en garde-fou.
+
+**Un dossard absent ne se dessine pas avec un tiret.** `BibDisplay` traçait la pliure de la latte
+en `after:top-1/2`, et le `—` du dossard non attribué tombait pile dessus : la pliure coupait le
+tiret en deux. Trois lattes vides remplacent le tiret. C'est ce que montre un panneau de gare qui
+n'a rien à afficher, et la pliure redevient ce qu'elle est.
+
+**Deux actions du même groupe ont désormais la même largeur.** Une transition qui demande
+confirmation posait l'`ActionButton` directement dans le groupe flex ; une transition directe
+l'enveloppait dans un `<Form>` sans largeur, qui se réduisait à son contenu. D'où « Confirmer »
+plus étroit qu'« Annuler » au téléphone, pour une raison purement structurelle. Le `<Form>` prend
+`w-full sm:w-auto`, la largeur que l'`ActionButton` porte déjà dans l'autre branche.
+
+**La fiche gagne son retour, et l'accueil du gérant cesse de lui parler d'inscription.**
+`manage/registrations/{id}/edit` s'atteint depuis le volet et depuis un lien direct : sans retour,
+la seule sortie était le rail. Sur l'accueil, un compte qui tient `manage-event` sans inscription
+lisait « Tu n'es pas encore inscrit » — une invitation adressée à quelqu'un qui ne court pas. Il
+lit maintenant son poste de gestion. La branche s'appuie sur `auth.permissions.manage-event`, déjà
+partagé, et `DashboardTest` verrouille le contrat côté serveur.

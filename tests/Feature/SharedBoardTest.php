@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Enums\RegistrationStatus;
-use App\Models\Event;
 use App\Models\Participant;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;

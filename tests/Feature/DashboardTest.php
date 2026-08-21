@@ -137,6 +137,21 @@ class DashboardTest extends TestCase
             );
     }
 
+    #[Test]
+    public function it_flags_a_manager_who_holds_no_registration(): void
+    {
+        Event::factory()->create();
+
+        $this->actingAs(User::factory()->manager()->create())
+            ->get(route('dashboard'))
+            ->assertOk()
+            ->assertInertia(
+                fn (AssertableInertia $page) => $page
+                    ->where('registration', null)
+                    ->where('auth.permissions.manage-event', true),
+            );
+    }
+
     private function runnerOf(Event $event): User
     {
         $runner = User::factory()->participant()->create();

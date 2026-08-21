@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Form, Head } from '@inertiajs/vue3';
+import { Form, Head, Link } from '@inertiajs/vue3';
+import { ArrowLeft } from '@lucide/vue';
 import { computed } from 'vue';
 import RegistrationController from '@/actions/App/Http/Controllers/Manage/RegistrationController';
 import ActionBar from '@/components/board/ActionBar.vue';
@@ -16,6 +17,7 @@ import RegistrationFields from '@/components/registration/RegistrationFields.vue
 import RegistrationStatusBadge from '@/components/registration/RegistrationStatusBadge.vue';
 import { Input } from '@/components/ui/input';
 import { t } from '@/lib/i18n';
+import { index } from '@/routes/manage/registrations';
 import type { ManagedRegistration } from '@/types/registration';
 
 type Props = {
@@ -33,6 +35,14 @@ const fullName = computed(
     <Head :title="t('registration.manage.edit_title')" />
 
     <BoardPage>
+        <div class="mb-6 flex">
+            <ActionButton tone="quiet" :icon="ArrowLeft" as-child>
+                <Link :href="index()">
+                    {{ t('registration.manage.back') }}
+                </Link>
+            </ActionButton>
+        </div>
+
         <BoardColumns>
             <template #lead>
                 <BibDisplay

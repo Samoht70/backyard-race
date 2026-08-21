@@ -8,6 +8,7 @@ import {
 } from 'reka-ui';
 import AppearanceToggle from '@/components/AppearanceToggle.vue';
 import BoardAccount from '@/components/board/BoardAccount.vue';
+import BoardMenu from '@/components/board/BoardMenu.vue';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { t } from '@/lib/i18n';
 import { mainNavItems } from '@/lib/mainNav';
@@ -20,9 +21,11 @@ const { isCurrentUrl } = useCurrentUrl();
     <div
         class="flex shrink-0 items-stretch border-b border-border sm:px-6 lg:px-8"
     >
+        <BoardMenu />
+
         <NavigationMenuRoot
             orientation="horizontal"
-            class="min-w-0 flex-1"
+            class="hidden min-w-0 flex-1 md:block"
             :aria-label="t('ui.nav.main')"
         >
             <NavigationMenuList class="scroll-rail flex items-stretch">
@@ -42,7 +45,7 @@ const { isCurrentUrl } = useCurrentUrl();
             </NavigationMenuList>
         </NavigationMenuRoot>
 
-        <div class="flex shrink-0 items-center gap-1 pr-2 pl-3 sm:pr-0">
+        <div class="ml-auto flex shrink-0 items-center gap-1 pr-2 pl-3 sm:pr-0">
             <AppearanceToggle />
             <BoardAccount />
         </div>

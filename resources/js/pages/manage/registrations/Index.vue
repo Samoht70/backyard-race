@@ -1,18 +1,26 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import { ClipboardList } from '@lucide/vue';
-import { computed } from 'vue';
+import { ClipboardList, MousePointerClick } from '@lucide/vue';
+import { useMediaQuery } from '@vueuse/core';
+import { VisuallyHidden } from 'reka-ui';
+import { computed, ref } from 'vue';
 import AlertError from '@/components/AlertError.vue';
 import BoardPage from '@/components/board/BoardPage.vue';
 import Heading from '@/components/Heading.vue';
 import BoardFilter from '@/components/race/BoardFilter.vue';
-import RegistrationActionForm from '@/components/registration/RegistrationActionForm.vue';
+import RegistrationDossier from '@/components/registration/RegistrationDossier.vue';
 import RegistrationSlat from '@/components/registration/RegistrationSlat.vue';
 import SeatCounter from '@/components/registration/SeatCounter.vue';
 import EmptyState from '@/components/state/EmptyState.vue';
+import {
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+} from '@/components/ui/sheet';
 import { t } from '@/lib/i18n';
 import { registrationStatusLabelKey } from '@/lib/registrationStatus';
-import { edit, index } from '@/routes/manage/registrations';
+import { index } from '@/routes/manage/registrations';
 import { REGISTRATION_STATUSES } from '@/types/registration';
 import type {
     ManagedRegistration,
@@ -47,6 +55,32 @@ const filters = computed<BoardFilterOption[]>(() => [
 ]);
 
 const isBlocked = computed(() => props.refusals.length > 0);
+
+const selectedId = ref<number | null>(null);
+
+const selected = computed(
+    () =>
+        props.registrations.find(
+            (registration) => registration.id === selectedId.value,
+        ) ?? null,
+);
+
+const isWide = useMediaQuery('(min-width: 64rem)');
+
+const isDossierOpen = computed({
+    get: () => !isWide.value && selected.value !== null,
+    set: (open: boolean) => {
+        if (!open) {
+            selectedId.value = null;
+        }
+    },
+});
+
+const dossierTitle = computed(() =>
+    selected.value === null
+        ? ''
+        : `${selected.value.first_name} ${selected.value.last_name}`,
+);
 </script>
 
 <template>
@@ -77,34 +111,44 @@ const isBlocked = computed(() => props.refusals.length > 0);
                 :active-value="status"
             />
 
-            <div v-if="registrations.length" class="slats">
-                <RegistrationSlat
-                    v-for="registration in registrations"
-                    :key="registration.id"
-                    :bib="registration.bib_label"
-                    :first-name="registration.first_name"
-                    :last-name="registration.last_name"
-                    :status="registration.status"
-                    :href="edit(registration.id)"
-                >
-                    <template #cell>
-                        <RegistrationActionForm
-                            v-if="registration.allowed_transitions.length"
-                            :registration-id="registration.id"
-                            :runner-name="`${registration.first_name} ${registration.last_name}`"
-                            :transition="registration.allowed_transitions[0]"
-                            :disabled="
-                                isBlocked &&
-                                registration.allowed_transitions[0] ===
-                                    'confirm'
-                            "
-                            :described-by="
-                                isBlocked ? 'registration-refusals' : undefined
-                            "
-                            class="w-auto px-3"
+            <div
+                v-if="registrations.length"
+                class="grid items-start gap-6 lg:grid-cols-12 lg:gap-8"
+            >
+                <div class="slats min-w-0 lg:col-span-5">
+                    <RegistrationSlat
+                        v-for="registration in registrations"
+                        :key="registration.id"
+                        as="button"
+                        type="button"
+                        :bib="registration.bib_label"
+                        :first-name="registration.first_name"
+                        :last-name="registration.last_name"
+                        :status="registration.status"
+                        :active="registration.id === selectedId"
+                        @click="selectedId = registration.id"
+                    />
+                </div>
+
+                <div class="hidden lg:col-span-7 lg:block">
+                    <div class="lg:sticky lg:top-0">
+                        <RegistrationDossier
+                            v-if="selected"
+                            :registration="selected"
+                            :blocked="isBlocked"
+                            described-by="registration-refusals"
                         />
-                    </template>
-                </RegistrationSlat>
+
+                        <EmptyState
+                            v-else
+                            :icon="MousePointerClick"
+                            :title="t('registration.manage.select_title')"
+                            :description="
+                                t('registration.manage.select_description')
+                            "
+                        />
+                    </div>
+                </div>
             </div>
 
             <EmptyState
@@ -129,5 +173,25 @@ const isBlocked = computed(() => props.refusals.length > 0);
                 :description="t('registration.manage.empty_description')"
             />
         </div>
+
+        <Sheet v-model:open="isDossierOpen">
+            <SheetContent
+                side="right"
+                class="w-full overflow-y-auto p-4 sm:max-w-lg"
+            >
+                <VisuallyHidden>
+                    <SheetHeader>
+                        <SheetTitle>{{ dossierTitle }}</SheetTitle>
+                    </SheetHeader>
+                </VisuallyHidden>
+
+                <RegistrationDossier
+                    v-if="selected"
+                    :registration="selected"
+                    :blocked="isBlocked"
+                    described-by="registration-refusals"
+                />
+            </SheetContent>
+        </Sheet>
     </BoardPage>
 </template>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import { CalendarOff, Ticket } from '@lucide/vue';
+import { CalendarOff, SlidersHorizontal, Ticket } from '@lucide/vue';
 import { computed } from 'vue';
 import ActionBar from '@/components/board/ActionBar.vue';
 import BoardColumns from '@/components/board/BoardColumns.vue';
@@ -15,9 +15,11 @@ import EmptyState from '@/components/state/EmptyState.vue';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { canReach } from '@/lib/access';
 import { t } from '@/lib/i18n';
+import { can } from '@/lib/permissions';
 import { show as showBriefing } from '@/routes/briefing';
 import { index as showDocuments } from '@/routes/documents';
 import { show as showEvent } from '@/routes/event';
+import { index as showManage } from '@/routes/manage';
 import { show as showRegistration } from '@/routes/registration';
 import type { RegistrationStatus } from '@/types/registration';
 
@@ -37,6 +39,7 @@ const props = defineProps<Props>();
 const title = computed(() => props.event?.name ?? t('ui.dashboard.title'));
 const status = computed(() => props.registration?.status ?? null);
 const isConfirmed = computed(() => status.value === 'confirmed');
+const isManager = computed(() => can('manage-event'));
 </script>
 
 <template>
@@ -49,6 +52,21 @@ const isConfirmed = computed(() => status.value === 'confirmed');
             :title="t('ui.dashboard.no_event_title')"
             :description="t('ui.dashboard.no_event_description')"
         />
+
+        <EmptyState
+            v-else-if="registration === null && isManager"
+            :icon="SlidersHorizontal"
+            :title="t('ui.dashboard.manager_title')"
+            :description="t('ui.dashboard.manager_description')"
+        >
+            <template #action>
+                <ActionButton as-child>
+                    <Link :href="showManage()">
+                        {{ t('ui.dashboard.manager_action') }}
+                    </Link>
+                </ActionButton>
+            </template>
+        </EmptyState>
 
         <EmptyState
             v-else-if="registration === null"
