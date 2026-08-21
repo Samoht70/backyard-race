@@ -16,6 +16,11 @@ return [
         'profile' => 'Profil',
         'logout' => 'Se déconnecter',
     ],
+    'board' => [
+        'places' => 'Places',
+        'first_start' => 'Premier départ',
+        'account' => 'Mon compte',
+    ],
     'dashboard' => [
         'title' => 'Accueil',
         'pending' => 'Ton inscription est en attente de confirmation par le gérant.',
@@ -26,6 +31,11 @@ return [
         'no_event_title' => 'Aucun événement',
         'no_event_description' => 'Le gérant n’a pas encore ouvert l’événement. Reviens plus tard.',
         'practical' => 'Informations pratiques',
+        'my_registration' => 'Mon inscription',
+        'submitted_on' => 'Déposée le',
+        'editable' => 'Modifiable',
+        'editable_yes' => 'Oui, jusqu’à la confirmation',
+        'editable_no' => 'Non, elle est confirmée',
     ],
     'state' => [
         'loading' => 'Chargement…',

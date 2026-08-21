@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Enums\Permission;
+use App\Http\Resources\BoardResource;
 use App\Models\Document;
 use App\Models\Event;
 use App\Models\User;
@@ -31,6 +32,10 @@ class HandleInertiaRequests extends Middleware
      */
     protected $rootView = 'app';
 
+    private ?Event $event = null;
+
+    private bool $isEventResolved = false;
+
     /**
      * Determines the current asset version.
      *
@@ -58,7 +63,7 @@ class HandleInertiaRequests extends Middleware
                 'permissions' => $this->permissions($request->user()),
             ],
             'access' => $this->access($request->user()),
-            'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'board' => $this->board(),
             'translations' => $this->translations(),
         ];
     }
@@ -90,7 +95,7 @@ class HandleInertiaRequests extends Middleware
             return ['event' => false, 'documents' => false, 'registration' => false];
         }
 
-        $event = Event::query()->first();
+        $event = $this->event();
         $gate = Gate::forUser($user);
 
         return [
@@ -98,6 +103,26 @@ class HandleInertiaRequests extends Middleware
             'documents' => $event !== null && $gate->allows('viewAny', [Document::class, $event]),
             'registration' => $user->participant()->exists(),
         ];
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function board(): ?array
+    {
+        $event = $this->event();
+
+        return $event === null ? null : new BoardResource($event)->resolve();
+    }
+
+    private function event(): ?Event
+    {
+        if (! $this->isEventResolved) {
+            $this->event = Event::query()->first();
+            $this->isEventResolved = true;
+        }
+
+        return $this->event;
     }
 
     /**

@@ -11,6 +11,8 @@ defineProps<Props>();
         <h2 class="font-mono text-label text-muted-foreground uppercase">
             {{ title }}
         </h2>
-        <slot />
+        <div class="grid gap-4 sm:grid-cols-6">
+            <slot />
+        </div>
     </section>
 </template>

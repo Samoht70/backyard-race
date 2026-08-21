@@ -1,5 +1,6 @@
 import type { Access } from '@/types/access';
 import type { Auth } from '@/types/auth';
+import type { Board } from '@/types/board';
 
 // Extend ImportMeta interface for Vite...
 declare module 'vite/client' {
@@ -20,7 +21,7 @@ declare module '@inertiajs/core' {
             name: string;
             auth: Auth;
             access: Access;
-            sidebarOpen: boolean;
+            board: Board | null;
             translations: Record<string, string>;
             [key: string]: unknown;
         };

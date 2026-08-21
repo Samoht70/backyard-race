@@ -32,6 +32,7 @@ function shows(section: RegistrationSection): boolean {
     >
         <EventField
             name="phone"
+            :span="2"
             :label="t('registration.field.phone')"
             :hint="t('registration.hint.phone')"
             :error="errors.phone"
@@ -49,6 +50,7 @@ function shows(section: RegistrationSection): boolean {
 
         <EventField
             name="birth_date"
+            :span="2"
             :label="t('registration.field.birth_date')"
             :hint="t('registration.hint.birth_date')"
             :error="errors.birth_date"
@@ -66,6 +68,7 @@ function shows(section: RegistrationSection): boolean {
 
         <EventField
             name="pps_number"
+            :span="2"
             :label="t('registration.field.pps_number')"
             :error="errors.pps_number"
             :locked="lockPps"
@@ -90,6 +93,7 @@ function shows(section: RegistrationSection): boolean {
     >
         <EventField
             name="emergency_contact_name"
+            :span="3"
             :label="t('registration.field.emergency_contact_name')"
             :error="errors.emergency_contact_name"
         >
@@ -104,6 +108,7 @@ function shows(section: RegistrationSection): boolean {
 
         <EventField
             name="emergency_contact_phone"
+            :span="3"
             :label="t('registration.field.emergency_contact_phone')"
             :error="errors.emergency_contact_phone"
         >

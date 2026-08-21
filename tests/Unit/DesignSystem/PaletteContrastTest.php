@@ -129,8 +129,6 @@ class PaletteContrastTest extends TestCase
             ['secondary-foreground', 'secondary'],
             ['accent-foreground', 'accent'],
             ['destructive-foreground', 'destructive'],
-            ['sidebar-foreground', 'sidebar-background'],
-            ['sidebar-accent-foreground', 'sidebar-accent'],
         ];
 
         foreach (['running', 'eliminated', 'abandoned', 'finished'] as $status) {

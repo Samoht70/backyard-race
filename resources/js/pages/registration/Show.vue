@@ -2,10 +2,18 @@
 import { Head, Link } from '@inertiajs/vue3';
 import { CircleSlash } from '@lucide/vue';
 import { computed } from 'vue';
+import ActionBar from '@/components/board/ActionBar.vue';
+import BoardColumns from '@/components/board/BoardColumns.vue';
+import BoardPage from '@/components/board/BoardPage.vue';
+import BoardRow from '@/components/board/BoardRow.vue';
+import BoardRows from '@/components/board/BoardRows.vue';
+import BoardSection from '@/components/board/BoardSection.vue';
+import ActionButton from '@/components/race/ActionButton.vue';
+import BibDisplay from '@/components/race/BibDisplay.vue';
 import RegistrationStatusBadge from '@/components/registration/RegistrationStatusBadge.vue';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { t } from '@/lib/i18n';
-import { edit, show } from '@/routes/registration';
+import { edit } from '@/routes/registration';
 import type { RegistrationDetails } from '@/types/registration';
 
 type Props = {
@@ -15,108 +23,95 @@ type Props = {
 
 const props = defineProps<Props>();
 
-defineOptions({
-    layout: {
-        breadcrumbs: [
-            {
-                title: 'Inscription',
-                href: show(),
-            },
-        ],
-    },
-});
-
 const isCancelled = computed(() => props.registration.status === 'cancelled');
-
-const facts = computed(() => [
-    ...(props.registration.bib_label === null
-        ? []
-        : [
-              {
-                  term: t('registration.field.bib'),
-                  detail: props.registration.bib_label,
-              },
-          ]),
-    {
-        term: t('registration.field.email'),
-        detail: props.registration.email,
-    },
-    {
-        term: t('registration.field.phone'),
-        detail: props.registration.phone,
-    },
-    {
-        term: t('registration.field.birth_date'),
-        detail: props.registration.birth_date,
-    },
-    {
-        term: t('registration.field.pps_number'),
-        detail: props.registration.pps_number ?? t('registration.show.no_pps'),
-    },
-    {
-        term: t('registration.field.emergency_contact_name'),
-        detail: props.registration.emergency_contact_name,
-    },
-    {
-        term: t('registration.field.emergency_contact_phone'),
-        detail: props.registration.emergency_contact_phone,
-    },
-]);
+const fullName = computed(
+    () => `${props.registration.first_name} ${props.registration.last_name}`,
+);
 </script>
 
 <template>
     <Head :title="t('registration.show.title')" />
 
-    <div class="flex flex-col gap-6 p-4">
-        <header class="flex flex-col items-center gap-2 text-center">
-            <h1 class="text-title">
-                {{ registration.first_name }} {{ registration.last_name }}
-            </h1>
-            <RegistrationStatusBadge :status="registration.status" />
-        </header>
+    <BoardPage>
+        <BoardColumns>
+            <template #lead>
+                <BibDisplay
+                    v-if="registration.bib_label"
+                    :value="registration.bib_label"
+                    :label="t('registration.field.bib')"
+                />
+                <div class="grid justify-items-start gap-2">
+                    <h1 class="text-title">{{ fullName }}</h1>
+                    <RegistrationStatusBadge :status="registration.status" />
+                </div>
+            </template>
 
-        <Alert v-if="isCancelled" variant="destructive">
-            <CircleSlash class="size-4" />
-            <AlertTitle>{{
-                t('registration.show.cancelled_title')
-            }}</AlertTitle>
-            <AlertDescription>
-                {{ t('registration.show.cancelled_description') }}
-            </AlertDescription>
-        </Alert>
+            <Alert v-if="isCancelled" variant="destructive">
+                <CircleSlash class="size-4" />
+                <AlertTitle>
+                    {{ t('registration.show.cancelled_title') }}
+                </AlertTitle>
+                <AlertDescription>
+                    {{ t('registration.show.cancelled_description') }}
+                </AlertDescription>
+            </Alert>
 
-        <dl class="flex flex-col gap-2">
-            <div
-                v-for="fact in facts"
-                :key="fact.term"
-                class="flex flex-wrap justify-between gap-2 border-b border-border pb-2"
+            <BoardSection :title="t('registration.section.runner')">
+                <BoardRows>
+                    <BoardRow :label="t('registration.field.email')">
+                        {{ registration.email }}
+                    </BoardRow>
+                    <BoardRow :label="t('registration.field.phone')" mono>
+                        {{ registration.phone }}
+                    </BoardRow>
+                    <BoardRow :label="t('registration.field.birth_date')" mono>
+                        {{ registration.birth_date }}
+                    </BoardRow>
+                    <BoardRow :label="t('registration.field.pps_number')" mono>
+                        {{
+                            registration.pps_number ??
+                            t('registration.show.no_pps')
+                        }}
+                    </BoardRow>
+                </BoardRows>
+            </BoardSection>
+
+            <BoardSection :title="t('registration.section.emergency')">
+                <BoardRows>
+                    <BoardRow
+                        :label="t('registration.field.emergency_contact_name')"
+                    >
+                        {{ registration.emergency_contact_name }}
+                    </BoardRow>
+                    <BoardRow
+                        :label="t('registration.field.emergency_contact_phone')"
+                        mono
+                    >
+                        {{ registration.emergency_contact_phone }}
+                    </BoardRow>
+                </BoardRows>
+            </BoardSection>
+
+            <BoardSection
+                v-if="registration.notes"
+                :title="t('registration.section.notes')"
             >
-                <dt
-                    class="font-mono text-label text-muted-foreground uppercase"
-                >
-                    {{ fact.term }}
-                </dt>
-                <dd class="text-sm tabular-nums">{{ fact.detail }}</dd>
-            </div>
-        </dl>
+                <p class="text-sm whitespace-pre-line">
+                    {{ registration.notes }}
+                </p>
+            </BoardSection>
 
-        <p v-if="registration.notes" class="text-sm whitespace-pre-line">
-            {{ registration.notes }}
-        </p>
+            <ActionBar>
+                <template v-if="!canEdit && !isCancelled" #note>
+                    {{ t('registration.show.locked') }}
+                </template>
 
-        <Link
-            v-if="canEdit"
-            :href="edit()"
-            class="inline-flex min-h-11 w-full touch-manipulation items-center justify-center border border-foreground text-xs font-bold tracking-widest uppercase"
-        >
-            {{ t('registration.show.edit') }}
-        </Link>
-
-        <p
-            v-else-if="!isCancelled"
-            class="text-center text-sm text-muted-foreground"
-        >
-            {{ t('registration.show.locked') }}
-        </p>
-    </div>
+                <ActionButton v-if="canEdit" tone="quiet" as-child>
+                    <Link :href="edit()">
+                        {{ t('registration.show.edit') }}
+                    </Link>
+                </ActionButton>
+            </ActionBar>
+        </BoardColumns>
+    </BoardPage>
 </template>

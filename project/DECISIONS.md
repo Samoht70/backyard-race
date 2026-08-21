@@ -1889,3 +1889,59 @@ déduit du schéma de la requête. La déduction est désormais juste, mais le r
 appartient à BR-28. En revanche, ce qu'on craignait sur les liens signés n'existait pas : sans
 `trustProxies`, la signature était produite et vérifiée sur le même schéma, donc cohérente. Le lien
 partait simplement en clair dans le mail.
+
+## D-58 — Le grand format : la coquille passe du téléphone élargi au panneau replié
+
+Arrêtée le 2026-08-21 avec le propriétaire du projet, après maquettage de la refonte
+(`project/design/grand-format.html`). Elle ne touche ni la palette, ni les familles, ni les quatre
+statuts : D-46 tient en totalité. Ce qui change est l'écran de référence.
+
+**Le mobile-first coûtait au bureau, et la cause tenait en une ligne.** `ActionButton` portait
+`w-full` dans sa base `cva`, donc ses quatre-vingt-douze usages s'étiraient jusqu'au bord sur tout
+écran. Là où il fallait un lien plutôt qu'un bouton, `Dashboard.vue` l'avait contourné en recopiant
+`primaryLinkClasses` et `outlineLinkClasses` — le symptôme, pas la maladie. La base perd `w-full`
+au profit de `w-full sm:w-auto`, et le composant gagne `as-child` sur la primitive `Primitive` de
+reka-ui : un `<Link>` d'Inertia entre désormais dans un `ActionButton` sans recopier une classe.
+Le contournement disparaît, et avec lui l'imbrication `<button>` dans `<a>` de `Welcome.vue`, qui
+était du HTML invalide.
+
+**La coquille SaaS sort, le panneau la remplace.** `BoardBand` porte les faits de l'événement,
+partagés par Inertia via `BoardResource` — un seul `Event::query()->first()` mémoïsé sert le
+bandeau et `access()`. `BoardRail` porte les six destinations de `mainNavItems()`, ce qui règle
+`BOTTOM_NAV_LIMIT` : le rail défile au téléphone au lieu de tronquer à quatre, et son test change
+de sujet plutôt que de disparaître. Sortent `AppSidebar`, `AppSidebarHeader`, `AppSidebarLayout`,
+`AppShell`, `AppContent`, `AppBottomNav`, `NavMain`, `NavFooter`, `NavUser`, `Breadcrumbs`, et les
+habillages `ui/sidebar`, `ui/breadcrumb`, `ui/card`. Les tokens `--sidebar-*` partent avec eux, des
+deux blocs de `app.css` et des deux paires de `PaletteContrastTest`.
+
+**Aucune primitive reka-ui n'est perdue dans l'opération, et une est gagnée.** `ui/sidebar`
+n'était pas une primitive — reka-ui n'en a pas — mais un assemblage shadcn empruntant `Sheet`,
+`Tooltip`, `Separator` et `Primitive`, tous conservés. `breadcrumb` et `card` ne prenaient que
+`Primitive`. Le rail est monté directement sur `NavigationMenuRoot / List / Item / Link` plutôt que
+sur l'habillage `ui/navigation-menu`, dont les `rounded-sm`, `bg-accent` et le viewport des
+sous-menus auraient été annulés ligne à ligne pour une charte sans arrondi ni sous-menu.
+`AlertDialog` est ajouté et remplace le `Dialog` d'`EventStatusPanel` : une transition
+irréversible mérite le focus sur l'action sûre et pas de fermeture au clic extérieur.
+
+**Trois règles portées par des composants, pas par des classes recopiées.** La largeur du bouton
+vit dans `ActionButton` et `ActionBar`. Les points de rupture vivent dans `BoardColumns` (5/7 au
+bureau, deux colonnes égales en tablette, une au téléphone) et dans `EventFieldset`, passé en
+grille de six colonnes où chaque `EventField` déclare son `span` — la naissance en prend deux,
+l'e-mail quatre, les remarques six. La largeur de lecture du briefing est bornée à 68 caractères
+sur tous les écrans. La densité suit le pointeur : 44 px au doigt, 40 à la souris, par
+`sm:min-h-10` et `sm:[&_input]:h-10`.
+
+**L'échelle typographique gagne un sixième cran, `marquee`** (5,5 rem). D-46 impose qu'une taille
+se nomme au lieu de se choisir ; le dossard héroïque du bureau n'entrait dans aucun des cinq.
+`BibDisplay` pose chaque chiffre sur sa latte et étend `animate-flip` — jusqu'ici cantonné à
+`SlatCell` — aux chiffres qui font autorité, décalés de 60 ms, une fois à l'affichage,
+`motion-reduce` respecté. C'est le seul mouvement ajouté, et D-25 tient : pas d'horloge, pas de
+barre de progression.
+
+**Ce que cette décision ne règle pas.** Le master/detail de la console — la liste des quarante qui
+garde le détail à droite au lieu de changer d'écran — n'est pas livré : il déplace un flux, pas une
+mise en page, et demande une visite partielle Inertia. La liste reste une page, la fiche une autre.
+L'écart des 72 px relevé par D-46 sur la variante `validate` n'est pas tranché non plus : il
+appartient toujours à BR-09 ou BR-13, qui posent le bouton en situation réelle. La refonte n'y
+touche pas, mais elle en rend le choix plus net — une règle conditionnelle au pointeur
+(`pointer: coarse`) rendrait les 72 px au doigt sans imposer la même hauteur à la souris.
