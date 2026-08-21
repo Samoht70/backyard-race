@@ -1,0 +1,103 @@
+name: backyard-race-production
+
+x-app: &app
+    image: '${APP_IMAGE:-backyard-race:latest}'
+    build:
+        context: .
+        dockerfile: Dockerfile
+        args:
+            VITE_APP_NAME: '${APP_NAME}'
+    restart: unless-stopped
+    env_file:
+        - .env
+    security_opt:
+        - 'no-new-privileges:true'
+    depends_on:
+        mysql:
+            condition: service_healthy
+        redis:
+            condition: service_healthy
+    networks:
+        - internal
+
+services:
+    app:
+        <<: *app
+        command: ['web']
+        expose:
+            - '8080'
+        networks:
+            - internal
+            - dokploy-network
+        healthcheck:
+            test: ['CMD', 'curl', '--fail', '--silent', '--output', '/dev/null', 'http://127.0.0.1:8080/up']
+            interval: 15s
+            timeout: 5s
+            retries: 3
+            start_period: 30s
+
+    worker:
+        <<: *app
+        command: ['worker']
+        stop_grace_period: 60s
+        healthcheck:
+            test: ['CMD', 'php', 'artisan', 'horizon:status']
+            interval: 30s
+            timeout: 10s
+            retries: 3
+            start_period: 30s
+
+    scheduler:
+        <<: *app
+        command: ['scheduler']
+        stop_grace_period: 30s
+        healthcheck:
+            disable: true
+
+    mysql:
+        image: 'mysql:8.4'
+        restart: unless-stopped
+        command:
+            - '--character-set-server=utf8mb4'
+            - '--collation-server=utf8mb4_unicode_ci'
+        environment:
+            MYSQL_DATABASE: '${DB_DATABASE}'
+            MYSQL_USER: '${DB_USERNAME}'
+            MYSQL_PASSWORD: '${DB_PASSWORD}'
+            MYSQL_ROOT_PASSWORD: '${DB_ROOT_PASSWORD}'
+        volumes:
+            - 'mysql-data:/var/lib/mysql'
+        networks:
+            - internal
+        healthcheck:
+            test: ['CMD', 'mysqladmin', 'ping', '-h', '127.0.0.1', '-u', 'root', '-p${DB_ROOT_PASSWORD}']
+            interval: 10s
+            timeout: 5s
+            retries: 10
+            start_period: 30s
+
+    redis:
+        image: 'redis:8-alpine'
+        restart: unless-stopped
+        command: ['redis-server', '--appendonly', 'yes', '--maxmemory-policy', 'noeviction']
+        volumes:
+            - 'redis-data:/data'
+        networks:
+            - internal
+        healthcheck:
+            test: ['CMD', 'redis-cli', 'ping']
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+networks:
+    internal:
+        driver: bridge
+    dokploy-network:
+        external: true
+
+volumes:
+    mysql-data:
+        driver: local
+    redis-data:
+        driver: local
