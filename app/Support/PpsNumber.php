@@ -6,7 +6,7 @@ use Illuminate\Support\Str;
 
 final class PpsNumber
 {
-    public const PATTERN = '/^[A-Z]{11}$/';
+    public const PATTERN = '/^[A-Z]{3}\d{8}$/';
 
     private const SEPARATORS = '/[\s\x{00A0}-]+/u';
 
