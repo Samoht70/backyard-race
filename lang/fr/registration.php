@@ -33,7 +33,7 @@ return [
     'hint' => [
         'phone' => 'Le gérant t’appelle dessus la nuit de la course.',
         'birth_date' => 'Il faut avoir 8 ans révolus pour s’inscrire.',
-        'pps_number' => 'Prétexte Pour Siffler 🍺',
+        'pps_number' => 'Trois lettres puis huit chiffres, comme PPS12345678.',
         'notes' => 'Allergie, traitement, régime : tout ce que le gérant doit savoir.',
     ],
     'locked' => [

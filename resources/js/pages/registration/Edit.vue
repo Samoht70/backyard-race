@@ -30,6 +30,7 @@ defineProps<Props>();
             <Form
                 v-bind="RegistrationController.update.form()"
                 :options="{ preserveScroll: true }"
+                novalidate
                 v-slot="{ errors, processing }"
                 class="grid gap-6"
             >

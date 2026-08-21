@@ -248,7 +248,12 @@ class RegistrationTest extends TestCase
     #[Test]
     public function it_refuses_a_pps_number_without_its_three_letters(): void
     {
-        $this->assertRejects(['pps_number' => '12345678'], 'pps_number');
+        $this->openEvent();
+
+        $this->completeRegistration(self::EMAIL, ['pps_number' => '12345678'])
+            ->assertSessionHasErrors(['pps_number' => __('registration.validation.pps_number')]);
+
+        $this->assertDatabaseCount('users', 0);
     }
 
     #[Test]

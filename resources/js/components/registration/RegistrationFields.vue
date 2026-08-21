@@ -70,6 +70,7 @@ function shows(section: RegistrationSection): boolean {
             name="pps_number"
             :span="2"
             :label="t('registration.field.pps_number')"
+            :hint="t('registration.hint.pps_number')"
             :error="errors.pps_number"
             :locked="lockPps"
             :locked-reason="t('registration.locked.pps_number')"
