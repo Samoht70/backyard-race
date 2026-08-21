@@ -32,7 +32,7 @@ return [
     ],
     'hint' => [
         'phone' => 'Le gérant t’appelle dessus la nuit de la course.',
-        'birth_date' => 'Il faut être majeur le jour du départ.',
+        'birth_date' => 'Il faut avoir 8 ans révolus pour s’inscrire.',
         'pps_number' => 'Prétexte Pour Siffler 🍺',
         'notes' => 'Allergie, traitement, régime : tout ce que le gérant doit savoir.',
     ],

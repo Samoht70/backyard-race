@@ -1788,3 +1788,104 @@ couvraient les quatre branches. En revanche la chaîne de classes du lien pleine
 désormais déclarée dans **trois** écrans — `Event.vue`, `registration/Show.vue` et `Dashboard.vue`.
 Le troisième exemplaire est le seuil où l'extraction se justifie ; elle n'est pas faite ici pour ne
 pas déborder sur deux écrans qui ne sont pas de cette story.
+
+## D-56 — L'image de production sert avec FrankenPHP, et son build embarque Node parce que Vite appelle PHP
+
+Arrêté le 2026-08-21 par BR-27, avec le propriétaire du projet. C'est la première fois que le
+projet produit un artefact déployable : jusqu'ici, « faire tourner l'application » voulait dire
+Sail.
+
+**Le conteneur web sert avec FrankenPHP**, en mode classique — le mode worker reste désactivé.
+La branche écartée est nginx + php-fpm + supervisor, qui reproduit la forme de l'image Sail mais
+demande trois briques et un superviseur pour les tenir. FrankenPHP est un seul binaire et un seul
+processus : il n'y a ni socket FastCGI à câbler, ni superviseur à surveiller, et le Caddyfile
+fourni par l'image convient tel quel (`{$SERVER_NAME}`, racine `public/`). Le mode worker aurait
+gardé l'application en mémoire entre les requêtes ; on ne prend pas ce risque pour quarante
+coureurs sur une nuit, alors qu'il change le cycle de vie des singletons.
+
+**FrankenPHP ne sert que le HTTP.** Les files ne passent pas par lui : le worker et le
+planificateur sont deux conteneurs de la même image, avec `php artisan horizon` et
+`php artisan schedule:work` en guise de commande. Le point d'entrée reçoit un rôle — `web`,
+`worker`, `scheduler` — et rien d'autre ne distingue les trois services.
+
+### Le build des assets a besoin de PHP, ce qui décide du découpage
+
+`vite.config.ts` charge `wayfinder({formVariants: true})`. Ce greffon exécute
+`php artisan wayfinder:generate --with-form` dans son hook `buildStart` et fait échouer le build
+s'il n'aboutit pas ; les dossiers qu'il produit sous `resources/js` sont hors dépôt. L'étape qui
+lance `npm run build` doit donc disposer de PHP **et** des dépendances Composer.
+
+D'où une étape de build unique où Node est copié depuis `node:22-bookworm-slim` dans une image qui
+est déjà celle de PHP — même Debian des deux côtés, donc même glibc. Les deux contournements
+possibles ont été écartés : neutraliser le greffon depuis `vite.config.ts` ferait dépendre le
+fichier de build de l'application d'une variable propre à Docker, et poser un faux binaire `php`
+laisserait passer un build dont les types de routes sont faux. Les deux échangent un problème
+d'outillage contre un écart entre le développement et la production, ce que la story cherchait
+précisément à supprimer.
+
+### Cinq étapes, et une suppression qui n'est pas au bon endroit par hasard
+
+`base` porte le runtime, `vendor` les dépendances Composer, `assets` la compilation front, `prune`
+la suppression des sources front, `final` l'image livrée. La suppression vit dans son étape à elle
+parce qu'un `rm` dans l'étape finale ne fait qu'ajouter une couche d'effacement **au-dessus** d'une
+couche qui contient encore les fichiers : `docker export` les ressort. En supprimant dans `prune`,
+le `COPY --from=prune` ne voit jamais `node_modules` ni `resources/js`. Vérifié sur le système de
+fichiers aplati : zéro entrée.
+
+### Non-root sans capability, en écoutant sur 8080
+
+L'application tourne sous l'utilisateur `app`. Plutôt que de compter sur la capability
+`CAP_NET_BIND_SERVICE` du binaire pour tenir le port 80, le serveur écoute sur **8080** : un port
+au-dessus de 1024 n'en réclame aucune, ce qui laisse poser `no-new-privileges` sans y réfléchir.
+Le port n'est de toute façon jamais publié — Traefik joint le conteneur par le réseau de Dokploy.
+Caddy écrit dans `/data/caddy` et `/config/caddy` au démarrage : ces deux répertoires changent de
+propriétaire avant le `USER app`, faute de quoi le conteneur s'arrête sur un refus d'écriture.
+
+### Le nom de projet Compose est explicite, et ce n'est pas cosmétique
+
+`compose.prod.yaml` déclare `name: backyard-race-production`. Sans lui, Compose déduit le nom du
+répertoire — le même que celui de Sail — et monter la pile de production **remplace les conteneurs
+MySQL et Redis du développement**. C'est arrivé pendant la vérification de la story. Les volumes
+diffèrent (`sail-mysql` contre `mysql-data`), donc les données de développement ont survécu, mais
+les conteneurs avaient bien été repris.
+
+### Le planificateur n'a pas de contrôle de santé
+
+L'image porte un `HEALTHCHECK` HTTP sur `/up`, juste pour le rôle `web`. Le worker le remplace par
+`horizon:status`. Le planificateur, lui, le **désactive** : il n'écoute sur rien, et le contrôle
+hérité le déclarerait mort en permanence. Lui inventer une sonde qui ne prouverait que le
+démarrage d'`artisan` serait une garantie sans exécution derrière. Surveiller que le planificateur
+tourne encore est un sujet de supervision, et il appartient à BR-30.
+
+### Ce que BR-27 ne fait pas
+
+Pas de `artisan optimize` au démarrage (BR-28), pas de migrations au déploiement (BR-29), pas
+d'orchestration ni d'accès Horizon (BR-30), pas de domaine ni de HTTPS (BR-31). Le point d'entrée
+valide l'environnement puis passe la main au rôle : c'est là que BR-28 branchera la mise en cache,
+entre la validation et l'aiguillage.
+
+## D-57 — L'application fait confiance au proxy, sinon un seul coureur épuise le quota de tous
+
+Arrêté le 2026-08-21 par BR-27. `bootstrap/app.php` n'avait aucun `trustProxies`, et Laravel 11+
+ne fait confiance à aucun proxy par défaut.
+
+Derrière le Traefik de Dokploy, qui termine TLS, l'application voit `http` là où le coureur voit
+`https`, et voit l'adresse du frontal à la place de celle du coureur. Le dégât mesurable est le
+second : `RateLimiter::for('registration')` compte `Limit::perMinute(6)->by($request->ip())`.
+Toutes les inscriptions partageant la même adresse, **le septième coureur d'une même minute est
+refusé, quel que soit son poste**. Le soir de l'ouverture, c'est une panne. Le limiteur de
+connexion, lui, mêle l'adresse à l'e-mail, donc il ne tombe pas — il devient seulement moins fin.
+
+Les deux tests de `TrustedProxyTest` gardent exactement ces deux points : le lien d'inscription
+part en `https`, et deux coureurs derrière le même frontal ont chacun leur quota. Retirer le
+`trustProxies` fait passer les deux au rouge, dont le second sur un 429.
+
+`at: '*'` est retenu plutôt qu'une liste d'adresses. Le conteneur ne publie aucun port et n'est
+joignable que depuis le réseau de Dokploy : le seul client possible est Traefik. Une liste
+d'adresses aurait à suivre celle d'un frontal qu'on ne maîtrise pas.
+
+**Ce que cette décision ne règle pas** : `SESSION_SECURE_COOKIE` n'est pas posé, donc Laravel le
+déduit du schéma de la requête. La déduction est désormais juste, mais le rendre explicite
+appartient à BR-28. En revanche, ce qu'on craignait sur les liens signés n'existait pas : sans
+`trustProxies`, la signature était produite et vérifiée sur le même schéma, donc cohérente. Le lien
+partait simplement en clair dans le mail.

@@ -113,7 +113,7 @@ class RegistrationEditTest extends TestCase
         $this->actingAs($this->manager())
             ->put(
                 route('manage.registrations.update', $participant),
-                $this->payload(['birth_date' => now()->subYears(17)->format('Y-m-d')]),
+                $this->payload(['birth_date' => now()->subYears(7)->format('Y-m-d')]),
             )
             ->assertSessionHasErrors('birth_date');
     }
