@@ -146,9 +146,9 @@ class RegistrationTest extends TestCase
     }
 
     #[Test]
-    public function it_refuses_a_runner_under_eighteen(): void
+    public function it_refuses_a_runner_under_eight(): void
     {
-        $this->assertRejects(['birth_date' => now()->subYears(17)->format('Y-m-d')], 'birth_date');
+        $this->assertRejects(['birth_date' => now()->subYears(7)->format('Y-m-d')], 'birth_date');
     }
 
     #[Test]
