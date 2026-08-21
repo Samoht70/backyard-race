@@ -144,6 +144,7 @@ ne peut créer de compte**. Le lot 1 en dépend déjà.
 |----|-------|-----|--------|
 | [BR-33](stories/BR-33-acces-parcours-coureur.md) | Accès du coureur à son inscription | 5 | ✅ Terminé |
 | [BR-24](stories/BR-24-dashboard-participant.md) | Dashboard participant | 8 | À faire |
+| [BR-36](stories/BR-36-gabarit-de-mail.md) | Habiller les mails aux couleurs de la course | 3 | À faire |
 | [BR-25](stories/BR-25-mon-dossard.md) | ~~Dossard imprimable~~ | — | ⛔ Abandonné |
 
 ### EPIC 7 — Déploiement
@@ -171,7 +172,7 @@ pas de fichier de story : c'est la décision qui les porte, et elles prennent un
 | R-03 | Direction artistique « Tableau des départs » à la place de « Corral » | 8 | ✅ Livrée | [D-46](DECISIONS.md) |
 | R-04 | Formulaire d'inscription en quatre étapes au lieu d'une page scrollable | 5 | ✅ Livrée | [D-50](DECISIONS.md), D-54 |
 
-**Total : 32 stories actives + 4 reprises · 230 pts · 109 pts livrés (47 %)**
+**Total : 33 stories actives + 4 reprises · 233 pts · 109 pts livrés (47 %)**
 
 **Hors périmètre : 4 stories abandonnées, 32 pts non engagés** — voir [D-47](DECISIONS.md).
 
@@ -185,7 +186,7 @@ BR-30 → BR-31 → BR-32
 **Ensuite, le moteur et les écrans de course** — BR-08 → BR-09 → BR-10 → BR-11 → BR-12 → BR-13 →
 BR-14 → BR-15 → BR-16 → BR-24 → BR-20 → BR-23
 
-Huit remarques sur cet ordre :
+Neuf remarques sur cet ordre :
 
 - Les deux premiers lots livrent un produit **incomplet mais utile** : un coureur s'inscrit, lit le
   briefing, télécharge le règlement et déclare son numéro PPS. Rien de la nuit de course n'existe
@@ -203,6 +204,10 @@ Huit remarques sur cet ordre :
 - BR-35 passe tôt parce qu'elle est la porte d'entrée : sans compte organisateur, aucun écran du
   lot 1 ne se vérifie en production, et la course n'existe pas — c'est l'écran d'organisation qui
   la crée. Elle tient dans le dépôt, comme BR-27, donc elle n'attend rien.
+- BR-36 ne dépend d'aucune autre et se laisse avancer à n'importe quel moment. L'argument pour la
+  prendre tôt n'est pas esthétique : le mail de lien est le seul chemin de création de compte
+  (D-45), il part déjà en production avec un habillage anglais, et c'est lui qui décide si un
+  coureur clique.
 - BR-30 est la story du lot 2 à ne pas bâcler — sans worker en production, les éliminations
   automatiques ne tombent pas, et rien ne le signale à l'écran.
 
