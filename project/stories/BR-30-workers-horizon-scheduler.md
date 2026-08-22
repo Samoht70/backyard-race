@@ -103,7 +103,7 @@ du site.
 - [x] **T2** — Configurer Horizon en production : files, tentatives, délais `1 pt`
 - [x] **T3** — Protéger l'interface Horizon par permission `1 pt`
 - [x] **T4** — Redémarrage des workers au déploiement `1 pt`
-- [ ] **T5** — Alerte sur file non consommée `2 pts` — sondage livré, surveillance à inscrire
+- [ ] **T5** — Alerte sur file non consommée `2 pts` — sondage et battement livrés, deux inscriptions à faire
 - [x] **T6** — Vérifier de bout en bout qu'une élimination tombe sans navigateur ouvert `1 pt`
 
 ## Ce qui reste au 2026-08-22
@@ -124,7 +124,19 @@ La notification de longue attente d'Horizon a été écartée, parce qu'elle est
 qu'elle devrait surveiller, et le mail d'alerte avec elle, parce qu'il passerait par la file arrêtée
 ([D-67](../DECISIONS.md)).
 
-**Ce qui reste à T5 : inscrire `up/queue` dans la surveillance externe déjà posée par BR-31 T3**, avec
-deux échecs consécutifs avant l'alerte pour laisser passer le redémarrage du worker au déploiement.
-Tant que cette inscription n'est pas faite, le sondage sait dire que la file décroche mais personne ne
+**Le sondage seul laissait le planificateur invisible.** Interrogé de l'extérieur, `up/queue` ne dit
+rien de lui, et il n'a pas de contrôle de santé non plus : s'il meurt, plus aucune élimination ne
+tombe et rien ne le signale — la panne même que la user story ci-dessus nomme. `race:queue-heartbeat`
+la couvre par renversement : le planificateur l'exécute chaque minute et elle ne ping
+`HEALTHCHECKS_QUEUE_URL` que si la file est consommée. Plus de ping veut dire « le planificateur est
+mort » ou « le worker ne consomme plus » ; `up/queue` dit ensuite lequel des deux.
+
+**Ce qui reste à T5, deux inscriptions et rien de plus :**
+
+1. Un moniteur sur `https://<domaine>/up/queue` dans la surveillance externe de BR-31 T3, deux échecs
+   consécutifs avant l'alerte — le redémarrage du worker au déploiement ne doit pas sonner.
+2. Un check de battement chez le service de ping déjà utilisé par les sauvegardes (BR-29), son URL
+   dans `HEALTHCHECKS_QUEUE_URL`, période et grâce réglées pour laisser passer un déploiement.
+
+Tant que ces deux entrées n'existent pas, le dépôt sait dire que la file décroche et personne ne
 l'écoute — la case reste donc ouverte.

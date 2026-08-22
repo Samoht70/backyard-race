@@ -2531,3 +2531,22 @@ pour une réponse qui n'en a pas besoin. Un test le tient.
 la surveillance externe, qui doit appeler `up/queue` comme elle appelle déjà `/up`, avec deux échecs
 consécutifs avant de sonner : un déploiement laisse le maître absent le temps du redémarrage du
 conteneur, et une alerte à chaque mise en ligne est une alerte qu'on finit par ignorer.
+
+**Le sondage seul laissait le planificateur invisible, et un second signal le couvre.** Interrogé de
+l'extérieur, `up/queue` dit tout du worker et rien du planificateur — qui n'a pas de contrôle de santé
+non plus (D-56 l'assume), alors que la user story de BR-30 est précisément « les éliminations tombent
+sans navigateur ouvert ». `race:queue-heartbeat` ferme ce trou par renversement : le planificateur
+l'exécute chaque minute, la commande ping `HEALTHCHECKS_QUEUE_URL` **seulement si la file est
+consommée**, et c'est l'absence de ping qui alerte. Un planificateur mort n'appelle plus, un worker
+mort fait taire l'appel : les deux pannes de BR-30 tiennent dans un signal, et le VPS éteint aussi.
+
+Le ping conditionnel est le motif déjà retenu pour la sauvegarde en BR-29, et pour la même raison :
+ce qui doit alerter, c'est le silence. `up/queue` reste, parce que le battement dit qu'une des deux
+choses a lâché sans dire laquelle, là où le sondage nomme l'état — worker absent, en pause, ou en
+retard. Les deux ne se remplacent pas : l'un porte l'alerte, l'autre le diagnostic.
+
+**La commande ne rattrape pas une URL illisible, et n'avale pas un hôte injoignable.** Une valeur qui
+n'est pas une URL est traitée comme une absence, avec le nom de la variable dans la sortie : la
+réparer silencieusement enverrait le ping nulle part en ayant l'air de fonctionner. Un hôte
+injoignable laisse remonter `ConnectionException` — la règle maison interdit le `try`/`catch`, le
+planificateur la journalise, et le check alerte de lui-même faute de ping.

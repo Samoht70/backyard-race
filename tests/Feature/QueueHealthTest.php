@@ -2,13 +2,14 @@
 
 namespace Tests\Feature;
 
-use Laravel\Horizon\Contracts\MasterSupervisorRepository;
-use Laravel\Horizon\WaitTimeCalculator;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\Concerns\FakesQueueConsumption;
 use Tests\TestCase;
 
 class QueueHealthTest extends TestCase
 {
+    use FakesQueueConsumption;
+
     #[Test]
     public function it_reports_a_consuming_queue(): void
     {
@@ -79,23 +80,5 @@ class QueueHealthTest extends TestCase
         $this->waitsFor(0);
 
         $this->get('up/queue')->assertCookieMissing(config('session.cookie'));
-    }
-
-    private function workerReports(?string $status = null): void
-    {
-        $masters = $status === null ? [] : [(object) ['status' => $status]];
-
-        $this->mock(
-            MasterSupervisorRepository::class,
-            fn ($repository) => $repository->shouldReceive('all')->andReturn($masters),
-        );
-    }
-
-    private function waitsFor(int $seconds): void
-    {
-        $this->mock(
-            WaitTimeCalculator::class,
-            fn ($calculator) => $calculator->shouldReceive('calculate')->andReturn(['redis:default' => $seconds]),
-        );
     }
 }
