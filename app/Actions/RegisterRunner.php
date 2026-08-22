@@ -6,7 +6,7 @@ use App\Enums\Role;
 use App\Models\Event;
 use App\Models\Participant;
 use App\Models\User;
-use App\Notifications\RegistrationConfirmed;
+use App\Notifications\RegistrationReceived;
 use App\Support\AccessCode;
 use Illuminate\Support\Facades\DB;
 
@@ -37,7 +37,7 @@ final class RegisterRunner
             return $user;
         });
 
-        $user->notify(new RegistrationConfirmed($code));
+        $user->notify(new RegistrationReceived($code));
 
         return $code;
     }

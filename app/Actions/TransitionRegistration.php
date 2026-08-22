@@ -2,10 +2,12 @@
 
 namespace App\Actions;
 
+use App\Enums\RegistrationOutcome;
 use App\Enums\RegistrationTransition;
 use App\Exceptions\RegistrationTransitionRefusedException;
 use App\Models\Event;
 use App\Models\Participant;
+use App\Notifications\RegistrationProcessed;
 use Illuminate\Support\Facades\DB;
 
 final class TransitionRegistration
@@ -13,23 +15,19 @@ final class TransitionRegistration
     public function __construct(private NextBibNumber $nextBibNumber) {}
 
     /**
-     * Dropping the `where` on the status being left lets a concurrent request's
-     * transition be overwritten, and a double click assign a second bib number.
-     * Releasing the event lock lets two confirmations share the last seat, or
-     * the same bib number.
-     *
      * @throws RegistrationTransitionRefusedException
      */
     public function __invoke(Participant $participant, RegistrationTransition $transition): Participant
     {
-        return DB::transaction(function () use ($participant, $transition): Participant {
+        $leaving = $participant->lifecycle();
+
+        $moved = DB::transaction(function () use ($participant, $transition, $leaving): Participant {
             $event = Event::query()
                 ->whereKey($participant->event_id)
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            $leaving = $participant->status;
-            $next = $transition->apply($participant->lifecycle());
+            $next = $transition->apply($leaving);
 
             if ($next->consumesASeat() && $event->isFull()) {
                 throw RegistrationTransitionRefusedException::full();
@@ -41,16 +39,20 @@ final class TransitionRegistration
                 $changes['bib_number'] = ($this->nextBibNumber)($event);
             }
 
-            $moved = Participant::query()
+            $written = Participant::query()
                 ->whereKey($participant->getKey())
-                ->where('status', $leaving->value)
+                ->where('status', $leaving->status()->value)
                 ->update($changes);
 
-            if ($moved === 0) {
+            if ($written === 0) {
                 throw RegistrationTransitionRefusedException::stale();
             }
 
             return $participant->refresh();
         });
+
+        $moved->user->notify(new RegistrationProcessed(RegistrationOutcome::of($leaving, $transition)));
+
+        return $moved;
     }
 }

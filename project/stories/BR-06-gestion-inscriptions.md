@@ -104,3 +104,10 @@ Voir [D-48](../DECISIONS.md).
 
 Le critère « et un numéro de dossard lui est attribué » appartient à BR-07, livrée juste après sur
 sa propre branche. La confirmation pose le point de branchement ; l'attribution s'y greffe.
+
+## Ce qui a changé depuis
+
+L'exclusion « l'envoi d'un email de confirmation : hors périmètre » est levée le 2026-08-22 par
+[BR-43](BR-43-notification-de-traitement.md) : les quatre traitements livrés ici préviennent
+désormais le coureur par mail, et le sens du mail se lit sur le statut quitté autant que sur la
+transition. Voir [D-71](../DECISIONS.md).
