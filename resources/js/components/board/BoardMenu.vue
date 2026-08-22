@@ -12,6 +12,7 @@ import {
     DialogTrigger,
 } from 'reka-ui';
 import { computed, ref, watch } from 'vue';
+import AppLogo from '@/components/AppLogo.vue';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { t } from '@/lib/i18n';
 import { mainNavItems } from '@/lib/mainNav';
@@ -42,11 +43,12 @@ watch(isRailVisible, (visible) => {
         <DialogPortal>
             <DialogOverlay :class="overlayBackdrop" />
             <DialogContent :class="overlayRail">
-                <DialogTitle
-                    class="border-b border-border px-4 py-3 font-mono text-label uppercase"
-                >
-                    {{ t('ui.nav.main') }}
-                </DialogTitle>
+                <div class="border-b border-border px-4 py-3">
+                    <AppLogo class="flex" />
+                    <DialogTitle class="sr-only">
+                        {{ t('ui.nav.main') }}
+                    </DialogTitle>
+                </div>
 
                 <nav class="grid content-start">
                     <DialogClose

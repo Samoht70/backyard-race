@@ -2,7 +2,7 @@
 import { Link } from '@inertiajs/vue3';
 import { ArrowLeft } from '@lucide/vue';
 import AppearanceToggle from '@/components/AppearanceToggle.vue';
-import AppLogoIcon from '@/components/AppLogoIcon.vue';
+import AppLogo from '@/components/AppLogo.vue';
 import { t } from '@/lib/i18n';
 import { home } from '@/routes';
 
@@ -30,17 +30,8 @@ defineProps<{
         <div class="w-full max-w-sm">
             <div class="flex flex-col gap-8">
                 <div class="flex flex-col items-center gap-4">
-                    <Link
-                        :href="home()"
-                        class="flex flex-col items-center gap-2 font-medium"
-                    >
-                        <div
-                            class="mb-1 flex size-9 items-center justify-center"
-                        >
-                            <AppLogoIcon
-                                class="size-9 fill-current text-primary"
-                            />
-                        </div>
+                    <Link :href="home()" class="mb-1 flex items-center">
+                        <AppLogo class="flex" />
                         <span class="sr-only">{{ title }}</span>
                     </Link>
                     <div class="grid gap-2 text-center">
