@@ -2497,3 +2497,56 @@ personne ne s'est inscrit. Ne compter que les inscriptions actives aurait laiss�
 porter des lignes annulées et les comptes qui vont avec — un brouillon qui garde des traces n'en est
 pas un. La règle stricte est tenable précisément parce que BR-39 donne l'outil pour atteindre la
 condition. BR-41 le porte.
+
+## D-67 — La file se surveille par un second point de contrôle, parce qu'Horizon ne peut pas signaler sa propre mort
+
+Arrêté le 2026-08-22 en implémentant BR-30 T5. La question était de savoir qui émet l'alerte quand la
+file cesse d'être consommée, et la réponse évidente — la notification de longue attente d'Horizon,
+`Horizon::routeMailNotificationsTo()` — est celle qui ne peut pas marcher.
+
+**Horizon surveille les attentes depuis son propre processus maître.** `MonitorWaitTimes` est un
+écouteur du superviseur : il ne tourne que tant que le superviseur tourne. Un worker mort n'émet donc
+rien, et c'est exactement la panne à couvrir. Le second chemin écarté est le mail : les deux mails du
+parcours passent par la file, et un mail d'alerte émis depuis une file arrêtée reste dans la file.
+L'alerte doit venir d'un observateur qui ne dépend ni du worker ni de la file.
+
+**Le sondage est une seconde URL, sur le patron de `/up`.** `up/queue` répond `200 {"queue":
+"consuming"}` quand la file est consommée, `503` sinon, et la surveillance déjà installée par BR-31 T3
+appelle les deux : `/up` dit si l'application répond, `up/queue` dit si le worker travaille. C'est la
+distinction que D-19 exigeait, tenue par deux points de contrôle plutôt que par deux mécanismes, et
+l'observateur reste hébergé hors du VPS — une machine éteinte fait tomber les deux.
+
+**Trois états valent refus, et le troisième est celui d'Horizon.** Aucun maître qui bat (absent
+depuis quinze secondes, la durée de vie de son enregistrement Redis), un maître en pause, ou une
+attente estimée au-delà du seuil de `horizon.waits` — le même seuil que la notification écartée, lu au
+même endroit, pour ne pas installer un second réglage à côté du premier. Un seuil à `0` tait la file,
+comme chez Horizon.
+
+**La route est déclarée hors du groupe `web`, à côté de `health:`.** C'est ce que fait le point de
+contrôle du framework, et ce n'est pas cosmétique : dans le groupe `web`, chaque appel de la
+surveillance ouvrirait une session et ferait travailler le partage de props d'Inertia, donc la base,
+pour une réponse qui n'en a pas besoin. Un test le tient.
+
+**Ce que le sondage ne fait pas** — il ne prévient personne. Il rend un état ; l'alerte est émise par
+la surveillance externe, qui doit appeler `up/queue` comme elle appelle déjà `/up`, avec deux échecs
+consécutifs avant de sonner : un déploiement laisse le maître absent le temps du redémarrage du
+conteneur, et une alerte à chaque mise en ligne est une alerte qu'on finit par ignorer.
+
+**Le sondage seul laissait le planificateur invisible, et un second signal le couvre.** Interrogé de
+l'extérieur, `up/queue` dit tout du worker et rien du planificateur — qui n'a pas de contrôle de santé
+non plus (D-56 l'assume), alors que la user story de BR-30 est précisément « les éliminations tombent
+sans navigateur ouvert ». `race:queue-heartbeat` ferme ce trou par renversement : le planificateur
+l'exécute chaque minute, la commande ping `HEALTHCHECKS_QUEUE_URL` **seulement si la file est
+consommée**, et c'est l'absence de ping qui alerte. Un planificateur mort n'appelle plus, un worker
+mort fait taire l'appel : les deux pannes de BR-30 tiennent dans un signal, et le VPS éteint aussi.
+
+Le ping conditionnel est le motif déjà retenu pour la sauvegarde en BR-29, et pour la même raison :
+ce qui doit alerter, c'est le silence. `up/queue` reste, parce que le battement dit qu'une des deux
+choses a lâché sans dire laquelle, là où le sondage nomme l'état — worker absent, en pause, ou en
+retard. Les deux ne se remplacent pas : l'un porte l'alerte, l'autre le diagnostic.
+
+**La commande ne rattrape pas une URL illisible, et n'avale pas un hôte injoignable.** Une valeur qui
+n'est pas une URL est traitée comme une absence, avec le nom de la variable dans la sortie : la
+réparer silencieusement enverrait le ping nulle part en ayant l'air de fonctionner. Un hôte
+injoignable laisse remonter `ConnectionException` — la règle maison interdit le `try`/`catch`, le
+planificateur la journalise, et le check alerte de lui-même faute de ping.

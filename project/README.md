@@ -73,12 +73,12 @@ qu'une plateforme managée aurait fait tomber une vingtaine de ces points pour 3
 | ✅ | [BR-26](stories/BR-26-provisionner-vps-dokploy.md) | VPS et Dokploy | 9 | Sur la machine | — |
 | ✅ | [BR-29](stories/BR-29-donnees-managees-sauvegardes.md) | MySQL, Redis, sauvegardes | 8 | Sur la machine | T6, la veille de la course |
 | 🚧 | [BR-28](stories/BR-28-configuration-secrets-stockage.md) | Environnement, secrets, stockage objet | 5 | Les deux | T3, T4 |
-| 🚧 | [BR-30](stories/BR-30-workers-horizon-scheduler.md) | Files, Horizon, planificateur | 5 | Les deux | T5 |
+| ✅ | [BR-30](stories/BR-30-workers-horizon-scheduler.md) | Files, Horizon, planificateur | 5 | Les deux | L'exercice à froid, avec BR-31 T5 |
 | 🚧 | [BR-31](stories/BR-31-domaine-https-supervision.md) | Domaine, HTTPS, supervision | 5 | Sur la machine | T4, T5 |
 | 🚧 | [BR-32](stories/BR-32-deploiement-dokploy.md) | Déploiement depuis Dokploy | 3 | Les deux | T3, T5 |
 | ↪ | [BR-35](stories/BR-35-compte-organisateur-en-commande.md) | Compte organisateur en une commande | 3 | Dans le dépôt | Passe au lot 3, entière |
 
-**52 pts, dont 31 livrés — et l'objectif du lot est atteint.** Le domaine répond en HTTPS, un compte
+**52 pts, dont 36 livrés — et l'objectif du lot est atteint.** Le domaine répond en HTTPS, un compte
 organisateur existe, l'événement est public, un coureur s'inscrit et reçoit son code par mail depuis
 un worker qui tourne pour de vrai, les fichiers atterrissent dans un bucket hors machine, la base est
 sauvegardée chaque jour et la restauration a été rejouée une fois. Le déploiement part de `main`,
@@ -86,9 +86,6 @@ migrations comprises, et le retour à la version précédente a été essayé.
 
 Ce qui reste ne met plus rien en ligne : **ça prévient quand ça casse, ou ça dit ce qui tourne.**
 
-- **BR-30 T5 — alerte sur file non consommée.** Le trou le plus coûteux du lot. Un worker mort ne se
-  signale pas : les inscriptions continuent de passer, les mails de code n'arrivent plus, et aucun
-  écran ne le dit — ni au coureur qui attend, ni au gérant.
 - **BR-31 T4 — notification des erreurs applicatives.** La supervision externe couvre la machine
   morte, pas l'application qui répond faux.
 - **BR-31 T5** — l'alerte n'a pas été éprouvée sur une extinction volontaire, seulement installée.
@@ -163,17 +160,19 @@ ce qui se voit dès qu'un inconnu arrive sur l'adresse, et il précède l'epic 2
 
 | Ordre | ID | Story | Pts | Pourquoi dans le lot |
 |-------|----|-------|-----|----------------------|
-| 1 | [BR-30](stories/BR-30-workers-horizon-scheduler.md) T5 | Alerte sur file non consommée | 2 | Un worker mort emporte les mails de code en silence |
-| 2 | [BR-41](stories/BR-41-retour-en-brouillon.md) | Remettre l'événement en brouillon | 3 | Le demi-tour n'existe que tant qu'il n'y a personne |
-| 3 | [BR-39](stories/BR-39-suppression-inscription-et-compte.md) | Supprimer une inscription et son compte | 3 | La réponse à « j'ai perdu mon code » |
-| 4 | [BR-40](stories/BR-40-page-erreur.md) | Rendre les refus et les erreurs dans le site | 3 | La dernière surface publique non habillée |
+| ✅ | [BR-30](stories/BR-30-workers-horizon-scheduler.md) T5 | Alerte sur file non consommée | 2 | Un worker mort emporte les mails de code en silence |
+| 1 | [BR-41](stories/BR-41-retour-en-brouillon.md) | Remettre l'événement en brouillon | 3 | Le demi-tour n'existe que tant qu'il n'y a personne |
+| 2 | [BR-39](stories/BR-39-suppression-inscription-et-compte.md) | Supprimer une inscription et son compte | 3 | La réponse à « j'ai perdu mon code » |
+| 3 | [BR-40](stories/BR-40-page-erreur.md) | Rendre les refus et les erreurs dans le site | 3 | La dernière surface publique non habillée |
 
-**11 pts, aucun livré.** L'ordre suit ce que chaque entrée coûte si elle attend :
+**11 pts, dont 2 livrés le 2026-08-22.** L'ordre suit ce que chaque entrée coûte si elle attend :
 
-- **BR-30 T5 d'abord**, parce que c'est la seule qui coûte déjà. Les deux mails du parcours — le lien
-  signé et le code d'accès — sont mis en file. Un worker mort ne se signale pas : le formulaire
-  continue de répondre « regarde tes mails », personne ne reçoit rien, et ni le coureur ni le gérant
-  ne l'apprennent. C'est le reliquat du lot 2, il n'appartient pas au lot 4, et il passe devant.
+- **BR-30 T5 d'abord et close**, parce que c'était la seule qui coûtait déjà. Les deux mails du
+  parcours — le lien signé et le code d'accès — sont mis en file, et un worker mort ne se signalait
+  pas : le formulaire continuait de répondre « regarde tes mails » sans que personne ne reçoive rien.
+  Deux signaux le disent maintenant, le sondage `up/queue` et le battement `race:queue-heartbeat`, et
+  la surveillance externe les écoute ([D-67](DECISIONS.md)). C'était le reliquat du lot 2, il
+  n'appartenait pas au lot 4, et il est passé devant.
 - **BR-41 ensuite**, parce que sa condition d'usage est vraie aujourd'hui et fausse demain : le retour
   en brouillon exige zéro inscription, et l'adresse est sur le point de circuler. Ce n'est pas une
   fenêtre qui se referme définitivement — BR-39 et la purge savent recréer la condition — mais c'est
@@ -269,7 +268,7 @@ par BR-33. Elle reste avec les écrans de course, dont elle dépend.
 | [BR-27](stories/BR-27-image-docker-production.md) | Image et Compose de production | 9 | ✅ Terminé |
 | [BR-28](stories/BR-28-configuration-secrets-stockage.md) | Configurer environnement, secrets et stockage objet | 5 | 🚧 En cours |
 | [BR-29](stories/BR-29-donnees-managees-sauvegardes.md) | MySQL, Redis et sauvegardes hors machine | 8 | ✅ Terminé |
-| [BR-30](stories/BR-30-workers-horizon-scheduler.md) | Files, Horizon et planificateur en production | 5 | 🚧 En cours |
+| [BR-30](stories/BR-30-workers-horizon-scheduler.md) | Files, Horizon et planificateur en production | 5 | ✅ Terminé |
 | [BR-31](stories/BR-31-domaine-https-supervision.md) | Domaine, HTTPS et supervision | 5 | 🚧 En cours |
 | [BR-32](stories/BR-32-deploiement-dokploy.md) | Déploiement depuis Dokploy et branche develop | 3 | 🚧 En cours |
 | [BR-35](stories/BR-35-compte-organisateur-en-commande.md) | Créer le compte organisateur en une commande | 3 | ✅ Terminé |
@@ -295,7 +294,7 @@ pas de fichier de story : c'est la décision qui les porte, et elles prennent un
 | R-06 | Charte de l’instrument, et primitives reka-ui à la place du starter kit | 5 | ✅ Livrée | [D-61](DECISIONS.md) |
 | R-07 | Adresse de l'organisateur en configuration, en plus du rôle `manager` | 2 | ✅ Livrée | [D-65](DECISIONS.md) |
 
-**Total : 38 stories actives + 7 reprises · 262 pts · 152 pts livrés (58 %)**
+**Total : 38 stories actives + 7 reprises · 262 pts · 157 pts livrés (60 %)**
 
 **Hors périmètre : 4 stories abandonnées, 32 pts non engagés** — voir [D-47](DECISIONS.md).
 
@@ -304,17 +303,19 @@ pas de fichier de story : c'est la décision qui les porte, et elles prennent un
 **Lot 1 — ouvrir les inscriptions (18 pts) — clos le 2026-08-20.**
 
 **Lot 2 — mettre en ligne (52 pts) — objectif atteint le 2026-08-22.** L'ordre suivi : BR-27 → R-05
-→ BR-26 → BR-29, les quatre entrées closes. Reste, dans cet ordre : BR-30 T5 → BR-31 T4 et T5 →
+→ BR-26 → BR-29 → BR-30, les cinq entrées closes. Reste, dans cet ordre : BR-31 T4 et T5 →
 BR-32 T3 et T5 → BR-28 T3 et T4.
 
 **Lot 3 — tenir la production à la main (11 pts) — les trois stories closes le 2026-08-22**, et les
 trois gestes faits sur la machine le même jour.
 
 **Lot 4 — tenir une adresse annoncée (11 pts) — en cours.** L'ordre : BR-30 T5 → BR-41 → BR-39 →
-BR-40. C'est le dernier lot avant le moteur, et le seul dont une entrée coûte déjà quelque chose.
+BR-40. C'est le dernier lot avant le moteur, et le seul dont une entrée coûtait déjà quelque chose :
+BR-30 T5 est close le 2026-08-22, sondage et battement livrés, surveillance inscrite. **BR-41 est en
+tête de ce qui reste.**
 
-**Le reste du reliquat du lot 2 avant le moteur, ou après ?** Après. BR-30 T5 passe dans le lot 4
-parce qu'une file qui cesse d'être consommée coûte des coureurs dès aujourd'hui ; la version exposée
+**Le reste du reliquat du lot 2 avant le moteur, ou après ?** Après. BR-30 T5 est passée dans le lot 4
+parce qu'une file qui cesse d'être consommée coûtait des coureurs dès aujourd'hui ; la version exposée
 et le garde-fou de gel, eux, ne coûtent que la nuit de course, et il reste du temps.
 
 **Ensuite, le moteur et les écrans de course** — BR-08 → BR-09 → BR-10 → BR-11 → BR-12 → BR-13 →
@@ -350,10 +351,12 @@ Dix remarques sur cet ordre :
 - BR-37 ferme le lot 3 et non l'inverse, parce que les essais de BR-36 en production créeront eux
   aussi des comptes. Elle est aussi la seule story du backlog qui **détruise** : d'où le garde-fou
   sur le rôle `manager` dans ses règles métier, et d'où sa dépendance à BR-35.
-- BR-30 était la story du lot 2 à ne pas bâcler, et elle a été à moitié entendue : le worker tourne,
-  les mails de code partent, mais T5 est restée sur le carreau. Sans alerte sur file non consommée,
-  un worker mort ne se signale pas — ni pour les mails d'aujourd'hui, ni pour les éliminations
-  automatiques de BR-11 demain.
+- BR-30 était la story du lot 2 à ne pas bâcler, et elle a d'abord été à moitié entendue : le worker
+  tournait, les mails de code partaient, et T5 est restée sur le carreau jusqu'au lot 4. Elle a fini
+  par coûter plus que son intitulé — la voie évidente, la notification d'Horizon, est émise par le
+  processus qu'elle devrait surveiller — et par couvrir une panne que personne n'avait nommée : le
+  planificateur mort, qui arrête les éliminations de BR-11 sans que rien ne l'affiche
+  ([D-67](DECISIONS.md)).
 
 ## Voir aussi
 
