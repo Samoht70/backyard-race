@@ -3,9 +3,10 @@
 | | |
 |---|---|
 | **Epic** | 7 — Déploiement |
-| **Statut** | À faire |
+| **Statut** | ✅ Terminé |
 | **Estimation** | 3 pts |
 | **Créée** | 2026-08-21 — relevé pendant la mise en ligne, lot 2 |
+| **Livrée** | 2026-08-22 — `race:manager-account`, lot 3 |
 | **Dépend de** | BR-01 |
 
 ## User story
@@ -138,8 +139,8 @@ La commande vit dans `app/Console/Commands`, à côté de `OpenDueRoundsCommand`
 
 ## Tâches
 
-- [ ] **T1** — Commande de création : normalisation de l'adresse, garde sur le rôle, garde sur
+- [x] **T1** — Commande de création : normalisation de l'adresse, garde sur le rôle, garde sur
   l'unicité, code affiché une fois `1 pt`
-- [ ] **T2** — Option de regénération du code d'accès `1 pt`
-- [ ] **T3** — Tests : création, normalisation, refus sur doublon, refus sans rôles, regénération
+- [x] **T2** — Option de regénération du code d'accès `1 pt`
+- [x] **T3** — Tests : création, normalisation, refus sur doublon, refus sans rôles, regénération
   qui invalide l'ancien code `1 pt`

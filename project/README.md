@@ -112,14 +112,15 @@ circule pour de vrai.
 
 | Ordre | ID | Story | Pts | Pourquoi dans le lot |
 |-------|----|-------|-----|----------------------|
-| 1 | [BR-35](stories/BR-35-compte-organisateur-en-commande.md) | Compte organisateur en une commande | 3 | La porte, et le filet de BR-37 |
-| 2 | [BR-36](stories/BR-36-gabarit-de-mail.md) | Habiller les mails aux couleurs de la course | 3 | Le mail est le seul chemin de création de compte (D-45) |
-| 3 | [BR-37](stories/BR-37-purge-des-inscriptions.md) | Purger les inscriptions et les comptes coureurs | 5 | La production porte des données d'essai |
+| ✅ | [BR-35](stories/BR-35-compte-organisateur-en-commande.md) | Compte organisateur en une commande | 3 | La porte, et le filet de BR-37 |
+| 1 | [BR-36](stories/BR-36-gabarit-de-mail.md) | Habiller les mails aux couleurs de la course | 3 | Le mail est le seul chemin de création de compte (D-45) |
+| 2 | [BR-37](stories/BR-37-purge-des-inscriptions.md) | Purger les inscriptions et les comptes coureurs | 5 | La production porte des données d'essai |
 
-**11 pts, aucun livré.** L'ordre n'est pas indifférent :
+**11 pts, dont 3 livrés.** L'ordre n'est pas indifférent :
 
-- **BR-35 d'abord**, parce qu'elle est le filet de BR-37. Une commande qui supprime des comptes se
-  lance plus sereinement quand une autre sait recréer celui de l'organisateur.
+- **BR-35 d'abord, close le 2026-08-22**, parce qu'elle est le filet de BR-37. Une commande qui
+  supprime des comptes se lance plus sereinement quand une autre sait recréer celui de
+  l'organisateur : `race:manager-account` crée le compte et regénère son code d'accès ([D-62](DECISIONS.md)).
 - **BR-36 ensuite**, avant le premier vrai inscrit. Chaque coureur reçoit ce mail une fois, et cette
   fois-là ne se rattrape pas : qui s'inscrit avant garde l'habillage anglais du paquet. Aucune autre
   story du backlog n'a cette propriété d'irréversibilité.
@@ -213,7 +214,7 @@ attend la semaine de la course.
 | [BR-30](stories/BR-30-workers-horizon-scheduler.md) | Files, Horizon et planificateur en production | 5 | 🚧 En cours |
 | [BR-31](stories/BR-31-domaine-https-supervision.md) | Domaine, HTTPS et supervision | 5 | 🚧 En cours |
 | [BR-32](stories/BR-32-deploiement-dokploy.md) | Déploiement depuis Dokploy et branche develop | 3 | 🚧 En cours |
-| [BR-35](stories/BR-35-compte-organisateur-en-commande.md) | Créer le compte organisateur en une commande | 3 | 🔥 Lot 3 |
+| [BR-35](stories/BR-35-compte-organisateur-en-commande.md) | Créer le compte organisateur en une commande | 3 | ✅ Terminé |
 | [BR-37](stories/BR-37-purge-des-inscriptions.md) | Purger les inscriptions et les comptes coureurs | 5 | 🔥 Lot 3 |
 
 Les quatre stories `En cours` sont en production et il leur manque une ou deux tâches, nommées dans
@@ -235,7 +236,7 @@ pas de fichier de story : c'est la décision qui les porte, et elles prennent un
 | R-05 | Course publique : l'accueil porte l'événement, les documents s'ouvrent aux invités | 5 | ✅ Livrée | [D-60](DECISIONS.md) |
 | R-06 | Charte de l’instrument, et primitives reka-ui à la place du starter kit | 5 | ✅ Livrée | [D-61](DECISIONS.md) |
 
-**Total : 34 stories actives + 6 reprises · 248 pts · 136 pts livrés (55 %)**
+**Total : 34 stories actives + 6 reprises · 248 pts · 139 pts livrés (56 %)**
 
 **Hors périmètre : 4 stories abandonnées, 32 pts non engagés** — voir [D-47](DECISIONS.md).
 
@@ -247,8 +248,8 @@ pas de fichier de story : c'est la décision qui les porte, et elles prennent un
 → BR-26 → BR-29, les quatre entrées closes. Reste, dans cet ordre : BR-30 T5 → BR-31 T4 et T5 →
 BR-32 T3 et T5 → BR-28 T3 et T4.
 
-**Lot 3, en cours — tenir la production à la main (11 pts)** — BR-35 → BR-36 → BR-37, plus BR-30 T5
-qui vient avec.
+**Lot 3, en cours — tenir la production à la main (11 pts, 3 livrés)** — BR-35 close, reste
+BR-36 → BR-37, plus BR-30 T5 qui vient avec.
 
 **Ce reliquat du lot 2 avant le moteur, ou après ?** Après, sauf BR-30 T5. Les inscriptions sont
 ouvertes, donc une file qui cesse d'être consommée coûte des coureurs dès aujourd'hui ; la version
