@@ -2,10 +2,12 @@
 
 namespace Tests\Feature\Notifications;
 
+use App\Enums\RegistrationOutcome;
 use App\Listeners\EmbedBrandMarkListener;
 use App\Models\User;
-use App\Notifications\RegistrationConfirmed;
 use App\Notifications\RegistrationLink;
+use App\Notifications\RegistrationProcessed;
+use App\Notifications\RegistrationReceived;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Mail\Markdown;
 use Illuminate\Mail\Transport\ArrayTransport;
@@ -56,6 +58,20 @@ class MailTemplateTest extends TestCase
         ];
     }
 
+    /**
+     * @return array<string, array{RegistrationOutcome}>
+     */
+    public static function processingOutcomes(): array
+    {
+        $outcomes = [];
+
+        foreach (RegistrationOutcome::cases() as $outcome) {
+            $outcomes[$outcome->value] = [$outcome];
+        }
+
+        return $outcomes;
+    }
+
     #[Test]
     #[DataProvider('paletteDeclarations')]
     public function it_dresses_the_mail_in_the_colours_of_the_site(string $token, string $declaration): void
@@ -75,7 +91,23 @@ class MailTemplateTest extends TestCase
     public function it_leaves_no_english_wrapping_in_either_mail(string $english): void
     {
         $this->assertStringNotContainsString($english, $this->html($this->linkMail()));
-        $this->assertStringNotContainsString($english, $this->html($this->confirmationMail()));
+        $this->assertStringNotContainsString($english, $this->html($this->receiptMail()));
+    }
+
+    #[Test]
+    #[DataProvider('processingOutcomes')]
+    public function it_writes_every_line_of_a_processing_mail_in_french_and_without_a_bib(
+        RegistrationOutcome $outcome,
+    ): void {
+        $html = $this->html($this->processingMail($outcome));
+
+        $this->assertStringNotContainsString($outcome->mailKey(), $html);
+        $this->assertStringContainsString('Camille', $html);
+        $this->assertDoesNotMatchRegularExpression('/dossard[^.]*\d/', $html);
+
+        foreach (self::packageEnglish() as [$english]) {
+            $this->assertStringNotContainsString($english, $html);
+        }
     }
 
     #[Test]
@@ -91,7 +123,7 @@ class MailTemplateTest extends TestCase
     #[Test]
     public function it_asks_nothing_of_a_third_party_when_the_mail_opens(): void
     {
-        $html = $this->html($this->confirmationMail());
+        $html = $this->html($this->receiptMail());
 
         $this->assertStringContainsString('src="cid:'.EmbedBrandMarkListener::CID.'"', $html);
         $this->assertDoesNotMatchRegularExpression('/src="(?!cid:)/', $html);
@@ -108,7 +140,7 @@ class MailTemplateTest extends TestCase
     #[Test]
     public function it_carries_the_brand_mark_inside_the_message(): void
     {
-        User::factory()->create()->notify(new RegistrationConfirmed(self::CODE));
+        User::factory()->create()->notify(new RegistrationReceived(self::CODE));
 
         $sent = Mail::getSymfonyTransport();
         $this->assertInstanceOf(ArrayTransport::class, $sent);
@@ -128,7 +160,7 @@ class MailTemplateTest extends TestCase
     #[Test]
     public function it_gives_the_access_code_a_block_of_its_own(): void
     {
-        $html = $this->html($this->confirmationMail());
+        $html = $this->html($this->receiptMail());
 
         $this->assertMatchesRegularExpression(
             '/<span class="code-value"[^>]*>'.preg_quote(self::CODE, '/').'<\/span>/',
@@ -152,7 +184,7 @@ class MailTemplateTest extends TestCase
     #[Test]
     public function it_keeps_the_access_code_alone_on_its_line_in_the_text_version(): void
     {
-        $text = $this->text($this->confirmationMail());
+        $text = $this->text($this->receiptMail());
 
         $this->assertStringNotContainsString('**', $text);
         $this->assertMatchesRegularExpression('/^'.preg_quote(self::CODE, '/').'$/m', $text);
@@ -163,9 +195,14 @@ class MailTemplateTest extends TestCase
         return new RegistrationLink(self::LINK, 48)->toMail($this->runner());
     }
 
-    private function confirmationMail(): MailMessage
+    private function receiptMail(): MailMessage
     {
-        return new RegistrationConfirmed(self::CODE)->toMail($this->runner());
+        return new RegistrationReceived(self::CODE)->toMail($this->runner());
+    }
+
+    private function processingMail(RegistrationOutcome $outcome): MailMessage
+    {
+        return new RegistrationProcessed($outcome)->toMail($this->runner());
     }
 
     private function runner(): User

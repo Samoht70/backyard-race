@@ -318,6 +318,13 @@ par mail. Ce mail est le **seul** que l'application envoie, et il appartient au 
 de compte, pas à la course. Tout le reste de la liste tient : aucune alerte d'élimination, aucun
 récapitulatif, aucune relance.
 
+**Seconde révision du 2026-08-22 (D-71) : « notifications » ne couvre plus le traitement d'une
+inscription.** Le propriétaire a demandé que le coureur apprenne par mail ce que le gérant a décidé
+de son inscription. Les quatre traitements — validation, refus, annulation, remise en attente — sont
+donc dans le périmètre, et BR-06 perd son exclusion. Le reste de la liste tient toujours, et la
+frontière est nette : ce qui touche l'inscription se dit, ce qui touche la course ne se dit pas.
+Aucune alerte d'élimination, aucun classement envoyé, aucune relance.
+
 ## D-19 — Déploiement sur un petit VPS mensuel, avec Dokploy
 
 Arbitré le 2026-08-18, après un premier passage fondé sur une prémisse fausse — il n'y a pas de
@@ -2734,3 +2741,75 @@ de composants dans ses specs.
 **Le libellé du refus ne nomme rien.** « Accès refusé · Ton compte n'a pas accès à cette adresse » ne
 dit pas si la ressource existe. C'est la seule des quatre phrases qui devait se surveiller : les
 trois autres ne peuvent rien révéler.
+
+## D-71 — Le mail de traitement se lit sur la transition, et l'accusé de réception cesse de promettre une place
+
+Arrêté le 2026-08-22 pendant BR-43, dans le prolongement du lot 4. Le propriétaire a demandé un mail
+quand le gérant traite une inscription, en laissant ouverte la question du volume : à chaque
+changement d'état, ou seulement à la validation ?
+
+**Les quatre traitements donnent quatre mails, parce qu'aucun des trois autres n'est du bruit.**
+« Seulement la validation » laissait le trou le plus coûteux : le coureur refusé n'apprenait rien et
+attendait indéfiniment. Sur un événement d'une quarantaine de coureurs traités un par un, il n'y a
+pas de volume à contenir — la question n'était donc pas combien de mails, mais lequel dit quoi.
+
+**Le sens se lit sur l'état quitté et la transition, jamais sur le statut d'arrivée.** C'est la seule
+règle nouvelle de la story, et la voie évidente est fausse : une annulation depuis « en attente » est
+un refus, la même annulation depuis « confirmée » retire une place déjà acquise. Les deux
+atterrissent sur `cancelled`. Un mail choisi sur le statut d'arrivée aurait annoncé un refus à un
+coureur qui était dans la liste des partants. `RegistrationOutcome::of()` porte cette lecture en une
+expression, et ne redéclare pas la chaîne : les couples illégaux ne l'atteignent pas, puisque
+`RegistrationTransition::apply()` a déjà refusé avant.
+
+**Et la question est posée à l'état, pas au nom du statut.** Le premier jet discriminait le refus de
+l'annulation par `$leaving === RegistrationStatus::Pending`. C'était le dernier test de statut hors
+des états, exactement la construction que D-48 s'était félicitée d'avoir éliminée, et son coût était
+silencieux : le jour où un quatrième statut consomme une place, `apply()` et les `match` exhaustifs
+tombent à l'analyse statique, mais un ternaire sur un nom de statut continue de compiler — et envoie
+« ton inscription n'a pas été retenue » à quelqu'un qui était parmi les partants. `of()` reçoit donc
+la `RegistrationLifecycleState` quittée, comme `apply()` la reçoit déjà, et interroge
+`consumesASeat()` : le fait qui distingue les deux mails est la place, pas le nom.
+
+**Les quatre mails atterrissent sur la même page, et cette page est la seule à jour.** La remise en
+attente semblait devoir mener droit au formulaire d'édition — c'est ce qu'elle demande au coureur. La
+voie a été écartée après avoir suivi le lien jusqu'au clic : il est calculé à l'envoi et cliqué plus
+tard, donc si le gérant confirme entre-temps, `registration.edit` passe par `ParticipantPolicy` et
+sa lecture de `isEditableByRunner()`, et le coureur reçoit un refus depuis un mail qui lui dit de
+corriger sa fiche. `registration.show` est l'écran de vérité, il embranche déjà sur le statut réel et
+porte le bouton d'édition quand il existe. Les libellés de bouton restent différenciés par la copie ;
+c'est la destination qui n'avait pas besoin d'être quatre.
+
+**Une notification, pas quatre.** Les quatre mails ont la même forme — titre, corps, bouton, clôture,
+salutation — et ne diffèrent que par leur copie. `RegistrationProcessed` porte l'issue et lit sa
+copie dans `lang/fr/mail.php` ; quatre classes auraient recopié le même `toMail()` quatre fois. Le
+prix est une clé de traduction obtenue par `mailKey()` plutôt qu'écrite en dur à l'appel, et c'est
+pour la garder trouvable au `grep` que ce `match` existe au lieu d'une concaténation sur la valeur.
+
+**L'envoi est placé après la transaction, et cet emplacement est la garantie.** Aucune connexion de
+file n'est en `after_commit` (`config/queue.php`) : une notification mise en file depuis l'intérieur
+du `DB::transaction()` peut être traitée avant le commit et rendre un statut que la base n'a pas
+encore. Un observer sur `Participant` aurait eu le même défaut, en plus discret. `RegisterRunner`
+avait déjà cette forme depuis D-45, et la story n'en invente pas une seconde.
+
+**Aucun mail ne recopie le numéro de dossard, et c'est le propriétaire qui l'a tranché.** Le premier
+jet l'annonçait dans la validation — la confirmation l'attribue, l'occasion semblait faite pour ça —
+et le rappelait dans l'annulation, où BR-06 le garde attribué. Écarté : le mail dit où lire le
+numéro, la page d'inscription le porte, et un numéro recopié se périme dans une boîte de réception
+sans que rien ne le rattrape. La conséquence a décidé du reste : le dossard sorti de la validation,
+la mention « ton dossard n° X » de l'annulation devenait absurde — le coureur y aurait découvert un
+numéro que personne ne lui avait annoncé. Le paramètre a donc quitté la notification entièrement, et
+un test par issue vérifie qu'aucun des quatre mails ne fait entrer un chiffre à côté du mot dossard.
+
+**`RegistrationConfirmed` devient `RegistrationReceived`, et son sujet ne mentait plus qu'une fois.**
+Le mail du code d'accès annonçait « C'est officiel : tu cours la Backyard Race » alors qu'il partait à
+la création du compte, sur une inscription **en attente** — il promettait la validation que cette
+story livre vraiment. Le renommage n'est pas cosmétique : sans lui, deux mails du projet portent la
+même promesse et un seul la tient, et le nom dont le mail de validation a besoin est déjà pris. Le
+nouvel accusé de réception dit ce qu'il fait — l'inscription est enregistrée, elle passera devant le
+gérant, un mail suivra.
+
+**Ce qui reste ouvert.** Aucun désabonnement : quatre mails sur la vie d'une inscription ne se
+règlent pas. Aucune trace en base de ce qui a été envoyé — un job qui échoue définitivement se voit
+dans Horizon et dans `failed_jobs`, pas dans la fiche du coureur. Et le va-et-vient d'un gérant qui
+annule puis remet en attente par erreur envoie bien deux mails contradictoires : c'est voulu, le
+coureur voit ce que le gérant a fait plutôt qu'un statut changé sans explication.

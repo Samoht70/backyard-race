@@ -5,8 +5,8 @@ namespace Tests\Feature\Auth;
 use App\Enums\Permission;
 use App\Enums\Role;
 use App\Models\User;
-use App\Notifications\RegistrationConfirmed;
 use App\Notifications\RegistrationLink;
+use App\Notifications\RegistrationReceived;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Notifications\AnonymousNotifiable;
@@ -168,8 +168,8 @@ class RegistrationTest extends TestCase
 
         Notification::assertSentTo(
             $runner,
-            RegistrationConfirmed::class,
-            fn (RegistrationConfirmed $notification) => str_contains(
+            RegistrationReceived::class,
+            fn (RegistrationReceived $notification) => str_contains(
                 implode(' ', $notification->toMail($runner)->introLines),
                 $code
             )

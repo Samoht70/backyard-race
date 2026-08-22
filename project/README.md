@@ -216,6 +216,7 @@ par BR-33. Elle reste avec les écrans de course, dont elle dépend.
 | [BR-39](stories/BR-39-suppression-inscription-et-compte.md) | Supprimer une inscription et le compte qui va avec | 3 | ✅ Terminé |
 | [BR-40](stories/BR-40-page-erreur.md) | Rendre les refus et les erreurs dans le site | 3 | ✅ Terminé |
 | [BR-41](stories/BR-41-retour-en-brouillon.md) | Remettre l'événement en brouillon | 3 | ✅ Terminé |
+| [BR-43](stories/BR-43-notification-de-traitement.md) | Prévenir le coureur quand son inscription est traitée | 3 | ✅ Terminé |
 
 ### EPIC 2 — Moteur de course
 

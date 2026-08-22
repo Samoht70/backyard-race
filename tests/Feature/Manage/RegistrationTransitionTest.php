@@ -4,14 +4,17 @@ namespace Tests\Feature\Manage;
 
 use App\Actions\TransitionRegistration;
 use App\Enums\Permission;
+use App\Enums\RegistrationOutcome;
 use App\Enums\RegistrationStatus;
 use App\Enums\RegistrationTransition;
 use App\Exceptions\RegistrationTransitionRefusedException;
 use App\Models\Event;
 use App\Models\Participant;
 use App\Models\User;
+use App\Notifications\RegistrationProcessed;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -19,6 +22,13 @@ use Tests\TestCase;
 class RegistrationTransitionTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Notification::fake();
+    }
 
     #[Test]
     public function it_confirms_a_pending_registration(): void
@@ -113,6 +123,7 @@ class RegistrationTransitionTest extends TestCase
             ->assertSessionHasErrors('transition');
 
         $this->assertSame(RegistrationStatus::Pending, $participant->refresh()->status);
+        Notification::assertNothingSent();
     }
 
     #[Test]
@@ -156,6 +167,7 @@ class RegistrationTransitionTest extends TestCase
 
         $this->assertSame(RegistrationStatus::Confirmed, $confirmed->status);
         $this->assertSame($bib, $confirmed->bib_number);
+        Notification::assertSentTimes(RegistrationProcessed::class, 1);
     }
 
     /** Between the form request's read and the write, another request can move the row. */
@@ -241,6 +253,55 @@ class RegistrationTransitionTest extends TestCase
                 'inertia.flash_data.toast.message',
                 'L’inscription est passée en « Confirmée ».',
             );
+    }
+
+    #[Test]
+    public function it_tells_the_runner_his_registration_is_validated(): void
+    {
+        $participant = $this->registration(RegistrationStatus::Pending);
+
+        $this->transition($participant, RegistrationTransition::Confirm);
+
+        $this->assertNotified($participant, RegistrationOutcome::Approved);
+    }
+
+    #[Test]
+    public function it_tells_the_runner_his_registration_is_refused(): void
+    {
+        $participant = $this->registration(RegistrationStatus::Pending);
+
+        $this->transition($participant, RegistrationTransition::Cancel);
+
+        $this->assertNotified($participant, RegistrationOutcome::Refused);
+    }
+
+    #[Test]
+    public function it_tells_the_runner_a_place_he_had_is_cancelled(): void
+    {
+        $participant = $this->registration(RegistrationStatus::Confirmed);
+
+        $this->transition($participant, RegistrationTransition::Cancel);
+
+        $this->assertNotified($participant, RegistrationOutcome::Cancelled);
+    }
+
+    #[Test]
+    public function it_tells_the_runner_he_can_correct_his_registration_again(): void
+    {
+        $participant = $this->registration(RegistrationStatus::Cancelled);
+
+        $this->transition($participant, RegistrationTransition::Reopen);
+
+        $this->assertNotified($participant, RegistrationOutcome::Reopened);
+    }
+
+    private function assertNotified(Participant $participant, RegistrationOutcome $outcome): void
+    {
+        Notification::assertSentTo(
+            $participant->user,
+            RegistrationProcessed::class,
+            fn (RegistrationProcessed $notification): bool => $notification->outcome === $outcome,
+        );
     }
 
     /**

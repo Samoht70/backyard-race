@@ -8,7 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class RegistrationConfirmed extends Notification implements ShouldQueue
+class RegistrationReceived extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -27,14 +27,14 @@ class RegistrationConfirmed extends Notification implements ShouldQueue
     public function toMail(User $notifiable): MailMessage
     {
         return new MailMessage()
-            ->subject(__('mail.registration_confirmed.subject'))
-            ->greeting(__('mail.registration_confirmed.heading', ['name' => $notifiable->first_name]))
-            ->line(__('mail.registration_confirmed.body'))
-            ->line(__('mail.registration_confirmed.code'))
+            ->subject(__('mail.registration_received.subject'))
+            ->greeting(__('mail.registration_received.heading', ['name' => $notifiable->first_name]))
+            ->line(__('mail.registration_received.body'))
+            ->line(__('mail.registration_received.code'))
             ->line(view('mail.access-code', ['code' => $this->code]))
-            ->line(__('mail.registration_confirmed.keep'))
-            ->action(__('mail.registration_confirmed.action'), route('login'))
-            ->line(__('mail.registration_confirmed.encouragement'))
-            ->salutation(__('mail.registration_confirmed.salutation'));
+            ->line(__('mail.registration_received.keep'))
+            ->action(__('mail.registration_received.action'), route('login'))
+            ->line(__('mail.registration_received.encouragement'))
+            ->salutation(__('mail.registration_received.salutation'));
     }
 }
