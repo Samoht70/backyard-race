@@ -153,7 +153,7 @@ puis retracée en géométrie. [BR-38](stories/BR-38-identite-de-marque.md) port
 en est le seul point qui coûte dès aujourd'hui : elle prend la tête du lot 4. Le reste attend la
 semaine de la course.
 
-### Lot 4 — tenir une adresse annoncée · en cours
+### Lot 4 — tenir une adresse annoncée · clos le 2026-08-22
 
 Trois stories et une tâche de reliquat, 11 pts. Aucune ne touche au moteur de course : le lot ferme
 ce qui se voit dès qu'un inconnu arrive sur l'adresse, et il précède l'epic 2.
@@ -163,9 +163,9 @@ ce qui se voit dès qu'un inconnu arrive sur l'adresse, et il précède l'epic 2
 | ✅ | [BR-30](stories/BR-30-workers-horizon-scheduler.md) T5 | Alerte sur file non consommée | 2 | Un worker mort emporte les mails de code en silence |
 | ✅ | [BR-41](stories/BR-41-retour-en-brouillon.md) | Remettre l'événement en brouillon | 3 | Le demi-tour n'existe que tant qu'il n'y a personne |
 | ✅ | [BR-39](stories/BR-39-suppression-inscription-et-compte.md) | Supprimer une inscription et son compte | 3 | La réponse à « j'ai perdu mon code » |
-| 1 | [BR-40](stories/BR-40-page-erreur.md) | Rendre les refus et les erreurs dans le site | 3 | La dernière surface publique non habillée |
+| ✅ | [BR-40](stories/BR-40-page-erreur.md) | Rendre les refus et les erreurs dans le site | 3 | La dernière surface publique non habillée |
 
-**11 pts, dont 8 livrés le 2026-08-22.** L'ordre suit ce que chaque entrée coûte si elle attend :
+**11 pts, tous livrés le 2026-08-22.** L'ordre a suivi ce que chaque entrée coûtait si elle attendait :
 
 - **BR-30 T5 d'abord et close**, parce que c'était la seule qui coûtait déjà. Les deux mails du
   parcours — le lien signé et le code d'accès — sont mis en file, et un worker mort ne se signalait
@@ -214,7 +214,7 @@ par BR-33. Elle reste avec les écrans de course, dont elle dépend.
 | [BR-34](stories/BR-34-numero-pps.md) | Numéro PPS demandé à l'inscription | 2 | ✅ Terminé |
 | [BR-38](stories/BR-38-identite-de-marque.md) | Identité : la forme, le lockup et les icônes | 3 | ✅ Terminé |
 | [BR-39](stories/BR-39-suppression-inscription-et-compte.md) | Supprimer une inscription et le compte qui va avec | 3 | ✅ Terminé |
-| [BR-40](stories/BR-40-page-erreur.md) | Rendre les refus et les erreurs dans le site | 3 | 🔥 Lot 4 |
+| [BR-40](stories/BR-40-page-erreur.md) | Rendre les refus et les erreurs dans le site | 3 | ✅ Terminé |
 | [BR-41](stories/BR-41-retour-en-brouillon.md) | Remettre l'événement en brouillon | 3 | ✅ Terminé |
 
 ### EPIC 2 — Moteur de course
@@ -296,7 +296,7 @@ pas de fichier de story : c'est la décision qui les porte, et elles prennent un
 | R-06 | Charte de l’instrument, et primitives reka-ui à la place du starter kit | 5 | ✅ Livrée | [D-61](DECISIONS.md) |
 | R-07 | Adresse de l'organisateur en configuration, en plus du rôle `manager` | 2 | ✅ Livrée | [D-65](DECISIONS.md) |
 
-**Total : 38 stories actives + 7 reprises · 262 pts · 160 pts livrés (61 %)**
+**Total : 38 stories actives + 7 reprises · 262 pts · 163 pts livrés (62 %)**
 
 **Hors périmètre : 4 stories abandonnées, 32 pts non engagés** — voir [D-47](DECISIONS.md).
 
@@ -311,12 +311,13 @@ BR-32 T3 et T5 → BR-28 T3 et T4.
 **Lot 3 — tenir la production à la main (11 pts) — les trois stories closes le 2026-08-22**, et les
 trois gestes faits sur la machine le même jour.
 
-**Lot 4 — tenir une adresse annoncée (11 pts) — en cours.** L'ordre : BR-30 T5 → BR-41 → BR-39 →
-BR-40. C'est le dernier lot avant le moteur, et le seul dont une entrée coûtait déjà quelque chose :
-BR-30 T5 est close le 2026-08-22, sondage et battement livrés, surveillance inscrite. BR-41 est close
-le même jour, avant que l'adresse ne circule : le demi-tour existe dans l'application, sous la seule
-condition de zéro inscription. BR-39 est close le même jour aussi, et la logique de suppression est
-désormais partagée avec la purge. **BR-40 est la dernière entrée du lot.**
+**Lot 4 — tenir une adresse annoncée (11 pts) — clos le 2026-08-22.** L'ordre : BR-30 T5 → BR-41 →
+BR-39 → BR-40. C'était le dernier lot avant le moteur, et le seul dont une entrée coûtait déjà
+quelque chose : BR-30 T5 est close, sondage et battement livrés, surveillance inscrite. BR-41 est
+close avant que l'adresse ne circule : le demi-tour existe dans l'application, sous la seule
+condition de zéro inscription. BR-39 est close aussi, et la logique de suppression est désormais
+partagée avec la purge. **BR-40 a fermé le lot** : les quatre refus sortent dans le site, en
+français, et le mode développement garde son écran de diagnostic.
 
 **Le reste du reliquat du lot 2 avant le moteur, ou après ?** Après. BR-30 T5 est passée dans le lot 4
 parce qu'une file qui cesse d'être consommée coûtait des coureurs dès aujourd'hui ; la version exposée

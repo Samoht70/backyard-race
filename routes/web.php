@@ -7,6 +7,7 @@ use App\Http\Controllers\DesignSystemController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\Manage;
+use App\Http\Controllers\MissingPageController;
 use App\Http\Controllers\RegistrationController;
 use Illuminate\Support\Facades\Route;
 
@@ -67,3 +68,5 @@ Route::middleware('auth')
 
 require __DIR__.'/account.php';
 require __DIR__.'/profile.php';
+
+Route::fallback(MissingPageController::class);
