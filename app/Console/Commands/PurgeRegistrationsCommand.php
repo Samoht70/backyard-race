@@ -6,6 +6,7 @@ use App\Enums\Role;
 use App\Models\Event;
 use App\Models\Participant;
 use App\Models\User;
+use App\Support\OrganiserAddress;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
@@ -60,7 +61,7 @@ class PurgeRegistrationsCommand extends Command
     private function announce(int $registrations, int $accounts): void
     {
         $this->warn("About to delete {$registrations} registration(s) and {$accounts} runner account(s).");
-        $this->line('The event, its briefing, its documents and every manager account stay.');
+        $this->line('The event, its briefing, its documents and every spared account stay.');
 
         $queued = Queue::size();
 
@@ -68,8 +69,17 @@ class PurgeRegistrationsCommand extends Command
             $this->warn("{$queued} job(s) are still queued: one addressed to a purged account fails when it wakes up.");
         }
 
+        $this->warnAboutTheDoor($accounts);
+    }
+
+    private function warnAboutTheDoor(int $accounts): void
+    {
+        if (OrganiserAddress::configured() === null) {
+            $this->warn('`RACE_ORGANISER_EMAIL` points at no usable address: the `manager` role alone spares an account.');
+        }
+
         if ($accounts === User::query()->count()) {
-            $this->warn('No account carries the `manager` role: this purge takes every account and leaves no way in. `race:manager-account` opens the door again.');
+            $this->warn('Not one account is spared, by role or by address: this purge leaves no way in. `race:manager-account` opens the door again.');
         }
     }
 
@@ -105,7 +115,10 @@ class PurgeRegistrationsCommand extends Command
      */
     private function runnerAccounts(): Builder
     {
-        return User::query()->whereDoesntHave('roles', $this->managerRole(...));
+        $accounts = User::query()->whereDoesntHave('roles', $this->managerRole(...));
+        $organiser = OrganiserAddress::configured();
+
+        return $organiser === null ? $accounts : $accounts->where('email', '!=', $organiser);
     }
 
     /**

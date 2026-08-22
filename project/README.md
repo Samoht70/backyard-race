@@ -129,6 +129,12 @@ circule pour de vrai.
   `race:purge-registrations` est livrée et couverte ([D-64](DECISIONS.md)) ; le geste sur la
   machine reste à faire, et c'est le dernier avant d'annoncer l'adresse.
 
+**R-07 a suivi BR-37 le même jour.** Il n'y aura jamais qu'un seul manager, donc son adresse est une
+donnée d'installation : `RACE_ORGANISER_EMAIL` épargne désormais un compte à la purge, et sert de
+défaut à `race:manager-account`. Elle vient **en plus** du rôle, pas à sa place, pour qu'une variable
+absente ou fautive retombe sur le comportement de BR-37 au lieu de fermer la porte
+([D-65](DECISIONS.md)).
+
 **BR-36 a été recalée en la prenant.** Son contexte s'appuyait sur D-46 — « un bouton bleu de
 démonstration », la palette de D-46 à aplatir en hexadécimal — alors que R-06 avait révoqué le parti
 monochrome et que D-61 avait posé la charte de l'instrument. Le travail demandé n'a pas changé ;
@@ -246,8 +252,9 @@ pas de fichier de story : c'est la décision qui les porte, et elles prennent un
 | R-04 | Formulaire d'inscription en quatre étapes au lieu d'une page scrollable | 5 | ✅ Livrée | [D-50](DECISIONS.md), D-54 |
 | R-05 | Course publique : l'accueil porte l'événement, les documents s'ouvrent aux invités | 5 | ✅ Livrée | [D-60](DECISIONS.md) |
 | R-06 | Charte de l’instrument, et primitives reka-ui à la place du starter kit | 5 | ✅ Livrée | [D-61](DECISIONS.md) |
+| R-07 | Adresse de l'organisateur en configuration, en plus du rôle `manager` | 2 | ✅ Livrée | [D-65](DECISIONS.md) |
 
-**Total : 35 stories actives + 6 reprises · 251 pts · 145 pts livrés (58 %)**
+**Total : 35 stories actives + 7 reprises · 253 pts · 152 pts livrés (60 %)**
 
 **Hors périmètre : 4 stories abandonnées, 32 pts non engagés** — voir [D-47](DECISIONS.md).
 

@@ -6,19 +6,26 @@ use App\Enums\Role;
 use App\Models\User;
 use App\Support\AccessCode;
 use App\Support\EmailAddress;
+use App\Support\OrganiserAddress;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Validator;
 use Spatie\Permission\Models\Role as RoleModel;
 
 class ManagerAccountCommand extends Command
 {
-    protected $signature = 'race:manager-account {email} {first-name?} {last-name?} {--regenerate}';
+    protected $signature = 'race:manager-account {email?} {first-name?} {last-name?} {--regenerate}';
 
     protected $description = 'Create the organiser account and show its access code once, or issue a new code for an existing account';
 
     public function handle(): int
     {
-        $email = EmailAddress::normalise($this->text('email'));
+        $email = $this->address();
+
+        if ($email === '') {
+            $this->error('No usable address: pass one as the first argument, or point `RACE_ORGANISER_EMAIL` at the organiser.');
+
+            return self::FAILURE;
+        }
 
         if (Validator::make(['email' => $email], ['email' => ['required', 'string', 'email', 'max:255']])->fails()) {
             $this->error("`{$email}` is not an email address: pass the organiser's address as the first argument.");
@@ -83,6 +90,13 @@ class ManagerAccountCommand extends Command
         $this->comment('It is stored hashed and shown this once only.');
 
         return self::SUCCESS;
+    }
+
+    private function address(): string
+    {
+        $typed = EmailAddress::normalise($this->text('email'));
+
+        return $typed === '' ? OrganiserAddress::configured() ?? '' : $typed;
     }
 
     private function text(string $name): string

@@ -2399,6 +2399,10 @@ définir par la présence d'une inscription était l'autre voie, plus étroite e
 les comptes orphelins, que `RegisterRunner` ne crée jamais et qui sont donc exactement ce qu'une
 purge doit balayer.
 
+**Repris le même jour par [R-07](README.md) :** le rôle n'est plus la seule règle. L'adresse de
+l'organisateur, en configuration, épargne un compte elle aussi — en plus du rôle et jamais à sa
+place. Voir D-65.
+
 **Le rôle se teste par son nom en sous-requête, pas par le scope `withoutRole()` du paquet.** Le
 scope résout d'abord le rôle par `Role::findByName()`, qui lève `RoleDoesNotExist` quand la table
 des rôles n'a pas été semée. Une commande de purge qui casse sur une base incomplète est pire
@@ -2426,3 +2430,34 @@ emportés, dans la même transaction.
 **Pas de classe d'action, pas d'écran.** La logique vit entière dans la commande, seul appelant
 qu'elle aura jamais : la story exclut le bouton, et une action extraite pour un appelant unique
 n'aurait déplacé que le nom.
+
+## D-65 — L'adresse de l'organisateur en configuration, mais en plus du rôle et jamais à sa place
+
+Arrêté le 2026-08-22, juste après BR-37, et porté par la reprise R-07. Le constat du propriétaire :
+il n'y aura jamais qu'un seul manager, donc son adresse est une donnée d'installation et non quelque
+chose à retaper à chaque geste. La proposition initiale allait plus loin — purger tous les comptes
+sauf cette adresse, et retirer l'argument des deux commandes.
+
+**La liste blanche est une disjonction, pas un remplacement.** Un compte est épargné s'il porte le
+rôle `manager` **ou** si son adresse est celle configurée. Faire de la configuration la source unique
+était la voie demandée, et elle déplace le rempart de la commande la plus destructrice du dépôt
+depuis une ligne en base vers un fichier non versionné : une variable absente, une faute de frappe ou
+un cache de configuration périmé — BR-28 T3, encore ouverte — et la purge emporte tous les comptes et
+se ferme la porte derrière elle. En disjonction, la même erreur retombe sur le comportement de D-64
+au lieu d'ouvrir la trappe.
+
+**`OrganiserAddress::configured()` est le seul lecteur, et il valide.** Le fichier de configuration
+lit et donne un défaut, il ne répare pas : le défaut de `env()` ne couvre que la clé absente, une
+valeur vide ou illisible passe. Le lecteur normalise donc par `EmailAddress` et filtre par
+`filter_var`, et rend `null` — pas la chaîne vide, qui aurait produit un `where('email', '!=', '')`
+épargnant zéro ligne tout en ayant l'air d'épargner quelqu'un.
+
+**La purge dit à voix haute que la porte ne tient qu'à une ligne.** Quand l'adresse n'est pas
+configurée, l'avertissement tombe avant la confirmation, à côté de celui qui signale qu'aucun compte
+ne serait épargné. Elle ne refuse pas pour autant : BR-37 demandait qu'elle le dise avant, pas
+qu'elle s'arrête.
+
+**`race:manager-account` garde son argument, la configuration n'en est que le défaut.** L'adresse
+explicite reste la voie de la première installation et celle des tests ; le geste courant devient
+`race:manager-account --regenerate`, sans rien à taper. `RACE_ORGANISER_EMAIL` entre dans
+`.env.example` au passage, ce que BR-28 T4 reproche justement aux variables nées en production.

@@ -73,6 +73,35 @@ class PurgeRegistrationsCommandTest extends TestCase
     }
 
     #[Test]
+    public function it_spares_the_configured_address_even_when_it_carries_no_role(): void
+    {
+        $event = $this->registrationEvent();
+        config()->set('race.organiser_email', 'ORGA@Backyard.Test ');
+        $organiser = User::factory()->create(['email' => 'orga@backyard.test']);
+        Participant::factory()->for($event)->for($organiser)->create();
+        Participant::factory()->count(3)->for($event)->create();
+
+        Artisan::call('race:purge-registrations', ['--force' => true]);
+
+        $this->assertDatabaseCount('participants', 0);
+        $this->assertSame([$organiser->getKey()], User::query()->pluck('id')->all());
+    }
+
+    #[Test]
+    public function it_spares_by_role_alone_when_the_configured_address_is_not_one(): void
+    {
+        $event = $this->registrationEvent();
+        config()->set('race.organiser_email', 'not-an-address');
+        User::factory()->manager()->create();
+        Participant::factory()->for($event)->create();
+
+        Artisan::call('race:purge-registrations', ['--force' => true]);
+
+        $this->assertDatabaseCount('users', 1);
+        $this->assertStringContainsString('RACE_ORGANISER_EMAIL', Artisan::output());
+    }
+
+    #[Test]
     public function it_detaches_the_roles_of_the_accounts_it_deletes(): void
     {
         $event = $this->registrationEvent();
