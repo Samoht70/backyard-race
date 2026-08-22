@@ -2461,3 +2461,39 @@ qu'elle s'arrête.
 explicite reste la voie de la première installation et celle des tests ; le geste courant devient
 `race:manager-account --regenerate`, sans rien à taper. `RACE_ORGANISER_EMAIL` entre dans
 `.env.example` au passage, ce que BR-28 T4 reproche justement aux variables nées en production.
+
+## D-66 — Le code perdu se règle en libérant l'adresse, et la page d'erreur sort en story propre
+
+Arrêté le 2026-08-22 en ouvrant le lot 4, à la question « l'inscription est-elle finie et
+déployable ? ». Elle l'est, et l'examen a fait remonter quatre choses qui cassent dès qu'un inconnu
+arrive sur l'adresse. Deux d'entre elles demandaient un arbitrage.
+
+**Un coureur qui perd son code ne reçoit pas un second chemin d'authentification.**
+`config/fortify.php` porte `'features' => []` : ni réinitialisation, ni renvoi de code, parce que
+D-43 a réduit l'authentification au seul mot de passe et D-45 a fait du mail le seul chemin de
+création de compte. Le réflexe — ajouter un renvoi de code — rouvre exactement ce que ces deux
+décisions avaient fermé, et il faudrait le protéger comme une porte : limitation de débit, lien
+signé, expiration, énumération d'adresses. Le geste retenu est plus étroit et n'ouvre rien : le
+gérant **supprime l'inscription et le compte**, l'adresse redevient libre, et le coureur reprend le
+parcours public d'inscription — qui envoie déjà un lien signé puis un code neuf. BR-39 le porte.
+
+**La suppression est ouverte quel que soit le statut de l'inscription.** Exiger une annulation
+d'abord aurait fait du geste destructeur un geste en deux temps, ce qui se défend ; mais le cas
+courant est un coureur confirmé qui a perdu son mail, et l'aller-retour n'ajoute aucune sécurité que
+la confirmation à l'écran n'apporte pas déjà. Une confirmée part donc avec son dossard : la place se
+libère, le numéro laisse un trou, conformément à BR-37 — les dossards ne rebouchent pas leurs trous.
+
+**Q-02 est fermée : la page d'erreur ne suit plus BR-13.** La question laissait le choix entre une
+story dédiée dans l'epic 1 et un rattachement à BR-13, premier écran où un refus serait banal. La
+mise en ligne a tranché : le besoin est devenu public — un lien recopié, un lien d'inscription
+expiré, un onglet resté ouvert la nuit — alors que BR-13 est un écran de gérant qui n'arrive pas
+avant le moteur de course. C'est aussi la dernière surface publique que BR-38 n'a pas habillée.
+BR-40 la porte, dans l'epic 1. Q-04 reste sur BR-13, qui pose le bouton de validation en situation.
+
+**Le retour en brouillon exige zéro inscription, annulées comprises.** BR-03 avait livré une chaîne à
+sens unique, et c'était juste : aucune de ces transitions ne s'annule une fois qu'un coureur a couru.
+La première marche est l'exception, parce qu'une ouverture prématurée n'a rien produit tant que
+personne ne s'est inscrit. Ne compter que les inscriptions actives aurait laissé un « brouillon »
+porter des lignes annulées et les comptes qui vont avec — un brouillon qui garde des traces n'en est
+pas un. La règle stricte est tenable précisément parce que BR-39 donne l'outil pour atteindre la
+condition. BR-41 le porte.

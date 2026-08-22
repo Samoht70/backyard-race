@@ -112,6 +112,9 @@ Le worker tourne en production et il travaille : un code d'accès est parti par 
 navigateur soit resté ouvert. C'est ce que T6 demandait de constater — l'élimination nommée dans son
 intitulé attend BR-11, le mécanisme, lui, est vérifié.
 
+**T5 est passée en tête du lot 4** le 2026-08-22, juste avant que l'adresse circule : c'est la seule
+entrée de ce lot qui coûte déjà quelque chose.
+
 **T5 reste ouverte, et c'est le trou du lot 2.** Rien ne prévient si la file cesse d'être consommée.
 Un worker mort ne se signale pas : les inscriptions continuent d'être acceptées, les mails de lien
 n'arrivent plus, et aucun écran ne le dit — ni au coureur, qui attend un code, ni au gérant. C'est le
