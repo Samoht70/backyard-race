@@ -1,0 +1,251 @@
+body,
+body *:not(html):not(style):not(br):not(tr):not(code) {
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    position: relative;
+}
+
+body {
+    -webkit-text-size-adjust: none;
+    background-color: #c4cbd0;
+    color: #3b4247;
+    height: 100%;
+    line-height: 1.5;
+    margin: 0;
+    padding: 0;
+    width: 100% !important;
+}
+
+p,
+ul,
+ol,
+blockquote {
+    line-height: 1.55;
+    text-align: start;
+}
+
+a {
+    color: #14181b;
+}
+
+a img {
+    border: none;
+}
+
+h1 {
+    color: #14181b;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    margin-top: 0;
+    margin-bottom: 20px;
+    text-align: start;
+}
+
+h2 {
+    color: #14181b;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-top: 0;
+    text-align: start;
+}
+
+h3 {
+    color: #14181b;
+    font-size: 15px;
+    font-weight: 700;
+    margin-top: 0;
+    text-align: start;
+}
+
+p {
+    color: #3b4247;
+    font-size: 15px;
+    line-height: 1.6;
+    margin-top: 0;
+    text-align: start;
+}
+
+p.sub {
+    font-size: 13px;
+}
+
+img {
+    max-width: 100%;
+}
+
+.wrapper {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 100%;
+    background-color: #c4cbd0;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.content {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 100%;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.header {
+    padding: 28px 0 24px;
+    text-align: center;
+}
+
+.header a {
+    color: #14181b;
+    display: inline-block;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+
+.body {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 100%;
+    background-color: #c4cbd0;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.inner-body {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 570px;
+    background-color: #d3d9dd;
+    border: 1px solid #a6afb6;
+    border-radius: 4px;
+    margin: 0 auto;
+    padding: 0;
+    width: 570px;
+}
+
+.content-cell {
+    max-width: 100vw;
+    padding: 32px;
+}
+
+.code {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 100%;
+    margin: 4px 0 24px;
+    width: 100%;
+}
+
+.code-cell {
+    background-color: #c4cbd0;
+    border: 1px solid #a6afb6;
+    border-radius: 4px;
+    padding: 18px 12px;
+    text-align: center;
+}
+
+.code-value {
+    color: #14181b;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+    word-break: keep-all;
+}
+
+.action {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 100%;
+    float: unset;
+    margin: 30px auto;
+    padding: 0;
+    text-align: center;
+    width: 100%;
+}
+
+.button {
+    -webkit-text-size-adjust: none;
+    border-radius: 4px;
+    color: #d3d9dd;
+    display: inline-block;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 18px;
+    overflow: hidden;
+    text-decoration: none;
+}
+
+.button-blue,
+.button-primary {
+    background-color: #14181b;
+    border-bottom: 13px solid #14181b;
+    border-left: 24px solid #14181b;
+    border-right: 24px solid #14181b;
+    border-top: 13px solid #14181b;
+}
+
+.button-green,
+.button-success {
+    background-color: #0c5334;
+    border-bottom: 13px solid #0c5334;
+    border-left: 24px solid #0c5334;
+    border-right: 24px solid #0c5334;
+    border-top: 13px solid #0c5334;
+}
+
+.button-red,
+.button-error {
+    background-color: #962713;
+    border-bottom: 13px solid #962713;
+    border-left: 24px solid #962713;
+    border-right: 24px solid #962713;
+    border-top: 13px solid #962713;
+}
+
+.subcopy {
+    border-top: 1px solid #a6afb6;
+    margin-top: 30px;
+    padding-top: 22px;
+}
+
+.subcopy p {
+    color: #4a5359;
+    font-size: 13px;
+}
+
+.footer {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 570px;
+    margin: 0 auto;
+    padding: 0;
+    text-align: center;
+    width: 570px;
+}
+
+.footer p {
+    color: #4a5359;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-align: center;
+}
+
+.footer a {
+    color: #4a5359;
+    text-decoration: underline;
+}
+
+.break-all {
+    word-break: break-all;
+}
