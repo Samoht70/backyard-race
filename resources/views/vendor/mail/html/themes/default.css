@@ -1,7 +1,9 @@
 body,
 body *:not(html):not(style):not(br):not(tr):not(code) {
     box-sizing: border-box;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-family:
+        -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
+        sans-serif;
     position: relative;
 }
 
@@ -102,7 +104,9 @@ img {
 .header a {
     color: #14181b;
     display: inline-block;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+    font-family:
+        ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono',
+        monospace;
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.16em;
@@ -155,7 +159,9 @@ img {
 
 .code-value {
     color: #14181b;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+    font-family:
+        ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono',
+        monospace;
     font-size: 21px;
     font-weight: 700;
     letter-spacing: 0.1em;
