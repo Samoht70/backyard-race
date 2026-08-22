@@ -1,27 +1,35 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
-import ActionButton from '@/components/ActionButton.vue';
 import BoardRow from '@/components/board/BoardRow.vue';
 import BoardRows from '@/components/board/BoardRows.vue';
 import BoardSection from '@/components/board/BoardSection.vue';
+import Notice from '@/components/Notice.vue';
 import BibDisplay from '@/components/race/BibDisplay.vue';
 import RegistrationActionForm from '@/components/registration/RegistrationActionForm.vue';
+import RegistrationDeleteForm from '@/components/registration/RegistrationDeleteForm.vue';
 import RegistrationStatusBadge from '@/components/registration/RegistrationStatusBadge.vue';
 import { t } from '@/lib/i18n';
-import { edit } from '@/routes/manage/registrations';
 import type { ManagedRegistration } from '@/types/registration';
 
 type Props = {
     registration: ManagedRegistration;
     blocked?: boolean;
     describedBy?: string;
+    deletionRefusal?: string | null;
 };
 
-const props = withDefaults(defineProps<Props>(), { blocked: false });
+const props = withDefaults(defineProps<Props>(), {
+    blocked: false,
+    deletionRefusal: null,
+});
 
 const fullName = computed(
     () => `${props.registration.first_name} ${props.registration.last_name}`,
+);
+
+const isDeletionRefused = computed(() => props.deletionRefusal !== null);
+const deletionRefusalId = computed(
+    () => `registration-${props.registration.id}-deletion-refusal`,
 );
 </script>
 
@@ -43,20 +51,39 @@ const fullName = computed(
         </div>
 
         <BoardSection
-            v-if="registration.allowed_transitions.length"
             :title="t('registration.manage.actions_title')"
             level="h3"
         >
-            <div class="flex flex-wrap items-start gap-2">
-                <RegistrationActionForm
-                    v-for="transition in registration.allowed_transitions"
-                    :key="transition"
-                    :registration-id="registration.id"
-                    :runner-name="fullName"
-                    :transition="transition"
-                    :disabled="blocked && transition === 'confirm'"
-                    :described-by="blocked ? describedBy : undefined"
-                />
+            <div class="grid gap-3">
+                <div class="flex flex-wrap items-start gap-2">
+                    <RegistrationActionForm
+                        v-for="transition in registration.allowed_transitions"
+                        :key="transition"
+                        :registration-id="registration.id"
+                        :runner-name="fullName"
+                        :transition="transition"
+                        :disabled="blocked && transition === 'confirm'"
+                        :described-by="blocked ? describedBy : undefined"
+                    />
+
+                    <RegistrationDeleteForm
+                        :registration-id="registration.id"
+                        :runner-name="fullName"
+                        :disabled="isDeletionRefused"
+                        :described-by="
+                            isDeletionRefused ? deletionRefusalId : undefined
+                        "
+                    />
+                </div>
+
+                <Notice
+                    v-if="isDeletionRefused"
+                    :id="deletionRefusalId"
+                    tone="danger"
+                    :title="t('registration.delete.blocked_title')"
+                >
+                    {{ deletionRefusal }}
+                </Notice>
             </div>
         </BoardSection>
 
@@ -102,13 +129,5 @@ const fullName = computed(
         >
             <p class="text-sm whitespace-pre-line">{{ registration.notes }}</p>
         </BoardSection>
-
-        <div class="flex justify-start">
-            <ActionButton tone="quiet" as-child>
-                <Link :href="edit(registration.id)">
-                    {{ t('registration.manage.open_form') }}
-                </Link>
-            </ActionButton>
-        </div>
     </div>
 </template>

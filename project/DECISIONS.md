@@ -2595,3 +2595,46 @@ distingue le sens de la marche : plein pour avancer, sobre pour refermer.
 calculés traversent le demi-tour intacts, et un test les nomme un par un. Le coureur qui remplissait
 le formulaire public au moment du retour est refusé par le contrôle de période déjà en place : le
 statut `brouillon` referme le parcours, aucun code neuf n'a été écrit pour ça.
+
+## D-69 — La suppression unitaire fournit l'appelant qui manquait à la purge, et se refuse par le formulaire
+
+Arrêté le 2026-08-22 pendant BR-39, troisième entrée du lot 4. D-64 avait laissé la logique de
+suppression entière dans `race:purge-registrations`, en notant qu'une classe d'action n'aurait
+déplacé qu'un nom faute de second appelant. L'écran en fournit un, donc la logique sort.
+
+**Deux actions et non une, parce que la purge balaie plus que des inscriptions.**
+`DeleteRegistration` prend une ligne — la fiche, puis son compte — et `DeleteAccount` prend un
+compte seul. La purge appelle les deux : la première pour chaque inscription, la seconde pour les
+comptes qui n'en portent aucune, que `RegisterRunner` ne crée jamais et qui sont donc exactement ce
+qu'un balai doit emporter. Réduire la purge à une boucle sur les inscriptions les aurait laissés
+derrière.
+
+**La règle du compte épargné se dit deux fois parce qu'on l'interroge de deux endroits.**
+`SparedAccount::runners()` est une contrainte de requête — la purge compte, annonce et itère ;
+`SparedAccount::spares()` est un prédicat sur un compte déjà chargé — l'action décide ligne à ligne.
+Ce sont deux formes de la même définition, dans une classe qui les tient ensemble, et non deux
+définitions. Les deux exceptions à `laravel:permissions-not-roles` que D-64 et D-65 avaient nommées
+vivent maintenant là, et nulle part ailleurs.
+
+**Le décompte des sessions est pris avant la boucle, pas rendu par elle.** Une action qui rendrait
+« combien de portes j'ai fermées » ferait porter à son type de retour un besoin d'affichage qui
+n'appartient qu'à la commande. La purge compte les sessions des comptes condamnés avant de les
+supprimer, dans la même transaction : le chiffre annoncé est celui qui part.
+
+**Le refus en course vit dans la requête de formulaire, pas dans l'action.** La voie évidente était
+une `RegistrationDeletionRefusedException`, sur le modèle de la transition. Elle rendrait un 409 là
+où le gérant a besoin d'une phrase sous le bouton, et l'action serait alors le seul endroit à
+connaître un statut d'événement — ce qui la rendrait inappelable par la purge, qui porte déjà son
+propre garde-fou. `RegistrationDeletion::refusal()` produit la phrase, la requête l'ajoute aux
+erreurs, l'écran désactive le bouton avec la même phrase en `aria-describedby`. La règle est écrite
+une fois ; c'est son rendu qui a deux formes.
+
+**Le geste n'a pas de garde-fou d'écriture concurrente, contrairement aux transitions.** D-32 et le
+demi-tour de BR-41 ajoutent un `where` sur l'état quitté parce que deux requêtes peuvent se marcher
+dessus. Ici la seconde suppression ne trouve plus la ligne : la liaison de modèle rend 404 avant
+d'entrer dans le contrôleur, et c'est le refus lisible que demandait le cas du second onglet.
+
+**Le bouton « Modifier la fiche » a été retiré du dossier, à la demande du propriétaire.** C'est le
+seul chemin que BR-06 avait posé vers `manage/registrations/{id}/edit` ; l'écran et ses routes
+restent, sans lien depuis l'application. Le dossier ne porte plus qu'une rangée d'actions, où la
+suppression rejoint les changements de statut.

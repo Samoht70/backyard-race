@@ -2,22 +2,29 @@
 
 namespace App\Console\Commands;
 
-use App\Enums\Role;
+use App\Actions\DeleteAccount;
+use App\Actions\DeleteRegistration;
 use App\Models\Event;
 use App\Models\Participant;
 use App\Models\User;
 use App\Support\OrganiserAddress;
+use App\Support\SparedAccount;
 use Illuminate\Console\Command;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
-use Spatie\Permission\Models\Role as RoleModel;
 
 class PurgeRegistrationsCommand extends Command
 {
     protected $signature = 'race:purge-registrations {--force}';
 
     protected $description = 'Delete every registration and every runner account, leaving the event and the manager accounts alone';
+
+    public function __construct(
+        private DeleteRegistration $deleteRegistration,
+        private DeleteAccount $deleteAccount,
+    ) {
+        parent::__construct();
+    }
 
     public function handle(): int
     {
@@ -30,7 +37,7 @@ class PurgeRegistrationsCommand extends Command
         }
 
         $registrations = Participant::query()->count();
-        $accounts = $this->runnerAccounts()->count();
+        $accounts = SparedAccount::runners()->count();
 
         if ($registrations === 0 && $accounts === 0) {
             $this->info('Nothing to purge: no registration and no runner account.');
@@ -101,31 +108,19 @@ class PurgeRegistrationsCommand extends Command
     private function purge(): int
     {
         return DB::transaction(function (): int {
-            $accounts = $this->runnerAccounts()->get();
+            $doomed = SparedAccount::runners()->pluck('id')->all();
+            $sessions = DB::table('sessions')->whereIn('user_id', $doomed)->count();
 
-            Participant::query()->get()->each->delete();
-            $accounts->each->delete();
+            Participant::query()
+                ->with('user')
+                ->get()
+                ->each(fn (Participant $registration) => ($this->deleteRegistration)($registration));
 
-            return DB::table('sessions')->whereIn('user_id', $accounts->modelKeys())->delete();
+            SparedAccount::runners()
+                ->get()
+                ->each(fn (User $account) => ($this->deleteAccount)($account));
+
+            return $sessions;
         });
-    }
-
-    /**
-     * @return Builder<User>
-     */
-    private function runnerAccounts(): Builder
-    {
-        $accounts = User::query()->whereDoesntHave('roles', $this->managerRole(...));
-        $organiser = OrganiserAddress::configured();
-
-        return $organiser === null ? $accounts : $accounts->where('email', '!=', $organiser);
-    }
-
-    /**
-     * @param  Builder<RoleModel>  $roles
-     */
-    private function managerRole(Builder $roles): void
-    {
-        $roles->where('name', Role::Manager->value);
     }
 }
