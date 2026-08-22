@@ -2,19 +2,27 @@
 
 namespace Tests\Feature\Notifications;
 
+use App\Listeners\EmbedBrandMarkListener;
 use App\Models\User;
 use App\Notifications\RegistrationConfirmed;
 use App\Notifications\RegistrationLink;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Mail\Markdown;
+use Illuminate\Mail\Transport\ArrayTransport;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Support\Facades\Mail;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Part\DataPart;
 use Tests\Support\CssTokens;
 use Tests\Support\Srgb;
 use Tests\TestCase;
 
 class MailTemplateTest extends TestCase
 {
+    use RefreshDatabase;
+
     private const LINK = 'https://backyard-race.fr/account/edit?signature=7f3ac9e1b2d4';
 
     private const CODE = 'K7QP-3M9X-RTBD';
@@ -85,7 +93,8 @@ class MailTemplateTest extends TestCase
     {
         $html = $this->html($this->confirmationMail());
 
-        $this->assertStringNotContainsString('src=', $html);
+        $this->assertStringContainsString('src="cid:'.EmbedBrandMarkListener::CID.'"', $html);
+        $this->assertDoesNotMatchRegularExpression('/src="(?!cid:)/', $html);
         $this->assertStringNotContainsString('url(', $html);
         $this->assertStringNotContainsString('@import', $html);
 
@@ -94,6 +103,26 @@ class MailTemplateTest extends TestCase
         foreach ($links[1] as $link) {
             $this->assertStringStartsWith((string) config('app.url'), $link);
         }
+    }
+
+    #[Test]
+    public function it_carries_the_brand_mark_inside_the_message(): void
+    {
+        User::factory()->create()->notify(new RegistrationConfirmed(self::CODE));
+
+        $sent = Mail::getSymfonyTransport();
+        $this->assertInstanceOf(ArrayTransport::class, $sent);
+
+        $email = $sent->messages()->first()?->getOriginalMessage();
+        $this->assertInstanceOf(Email::class, $email);
+
+        $mark = collect($email->getAttachments())
+            ->first(fn (DataPart $part): bool => $part->getName() === EmbedBrandMarkListener::CID);
+
+        $this->assertInstanceOf(DataPart::class, $mark);
+        $this->assertSame('image', $mark->getMediaType());
+        $this->assertSame('png', $mark->getMediaSubtype());
+        $this->assertSame('inline', $mark->getPreparedHeaders()->getHeaderBody('Content-Disposition'));
     }
 
     #[Test]
