@@ -3,6 +3,7 @@
 namespace App\Services\EventLifecycle;
 
 use App\Enums\EventStatus;
+use App\Enums\Permission;
 use App\Exceptions\EventTransitionRefusedException;
 use App\Models\Event;
 
@@ -11,6 +12,8 @@ interface EventLifecycleState
     public function status(): EventStatus;
 
     public function nextStatus(): ?EventStatus;
+
+    public function advancePermission(): ?Permission;
 
     public function previousStatus(): ?EventStatus;
 

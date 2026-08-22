@@ -11,6 +11,8 @@ use Illuminate\Http\UploadedFile;
 
 class DocumentStoreRequest extends FormRequest
 {
+    private ?Event $event = null;
+
     public function authorize(): bool
     {
         return $this->user()?->can('create', [Document::class, $this->event()]) === true;
@@ -51,6 +53,6 @@ class DocumentStoreRequest extends FormRequest
 
     public function event(): Event
     {
-        return Event::query()->firstOrFail();
+        return $this->event ??= Event::current();
     }
 }

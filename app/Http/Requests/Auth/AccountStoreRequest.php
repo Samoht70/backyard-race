@@ -31,7 +31,7 @@ class AccountStoreRequest extends FormRequest
     {
         return [fn (Validator $validator) => $this->refuseOutsideRegistrationWindow(
             $validator,
-            Event::query()->first(),
+            Event::currentOrNull(),
         )];
     }
 

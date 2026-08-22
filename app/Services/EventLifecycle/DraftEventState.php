@@ -3,6 +3,7 @@
 namespace App\Services\EventLifecycle;
 
 use App\Enums\EventStatus;
+use App\Enums\Permission;
 use App\Exceptions\EventTransitionRefusedException;
 use App\Models\Event;
 
@@ -21,6 +22,11 @@ final class DraftEventState implements EventLifecycleState
     public function previousStatus(): ?EventStatus
     {
         return null;
+    }
+
+    public function advancePermission(): Permission
+    {
+        return Permission::ManageEvent;
     }
 
     public function refusals(Event $event): array

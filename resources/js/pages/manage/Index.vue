@@ -58,7 +58,7 @@ const desks = computed(() =>
 </script>
 
 <template>
-    <Head title="Gestion" />
+    <Head :title="t('ui.manage.title')" />
 
     <RoundHeader
         v-if="currentRound"

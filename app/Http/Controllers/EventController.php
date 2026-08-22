@@ -13,7 +13,7 @@ class EventController extends Controller
 {
     public function __invoke(Request $request): Response
     {
-        $event = Event::query()->first();
+        $event = Event::currentOrNull();
         $visibleEvent = $event !== null && Gate::allows('view', $event) ? $event : null;
 
         return Inertia::render('Event', [

@@ -2,7 +2,6 @@
 
 namespace App\Policies;
 
-use App\Enums\EventStatus;
 use App\Enums\Permission;
 use App\Models\Event;
 use App\Models\User;
@@ -29,17 +28,9 @@ class EventPolicy
 
     public function advance(User $user, Event $event): bool
     {
-        $next = $event->lifecycle()->nextStatus();
+        $permission = $event->lifecycle()->advancePermission();
 
-        if ($next === null) {
-            return false;
-        }
-
-        if ($next === EventStatus::Finished) {
-            return $user->can(Permission::FinishEvent->value);
-        }
-
-        return $user->can(Permission::ManageEvent->value);
+        return $permission !== null && $user->can($permission->value);
     }
 
     public function revert(User $user, Event $event): bool

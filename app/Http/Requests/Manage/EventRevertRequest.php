@@ -11,6 +11,8 @@ use Illuminate\Validation\Validator;
 
 class EventRevertRequest extends FormRequest
 {
+    private ?Event $event = null;
+
     public function authorize(): bool
     {
         return $this->user()?->can('revert', $this->event()) === true;
@@ -47,6 +49,6 @@ class EventRevertRequest extends FormRequest
 
     private function event(): Event
     {
-        return Event::query()->firstOrFail();
+        return $this->event ??= Event::current();
     }
 }

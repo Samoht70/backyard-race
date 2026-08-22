@@ -12,7 +12,7 @@ class DashboardController extends Controller
 {
     public function __invoke(Request $request): Response
     {
-        $event = Event::query()->first();
+        $event = Event::currentOrNull();
         $participant = $request->user()?->participant;
 
         return Inertia::render('Dashboard', [

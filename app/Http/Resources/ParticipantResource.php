@@ -20,7 +20,6 @@ class ParticipantResource extends JsonResource
         return [
             'status' => $this->status->value,
             'status_label' => $this->status->label(),
-            'bib_number' => $this->bib_number,
             'bib_label' => BibNumber::label($this->bib_number),
             'first_name' => $this->user->first_name,
             'last_name' => $this->user->last_name,

@@ -9,6 +9,8 @@ use Illuminate\Validation\Rule;
 
 class EventUpdateRequest extends FormRequest
 {
+    private ?Event $event = null;
+
     public function authorize(): bool
     {
         return $this->user()?->can('update', $this->event()) === true;
@@ -81,6 +83,6 @@ class EventUpdateRequest extends FormRequest
 
     private function event(): Event
     {
-        return Event::query()->firstOrNew();
+        return $this->event ??= Event::currentOrNew();
     }
 }

@@ -26,7 +26,7 @@ class DocumentSeeder extends Seeder
 
     public function run(): void
     {
-        $event = Event::query()->first();
+        $event = Event::currentOrNull();
 
         if ($event === null || $event->documents()->exists()) {
             return;

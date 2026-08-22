@@ -51,6 +51,21 @@ class Event extends Model
      */
     protected $attributes = ['status' => EventStatus::Draft->value];
 
+    public static function current(): self
+    {
+        return self::query()->firstOrFail();
+    }
+
+    public static function currentOrNew(): self
+    {
+        return self::query()->firstOrNew();
+    }
+
+    public static function currentOrNull(): ?self
+    {
+        return self::query()->first();
+    }
+
     public function lifecycle(): EventLifecycleState
     {
         return app(EventLifecycleFactory::class)->fromStatus($this->status);

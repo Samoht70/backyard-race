@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\RegistrationStatus;
+use App\Enums\RegistrationTransition;
 use App\Services\RegistrationLifecycle\RegistrationLifecycleFactory;
 use App\Services\RegistrationLifecycle\RegistrationLifecycleState;
 use Carbon\CarbonImmutable;
@@ -48,6 +49,17 @@ class Participant extends Model
     public function lifecycle(): RegistrationLifecycleState
     {
         return app(RegistrationLifecycleFactory::class)->fromStatus($this->status);
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function allowedTransitionValues(): array
+    {
+        return array_map(
+            fn (RegistrationTransition $transition): string => $transition->value,
+            $this->lifecycle()->allowedTransitions(),
+        );
     }
 
     /**

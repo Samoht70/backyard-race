@@ -18,11 +18,11 @@ class DocumentController extends Controller
 {
     public function index(): Response
     {
-        $event = Event::query()->firstOrNew();
+        $event = Event::currentOrNew();
 
         return Inertia::render('manage/documents/Index', [
             'documents' => DocumentResource::collection($event->documents()->with('media')->get())->resolve(),
-            'isEditable' => $event->lifecycle()->isEditable(),
+            'isEditable' => Gate::allows('create', [Document::class, $event]),
             'maxFileMegabytes' => DocumentFile::maxMegabytes(),
         ]);
     }
@@ -38,7 +38,7 @@ class DocumentController extends Controller
             $document->addMedia($request->document())->toMediaCollection(Document::FILE_COLLECTION);
         });
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => __('document.manage.saved')]);
+        $this->flashSuccess(__('document.manage.saved'));
 
         return to_route('manage.documents.index');
     }
@@ -49,7 +49,7 @@ class DocumentController extends Controller
 
         $document->delete();
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => __('document.manage.deleted')]);
+        $this->flashSuccess(__('document.manage.deleted'));
 
         return to_route('manage.documents.index');
     }

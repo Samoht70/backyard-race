@@ -24,7 +24,7 @@ class RegistrationController extends Controller
 {
     public function index(RegistrationIndexRequest $request): Response
     {
-        $event = Event::query()->firstOrNew();
+        $event = Event::currentOrNew();
         $status = $request->status();
 
         return Inertia::render('manage/registrations/Index', [
@@ -56,7 +56,7 @@ class RegistrationController extends Controller
     ): RedirectResponse {
         $update($participant, $request->validated());
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => __('registration.manage.saved')]);
+        $this->flashSuccess(__('registration.manage.saved'));
 
         return to_route('manage.registrations.edit', $participant);
     }
@@ -70,10 +70,7 @@ class RegistrationController extends Controller
 
         $delete($participant);
 
-        Inertia::flash('toast', [
-            'type' => 'success',
-            'message' => __('registration.manage.deleted', ['name' => $runner]),
-        ]);
+        $this->flashSuccess(__('registration.manage.deleted', ['name' => $runner]));
 
         return to_route('manage.registrations.index');
     }

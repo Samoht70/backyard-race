@@ -13,10 +13,10 @@ class IndexController extends Controller
 {
     public function __invoke(ResolveCurrentRound $resolveCurrentRound): Response
     {
-        $round = $resolveCurrentRound(Event::query()->firstOrNew());
+        $round = $resolveCurrentRound(Event::currentOrNew());
 
         return Inertia::render('manage/Index', [
-            'currentRound' => $round === null ? null : (new CurrentRoundResource($round))->resolve(),
+            'currentRound' => $round === null ? null : new CurrentRoundResource($round)->resolve(),
         ]);
     }
 }

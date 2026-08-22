@@ -19,4 +19,9 @@ final class EventLifecycleFactory
             EventStatus::Finished => new FinishedEventState,
         };
     }
+
+    public function isReversible(?EventStatus $status): bool
+    {
+        return $status !== null && $this->fromStatus($status)->previousStatus() !== null;
+    }
 }

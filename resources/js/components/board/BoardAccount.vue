@@ -11,14 +11,13 @@ import {
     DropdownMenuTrigger,
 } from 'reka-ui';
 import { computed } from 'vue';
-import { useInitials } from '@/composables/useInitials';
 import { t } from '@/lib/i18n';
+import { getInitials } from '@/lib/initials';
 import { overlayMenu, overlayMenuItem } from '@/lib/overlayClasses';
 import { logout } from '@/routes';
 import { edit } from '@/routes/profile';
 
 const user = computed(() => usePage().props.auth?.user ?? null);
-const { getInitials } = useInitials();
 
 function flushBeforeLogout(): void {
     router.flushAll();

@@ -13,7 +13,7 @@ class DocumentController extends Controller
 {
     public function index(): Response
     {
-        $event = Event::query()->firstOrFail();
+        $event = Event::current();
 
         Gate::authorize('viewAny', [Document::class, $event]);
 

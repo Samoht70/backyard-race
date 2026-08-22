@@ -28,7 +28,7 @@ class PurgeRegistrationsCommand extends Command
 
     public function handle(): int
     {
-        $event = Event::query()->first();
+        $event = Event::currentOrNull();
 
         if ($event !== null && $event->lifecycle()->isRacing()) {
             $this->error("The event is `{$event->status->value}`: a registration is a runner on the course, not a test row.");

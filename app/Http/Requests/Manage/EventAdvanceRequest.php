@@ -11,6 +11,8 @@ use Illuminate\Validation\Validator;
 
 class EventAdvanceRequest extends FormRequest
 {
+    private ?Event $event = null;
+
     public function authorize(): bool
     {
         return $this->user()?->can('advance', $this->event()) === true;
@@ -54,6 +56,6 @@ class EventAdvanceRequest extends FormRequest
 
     private function event(): Event
     {
-        return Event::query()->firstOrFail();
+        return $this->event ??= Event::current();
     }
 }

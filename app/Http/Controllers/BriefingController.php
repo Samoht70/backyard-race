@@ -12,7 +12,7 @@ class BriefingController extends Controller
 {
     public function show(): Response
     {
-        $event = Event::query()->firstOrFail();
+        $event = Event::current();
 
         Gate::authorize('view', $event);
 

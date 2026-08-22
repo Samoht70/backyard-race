@@ -9,6 +9,8 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class BriefingUpdateRequest extends FormRequest
 {
+    private ?Event $event = null;
+
     public function authorize(): bool
     {
         return $this->user()?->can('updateBriefing', $this->event()) === true;
@@ -38,6 +40,6 @@ class BriefingUpdateRequest extends FormRequest
 
     public function event(): Event
     {
-        return Event::query()->firstOrFail();
+        return $this->event ??= Event::current();
     }
 }
