@@ -70,12 +70,12 @@ const deletionRefusalId = computed(
         </div>
 
         <BoardSection
-            v-if="registration.allowed_transitions.length || !isDrawer"
+            :class="isDrawer ? 'order-last' : undefined"
             :title="t('registration.manage.actions_title')"
             level="h3"
         >
             <div class="grid gap-3">
-                <div class="flex flex-wrap items-start gap-2">
+                <div class="grid gap-2 sm:flex sm:flex-wrap sm:items-start">
                     <RegistrationActionForm
                         v-for="transition in registration.allowed_transitions"
                         :key="transition"
@@ -87,7 +87,6 @@ const deletionRefusalId = computed(
                     />
 
                     <RegistrationDeleteForm
-                        v-if="!isDrawer"
                         :registration-id="registration.id"
                         :runner-name="fullName"
                         :disabled="isDeletionRefused"
@@ -98,7 +97,7 @@ const deletionRefusalId = computed(
                 </div>
 
                 <Notice
-                    v-if="isDeletionRefused && !isDrawer"
+                    v-if="isDeletionRefused"
                     :id="deletionRefusalId"
                     tone="danger"
                     :title="t('registration.delete.blocked_title')"
@@ -149,32 +148,6 @@ const deletionRefusalId = computed(
             level="h3"
         >
             <p class="text-sm whitespace-pre-line">{{ registration.notes }}</p>
-        </BoardSection>
-
-        <BoardSection
-            v-if="isDrawer"
-            :title="t('registration.delete.title')"
-            level="h3"
-        >
-            <div class="grid justify-items-start gap-3">
-                <RegistrationDeleteForm
-                    :registration-id="registration.id"
-                    :runner-name="fullName"
-                    :disabled="isDeletionRefused"
-                    :described-by="
-                        isDeletionRefused ? deletionRefusalId : undefined
-                    "
-                />
-
-                <Notice
-                    v-if="isDeletionRefused"
-                    :id="deletionRefusalId"
-                    tone="danger"
-                    :title="t('registration.delete.blocked_title')"
-                >
-                    {{ deletionRefusal }}
-                </Notice>
-            </div>
         </BoardSection>
     </div>
 </template>

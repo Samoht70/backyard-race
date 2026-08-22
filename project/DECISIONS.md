@@ -2646,12 +2646,17 @@ transition d'inscription ne l'est. La nuit de la course, un inscrit qui ne se pr
 qu'il avait tapé — et le compte, qui survit à l'annulation et pas à la suppression. Le rouge plein ne
 désigne donc plus que l'irréversible : `cancel` passe en ton sobre, `destroy` garde `danger`.
 
-**Le dossier place la suppression à deux endroits selon l'instance qui le rend.** Une règle CSS ne
-déplace pas un élément d'un parent à l'autre, et dupliquer le composant derrière `hidden`/`lg:hidden`
-laisserait deux fois le même `id` dans le document, puisque la colonne du tableau reste rendue sous
-le tiroir mobile. Le dossier reçoit donc `variant` — `board` ou `drawer` — qui décide de la place du
-bouton et suffixe l'identifiant du refus. Le parent sait laquelle des deux instances il rend ; le
-composant n'interroge aucune media query.
+**La rangée d'actions descend en bas du tiroir par `order`, pas par un second bloc.** Les trois
+gestes tiennent dans une seule section, placée en tête sur le tableau et en pied dans le tiroir :
+comme les sections sont les items d'une même grille, `order-last` suffit à la déplacer. Dupliquer le
+bloc derrière un point de rupture aurait laissé deux fois le même `id` dans le document, puisque la
+colonne du tableau reste rendue sous le tiroir mobile. Le dossier reçoit tout de même `variant` —
+`board` ou `drawer` — pour suffixer l'identifiant du refus et choisir l'ordre : le parent sait
+laquelle des deux instances il rend, et le composant n'interroge aucune media query.
+
+**Les boutons s'empilent sous 640 px et passent en ligne au-dessus.** La rangée est une grille à une
+colonne sur mobile et un `flex flex-wrap` à partir de `sm`, ce qui reprend le point de rupture que
+`ActionButton` utilise déjà pour passer de `w-full` à `w-auto`.
 
 **La fermeture du dossier est un événement, pas un `DialogClose`.** Le tiroir mobile se fermait à la
 touche d'échappement et au voile, la colonne du tableau ne se fermait pas du tout — aucune des deux

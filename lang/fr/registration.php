@@ -100,7 +100,6 @@ return [
         'keep' => 'Ne rien changer',
     ],
     'delete' => [
-        'title' => 'Supprimer l’inscription',
         'open' => 'Supprimer',
         'aria_open' => 'Supprimer l’inscription de :name et son compte',
         'confirm_title' => 'Supprimer l’inscription de :name ?',
