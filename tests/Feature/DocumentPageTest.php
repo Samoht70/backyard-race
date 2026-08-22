@@ -25,11 +25,27 @@ class DocumentPageTest extends TestCase
     }
 
     #[Test]
-    public function it_redirects_a_guest_to_the_login_page(): void
+    public function it_lists_the_documents_for_a_guest(): void
     {
-        Event::factory()->registration()->create();
+        $this->deposit(Event::factory()->registration()->create());
 
-        $this->get(route('documents.index'))->assertRedirect(route('login'));
+        $response = $this->get(route('documents.index'));
+
+        $response->assertOk();
+        $response->assertInertia(
+            fn (AssertableInertia $page) => $page
+                ->component('Documents')
+                ->has('documents', 1)
+                ->where('documents.0.title', 'Règlement de la course'),
+        );
+    }
+
+    #[Test]
+    public function it_refuses_a_draft_event_to_a_guest(): void
+    {
+        $this->deposit(Event::factory()->create());
+
+        $this->get(route('documents.index'))->assertForbidden();
     }
 
     #[Test]

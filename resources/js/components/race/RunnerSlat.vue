@@ -5,6 +5,7 @@ import { computed } from 'vue';
 import SlatCell from '@/components/race/SlatCell.vue';
 import { t } from '@/lib/i18n';
 import {
+    runnerStatusBar,
     runnerStatusIcons,
     runnerStatusLabelKey,
     runnerStatusTone,
@@ -26,6 +27,7 @@ const props = defineProps<Props>();
 const fullName = computed(() => `${props.firstName} ${props.lastName}`);
 const icon = computed(() => runnerStatusIcons[props.status]);
 const tone = computed(() => runnerStatusTone[props.status]);
+const bar = computed(() => runnerStatusBar[props.status]);
 const statusLabel = computed(() => t(runnerStatusLabelKey(props.status)));
 const isRunning = computed(() => props.status === 'running');
 </script>
@@ -34,8 +36,13 @@ const isRunning = computed(() => props.status === 'running');
     <component
         :is="href ? Link : 'div'"
         :href="href"
-        class="flex min-h-[4.25rem] min-w-0 items-center gap-2 bg-card px-3 py-2.5"
+        class="flex min-h-[4.25rem] min-w-0 items-center gap-2 overflow-hidden rounded-sm border border-border bg-card py-2.5 pr-3"
     >
+        <span
+            class="w-1 shrink-0 self-stretch"
+            :class="bar"
+            aria-hidden="true"
+        />
         <span class="w-9 shrink-0 font-mono text-data font-bold tabular-nums">{{
             bib
         }}</span>

@@ -11,7 +11,9 @@ defineProps<Props>();
 </script>
 
 <template>
-    <div class="flex flex-col items-center gap-2 bg-card px-6 py-8 text-center">
+    <div
+        class="flex flex-col items-center gap-2 rounded-sm border border-border bg-card px-6 py-8 text-center"
+    >
         <component
             :is="icon"
             v-if="icon"

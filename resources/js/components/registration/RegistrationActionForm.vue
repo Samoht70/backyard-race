@@ -1,20 +1,27 @@
 <script setup lang="ts">
 import { Form } from '@inertiajs/vue3';
-import { computed } from 'vue';
-import RegistrationTransitionController from '@/actions/App/Http/Controllers/Manage/RegistrationTransitionController';
-import InputError from '@/components/InputError.vue';
-import ActionButton from '@/components/race/ActionButton.vue';
 import {
-    Dialog,
     DialogClose,
     DialogContent,
     DialogDescription,
-    DialogFooter,
-    DialogHeader,
+    DialogOverlay,
+    DialogPortal,
+    DialogRoot,
     DialogTitle,
     DialogTrigger,
-} from '@/components/ui/dialog';
+} from 'reka-ui';
+import { computed } from 'vue';
+import RegistrationTransitionController from '@/actions/App/Http/Controllers/Manage/RegistrationTransitionController';
+import ActionButton from '@/components/ActionButton.vue';
+import FieldError from '@/components/form/FieldError.vue';
 import { t } from '@/lib/i18n';
+import {
+    overlayBackdrop,
+    overlayDescription,
+    overlayFooter,
+    overlayPanel,
+    overlayTitle,
+} from '@/lib/overlayClasses';
 import {
     registrationTransitionAriaKey,
     registrationTransitionLabelKey,
@@ -46,7 +53,7 @@ const errorBag = computed(() => `registration-${props.registrationId}`);
 </script>
 
 <template>
-    <Dialog v-if="presentation.needsConfirmation">
+    <DialogRoot v-if="presentation.needsConfirmation">
         <DialogTrigger as-child>
             <ActionButton
                 :tone="presentation.tone"
@@ -60,59 +67,70 @@ const errorBag = computed(() => `registration-${props.registrationId}`);
             </ActionButton>
         </DialogTrigger>
 
-        <DialogContent>
-            <Form
-                v-bind="RegistrationTransitionController.form(registrationId)"
-                :error-bag="errorBag"
-                :options="{ preserveScroll: true }"
-                class="flex flex-col gap-4"
-                v-slot="{ errors, processing }"
-            >
-                <input type="hidden" name="transition" :value="transition" />
+        <DialogPortal>
+            <DialogOverlay :class="overlayBackdrop" />
+            <DialogContent :class="overlayPanel">
+                <Form
+                    v-bind="
+                        RegistrationTransitionController.form(registrationId)
+                    "
+                    :error-bag="errorBag"
+                    :options="{ preserveScroll: true }"
+                    class="flex flex-col gap-4"
+                    v-slot="{ errors, processing }"
+                >
+                    <input
+                        type="hidden"
+                        name="transition"
+                        :value="transition"
+                    />
 
-                <DialogHeader class="space-y-3">
-                    <DialogTitle>
+                    <DialogTitle :class="overlayTitle">
                         {{
                             t('registration.transition.confirm_cancel_title', {
                                 name: runnerName,
                             })
                         }}
                     </DialogTitle>
-                    <DialogDescription>
+                    <DialogDescription :class="overlayDescription">
                         {{
                             t(
                                 'registration.transition.confirm_cancel_description',
                             )
                         }}
                     </DialogDescription>
-                </DialogHeader>
 
-                <InputError :message="errors.transition" />
+                    <FieldError :message="errors.transition" />
 
-                <DialogFooter class="gap-2">
-                    <DialogClose as-child>
-                        <ActionButton tone="quiet">
-                            {{ t('registration.transition.keep') }}
+                    <div :class="overlayFooter">
+                        <DialogClose as-child>
+                            <ActionButton tone="quiet">
+                                {{ t('registration.transition.keep') }}
+                            </ActionButton>
+                        </DialogClose>
+                        <ActionButton
+                            type="submit"
+                            tone="danger"
+                            :loading="processing"
+                        >
+                            {{
+                                t(
+                                    'registration.transition.confirm_cancel_submit',
+                                )
+                            }}
                         </ActionButton>
-                    </DialogClose>
-                    <ActionButton
-                        type="submit"
-                        tone="danger"
-                        :loading="processing"
-                    >
-                        {{ t('registration.transition.confirm_cancel_submit') }}
-                    </ActionButton>
-                </DialogFooter>
-            </Form>
-        </DialogContent>
-    </Dialog>
+                    </div>
+                </Form>
+            </DialogContent>
+        </DialogPortal>
+    </DialogRoot>
 
     <Form
         v-else
         v-bind="RegistrationTransitionController.form(registrationId)"
         :error-bag="errorBag"
         :options="{ preserveScroll: true }"
-        class="flex flex-col items-end gap-1"
+        class="flex w-full flex-col items-stretch gap-1 sm:w-auto"
         v-slot="{ errors, processing }"
     >
         <input type="hidden" name="transition" :value="transition" />
@@ -130,6 +148,6 @@ const errorBag = computed(() => `registration-${props.registrationId}`);
             {{ label }}
         </ActionButton>
 
-        <InputError :message="errors.transition" />
+        <FieldError :message="errors.transition" />
     </Form>
 </template>

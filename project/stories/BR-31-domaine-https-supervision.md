@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Epic** | 7 — Déploiement |
-| **Statut** | À faire |
+| **Statut** | 🚧 En cours |
 | **Estimation** | 5 pts |
 | **Dépend de** | BR-30 |
 
@@ -89,8 +89,20 @@ arrive sur le téléphone qu'il a en main, et si elle distingue « l'application
 
 ## Tâches
 
-- [ ] **T1** — Servir le domaine en HTTPS via le frontal Dokploy, vérifier le renouvellement `1 pt`
-- [ ] **T2** — Journalisation sur la sortie standard, avec rotation, sans donnée personnelle `1 pt`
-- [ ] **T3** — Surveillance externe du point de contrôle de santé, alerte sur téléphone `2 pts`
+- [x] **T1** — Servir le domaine en HTTPS via le frontal Dokploy, vérifier le renouvellement `1 pt`
+- [x] **T2** — Journalisation sur la sortie standard, avec rotation, sans donnée personnelle `1 pt`
+- [x] **T3** — Surveillance externe du point de contrôle de santé, alerte sur téléphone `2 pts`
 - [ ] **T4** — Notification des erreurs applicatives `1 pt`
 - [ ] **T5** — Vérifier redirection, certificat et alerte de bout en bout, VPS éteint compris `1 pt`
+
+## Ce qui reste au 2026-08-22
+
+Le domaine est servi en HTTPS avec renouvellement, les journaux partent sur la sortie standard, et un
+service tiers interroge le point de contrôle de santé et alerte sur téléphone. La machine qui tombe
+se sait donc.
+
+- **T4** — Rien ne remonte les erreurs applicatives. Une exception de production reste dans les
+  journaux du conteneur, et il faut déjà savoir qu'elle a eu lieu pour aller la lire. La supervision
+  couvre la machine morte, pas l'application qui répond faux.
+- **T5** — La vérification de bout en bout, VPS éteint compris, n'a pas été conduite comme un
+  exercice. Que l'alerte parte n'a pas été observé sur une extinction volontaire.

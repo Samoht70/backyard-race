@@ -11,15 +11,14 @@ use Inertia\Response;
 
 class EventController extends Controller
 {
-    public function show(Request $request): Response
+    public function __invoke(Request $request): Response
     {
-        $event = Event::query()->firstOrFail();
-
-        Gate::authorize('view', $event);
+        $event = Event::currentOrNull();
+        $visibleEvent = $event !== null && Gate::allows('view', $event) ? $event : null;
 
         return Inertia::render('Event', [
-            'event' => new EventResource($event)->resolve(),
-            'canRegister' => $event->lifecycle()->allowsRegistration(),
+            'event' => $visibleEvent === null ? null : new EventResource($visibleEvent)->resolve(),
+            'canRegister' => $visibleEvent !== null && $visibleEvent->lifecycle()->allowsRegistration(),
             'isRegistered' => $request->user()?->participant()->exists() === true,
         ]);
     }

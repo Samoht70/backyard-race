@@ -1,0 +1,1461 @@
+<title>Quai, Dossard, Console</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400..700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Martian+Mono:wght@400..700&display=swap">
+
+<style>
+    :root {
+        --d-board: #FFFFFF;
+        --d-slat: #DCE0E4;
+        --d-alt: #CFD5DA;
+        --d-ink: #14161A;
+        --d-ink-2: #3A3F47;
+        --d-muted: #474D56;
+        --d-line: #AEB6BC;
+        --d-line-soft: #C6CDD3;
+        --d-keyline: #14161A;
+        --d-action: #14161A;
+        --d-action-ink: #FFFFFF;
+        --d-run: #0A6135;
+        --d-run-s: #E0EFE6;
+        --d-out: #A1221B;
+        --d-out-s: #FBE4E2;
+        --d-quit: #474D56;
+        --d-quit-s: #E8EAED;
+        --d-done: #6A5000;
+        --d-done-s: #F5EBD3;
+
+        --n-board: #0C0E11;
+        --n-slat: #191C21;
+        --n-alt: #22262C;
+        --n-ink: #F0F1F3;
+        --n-ink-2: #C3C7CE;
+        --n-muted: #949AA3;
+        --n-line: #2B2F36;
+        --n-line-soft: #313640;
+        --n-keyline: #F0F1F3;
+        --n-action: #FFB020;
+        --n-action-ink: #14161A;
+        --n-run: #5CD494;
+        --n-run-s: #14301F;
+        --n-out: #FF8A72;
+        --n-out-s: #331A16;
+        --n-quit: #949AA3;
+        --n-quit-s: #23272D;
+        --n-done: #F0C24E;
+        --n-done-s: #322609;
+
+        --board: var(--d-board);
+        --slat: var(--d-slat);
+        --alt: var(--d-alt);
+        --ink: var(--d-ink);
+        --ink-2: var(--d-ink-2);
+        --muted: var(--d-muted);
+        --line: var(--d-line);
+        --line-soft: var(--d-line-soft);
+        --keyline: var(--d-keyline);
+        --action: var(--d-action);
+        --action-ink: var(--d-action-ink);
+        --run: var(--d-run);
+        --run-s: var(--d-run-s);
+        --out: var(--d-out);
+        --out-s: var(--d-out-s);
+        --quit: var(--d-quit);
+        --quit-s: var(--d-quit-s);
+        --done: var(--d-done);
+        --done-s: var(--d-done-s);
+
+        --sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+        --mono: 'Martian Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+        --s1: 4px;
+        --s2: 8px;
+        --s3: 12px;
+        --s4: 16px;
+        --s5: 24px;
+        --s6: 32px;
+        --s7: 48px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+            --board: var(--n-board);
+            --slat: var(--n-slat);
+            --alt: var(--n-alt);
+            --ink: var(--n-ink);
+            --ink-2: var(--n-ink-2);
+            --muted: var(--n-muted);
+            --line: var(--n-line);
+            --line-soft: var(--n-line-soft);
+            --keyline: var(--n-keyline);
+            --action: var(--n-action);
+            --action-ink: var(--n-action-ink);
+            --run: var(--n-run);
+            --run-s: var(--n-run-s);
+            --out: var(--n-out);
+            --out-s: var(--n-out-s);
+            --quit: var(--n-quit);
+            --quit-s: var(--n-quit-s);
+            --done: var(--n-done);
+            --done-s: var(--n-done-s);
+        }
+    }
+
+    :root[data-theme="dark"] {
+        --board: var(--n-board);
+        --slat: var(--n-slat);
+        --alt: var(--n-alt);
+        --ink: var(--n-ink);
+        --ink-2: var(--n-ink-2);
+        --muted: var(--n-muted);
+        --line: var(--n-line);
+        --line-soft: var(--n-line-soft);
+        --keyline: var(--n-keyline);
+        --action: var(--n-action);
+        --action-ink: var(--n-action-ink);
+        --run: var(--n-run);
+        --run-s: var(--n-run-s);
+        --out: var(--n-out);
+        --out-s: var(--n-out-s);
+        --quit: var(--n-quit);
+        --quit-s: var(--n-quit-s);
+        --done: var(--n-done);
+        --done-s: var(--n-done-s);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        background: var(--board);
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: 15px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: var(--s6) var(--s4) var(--s7);
+    }
+
+    .lbl {
+        font-family: var(--mono);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        line-height: 1;
+        text-transform: uppercase;
+    }
+
+    .tnum { font-variant-numeric: tabular-nums; }
+
+    /* ---------- chrome de la planche ---------- */
+
+    .top {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: var(--s4);
+        border-bottom: 3px solid var(--keyline);
+        padding-bottom: var(--s3);
+    }
+
+    .top h1 {
+        margin: 0;
+        font-size: clamp(1.75rem, 5vw, 2.5rem);
+        font-weight: 700;
+        letter-spacing: -0.04em;
+        line-height: 1.05;
+        text-wrap: balance;
+    }
+
+    .top .lbl { color: var(--muted); margin-bottom: 6px; display: block; }
+
+    .swap {
+        border: 1px solid var(--ink);
+        background: transparent;
+        color: var(--ink);
+        padding: 10px var(--s3);
+        min-height: 40px;
+        cursor: pointer;
+        font-family: var(--mono);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+    }
+
+    .swap:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+    .lede {
+        max-width: 68ch;
+        margin: var(--s5) 0 0;
+        font-size: 1.0625rem;
+    }
+
+    .lede strong { font-weight: 700; }
+
+    .diag {
+        margin: var(--s6) 0 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 1px;
+        background: var(--line);
+        border: 1px solid var(--line);
+    }
+
+    .diag li { background: var(--board); padding: var(--s3) var(--s4); }
+    .diag b { display: block; font-family: var(--mono); font-size: 12px; letter-spacing: -0.02em; margin-bottom: 2px; }
+    .diag span { color: var(--muted); font-size: 0.9375rem; }
+
+    .dir { margin-top: var(--s7); border-top: 3px solid var(--keyline); padding-top: var(--s4); }
+
+    .dir-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--s3); }
+    .dir-head .rank { font-family: var(--mono); font-size: 1.75rem; font-weight: 700; letter-spacing: -0.05em; }
+    .dir-head h2 { margin: 0; font-size: 1.625rem; font-weight: 700; letter-spacing: -0.03em; }
+    .dir-head .tag { color: var(--muted); }
+
+    .thesis { max-width: 66ch; margin: var(--s3) 0 0; }
+
+    .facts { display: grid; gap: var(--s4); grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin: var(--s4) 0 0; }
+    .facts > div { border-top: 1px solid var(--line); padding-top: var(--s2); }
+    .facts h3 { margin: 0 0 4px; font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+    .facts p { margin: 0; font-size: 0.9375rem; }
+
+    .risk { margin: var(--s4) 0 0; border-left: 3px solid var(--out); padding-left: var(--s3); max-width: 66ch; }
+    .risk h3 { margin: 0 0 2px; font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--out); }
+    .risk p { margin: 0; font-size: 0.9375rem; }
+
+    .boards {
+        display: flex;
+        gap: var(--s4);
+        margin: var(--s5) 0 0;
+        padding-bottom: var(--s3);
+        overflow-x: auto;
+        scroll-snap-type: x proximity;
+    }
+
+    .board { flex: 0 0 auto; width: 375px; scroll-snap-align: start; }
+    .board figcaption { margin-top: var(--s2); }
+    .board figcaption b { display: block; font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: -0.02em; }
+    .board figcaption span { color: var(--muted); font-size: 0.8125rem; line-height: 1.4; display: block; }
+
+    .screen {
+        width: 375px;
+        height: 760px;
+        overflow: hidden;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid var(--line);
+        background: var(--board);
+        color: var(--ink);
+    }
+
+    .screen[data-scheme="dark"] {
+        --board: var(--n-board);
+        --slat: var(--n-slat);
+        --alt: var(--n-alt);
+        --ink: var(--n-ink);
+        --ink-2: var(--n-ink-2);
+        --muted: var(--n-muted);
+        --line: var(--n-line);
+        --line-soft: var(--n-line-soft);
+        --keyline: var(--n-keyline);
+        --action: var(--n-action);
+        --action-ink: var(--n-action-ink);
+        --run: var(--n-run);
+        --run-s: var(--n-run-s);
+        --out: var(--n-out);
+        --out-s: var(--n-out-s);
+        --quit: var(--n-quit);
+        --quit-s: var(--n-quit-s);
+        --done: var(--n-done);
+        --done-s: var(--n-done-s);
+    }
+
+    .screen[data-scheme="light"] {
+        --board: var(--d-board);
+        --slat: var(--d-slat);
+        --alt: var(--d-alt);
+        --ink: var(--d-ink);
+        --ink-2: var(--d-ink-2);
+        --muted: var(--d-muted);
+        --line: var(--d-line);
+        --line-soft: var(--d-line-soft);
+        --keyline: var(--d-keyline);
+        --action: var(--d-action);
+        --action-ink: var(--d-action-ink);
+        --run: var(--d-run);
+        --run-s: var(--d-run-s);
+        --out: var(--d-out);
+        --out-s: var(--d-out-s);
+        --quit: var(--d-quit);
+        --quit-s: var(--d-quit-s);
+        --done: var(--d-done);
+        --done-s: var(--d-done-s);
+    }
+
+    .grow { flex: 1 1 auto; min-height: 0; }
+
+    .sq { width: 9px; height: 9px; flex: 0 0 auto; }
+    .sq-run { background: var(--run); }
+    .sq-out { background: var(--out); }
+    .sq-quit { background: var(--quit); }
+    .sq-done { background: var(--done); }
+
+    .stamp {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border: 2px solid currentColor;
+        padding: 4px 7px;
+        font-family: var(--mono);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        line-height: 1;
+        text-transform: uppercase;
+    }
+    .stamp-run { color: var(--run); }
+    .stamp-quit { color: var(--quit); }
+    .stamp-out { color: var(--out); }
+
+    /* ---------- direction A · quai ---------- */
+
+    .a-band { border-bottom: 3px solid var(--keyline); padding: var(--s3) var(--s4) 10px; }
+    .a-band-top { display: flex; align-items: center; justify-content: space-between; gap: var(--s2); }
+    .a-band-top .lbl { color: var(--muted); }
+    .a-band-top em { font-style: normal; font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.06em; color: var(--ink); font-variant-numeric: tabular-nums; }
+    .a-read { display: flex; align-items: baseline; gap: 10px; margin-top: 8px; font-family: var(--mono); }
+    .a-read .k { font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+    .a-read .v { font-size: 2.75rem; font-weight: 700; letter-spacing: -0.06em; line-height: 1; font-variant-numeric: tabular-nums; }
+    .a-read .t { font-size: 0.8125rem; letter-spacing: -0.04em; color: var(--muted); }
+
+    .a-rail { display: flex; border-bottom: 1px solid var(--line); overflow: hidden; }
+    .a-tab {
+        padding: 12px 11px;
+        font-family: var(--mono);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+        white-space: nowrap;
+        box-shadow: inset 0 -2px 0 transparent;
+    }
+    .a-tab.is-on { color: var(--ink); box-shadow: inset 0 -2px 0 var(--keyline); }
+
+    .a-sec { background: var(--alt); padding: 7px var(--s4); color: var(--ink-2); }
+    .a-hero { display: flex; align-items: center; justify-content: space-between; gap: var(--s3); padding: var(--s4); border-bottom: 1px solid var(--line); }
+    .a-hero-n { display: flex; align-items: baseline; gap: 10px; font-family: var(--mono); }
+    .a-hero-n .k { font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+    .a-hero-n .v { font-size: 2.75rem; font-weight: 700; letter-spacing: -0.06em; line-height: 1; font-variant-numeric: tabular-nums; }
+
+    .a-row { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s3); padding: 11px var(--s4); border-bottom: 1px solid var(--line-soft); }
+    .a-row .k { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+    .a-row .v { font-family: var(--mono); font-size: 0.8125rem; font-weight: 500; letter-spacing: -0.04em; text-align: right; font-variant-numeric: tabular-nums; }
+    .a-row .v.sans { font-family: var(--sans); font-size: 0.9375rem; letter-spacing: 0; }
+
+    .a-note { padding: var(--s3) var(--s4); color: var(--muted); font-size: 0.875rem; border-bottom: 1px solid var(--line-soft); }
+
+    .a-bar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 52px;
+        background: var(--action);
+        color: var(--action-ink);
+        font-family: var(--mono);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+    }
+
+    .a-filters { display: flex; gap: var(--s4); padding: 11px var(--s4); border-bottom: 1px solid var(--line); overflow: hidden; }
+    .a-f { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+    .a-f b { font-weight: 700; font-variant-numeric: tabular-nums; margin-left: 5px; }
+    .a-f.is-on { color: var(--ink); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 5px; }
+
+    .a-slat { display: flex; align-items: center; gap: 10px; padding: 11px var(--s4); border-bottom: 1px solid var(--line-soft); }
+    .a-slat .bib { width: 34px; flex: 0 0 auto; font-family: var(--mono); font-size: 1.0625rem; font-weight: 700; letter-spacing: -0.05em; font-variant-numeric: tabular-nums; }
+    .a-slat .who { flex: 1 1 auto; min-width: 0; }
+    .a-slat .who b { display: block; font-weight: 600; font-size: 0.9375rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .a-slat .who span { display: flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 0.75rem; letter-spacing: -0.04em; color: var(--muted); }
+    .a-slat .cell { flex: 0 0 auto; text-align: right; font-family: var(--mono); }
+    .a-slat .cell b { display: block; font-size: 0.8125rem; font-weight: 700; letter-spacing: -0.05em; font-variant-numeric: tabular-nums; }
+    .a-slat .cell span { display: block; font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+    .a-go {
+        flex: 0 0 auto;
+        min-width: 92px;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--action);
+        background: var(--action);
+        color: var(--action-ink);
+        font-family: var(--mono);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+    }
+
+    .a-prose { padding: var(--s3) var(--s4) var(--s4); font-size: 0.9375rem; line-height: 1.6; }
+    .a-prose h4 { margin: var(--s4) 0 4px; font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+    .a-prose h4:first-child { margin-top: 0; }
+    .a-prose p { margin: 0 0 var(--s2); }
+    .a-prose ul { margin: 0 0 var(--s2); padding-left: 18px; }
+
+    .a-file { display: flex; align-items: center; justify-content: space-between; gap: var(--s3); padding: 12px var(--s4); border-bottom: 1px solid var(--line-soft); }
+    .a-file b { font-weight: 600; font-size: 0.9375rem; }
+    .a-file span { display: block; font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+    .a-file i { font-style: normal; font-family: var(--mono); font-size: 1rem; }
+
+    /* ---------- direction B · dossard ---------- */
+
+    .b-tear { height: 7px; background-image: repeating-linear-gradient(90deg, var(--line) 0 5px, transparent 5px 11px); background-size: 100% 1px; background-position: 0 50%; background-repeat: repeat-x; }
+
+    .b-bib { padding: var(--s4) var(--s4) var(--s5); border-bottom: 3px solid var(--keyline); }
+    .b-bib-head { display: flex; align-items: center; justify-content: space-between; gap: var(--s2); }
+    .b-bib-head .lbl { color: var(--muted); }
+    .b-num { font-family: var(--mono); font-size: 5.25rem; font-weight: 700; letter-spacing: -0.08em; line-height: 0.9; margin-top: var(--s3); font-variant-numeric: tabular-nums; }
+    .b-num small { display: block; font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    .b-who { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--s3); margin-top: var(--s3); }
+    .b-who b { font-size: 1.25rem; font-weight: 600; letter-spacing: -0.02em; }
+
+    .b-strip { display: flex; align-items: center; gap: 10px; padding: var(--s3) var(--s4); border-bottom: 3px solid var(--keyline); }
+    .b-strip .n { font-family: var(--mono); font-size: 1.375rem; font-weight: 700; letter-spacing: -0.05em; font-variant-numeric: tabular-nums; }
+    .b-strip .who { flex: 1 1 auto; min-width: 0; font-weight: 600; font-size: 0.9375rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .b-sh { display: flex; align-items: center; justify-content: space-between; gap: var(--s3); min-height: 50px; padding: var(--s3) var(--s4); border-bottom: 1px solid var(--line); }
+    .b-sh.is-on { background: var(--alt); border-bottom-color: var(--keyline); }
+    .b-sh .t { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
+    .b-sh .h { display: flex; align-items: center; gap: 10px; }
+    .b-sh .h em { font-style: normal; font-family: var(--mono); font-size: 0.75rem; letter-spacing: -0.04em; color: var(--muted); max-width: 150px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    .b-sh .h i { font-style: normal; font-family: var(--mono); font-size: 1rem; font-weight: 700; width: 12px; text-align: center; }
+
+    .b-body { padding: var(--s3) var(--s4) var(--s4); border-bottom: 1px solid var(--line); }
+    .b-pair { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s3); padding: 8px 0; border-bottom: 1px solid var(--line-soft); }
+    .b-pair:last-child { border-bottom: 0; }
+    .b-pair .k { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+    .b-pair .v { font-family: var(--mono); font-size: 0.8125rem; font-weight: 500; letter-spacing: -0.04em; text-align: right; font-variant-numeric: tabular-nums; }
+    .b-pair .v.sans { font-family: var(--sans); font-size: 0.9375rem; letter-spacing: 0; }
+
+    .b-foot { border-top: 1px solid var(--line); }
+    .b-quiet { display: flex; align-items: center; justify-content: center; min-height: 46px; padding: 0 var(--s4); color: var(--muted); font-size: 0.8125rem; text-align: center; }
+    .b-door { display: flex; align-items: center; justify-content: space-between; min-height: 46px; padding: 0 var(--s4); border-top: 1px solid var(--line); font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+
+    .b-mhead { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s3); padding: var(--s4); border-bottom: 3px solid var(--keyline); }
+    .b-mhead .v { font-family: var(--mono); font-size: 1.75rem; font-weight: 700; letter-spacing: -0.05em; line-height: 1.05; font-variant-numeric: tabular-nums; }
+    .b-mhead .k { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+
+    .b-fiche { display: flex; align-items: center; gap: 10px; min-height: 54px; padding: 9px var(--s4); border-bottom: 1px solid var(--line-soft); }
+    .b-fiche.is-on { background: var(--alt); border-bottom-color: var(--keyline); }
+    .b-fiche .n { width: 32px; flex: 0 0 auto; font-family: var(--mono); font-size: 1rem; font-weight: 700; letter-spacing: -0.05em; font-variant-numeric: tabular-nums; }
+    .b-fiche .who { flex: 1 1 auto; min-width: 0; }
+    .b-fiche .who b { display: block; font-weight: 600; font-size: 0.9375rem; }
+    .b-fiche .who span { display: flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 0.6875rem; letter-spacing: -0.04em; color: var(--muted); }
+    .b-fiche i { font-style: normal; font-family: var(--mono); font-size: 1rem; font-weight: 700; }
+
+    .b-acts { display: flex; gap: 1px; background: var(--keyline); }
+    .b-act { flex: 1 1 0; min-height: 46px; display: flex; align-items: center; justify-content: center; background: var(--action); color: var(--action-ink); font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+    .b-act.quiet { background: var(--board); color: var(--ink); }
+
+    /* ---------- direction C · console ---------- */
+
+    .c-top { display: flex; align-items: center; justify-content: space-between; gap: var(--s2); min-height: 42px; padding: 0 var(--s3) 0 var(--s4); border-bottom: 1px solid var(--line); }
+    .c-top .lbl { color: var(--muted); }
+    .c-top .now { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+
+    .c-counts { display: flex; flex-wrap: wrap; gap: 4px 10px; padding: 10px var(--s4); border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 0.75rem; letter-spacing: -0.04em; color: var(--muted); }
+    .c-counts b { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+    .c-filters { display: flex; border-bottom: 1px solid var(--line); overflow: hidden; }
+    .c-f { padding: 11px var(--s3); font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); white-space: nowrap; box-shadow: inset 0 -2px 0 transparent; }
+    .c-f.is-on { color: var(--ink); box-shadow: inset 0 -2px 0 var(--keyline); }
+
+    .c-row { display: flex; align-items: stretch; min-height: 56px; border-bottom: 1px solid var(--line-soft); }
+    .c-row .main { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: 10px; padding: 8px var(--s4); }
+    .c-row .n { width: 32px; flex: 0 0 auto; font-family: var(--mono); font-size: 1.125rem; font-weight: 700; letter-spacing: -0.05em; font-variant-numeric: tabular-nums; }
+    .c-row .who { flex: 1 1 auto; min-width: 0; }
+    .c-row .who b { display: block; font-weight: 600; font-size: 0.9375rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .c-row .who span { display: flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 0.6875rem; letter-spacing: -0.04em; color: var(--muted); }
+    .c-act-cell { flex: 0 0 96px; display: flex; align-items: center; justify-content: center; border-left: 1px solid var(--line); background: var(--action); color: var(--action-ink); font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; text-align: center; }
+    .c-act-cell.quiet { background: transparent; color: var(--muted); }
+
+    .c-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border-bottom: 3px solid var(--keyline); }
+    .c-tile { background: var(--board); padding: var(--s3) var(--s3) var(--s4); }
+    .c-tile .k { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); display: block; }
+    .c-tile .v { font-family: var(--mono); font-size: 1.75rem; font-weight: 700; letter-spacing: -0.05em; line-height: 1.05; display: block; margin-top: 6px; font-variant-numeric: tabular-nums; }
+    .c-tile .v.sm { font-size: 0.9375rem; letter-spacing: -0.02em; padding-top: 8px; }
+
+    .c-thumb { min-height: 72px; display: flex; align-items: center; justify-content: center; background: var(--action); color: var(--action-ink); font-family: var(--mono); font-size: 0.9375rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; border-top: 1px solid var(--keyline); }
+    .c-foot-count { min-height: 52px; display: flex; align-items: center; justify-content: space-between; padding: 0 var(--s4); border-top: 3px solid var(--keyline); font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+    .c-foot-count b { color: var(--ink); font-size: 0.9375rem; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+
+    .c-nav { display: flex; border-top: 3px solid var(--keyline); }
+    .c-nav a { flex: 1 1 0; min-height: 56px; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); border-right: 1px solid var(--line); text-decoration: none; }
+    .c-nav a:last-child { border-right: 0; }
+    .c-nav a.is-on { color: var(--ink); background: var(--alt); }
+
+    .c-scrim { position: absolute; inset: 0; background: color-mix(in oklab, var(--ink) 55%, transparent); }
+    .c-sheet { position: absolute; left: 0; right: 0; bottom: 0; background: var(--board); border-top: 3px solid var(--keyline); display: flex; flex-direction: column; }
+    .c-grip { height: 20px; display: flex; align-items: center; justify-content: center; }
+    .c-grip span { display: block; width: 44px; height: 3px; background: var(--line); }
+    .c-sheet-head { display: flex; align-items: center; gap: 10px; padding: 4px var(--s4) var(--s3); border-bottom: 1px solid var(--line); }
+    .c-sheet-head .n { font-family: var(--mono); font-size: 1.75rem; font-weight: 700; letter-spacing: -0.05em; font-variant-numeric: tabular-nums; }
+    .c-sheet-head .who { flex: 1 1 auto; min-width: 0; font-size: 1.0625rem; font-weight: 600; }
+    .c-sheet-body { padding: var(--s2) var(--s4) var(--s3); }
+    .c-undo { display: flex; align-items: center; justify-content: center; min-height: 44px; border-top: 1px solid var(--line); color: var(--out); font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+
+    /* ---------- bascule ---------- */
+
+    @keyframes flip {
+        from { transform: scaleY(0.1); opacity: 0.4; }
+        to { transform: scaleY(1); opacity: 1; }
+    }
+
+    .flip { animation: flip 130ms ease-out 900ms 1 both; transform-origin: center; }
+
+    @media (prefers-reduced-motion: reduce) {
+        .flip { animation: none; }
+    }
+
+    /* ---------- synthèse ---------- */
+
+    .reco { margin-top: var(--s7); border-top: 3px solid var(--keyline); padding-top: var(--s4); }
+    .reco h2 { margin: 0 0 var(--s3); font-size: 1.625rem; font-weight: 700; letter-spacing: -0.03em; }
+    .reco p { max-width: 66ch; }
+
+    .tbl { width: 100%; border-collapse: collapse; margin-top: var(--s4); font-size: 0.875rem; }
+    .tbl th, .tbl td { border: 1px solid var(--line); padding: 8px 10px; text-align: left; vertical-align: top; }
+    .tbl th { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+    .tbl td b { font-family: var(--mono); font-size: 0.8125rem; letter-spacing: -0.04em; }
+    .tbl-wrap { overflow-x: auto; }
+
+    .cost { display: grid; gap: var(--s4); grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-top: var(--s5); }
+    .cost > div { border-top: 3px solid var(--keyline); padding-top: var(--s2); }
+    .cost h3 { margin: 0 0 var(--s2); font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
+    .cost ul { margin: 0; padding-left: 18px; font-size: 0.875rem; }
+    .cost li { margin-bottom: 3px; }
+    .cost code { font-family: var(--mono); font-size: 0.75rem; letter-spacing: -0.04em; }
+
+    a { color: inherit; }
+</style>
+
+<div class="page">
+
+    <header class="top">
+        <div>
+            <span class="lbl">Backyard Race · proposition d’architecture d’écrans</span>
+            <h1>Trois façons de tenir la même charte</h1>
+        </div>
+        <button class="swap" type="button" id="swap" aria-live="polite">Passer en nuit</button>
+    </header>
+
+    <p class="lede">
+        La charte ne bouge pas : <strong>Instrument Sans</strong> pour les mots,
+        <strong>Martian Mono</strong> pour les chiffres, zéro arrondi, une encre presque noire et
+        <strong>quatre statuts</strong> pour toute la couleur. Ce qui bouge, c’est la façon dont un
+        écran est monté — ce que l’œil trouve en premier, où vit la navigation, et ce que le pouce
+        atteint sans viser.
+    </p>
+
+    <ul class="diag">
+        <li>
+            <b>Trois navigations pour six destinations</b>
+            <span>Sidebar rétractable, fil d’Ariane, barre basse à icônes : le squelette d’un SaaS multi-modules, posé sur un produit qui vit une nuit.</span>
+        </li>
+        <li>
+            <b>Aucun écran ne dit ce qui compte maintenant</b>
+            <span>Titre centré, badge dessous, pile d’espacements égaux. Tout a le même poids, donc rien n’a de poids.</span>
+        </li>
+        <li>
+            <b>Les pages d’accueil ne font que lier</b>
+            <span>« Gestion » est quatre lignes icône + libellé. L’accueil coureur est un titre, un badge et deux boutons.</span>
+        </li>
+        <li>
+            <b>Le bouton crie plus fort que le dossard</b>
+            <span>Pleine largeur, bordé, capitales espacées, répété trois fois par écran : c’est l’élément le plus fort de la page, et il ne porte aucune information.</span>
+        </li>
+    </ul>
+
+    <!-- ===================== A ===================== -->
+
+    <section class="dir">
+        <div class="dir-head">
+            <span class="rank">A</span>
+            <h2>Quai</h2>
+            <span class="tag">— le panneau est l’application</span>
+        </div>
+
+        <p class="thesis">
+            La charte dit « panneau des départs » ; l’application met ce panneau dans un tiroir de
+            SaaS. La direction A retire le tiroir. Un <strong>bandeau de quai</strong> collé en haut
+            porte la seule vérité de l’événement — premier départ avant la course, tour en cours
+            pendant. Sous lui, un <strong>rail d’onglets en mono</strong>, sans une seule icône. Puis
+            une colonne de lignes à bord perdu, séparées par un filet, sans carte ni marge intérieure.
+        </p>
+
+        <div class="facts">
+            <div>
+                <h3>Ce qui disparaît</h3>
+                <p>Sidebar, fil d’Ariane, barre basse, icônes de navigation, cartes, et les boutons pleine largeur empilés.</p>
+            </div>
+            <div>
+                <h3>La signature</h3>
+                <p>Le bandeau. Invariant d’un écran à l’autre, c’est la seule chose qui bouge — et elle bouge par bascule de 130 ms.</p>
+            </div>
+            <div>
+                <h3>Une ligne, une forme</h3>
+                <p>Libellé mono à gauche, valeur en chiffres tabulaires à droite. Un document, un fait, un coureur : la même ligne.</p>
+            </div>
+        </div>
+
+        <div class="boards">
+
+            <figure class="board">
+                <div class="screen">
+                    <div class="a-band">
+                        <div class="a-band-top">
+                            <span class="lbl">Backyard des Coteaux</span>
+                            <em>32/40 PLACES</em>
+                        </div>
+                        <p class="a-read">
+                            <span class="k">Premier départ</span>
+                            <span class="v">13:00</span>
+                            <span class="t">sam 12 sept</span>
+                        </p>
+                    </div>
+                    <nav class="a-rail">
+                        <span class="a-tab is-on">Accueil</span>
+                        <span class="a-tab">Inscription</span>
+                        <span class="a-tab">Briefing</span>
+                        <span class="a-tab">Docs</span>
+                    </nav>
+                    <div class="a-hero">
+                        <p class="a-hero-n">
+                            <span class="k">Dossard</span>
+                            <span class="v">014</span>
+                        </p>
+                        <span class="stamp stamp-run"><span class="sq sq-run"></span>Confirmée</span>
+                    </div>
+                    <p class="a-sec lbl">L’événement</p>
+                    <div class="a-row"><span class="k">Lieu</span><span class="v sans">Saint-Clément (69)</span></div>
+                    <div class="a-row"><span class="k">Boucle</span><span class="v">6,706 km</span></div>
+                    <div class="a-row"><span class="k">Format</span><span class="v sans">Une boucle par heure</span></div>
+                    <div class="a-row"><span class="k">Rassemblement</span><span class="v">12:40</span></div>
+                    <p class="a-sec lbl">Mon inscription</p>
+                    <div class="a-row"><span class="k">Coureur</span><span class="v sans">Camille Roussel</span></div>
+                    <div class="a-row"><span class="k">Déposée le</span><span class="v">04.08.2026</span></div>
+                    <div class="a-row"><span class="k">Modifiable</span><span class="v sans">Non, elle est confirmée</span></div>
+                    <div class="grow"></div>
+                    <div class="a-bar">Voir mon inscription</div>
+                </div>
+                <figcaption>
+                    <b>A1 · Accueil coureur</b>
+                    <span>Le dossard occupe la première ligne parce que c’est la seule chose qu’on cherche. Une action, en pied, à bord perdu.</span>
+                </figcaption>
+            </figure>
+
+            <figure class="board">
+                <div class="screen">
+                    <div class="a-band">
+                        <div class="a-band-top">
+                            <span class="lbl">Backyard des Coteaux</span>
+                            <em>32/40 PLACES</em>
+                        </div>
+                        <p class="a-read">
+                            <span class="k">Premier départ</span>
+                            <span class="v">13:00</span>
+                            <span class="t">sam 12 sept</span>
+                        </p>
+                    </div>
+                    <nav class="a-rail">
+                        <span class="a-tab">Accueil</span>
+                        <span class="a-tab is-on">Inscription</span>
+                        <span class="a-tab">Briefing</span>
+                        <span class="a-tab">Docs</span>
+                    </nav>
+                    <p class="a-sec lbl">Le coureur</p>
+                    <div class="a-row"><span class="k">Nom</span><span class="v sans">Roussel</span></div>
+                    <div class="a-row"><span class="k">Prénom</span><span class="v sans">Camille</span></div>
+                    <div class="a-row"><span class="k">Naissance</span><span class="v">14.03.1991</span></div>
+                    <div class="a-row"><span class="k">Téléphone</span><span class="v">06 42 88 17 05</span></div>
+                    <div class="a-row"><span class="k">Email</span><span class="v" style="font-size:0.6875rem">camille.roussel@mailo.fr</span></div>
+                    <div class="a-row"><span class="k">PPS</span><span class="v">PPS40218837</span></div>
+                    <p class="a-sec lbl">En cas de pépin</p>
+                    <div class="a-row"><span class="k">À prévenir</span><span class="v sans">Léa Roussel</span></div>
+                    <div class="a-row"><span class="k">Son téléphone</span><span class="v">06 11 54 90 22</span></div>
+                    <p class="a-sec lbl">À signaler</p>
+                    <div class="a-row"><span class="k">Remarques</span><span class="v sans" style="max-width:210px">Allergie aux fruits à coque</span></div>
+                    <p class="a-note">Ton inscription est confirmée : contacte le gérant pour la faire changer.</p>
+                    <div class="grow"></div>
+                </div>
+                <figcaption>
+                    <b>A2 · Mon inscription, confirmée</b>
+                    <span>Verrouillée, donc aucune barre d’action : l’écran ne montre pas un bouton qu’on ne peut pas presser.</span>
+                </figcaption>
+            </figure>
+
+            <figure class="board">
+                <div class="screen">
+                    <div class="a-band">
+                        <div class="a-band-top">
+                            <span class="lbl">Backyard des Coteaux</span>
+                            <em>32/40 PLACES</em>
+                        </div>
+                        <p class="a-read">
+                            <span class="k">Premier départ</span>
+                            <span class="v">13:00</span>
+                            <span class="t">sam 12 sept</span>
+                        </p>
+                    </div>
+                    <nav class="a-rail">
+                        <span class="a-tab">Accueil</span>
+                        <span class="a-tab">Inscription</span>
+                        <span class="a-tab is-on">Briefing</span>
+                        <span class="a-tab">Docs</span>
+                    </nav>
+                    <div class="a-prose">
+                        <h4>Le départ</h4>
+                        <p>Rassemblement à 12:40 sous le chapiteau. Un coup de corne trois minutes avant chaque départ, puis un au départ. Le tour se referme à l’heure pile, sans exception.</p>
+                        <h4>La boucle</h4>
+                        <p>6,706 km, un seul sens, rubalise blanche aux intersections. Deux passages à gué : chaussures qui sèchent vite.</p>
+                        <h4>Le camp de base</h4>
+                        <ul>
+                            <li>Une table par coureur, à l’arrivée du chapiteau.</li>
+                            <li>Eau et ravitaillement salé en continu.</li>
+                            <li>Groupe électrogène coupé de 01:00 à 05:00.</li>
+                        </ul>
+                        <h4>L’élimination</h4>
+                        <p>Ne pas franchir la ligne avant l’heure pile met fin à la course. Le gérant l’annonce à voix haute avant de la saisir.</p>
+                    </div>
+                    <p class="a-sec lbl">À télécharger</p>
+                    <div class="a-file"><span><b>Règlement 2026</b><span>PDF · 240 ko</span></span><i>↓</i></div>
+                    <div class="a-file"><span><b>Consignes camp de base</b><span>PDF · 88 ko</span></span><i>↓</i></div>
+                    <div class="a-file"><span><b>Trace de la boucle</b><span>GPX · 12 ko</span></span><i>↓</i></div>
+                    <div class="grow"></div>
+                </div>
+                <figcaption>
+                    <b>A3 · Briefing</b>
+                    <span>Les titres de niveau 3 du Markdown tombent en libellés mono : la prose garde la voix du panneau.</span>
+                </figcaption>
+            </figure>
+
+            <figure class="board">
+                <div class="screen">
+                    <div class="a-band">
+                        <div class="a-band-top">
+                            <span class="lbl">Backyard des Coteaux</span>
+                            <em>32/40 PLACES</em>
+                        </div>
+                        <p class="a-read">
+                            <span class="k">Premier départ</span>
+                            <span class="v">13:00</span>
+                            <span class="t">sam 12 sept</span>
+                        </p>
+                    </div>
+                    <nav class="a-rail">
+                        <span class="a-tab is-on">Inscriptions</span>
+                        <span class="a-tab">Événement</span>
+                        <span class="a-tab">Briefing</span>
+                        <span class="a-tab">Docs</span>
+                    </nav>
+                    <nav class="a-filters">
+                        <span class="a-f">Toutes <b>40</b></span>
+                        <span class="a-f is-on">En attente <b>6</b></span>
+                        <span class="a-f">Confirmées <b>32</b></span>
+                        <span class="a-f">Annulées <b>2</b></span>
+                    </nav>
+                    <div class="a-slat">
+                        <span class="bib">—</span>
+                        <span class="who"><b>Yanis Belkacem</b><span><span class="sq sq-quit"></span>Déposée 06.08 · 34 ans</span></span>
+                        <span class="a-go">Confirmer</span>
+                    </div>
+                    <div class="a-slat">
+                        <span class="bib">—</span>
+                        <span class="who"><b>Fanny Le Guen</b><span><span class="sq sq-quit"></span>Déposée 06.08 · 41 ans</span></span>
+                        <span class="a-go">Confirmer</span>
+                    </div>
+                    <div class="a-slat">
+                        <span class="bib">—</span>
+                        <span class="who"><b>Naïm Sadaoui</b><span><span class="sq sq-quit"></span>Déposée 07.08 · 29 ans</span></span>
+                        <span class="a-go">Confirmer</span>
+                    </div>
+                    <div class="a-slat">
+                        <span class="bib">—</span>
+                        <span class="who"><b>Élodie Vasseur</b><span><span class="sq sq-quit"></span>Déposée 07.08 · 37 ans</span></span>
+                        <span class="a-go">Confirmer</span>
+                    </div>
+                    <div class="a-slat">
+                        <span class="bib">—</span>
+                        <span class="who"><b>Bruno Kessler</b><span><span class="sq sq-quit"></span>Déposée 08.08 · 52 ans</span></span>
+                        <span class="a-go">Confirmer</span>
+                    </div>
+                    <div class="a-slat">
+                        <span class="bib">—</span>
+                        <span class="who"><b>Awa Diomandé</b><span><span class="sq sq-quit"></span>Déposée 09.08 · 31 ans</span></span>
+                        <span class="a-go">Confirmer</span>
+                    </div>
+                    <div class="grow"></div>
+                </div>
+                <figcaption>
+                    <b>A4 · Gestion des inscriptions</b>
+                    <span>Les filtres portent leur compteur : une ligne remplace la grille de pastilles bordées <em>et</em> le compteur de places.</span>
+                </figcaption>
+            </figure>
+
+            <figure class="board">
+                <div class="screen" data-scheme="dark">
+                    <div class="a-band">
+                        <div class="a-band-top">
+                            <span class="lbl">Backyard des Coteaux</span>
+                            <em>28 EN COURSE</em>
+                        </div>
+                        <p class="a-read">
+                            <span class="k">Tour 07</span>
+                            <span class="v flip">20:00</span>
+                            <span class="t">→ 21:00</span>
+                        </p>
+                    </div>
+                    <nav class="a-rail">
+                        <span class="a-tab is-on">Course</span>
+                        <span class="a-tab">Coureurs</span>
+                        <span class="a-tab">Inscriptions</span>
+                        <span class="a-tab">Docs</span>
+                    </nav>
+                    <div class="a-slat">
+                        <span class="bib">014</span>
+                        <span class="who"><b>Camille Roussel</b><span><span class="sq sq-run"></span>Rentrée à 51:12</span></span>
+                        <span class="cell"><b>07</b><span>Boucles</span></span>
+                    </div>
+                    <div class="a-slat">
+                        <span class="bib">003</span>
+                        <span class="who"><b>Théo Marchand</b><span><span class="sq sq-run"></span>En boucle</span></span>
+                        <span class="a-go">Valider</span>
+                    </div>
+                    <div class="a-slat">
+                        <span class="bib">021</span>
+                        <span class="who"><b>Awa Diomandé</b><span><span class="sq sq-run"></span>En boucle</span></span>
+                        <span class="a-go">Valider</span>
+                    </div>
+                    <div class="a-slat">
+                        <span class="bib">008</span>
+                        <span class="who"><b>Julien Perret</b><span><span class="sq sq-run"></span>Rentré à 57:40</span></span>
+                        <span class="cell"><b>07</b><span>Boucles</span></span>
+                    </div>
+                    <div class="a-slat">
+                        <span class="bib">017</span>
+                        <span class="who"><b>Marion Chatel</b><span><span class="sq sq-out"></span>Éliminée au tour 06</span></span>
+                        <span class="cell"><b>06</b><span>Boucles</span></span>
+                    </div>
+                    <div class="a-slat">
+                        <span class="bib">005</span>
+                        <span class="who"><b>Bruno Kessler</b><span><span class="sq sq-quit"></span>Abandon au tour 04</span></span>
+                        <span class="cell"><b>04</b><span>Boucles</span></span>
+                    </div>
+                    <div class="grow"></div>
+                </div>
+                <figcaption>
+                    <b>A5 · Nuit de course (prospectif)</b>
+                    <span>L’écran de BR-13, monté sur la même ligne. Le bandeau bascule à chaque tour ; l’ambre de la nuit ne sert qu’à l’action.</span>
+                </figcaption>
+            </figure>
+
+        </div>
+
+        <div class="risk">
+            <h3>Le pari</h3>
+            <p>
+                Aucune icône, aucune carte, aucun arrondi : l’écran ressemble à un horaire affiché,
+                pas à une application. Et le rail ne tiendra pas dix destinations — mais ce produit
+                n’en aura jamais dix, et il ne servira qu’une nuit.
+            </p>
+        </div>
+    </section>
+
+    <!-- ===================== B ===================== -->
+
+    <section class="dir">
+        <div class="dir-head">
+            <span class="rank">B</span>
+            <h2>Dossard</h2>
+            <span class="tag">— une seule page, dépliée</span>
+        </div>
+
+        <p class="thesis">
+            Un coureur a besoin d’un numéro et de quatre blocs d’information qui ne changent pas.
+            La direction B arrête de les répartir sur quatre routes : le <strong>dossard</strong>
+            occupe le premier tiers de l’écran, et le reste est plié dessous en sections. Ouvrir une
+            section réduit le dossard à une bande de 50 px — l’identité reste visible, la place va au
+            contenu. La navigation du coureur tombe à zéro.
+        </p>
+
+        <div class="facts">
+            <div>
+                <h3>La signature</h3>
+                <p>Le dossard comme objet imprimé : bord détachable, en-tête d’événement, numéro lisible à bout de bras dans le noir.</p>
+            </div>
+            <div>
+                <h3>Le gérant</h3>
+                <p>Même logique appliquée aux inscriptions : la fiche s’ouvre sur place, on ne quitte jamais la liste des quarante.</p>
+            </div>
+            <div>
+                <h3>Ce que ça retire</h3>
+                <p>Trois routes coureur, la barre basse, le fil d’Ariane. Reste une porte « Gestion » en pied, pour le gérant.</p>
+            </div>
+        </div>
+
+        <div class="boards">
+
+            <figure class="board">
+                <div class="screen">
+                    <div class="b-tear"></div>
+                    <div class="b-bib">
+                        <div class="b-bib-head">
+                            <span class="lbl">Backyard des Coteaux</span>
+                            <span class="lbl">Sam 12 sept · 13:00</span>
+                        </div>
+                        <p class="b-num"><small>Dossard</small>014</p>
+                        <div class="b-who">
+                            <b>Camille Roussel</b>
+                            <span class="stamp stamp-run">Confirmée</span>
+                        </div>
+                    </div>
+                    <div class="b-sh"><span class="t">Mon inscription</span><span class="h"><em>Roussel · 06 42 88 17 05</em><i>+</i></span></div>
+                    <div class="b-sh"><span class="t">Le briefing</span><span class="h"><em>4 sections</em><i>+</i></span></div>
+                    <div class="b-sh"><span class="t">Les documents</span><span class="h"><em>3 fichiers</em><i>+</i></span></div>
+                    <div class="b-sh"><span class="t">L’événement</span><span class="h"><em>Saint-Clément · 6,706 km</em><i>+</i></span></div>
+                    <div class="grow"></div>
+                    <div class="b-foot">
+                        <p class="b-quiet">Ton inscription est confirmée. Rendez-vous à 12:40 sous le chapiteau.</p>
+                        <div class="b-door"><span>Gestion</span><span>→</span></div>
+                    </div>
+                </div>
+                <figcaption>
+                    <b>B1 · Ma course, tout replié</b>
+                    <span>Chaque en-tête de section porte déjà sa réponse courte à droite : on n’ouvre que si on veut le détail.</span>
+                </figcaption>
+            </figure>
+
+            <figure class="board">
+                <div class="screen">
+                    <div class="b-strip">
+                        <span class="n">014</span>
+                        <span class="who">Camille Roussel</span>
+                        <span class="stamp stamp-run">Confirmée</span>
+                    </div>
+                    <div class="b-sh is-on"><span class="t">Mon inscription</span><span class="h"><i>−</i></span></div>
+                    <div class="b-body">
+                        <div class="b-pair"><span class="k">Nom</span><span class="v sans">Roussel</span></div>
+                        <div class="b-pair"><span class="k">Prénom</span><span class="v sans">Camille</span></div>
+                        <div class="b-pair"><span class="k">Naissance</span><span class="v">14.03.1991</span></div>
+                        <div class="b-pair"><span class="k">Téléphone</span><span class="v">06 42 88 17 05</span></div>
+                        <div class="b-pair"><span class="k">Email</span><span class="v" style="font-size:0.6875rem">camille.roussel@mailo.fr</span></div>
+                        <div class="b-pair"><span class="k">PPS</span><span class="v">PPS40218837</span></div>
+                        <div class="b-pair"><span class="k">À prévenir</span><span class="v sans">Léa Roussel</span></div>
+                        <div class="b-pair"><span class="k">Son téléphone</span><span class="v">06 11 54 90 22</span></div>
+                        <div class="b-pair"><span class="k">À signaler</span><span class="v sans" style="max-width:190px">Allergie aux fruits à coque</span></div>
+                    </div>
+                    <div class="b-sh"><span class="t">Le briefing</span><span class="h"><em>4 sections</em><i>+</i></span></div>
+                    <div class="b-sh"><span class="t">Les documents</span><span class="h"><em>3 fichiers</em><i>+</i></span></div>
+                    <div class="b-sh"><span class="t">L’événement</span><span class="h"><em>Saint-Clément · 6,706 km</em><i>+</i></span></div>
+                    <div class="grow"></div>
+                    <div class="b-foot">
+                        <p class="b-quiet">Confirmée : contacte le gérant pour la faire changer.</p>
+                    </div>
+                </div>
+                <figcaption>
+                    <b>B2 · Une section ouverte</b>
+                    <span>Le dossard se replie en bande, les autres sections restent atteignables sans revenir en haut.</span>
+                </figcaption>
+            </figure>
+
+            <figure class="board">
+                <div class="screen" data-scheme="dark">
+                    <div class="b-strip">
+                        <span class="n">014</span>
+                        <span class="who">Camille Roussel</span>
+                        <span class="stamp stamp-run">Confirmée</span>
+                    </div>
+                    <div class="b-sh"><span class="t">Mon inscription</span><span class="h"><em>Roussel</em><i>+</i></span></div>
+                    <div class="b-sh is-on"><span class="t">Le briefing</span><span class="h"><i>−</i></span></div>
+                    <div class="a-prose" style="padding-bottom:var(--s3)">
+                        <h4>Le départ</h4>
+                        <p>Rassemblement à 12:40 sous le chapiteau. Un coup de corne trois minutes avant chaque départ, puis un au départ. Le tour se referme à l’heure pile, sans exception.</p>
+                        <h4>La boucle</h4>
+                        <p>6,706 km, un seul sens, rubalise blanche aux intersections. Deux passages à gué.</p>
+                        <h4>Le camp de base</h4>
+                        <p>Une table par coureur. Eau et salé en continu. Groupe électrogène coupé de 01:00 à 05:00.</p>
+                        <h4>L’élimination</h4>
+                        <p>Ne pas franchir la ligne avant l’heure pile met fin à la course.</p>
+                    </div>
+                    <div class="b-sh"><span class="t">Les documents</span><span class="h"><em>3 fichiers</em><i>+</i></span></div>
+                    <div class="b-sh"><span class="t">L’événement</span><span class="h"><em>Saint-Clément · 6,706 km</em><i>+</i></span></div>
+                    <div class="grow"></div>
+                </div>
+                <figcaption>
+                    <b>B3 · Le briefing, à 4 h du matin</b>
+                    <span>Même page, même position dans la liste : la mémoire du geste tient parce que rien ne se déplace.</span>
+                </figcaption>
+            </figure>
+
+            <figure class="board">
+                <div class="screen">
+                    <div class="b-mhead">
+                        <span><span class="k">Inscriptions confirmées</span><span class="v">32 / 40</span></span>
+                        <span><span class="k">En attente</span><span class="v">06</span></span>
+                    </div>
+                    <nav class="a-filters">
+                        <span class="a-f">Toutes <b>40</b></span>
+                        <span class="a-f is-on">En attente <b>6</b></span>
+                        <span class="a-f">Confirmées <b>32</b></span>
+                        <span class="a-f">Annulées <b>2</b></span>
+                    </nav>
+                    <div class="b-fiche">
+                        <span class="n">—</span>
+                        <span class="who"><b>Yanis Belkacem</b><span><span class="sq sq-quit"></span>En attente · déposée 06.08</span></span>
+                        <i>+</i>
+                    </div>
+                    <div class="b-fiche is-on">
+                        <span class="n">—</span>
+                        <span class="who"><b>Fanny Le Guen</b><span><span class="sq sq-quit"></span>En attente · déposée 06.08</span></span>
+                        <i>−</i>
+                    </div>
+                    <div class="b-body">
+                        <div class="b-pair"><span class="k">Naissance</span><span class="v">22.11.1984 · 41 ans</span></div>
+                        <div class="b-pair"><span class="k">Téléphone</span><span class="v">06 74 03 55 18</span></div>
+                        <div class="b-pair"><span class="k">PPS</span><span class="v">PPS31904772</span></div>
+                        <div class="b-pair"><span class="k">À prévenir</span><span class="v sans">Erwan Le Guen · 06 21 88 40 07</span></div>
+                        <div class="b-pair"><span class="k">À signaler</span><span class="v sans" style="max-width:185px">Végétarienne, pas de gluten</span></div>
+                    </div>
+                    <div class="b-acts">
+                        <span class="b-act quiet">Annuler</span>
+                        <span class="b-act">Confirmer</span>
+                    </div>
+                    <div class="b-fiche">
+                        <span class="n">—</span>
+                        <span class="who"><b>Naïm Sadaoui</b><span><span class="sq sq-quit"></span>En attente · déposée 07.08</span></span>
+                        <i>+</i>
+                    </div>
+                    <div class="b-fiche">
+                        <span class="n">014</span>
+                        <span class="who"><b>Camille Roussel</b><span><span class="sq sq-run"></span>Confirmée · dossard 014</span></span>
+                        <i>+</i>
+                    </div>
+                    <div class="grow"></div>
+                </div>
+                <figcaption>
+                    <b>B4 · Gestion, fiche ouverte sur place</b>
+                    <span>Aucun changement de page pour lire un dossier et trancher : les deux actions sont sous les faits qui les motivent.</span>
+                </figcaption>
+            </figure>
+
+            <figure class="board">
+                <div class="screen" data-scheme="dark">
+                    <div class="b-tear"></div>
+                    <div class="b-bib">
+                        <div class="b-bib-head">
+                            <span class="lbl">Dossard 014 · Camille Roussel</span>
+                            <span class="lbl">Tour 07</span>
+                        </div>
+                        <p class="b-num flip"><small>Boucles terminées</small>07</p>
+                        <div class="b-who">
+                            <b>46,9 km</b>
+                            <span class="stamp stamp-run"><span class="sq sq-run"></span>En course</span>
+                        </div>
+                    </div>
+                    <div class="a-row"><span class="k">Prochain départ</span><span class="v">21:00</span></div>
+                    <div class="a-row"><span class="k">Dernière boucle</span><span class="v">51:12</span></div>
+                    <div class="a-row"><span class="k">Encore en course</span><span class="v">28 coureurs</span></div>
+                    <div class="b-sh"><span class="t">Le briefing</span><span class="h"><em>4 sections</em><i>+</i></span></div>
+                    <div class="b-sh"><span class="t">Les documents</span><span class="h"><em>3 fichiers</em><i>+</i></span></div>
+                    <div class="b-sh"><span class="t">Mon inscription</span><span class="h"><em>Roussel</em><i>+</i></span></div>
+                    <div class="grow"></div>
+                    <div class="b-foot">
+                        <p class="b-quiet">Le gérant valide la boucle. Rien à faire sur cet écran.</p>
+                    </div>
+                </div>
+                <figcaption>
+                    <b>B5 · Nuit de course, côté coureur (prospectif)</b>
+                    <span>Le dossard bascule : le grand nombre devient le compteur de boucles, le numéro remonte dans l’en-tête.</span>
+                </figcaption>
+            </figure>
+
+        </div>
+
+        <div class="risk">
+            <h3>Le pari</h3>
+            <p>
+                On supprime des routes que BR-33 vient tout juste de câbler, et une section pliée n’a
+                pas d’URL : le briefing perd son lien propre, donc son partage par message. À trancher
+                — soit les sections deviennent des ancres, soit le briefing garde une route à lui.
+            </p>
+        </div>
+    </section>
+
+    <!-- ===================== C ===================== -->
+
+    <section class="dir">
+        <div class="dir-head">
+            <span class="rank">C</span>
+            <h2>Console</h2>
+            <span class="tag">— tout est subordonné au coût du geste</span>
+        </div>
+
+        <p class="thesis">
+            Le gérant répète le même geste quarante fois par heure, la nuit, à une main, avec une
+            lampe frontale. La direction C part de là. En-tête d’une ligne à 42 px, compteurs en
+            mono sur une ligne, filtres en texte souligné, lattes à 56 px dont <strong>le tiers droit
+            est le bouton</strong> — pas de visée. Le détail s’ouvre en tiroir : la liste reste
+            derrière, on ne la quitte jamais. Et la <strong>barre de pouce de 72 px</strong> revient,
+            comme la charte l’avait exigé avant de la perdre.
+        </p>
+
+        <div class="facts">
+            <div>
+                <h3>La signature</h3>
+                <p>La barre de pouce. Elle n’apparaît que là où il existe une action unique et évidente, jamais sur une liste.</p>
+            </div>
+            <div>
+                <h3>Côté coureur</h3>
+                <p>Trois tuiles de lecture en haut — dossard, statut, départ — puis les faits. Une barre basse de trois entrées, en texte, sans icône.</p>
+            </div>
+            <div>
+                <h3>Densité</h3>
+                <p>56 px par latte au lieu de 68. Dix coureurs à l’écran plutôt que sept, sans descendre sous la cible de 44 px.</p>
+            </div>
+        </div>
+
+        <div class="boards">
+
+            <figure class="board">
+                <div class="screen">
+                    <div class="c-top">
+                        <span class="lbl">Backyard des Coteaux</span>
+                        <span class="now">Sam 12 sept</span>
+                    </div>
+                    <div class="c-tiles">
+                        <div class="c-tile"><span class="k">Dossard</span><span class="v">014</span></div>
+                        <div class="c-tile"><span class="k">Statut</span><span class="v sm" style="color:var(--run)">Confirmée</span></div>
+                        <div class="c-tile"><span class="k">Départ</span><span class="v">13:00</span></div>
+                    </div>
+                    <div class="c-counts">Camille Roussel · inscrite le 04.08</div>
+                    <p class="a-sec lbl">L’événement</p>
+                    <div class="a-row"><span class="k">Lieu</span><span class="v sans">Saint-Clément (69)</span></div>
+                    <div class="a-row"><span class="k">Boucle</span><span class="v">6,706 km</span></div>
+                    <div class="a-row"><span class="k">Format</span><span class="v sans">Une boucle par heure</span></div>
+                    <div class="a-row"><span class="k">Rassemblement</span><span class="v">12:40</span></div>
+                    <p class="a-sec lbl">À lire avant de venir</p>
+                    <div class="a-file"><span><b>Le briefing</b><span>4 sections · mis à jour le 10.08</span></span><i>→</i></div>
+                    <div class="a-file"><span><b>Règlement 2026</b><span>PDF · 240 ko</span></span><i>↓</i></div>
+                    <div class="a-file"><span><b>Trace de la boucle</b><span>GPX · 12 ko</span></span><i>↓</i></div>
+                    <div class="grow"></div>
+                    <nav class="c-nav">
+                        <a href="#" class="is-on">Accueil</a>
+                        <a href="#">Inscription</a>
+                        <a href="#">Infos</a>
+                    </nav>
+                </div>
+                <figcaption>
+                    <b>C1 · Accueil coureur</b>
+                    <span>Trois lectures en haut, rien à décider. La barre basse porte trois mots, pas six icônes.</span>
+                </figcaption>
+            </figure>
+
+            <figure class="board">
+                <div class="screen">
+                    <div class="c-top">
+                        <span class="lbl">Mon inscription</span>
+                        <span class="now">En attente</span>
+                    </div>
+                    <div class="c-counts">Déposée le 06.08 · le gérant confirme dans les 48 h · <b>6</b> en attente devant</div>
+                    <p class="a-sec lbl">Le coureur</p>
+                    <div class="a-row"><span class="k">Nom</span><span class="v sans">Roussel</span></div>
+                    <div class="a-row"><span class="k">Prénom</span><span class="v sans">Camille</span></div>
+                    <div class="a-row"><span class="k">Naissance</span><span class="v">14.03.1991</span></div>
+                    <div class="a-row"><span class="k">Téléphone</span><span class="v">06 42 88 17 05</span></div>
+                    <div class="a-row"><span class="k">Email</span><span class="v" style="font-size:0.6875rem">camille.roussel@mailo.fr</span></div>
+                    <div class="a-row"><span class="k">PPS</span><span class="v">PPS40218837</span></div>
+                    <p class="a-sec lbl">En cas de pépin</p>
+                    <div class="a-row"><span class="k">À prévenir</span><span class="v sans">Léa Roussel</span></div>
+                    <div class="a-row"><span class="k">Son téléphone</span><span class="v">06 11 54 90 22</span></div>
+                    <p class="a-sec lbl">À signaler</p>
+                    <div class="a-row"><span class="k">Remarques</span><span class="v sans" style="max-width:205px">Allergie aux fruits à coque</span></div>
+                    <div class="grow"></div>
+                    <div class="c-thumb">Corriger</div>
+                    <nav class="c-nav">
+                        <a href="#">Accueil</a>
+                        <a href="#" class="is-on">Inscription</a>
+                        <a href="#">Infos</a>
+                    </nav>
+                </div>
+                <figcaption>
+                    <b>C2 · Mon inscription, encore modifiable</b>
+                    <span>La barre de pouce ne porte qu’un mot, et seulement tant que l’inscription est en attente.</span>
+                </figcaption>
+            </figure>
+
+            <figure class="board">
+                <div class="screen">
+                    <div class="c-top">
+                        <span class="lbl">Gestion · inscriptions</span>
+                        <span class="now">Sam 12 sept</span>
+                    </div>
+                    <div class="c-counts"><b>40</b> déposées · <b>32</b> confirmées · <b>6</b> en attente · <b>2</b> annulées</div>
+                    <nav class="c-filters">
+                        <span class="c-f is-on">En attente</span>
+                        <span class="c-f">Confirmées</span>
+                        <span class="c-f">Annulées</span>
+                        <span class="c-f">Toutes</span>
+                    </nav>
+                    <div class="c-row">
+                        <span class="main"><span class="n">—</span><span class="who"><b>Yanis Belkacem</b><span><span class="sq sq-quit"></span>34 ans · 06.08</span></span></span>
+                        <span class="c-act-cell">Confirmer</span>
+                    </div>
+                    <div class="c-row">
+                        <span class="main"><span class="n">—</span><span class="who"><b>Fanny Le Guen</b><span><span class="sq sq-quit"></span>41 ans · 06.08</span></span></span>
+                        <span class="c-act-cell">Confirmer</span>
+                    </div>
+                    <div class="c-row">
+                        <span class="main"><span class="n">—</span><span class="who"><b>Naïm Sadaoui</b><span><span class="sq sq-quit"></span>29 ans · 07.08</span></span></span>
+                        <span class="c-act-cell">Confirmer</span>
+                    </div>
+                    <div class="c-row">
+                        <span class="main"><span class="n">—</span><span class="who"><b>Élodie Vasseur</b><span><span class="sq sq-quit"></span>37 ans · 07.08</span></span></span>
+                        <span class="c-act-cell">Confirmer</span>
+                    </div>
+                    <div class="c-row">
+                        <span class="main"><span class="n">—</span><span class="who"><b>Bruno Kessler</b><span><span class="sq sq-quit"></span>52 ans · 08.08</span></span></span>
+                        <span class="c-act-cell">Confirmer</span>
+                    </div>
+                    <div class="c-row">
+                        <span class="main"><span class="n">—</span><span class="who"><b>Awa Diomandé</b><span><span class="sq sq-quit"></span>31 ans · 09.08</span></span></span>
+                        <span class="c-act-cell">Confirmer</span>
+                    </div>
+                    <div class="c-row">
+                        <span class="main"><span class="n">014</span><span class="who"><b>Camille Roussel</b><span><span class="sq sq-run"></span>Confirmée · 04.08</span></span></span>
+                        <span class="c-act-cell quiet">✓</span>
+                    </div>
+                    <div class="c-row">
+                        <span class="main"><span class="n">003</span><span class="who"><b>Théo Marchand</b><span><span class="sq sq-run"></span>Confirmée · 04.08</span></span></span>
+                        <span class="c-act-cell quiet">✓</span>
+                    </div>
+                    <div class="grow"></div>
+                    <div class="c-foot-count"><span>Places confirmées</span><b>32 / 40</b></div>
+                </div>
+                <figcaption>
+                    <b>C3 · Gestion, la liste</b>
+                    <span>Pas de barre de pouce sur une liste : l’action vit dans la latte. Le pied porte la seule vérité qui compte.</span>
+                </figcaption>
+            </figure>
+
+            <figure class="board">
+                <div class="screen">
+                    <div class="c-top">
+                        <span class="lbl">Gestion · inscriptions</span>
+                        <span class="now">Sam 12 sept</span>
+                    </div>
+                    <div class="c-counts"><b>40</b> déposées · <b>32</b> confirmées · <b>6</b> en attente · <b>2</b> annulées</div>
+                    <nav class="c-filters">
+                        <span class="c-f is-on">En attente</span>
+                        <span class="c-f">Confirmées</span>
+                        <span class="c-f">Annulées</span>
+                        <span class="c-f">Toutes</span>
+                    </nav>
+                    <div class="c-row">
+                        <span class="main"><span class="n">—</span><span class="who"><b>Yanis Belkacem</b><span><span class="sq sq-quit"></span>34 ans · 06.08</span></span></span>
+                        <span class="c-act-cell">Confirmer</span>
+                    </div>
+                    <div class="c-row">
+                        <span class="main"><span class="n">—</span><span class="who"><b>Fanny Le Guen</b><span><span class="sq sq-quit"></span>41 ans · 06.08</span></span></span>
+                        <span class="c-act-cell">Confirmer</span>
+                    </div>
+                    <div class="c-row">
+                        <span class="main"><span class="n">—</span><span class="who"><b>Naïm Sadaoui</b><span><span class="sq sq-quit"></span>29 ans · 07.08</span></span></span>
+                        <span class="c-act-cell">Confirmer</span>
+                    </div>
+                    <div class="grow"></div>
+                    <div class="c-scrim"></div>
+                    <div class="c-sheet">
+                        <div class="c-grip"><span></span></div>
+                        <div class="c-sheet-head">
+                            <span class="n">—</span>
+                            <span class="who">Fanny Le Guen</span>
+                            <span class="stamp stamp-quit">En attente</span>
+                        </div>
+                        <div class="c-sheet-body">
+                            <div class="b-pair"><span class="k">Naissance</span><span class="v">22.11.1984 · 41 ans</span></div>
+                            <div class="b-pair"><span class="k">Téléphone</span><span class="v">06 74 03 55 18</span></div>
+                            <div class="b-pair"><span class="k">Email</span><span class="v" style="font-size:0.6875rem">f.leguen@mailo.fr</span></div>
+                            <div class="b-pair"><span class="k">PPS</span><span class="v">PPS31904772</span></div>
+                            <div class="b-pair"><span class="k">À prévenir</span><span class="v sans">Erwan Le Guen · 06 21 88 40 07</span></div>
+                            <div class="b-pair"><span class="k">À signaler</span><span class="v sans" style="max-width:180px">Végétarienne, pas de gluten</span></div>
+                            <div class="b-pair"><span class="k">Déposée le</span><span class="v">06.08.2026 · 21:14</span></div>
+                        </div>
+                        <div class="c-undo">Annuler cette inscription</div>
+                        <div class="c-thumb">Confirmer · dossard 033</div>
+                    </div>
+                </div>
+                <figcaption>
+                    <b>C4 · Le détail en tiroir</b>
+                    <span>La liste reste derrière, la barre de pouce annonce le dossard qui sera attribué. Le geste destructeur est en texte, au-dessus.</span>
+                </figcaption>
+            </figure>
+
+            <figure class="board">
+                <div class="screen" data-scheme="dark">
+                    <div class="c-top">
+                        <span class="lbl">Tour 07 · 20:00 → 21:00</span>
+                        <span class="now">28 en course</span>
+                    </div>
+                    <div class="c-counts"><b>28</b> en course · <b>9</b> éliminés · <b>3</b> abandons · tour <b>07</b></div>
+                    <nav class="c-filters">
+                        <span class="c-f is-on">À valider <span class="tnum">12</span></span>
+                        <span class="c-f">En course</span>
+                        <span class="c-f">Sortis</span>
+                    </nav>
+                    <div class="c-row">
+                        <span class="main"><span class="n">003</span><span class="who"><b>Théo Marchand</b><span><span class="sq sq-run"></span>06 boucles · 40,2 km</span></span></span>
+                        <span class="c-act-cell">Valider</span>
+                    </div>
+                    <div class="c-row">
+                        <span class="main"><span class="n">021</span><span class="who"><b>Awa Diomandé</b><span><span class="sq sq-run"></span>06 boucles · 40,2 km</span></span></span>
+                        <span class="c-act-cell">Valider</span>
+                    </div>
+                    <div class="c-row">
+                        <span class="main"><span class="n">008</span><span class="who"><b>Julien Perret</b><span><span class="sq sq-run"></span>06 boucles · 40,2 km</span></span></span>
+                        <span class="c-act-cell">Valider</span>
+                    </div>
+                    <div class="c-row">
+                        <span class="main"><span class="n">030</span><span class="who"><b>Yanis Belkacem</b><span><span class="sq sq-run"></span>06 boucles · 40,2 km</span></span></span>
+                        <span class="c-act-cell">Valider</span>
+                    </div>
+                    <div class="c-row">
+                        <span class="main"><span class="n">014</span><span class="who"><b>Camille Roussel</b><span><span class="sq sq-run"></span>07 boucles · rentrée 51:12</span></span></span>
+                        <span class="c-act-cell quiet flip">✓</span>
+                    </div>
+                    <div class="c-row">
+                        <span class="main"><span class="n">012</span><span class="who"><b>Élodie Vasseur</b><span><span class="sq sq-run"></span>07 boucles · rentrée 55:03</span></span></span>
+                        <span class="c-act-cell quiet">✓</span>
+                    </div>
+                    <div class="grow"></div>
+                    <div class="c-foot-count"><span>Ferme dans</span><b>08:47</b></div>
+                </div>
+                <figcaption>
+                    <b>C5 · Nuit de course (prospectif)</b>
+                    <span>Le filtre « à valider » est l’écran par défaut : douze lattes, douze cibles de 96 px, aucune visée.</span>
+                </figcaption>
+            </figure>
+
+        </div>
+
+        <div class="risk">
+            <h3>Le pari</h3>
+            <p>
+                La densité est assumée : 56 px par latte et du texte à 11 px mono pour les
+                méta-données. C’est lisible sur un téléphone tenu à 30 cm, moins sur un écran posé
+                sur une table. Et le tiroir a un coût réel — un état d’ouverture à tenir côté client,
+                là où une route Inertia ne coûte rien.
+            </p>
+        </div>
+    </section>
+
+    <!-- ===================== synthèse ===================== -->
+
+    <section class="reco">
+        <h2>Ce que je recommande</h2>
+        <p>
+            Les trois directions ne répondent pas à la même question, donc elles se composent au lieu
+            de s’exclure. <strong>A</strong> tranche la coquille, <strong>B</strong> tranche
+            l’architecture côté coureur, <strong>C</strong> tranche l’interaction côté gérant. Prises
+            ensemble, elles donnent un produit cohérent : un bandeau de quai partout, une seule page
+            pour le coureur, une console pour la nuit.
+        </p>
+
+        <div class="tbl-wrap">
+            <table class="tbl">
+                <thead>
+                    <tr><th>Écran</th><th>Direction</th><th>Pourquoi celle-là</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Coquille, toutes pages</td><td><b>A</b></td><td>Le bandeau porte la vérité de l’événement partout, et remplace trois navigations par une.</td></tr>
+                    <tr><td>Accueil coureur</td><td><b>B</b></td><td>Le dossard est la seule chose qu’un coureur cherche. Il mérite le premier tiers de l’écran, pas un compteur au milieu d’une pile.</td></tr>
+                    <tr><td>Inscription, briefing, documents</td><td><b>B</b></td><td>Quatre blocs fixes n’ont pas besoin de quatre routes. Une section pliée reste à sa place, ce qui compte à 4 h du matin.</td></tr>
+                    <tr><td>Gestion des inscriptions</td><td><b>C</b></td><td>Quarante décisions à la chaîne : le tiers droit de la latte est la cible, le tiroir garde la liste derrière.</td></tr>
+                    <tr><td>Nuit de course (BR-13)</td><td><b>C</b> + bandeau <b>A</b></td><td>Le geste répété commande tout. Le bandeau donne l’heure de fermeture, la latte donne la cible.</td></tr>
+                    <tr><td>Connexion, inscription par mail</td><td><b>A</b></td><td>Le bandeau seul, sans rail : l’écran n’a qu’un formulaire à porter.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="cost">
+            <div>
+                <h3>Ce qui ne bouge pas</h3>
+                <ul>
+                    <li><code>resources/css/app.css</code> — jetons, échelle nommée, quatre statuts, <code>animate-flip</code>.</li>
+                    <li>Les deux familles auto-hébergées, et <code>PaletteContrastTest</code>.</li>
+                    <li><code>slats</code>, <code>SlatCell</code>, <code>StatusBadge</code>, <code>ActionButton</code>.</li>
+                    <li>Tout le back : contrôleurs, props Inertia, policies, traductions.</li>
+                </ul>
+            </div>
+            <div>
+                <h3>Ce qui sort</h3>
+                <ul>
+                    <li><code>AppSidebar</code>, <code>AppSidebarHeader</code>, <code>AppSidebarLayout</code>, <code>Breadcrumbs</code>, <code>AppBottomNav</code>.</li>
+                    <li><code>components/ui/</code> : <code>sidebar</code>, <code>breadcrumb</code>, <code>navigation-menu</code>, <code>card</code>.</li>
+                    <li>Les classes de lien pleine largeur recopiées dans six pages.</li>
+                    <li><code>BOTTOM_NAV_LIMIT</code> et son test — le rail défile, il ne tronque plus.</li>
+                </ul>
+            </div>
+            <div>
+                <h3>Ce qui naît</h3>
+                <ul>
+                    <li><code>BoardBand</code> — le bandeau, une prop de lecture, un slot d’appoint.</li>
+                    <li><code>BoardRail</code> — les onglets, alimentés par <code>mainNavItems()</code> tel quel.</li>
+                    <li><code>BoardRow</code> — la ligne libellé / valeur, qui remplace six <code>&lt;dl&gt;</code>.</li>
+                    <li><code>BibPanel</code>, <code>FoldSection</code>, <code>ThumbBar</code>, <code>DetailSheet</code>.</li>
+                </ul>
+            </div>
+        </div>
+
+        <p style="margin-top:var(--s5)">
+            <strong>Deux points à trancher avant d’écrire du code.</strong> D’abord les URL : si le
+            briefing perd sa route au profit d’une section pliée, il perd le lien qu’on colle dans un
+            message — soit on l’accepte, soit les sections deviennent des ancres. Ensuite la cible de
+            validation : D-46 relève que la variante <code>validate</code> a perdu un tiers de sa
+            hauteur face aux 72 px exigés. La barre de pouce et la cellule d’action de 96 px la
+            rendent, mais c’est une règle à réécrire noir sur blanc, avec un test.
+        </p>
+    </section>
+
+</div>
+
+<script>
+    (function () {
+        var root = document.documentElement;
+        var button = document.getElementById('swap');
+        var dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        function paint() {
+            root.setAttribute('data-theme', dark ? 'dark' : 'light');
+            button.textContent = dark ? 'Passer en jour' : 'Passer en nuit';
+        }
+
+        button.addEventListener('click', function () {
+            dark = !dark;
+            paint();
+        });
+
+        paint();
+    })();
+</script>

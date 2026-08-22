@@ -14,6 +14,10 @@ return [
     |
     */
 
+    'healthchecks' => [
+        'queue_url' => env('HEALTHCHECKS_QUEUE_URL'),
+    ],
+
     'postmark' => [
         'key' => env('POSTMARK_API_KEY'),
     ],

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Moon, Sun } from '@lucide/vue';
 import { computed } from 'vue';
-import { Button } from '@/components/ui/button';
+import ActionButton from '@/components/ActionButton.vue';
 import { useAppearance } from '@/composables/useAppearance';
 import { t } from '@/lib/i18n';
 
@@ -15,20 +15,14 @@ const label = computed(() =>
 </script>
 
 <template>
-    <Button
+    <ActionButton
         type="button"
-        variant="ghost"
+        tone="ghost"
         size="icon"
-        class="size-11 text-muted-foreground"
+        :icon="isDark ? Sun : Moon"
         :aria-label="label"
         :title="label"
         data-test="appearance-toggle"
         @click="toggleAppearance"
-    >
-        <component
-            :is="isDark ? Sun : Moon"
-            class="size-5"
-            aria-hidden="true"
-        />
-    </Button>
+    />
 </template>

@@ -8,7 +8,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Manage\RegistrationTransitionRequest;
 use App\Models\Participant;
 use Illuminate\Http\RedirectResponse;
-use Inertia\Inertia;
 
 class RegistrationTransitionController extends Controller
 {
@@ -22,10 +21,7 @@ class RegistrationTransitionController extends Controller
             RegistrationTransition::from($request->string('transition')->value()),
         );
 
-        Inertia::flash('toast', [
-            'type' => 'success',
-            'message' => __('registration.manage.transitioned', ['status' => $participant->status->label()]),
-        ]);
+        $this->flashSuccess(__('registration.manage.transitioned', ['status' => $participant->status->label()]));
 
         return to_route('manage.registrations.index');
     }

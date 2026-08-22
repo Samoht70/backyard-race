@@ -21,6 +21,7 @@ return [
             'description' => 'Entre ton adresse email : tu recevras un lien pour remplir ton inscription.',
             'email' => 'Adresse email',
             'submit' => 'Recevoir le lien',
+            'closed_title' => 'Inscriptions fermées',
             'closed' => 'Les inscriptions ne sont pas ouvertes. Reviens quand le gérant les aura lancées.',
             'has_account' => 'Tu as déjà un compte ?',
             'login' => 'Se connecter',

@@ -3,6 +3,8 @@
 namespace App\Services\EventLifecycle;
 
 use App\Enums\EventStatus;
+use App\Enums\Permission;
+use App\Exceptions\EventTransitionRefusedException;
 use App\Models\Event;
 
 final class RunningEventState implements EventLifecycleState
@@ -17,7 +19,22 @@ final class RunningEventState implements EventLifecycleState
         return EventStatus::Finished;
     }
 
+    public function previousStatus(): ?EventStatus
+    {
+        return null;
+    }
+
+    public function advancePermission(): Permission
+    {
+        return Permission::FinishEvent;
+    }
+
     public function refusals(Event $event): array
+    {
+        return [];
+    }
+
+    public function revertRefusals(Event $event): array
     {
         return [];
     }
@@ -25,6 +42,11 @@ final class RunningEventState implements EventLifecycleState
     public function advance(Event $event): EventLifecycleState
     {
         return new FinishedEventState;
+    }
+
+    public function revert(Event $event): EventLifecycleState
+    {
+        throw EventTransitionRefusedException::illegal();
     }
 
     public function allowsRegistration(): bool

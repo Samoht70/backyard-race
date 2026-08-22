@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import EventField from '@/components/event/EventField.vue';
-import EventFieldset from '@/components/event/EventFieldset.vue';
-import { Input } from '@/components/ui/input';
+import DateField from '@/components/form/DateField.vue';
+import FormField from '@/components/form/FormField.vue';
+import FormFieldset from '@/components/form/FormFieldset.vue';
+import NumberField from '@/components/form/NumberField.vue';
+import TimeField from '@/components/form/TimeField.vue';
 import { t } from '@/lib/i18n';
 import type { EventDetails, EventFieldName } from '@/types/event';
 
@@ -32,8 +34,8 @@ const duration = computed(() =>
 </script>
 
 <template>
-    <EventFieldset :title="t('event.section.schedule')">
-        <EventField
+    <FormFieldset :title="t('event.section.schedule')">
+        <FormField
             name="start_date"
             :label="t('event.field.start_date')"
             :error="errors.start_date"
@@ -41,16 +43,14 @@ const duration = computed(() =>
             :locked-reason="t('event.locked.running')"
             :value="event.start_date ?? undefined"
         >
-            <Input
+            <DateField
                 id="start_date"
-                type="date"
                 name="start_date"
-                class="tabular-nums"
                 :default-value="event.start_date ?? undefined"
             />
-        </EventField>
+        </FormField>
 
-        <EventField
+        <FormField
             name="start_time"
             :label="t('event.field.start_time')"
             :error="errors.first_start_at"
@@ -58,37 +58,32 @@ const duration = computed(() =>
             :locked-reason="t('event.locked.running')"
             :value="event.start_time ?? undefined"
         >
-            <Input
+            <TimeField
                 id="start_time"
-                type="time"
                 name="start_time"
-                class="tabular-nums"
                 :default-value="event.start_time ?? undefined"
             />
-        </EventField>
-    </EventFieldset>
+        </FormField>
+    </FormFieldset>
 
-    <EventFieldset :title="t('event.section.loop')">
-        <EventField
+    <FormFieldset :title="t('event.section.loop')">
+        <FormField
             name="lap_distance_meters"
             :label="t('event.field.lap_distance_meters')"
             :hint="t('event.hint.lap_distance_meters')"
             :unit="t('event.unit.meters')"
             :error="errors.lap_distance_meters"
         >
-            <Input
+            <NumberField
                 id="lap_distance_meters"
-                type="number"
-                inputmode="numeric"
-                min="1"
-                step="1"
                 name="lap_distance_meters"
-                class="tabular-nums"
+                :min="1"
+                :max="100000"
                 :default-value="event.lap_distance_meters ?? undefined"
             />
-        </EventField>
+        </FormField>
 
-        <EventField
+        <FormField
             name="lap_duration_minutes"
             :label="t('event.field.lap_duration_minutes')"
             :hint="t('event.hint.lap_duration_minutes')"
@@ -98,16 +93,13 @@ const duration = computed(() =>
             :locked-reason="t('event.locked.running')"
             :value="duration"
         >
-            <Input
+            <NumberField
                 id="lap_duration_minutes"
-                type="number"
-                inputmode="numeric"
-                min="1"
-                step="1"
                 name="lap_duration_minutes"
-                class="tabular-nums"
+                :min="1"
+                :max="1440"
                 :default-value="event.lap_duration_minutes ?? undefined"
             />
-        </EventField>
-    </EventFieldset>
+        </FormField>
+    </FormFieldset>
 </template>

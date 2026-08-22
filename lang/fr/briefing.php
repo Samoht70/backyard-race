@@ -2,25 +2,37 @@
 
 return [
     'default' => <<<'MARKDOWN'
-        # Le briefing
+        ## Backyard Ultra du Quart de Siècle
 
-        Une boucle d’environ 6 km, un départ toutes les heures, et on recommence tant qu’il reste
-        quelqu’un debout. C’est tout le principe d’une backyard.
+        **11-12 septembre 2025 · Virey (70150)**
 
-        ## Comment ça se passe
+        Un format simple à comprendre, corsé à vivre : un **Backyard Ultra**.
 
-        - Chaque tour part **à l’heure pile**, et tout le monde repart ensemble.
-        - La boucle fait environ 6 km. Tu la fais comme tu veux : en courant, ou en marchant.
-        - Tu as une heure pour revenir. Le temps qu’il te reste est ta pause.
+        ### Le principe
 
-        ## Les trois règles qui comptent
+        - Une boucle de **6 km** dans la campagne de Virey.
+        - **1 heure maximum** pour la boucler.
+        - À chaque heure pile, **tout le monde repart en même temps** pour un nouveau tour.
+        - Le temps restant après votre boucle, c'est votre pause : ravito, on souffle, on repart.
+        - Ça continue **jusqu'à ce qu'il ne reste plus qu'un seul coureur** capable de prendre le départ suivant. C'est le vainqueur.
 
-        - **Pas de départ en retard.** Le tour part sans toi.
-        - **Boucle non terminée, élimination.** C’est le jeu, et c’est tout le jeu.
-        - **Lampe frontale obligatoire** dès que la nuit tombe.
+        > Exemple : boucle en 45 min → 15 min pour manger, boire et se préparer avant le départ suivant.
 
-        ## Et surtout
+        ### Infos clés
 
-        C’est une fête entre amis avec un dossard. Viens t’amuser, et amène de quoi grignoter 🎉
+        | | |
+        |---|---|
+        | **Lieu** | 1 rue du Château d'Eau, 70150 Virey |
+        | **Arrivée conseillée** | Samedi, 10h-11h (brief + reconnaissance du parcours) |
+        | **1er départ** | Samedi 13h00 |
+        | **Format** | Boucles de 6 km, 1h max, jusqu'au dernier coureur |
+        | **Soirée** | Samedi soir, après la course |
+
+        ### L'esprit
+
+        On ne vient pas battre un record du monde. On vient courir, rigoler, s'encourager, et repousser un peu son propre curseur du ridicule — avant de fêter ça comme il se doit.
+
+        - 👉 Coureurs : retrouvez le **Guide du coureur** dans l'onglet **Documents** du site (parcours, équipement, ravito).
+        - 👉 Accompagnants : retrouvez le **Guide du fêtard** dans l'onglet **Documents** du site (programme, hébergement, repas).
         MARKDOWN,
 ];

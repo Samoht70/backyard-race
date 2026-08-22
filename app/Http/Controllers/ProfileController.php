@@ -20,7 +20,7 @@ class ProfileController extends Controller
     {
         $request->user()->update($request->validated());
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => __('ui.profile.updated')]);
+        $this->flashSuccess(__('ui.profile.updated'));
 
         return to_route('profile.edit');
     }

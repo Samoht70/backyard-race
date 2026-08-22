@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ActionButton from '@/components/race/ActionButton.vue';
+import ActionButton from '@/components/ActionButton.vue';
 import RunnerSlat from '@/components/race/RunnerSlat.vue';
 import SlatCell from '@/components/race/SlatCell.vue';
 import { t } from '@/lib/i18n';

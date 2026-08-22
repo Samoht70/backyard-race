@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Epic** | 7 — Déploiement |
-| **Statut** | À faire |
+| **Statut** | ✅ Terminé |
 | **Estimation** | 9 pts |
 | **Dépend de** | BR-00 |
 
@@ -103,8 +103,8 @@ la nuit de la course.
 
 ## Tâches
 
-- [ ] **T1** — Choisir et commander le VPS : KVM, 2 Go minimum, facturation mensuelle résiliable `2 pts`
-- [ ] **T2** — Durcir la machine : pare-feu, SSH par clé sans root, mises à jour automatiques `2 pts`
-- [ ] **T3** — Installer Dokploy et restreindre l'accès à son interface `2 pts`
-- [ ] **T4** — Pointer le domaine sur le VPS `1 pt`
-- [ ] **T5** — Surveillance de l'espace disque et purge périodique des images Docker `2 pts`
+- [x] **T1** — Choisir et commander le VPS : KVM, 2 Go minimum, facturation mensuelle résiliable `2 pts`
+- [x] **T2** — Durcir la machine : pare-feu, SSH par clé sans root, mises à jour automatiques `2 pts`
+- [x] **T3** — Installer Dokploy et restreindre l'accès à son interface `2 pts`
+- [x] **T4** — Pointer le domaine sur le VPS `1 pt`
+- [x] **T5** — Surveillance de l'espace disque et purge périodique des images Docker `2 pts`

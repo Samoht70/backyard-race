@@ -14,7 +14,7 @@ withDefaults(defineProps<Props>(), {
 
 <template>
     <p
-        class="min-w-[5.625rem] shrink-0 text-right font-mono"
+        class="min-w-24 shrink-0 text-right font-mono"
         :class="flip && 'animate-flip motion-reduce:animate-none'"
     >
         <span

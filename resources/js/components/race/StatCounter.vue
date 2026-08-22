@@ -19,7 +19,9 @@ const valueClass = computed(() =>
 </script>
 
 <template>
-    <div class="flex min-w-0 flex-col gap-1 bg-card px-3 py-2.5">
+    <div
+        class="flex min-w-0 flex-col gap-1 rounded-sm border border-border bg-card px-3 py-2.5"
+    >
         <p class="font-mono text-label text-muted-foreground uppercase">
             {{ label }}
         </p>

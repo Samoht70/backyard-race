@@ -84,7 +84,7 @@ class AccountController extends Controller
             return to_route('login')->with('status', __('auth.register.already_registered'));
         }
 
-        $code = $registerRunner(Event::query()->firstOrFail(), $email, $request->validated());
+        $code = $registerRunner(Event::current(), $email, $request->validated());
 
         return to_route('account.show')->with(self::ACCESS_CODE, $code);
     }
@@ -118,7 +118,7 @@ class AccountController extends Controller
 
     private function event(): ?Event
     {
-        return Event::query()->first();
+        return Event::currentOrNull();
     }
 
     /**

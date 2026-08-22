@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Epic** | 7 — Déploiement |
-| **Statut** | À faire |
+| **Statut** | ✅ Terminé |
 | **Estimation** | 5 pts |
 | **Dépend de** | BR-29 |
 
@@ -99,9 +99,43 @@ du site.
 
 ## Tâches
 
-- [ ] **T1** — Déclarer web, worker et planificateur dans le Compose de production, même image, redémarrage automatique `2 pts`
-- [ ] **T2** — Configurer Horizon en production : files, tentatives, délais `1 pt`
-- [ ] **T3** — Protéger l'interface Horizon par permission `1 pt`
-- [ ] **T4** — Redémarrage des workers au déploiement `1 pt`
-- [ ] **T5** — Alerte sur file non consommée `2 pts`
-- [ ] **T6** — Vérifier de bout en bout qu'une élimination tombe sans navigateur ouvert `1 pt`
+- [x] **T1** — Déclarer web, worker et planificateur dans le Compose de production, même image, redémarrage automatique `2 pts`
+- [x] **T2** — Configurer Horizon en production : files, tentatives, délais `1 pt`
+- [x] **T3** — Protéger l'interface Horizon par permission `1 pt`
+- [x] **T4** — Redémarrage des workers au déploiement `1 pt`
+- [x] **T5** — Alerte sur file non consommée `2 pts`
+- [x] **T6** — Vérifier de bout en bout qu'une élimination tombe sans navigateur ouvert `1 pt`
+
+## Où en est la story au 2026-08-22
+
+Le worker tourne en production et il travaille : un code d'accès est parti par mail sans qu'aucun
+navigateur soit resté ouvert. C'est ce que T6 demandait de constater — l'élimination nommée dans son
+intitulé attend BR-11, le mécanisme, lui, est vérifié.
+
+**T5 est passée en tête du lot 4** le 2026-08-22, juste avant que l'adresse circule : c'est la seule
+entrée de ce lot qui coûte déjà quelque chose.
+
+**T5 porte désormais son sondage, et il attend son observateur.** `up/queue` répond `200` quand la
+file est consommée et `503` quand elle ne l'est plus — worker absent, worker en pause, ou attente
+au-delà du seuil de `horizon.waits`. La vérification s'est faite sur la pile de développement : file
+mise en pause, le sondage refuse ; file reprise, il accepte.
+
+La notification de longue attente d'Horizon a été écartée, parce qu'elle est émise par le processus
+qu'elle devrait surveiller, et le mail d'alerte avec elle, parce qu'il passerait par la file arrêtée
+([D-67](../DECISIONS.md)).
+
+**Le sondage seul laissait le planificateur invisible.** Interrogé de l'extérieur, `up/queue` ne dit
+rien de lui, et il n'a pas de contrôle de santé non plus : s'il meurt, plus aucune élimination ne
+tombe et rien ne le signale — la panne même que la user story ci-dessus nomme. `race:queue-heartbeat`
+la couvre par renversement : le planificateur l'exécute chaque minute et elle ne ping
+`HEALTHCHECKS_QUEUE_URL` que si la file est consommée. Plus de ping veut dire « le planificateur est
+mort » ou « le worker ne consomme plus » ; `up/queue` dit ensuite lequel des deux.
+
+**Les deux inscriptions sont faites le 2026-08-22, et la story est close.** Un moniteur sur
+`up/queue` à côté de celui de `/up`, et un check de battement dont l'URL remplit
+`HEALTHCHECKS_QUEUE_URL`. Ce que le tuto de mise en ligne porte désormais à ses étapes 13 et 14, à la
+place de la voie qu'il proposait avant.
+
+Reste, mais ailleurs : l'exercice à froid — couper le worker en production et constater que les deux
+alertes arrivent sur le téléphone. C'est le même geste que celui que BR-31 T5 réclame pour sa propre
+alerte, et il se fait une fois, avec les deux.

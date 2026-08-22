@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { TriangleAlert } from '@lucide/vue';
-import ActionButton from '@/components/race/ActionButton.vue';
+import ActionButton from '@/components/ActionButton.vue';
 import { t } from '@/lib/i18n';
 
 type Props = {
@@ -21,7 +21,7 @@ defineEmits<{
 <template>
     <div
         role="alert"
-        class="flex flex-col items-center gap-2 border-l-[3px] border-destructive bg-card px-6 py-8 text-center"
+        class="flex flex-col items-center gap-2 rounded-sm border border-l-[3px] border-border border-l-destructive bg-card px-6 py-8 text-center"
     >
         <TriangleAlert class="size-7 text-destructive" aria-hidden="true" />
         <p class="text-base font-bold tracking-tight">

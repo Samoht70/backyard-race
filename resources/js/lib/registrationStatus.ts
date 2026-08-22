@@ -19,7 +19,7 @@ export const registrationStatusIcons = {
 } satisfies Record<RegistrationStatus, LucideIcon>;
 
 export const registrationStatusVariants = cva(
-    'inline-flex shrink-0 items-center gap-1.5 rounded-md border font-medium',
+    'inline-flex shrink-0 items-center gap-1.5 rounded-sm border font-medium',
     {
         variants: {
             status: {
@@ -45,6 +45,12 @@ export function registrationStatusLabelKey(status: RegistrationStatus): string {
     return `registration.status.${status}`;
 }
 
+export const registrationStatusBar = {
+    pending: 'bg-muted-foreground',
+    confirmed: 'bg-status-running',
+    cancelled: 'bg-status-eliminated',
+} satisfies Record<RegistrationStatus, string>;
+
 export const registrationStatusTone = {
     pending: 'text-muted-foreground',
     confirmed: 'text-status-running',
@@ -59,7 +65,7 @@ type RegistrationTransitionPresentation = {
 
 export const registrationTransitions = {
     confirm: { icon: Check, tone: 'primary', needsConfirmation: false },
-    cancel: { icon: CircleSlash, tone: 'danger', needsConfirmation: true },
+    cancel: { icon: CircleSlash, tone: 'quiet', needsConfirmation: true },
     reopen: { icon: Undo2, tone: 'quiet', needsConfirmation: false },
 } satisfies Record<RegistrationTransition, RegistrationTransitionPresentation>;
 

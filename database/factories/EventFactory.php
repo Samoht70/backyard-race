@@ -48,14 +48,6 @@ class EventFactory extends Factory
         ]);
     }
 
-    public function withoutCoordinates(): static
-    {
-        return $this->state(fn (array $attributes): array => [
-            'latitude' => null,
-            'longitude' => null,
-        ]);
-    }
-
     public function registration(): static
     {
         return $this->withStatus(EventStatus::Registration);

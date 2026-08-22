@@ -3,6 +3,7 @@
 namespace App\Services\EventLifecycle;
 
 use App\Enums\EventStatus;
+use App\Enums\Permission;
 use App\Exceptions\EventTransitionRefusedException;
 use App\Models\Event;
 
@@ -16,6 +17,16 @@ final class RegistrationEventState implements EventLifecycleState
     public function nextStatus(): EventStatus
     {
         return EventStatus::Running;
+    }
+
+    public function previousStatus(): EventStatus
+    {
+        return EventStatus::Draft;
+    }
+
+    public function advancePermission(): Permission
+    {
+        return Permission::ManageEvent;
     }
 
     public function refusals(Event $event): array
@@ -37,6 +48,17 @@ final class RegistrationEventState implements EventLifecycleState
         return $missing;
     }
 
+    public function revertRefusals(Event $event): array
+    {
+        $blocking = $event->participants()->count();
+
+        if ($blocking === 0) {
+            return [];
+        }
+
+        return [trans_choice('event.refusal.registrations_block_draft', $blocking)];
+    }
+
     public function advance(Event $event): EventLifecycleState
     {
         if ($this->refusals($event) !== []) {
@@ -44,6 +66,15 @@ final class RegistrationEventState implements EventLifecycleState
         }
 
         return new RunningEventState;
+    }
+
+    public function revert(Event $event): EventLifecycleState
+    {
+        if ($this->revertRefusals($event) !== []) {
+            throw EventTransitionRefusedException::registrationsExist();
+        }
+
+        return new DraftEventState;
     }
 
     public function allowsRegistration(): bool

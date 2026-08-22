@@ -1,50 +1,49 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import { ClipboardList } from '@lucide/vue';
-import { computed } from 'vue';
+import { ClipboardList, MousePointerClick } from '@lucide/vue';
+import { useMediaQuery } from '@vueuse/core';
+import { VisuallyHidden } from 'reka-ui';
+import {
+    DialogContent,
+    DialogOverlay,
+    DialogPortal,
+    DialogRoot,
+    DialogTitle,
+} from 'reka-ui';
+import { computed, ref } from 'vue';
 import AlertError from '@/components/AlertError.vue';
+import BoardPage from '@/components/board/BoardPage.vue';
 import Heading from '@/components/Heading.vue';
 import BoardFilter from '@/components/race/BoardFilter.vue';
-import RegistrationActionForm from '@/components/registration/RegistrationActionForm.vue';
+import BoardPagination from '@/components/race/BoardPagination.vue';
+import RegistrationDossier from '@/components/registration/RegistrationDossier.vue';
 import RegistrationSlat from '@/components/registration/RegistrationSlat.vue';
 import SeatCounter from '@/components/registration/SeatCounter.vue';
 import EmptyState from '@/components/state/EmptyState.vue';
 import { t } from '@/lib/i18n';
+import { overlayBackdrop, overlayDrawer } from '@/lib/overlayClasses';
+import { paginationBar } from '@/lib/pagination';
 import { registrationStatusLabelKey } from '@/lib/registrationStatus';
-import { index as manage } from '@/routes/manage';
-import { edit, index } from '@/routes/manage/registrations';
+import { index } from '@/routes/manage/registrations';
 import { REGISTRATION_STATUSES } from '@/types/registration';
 import type {
     ManagedRegistration,
     RegistrationCounts,
     RegistrationSeats,
 } from '@/types/registration';
-import type { BoardFilterOption } from '@/types/ui';
+import type { BoardFilterOption, Pagination } from '@/types/ui';
 
 type Props = {
     registrations: ManagedRegistration[];
+    pagination: Pagination;
     counts: RegistrationCounts;
     seats: RegistrationSeats;
     status: string | null;
     refusals: string[];
+    deletionRefusal: string | null;
 };
 
 const props = defineProps<Props>();
-
-defineOptions({
-    layout: {
-        breadcrumbs: [
-            {
-                title: 'Gestion',
-                href: manage(),
-            },
-            {
-                title: 'Inscriptions',
-                href: index(),
-            },
-        ],
-    },
-});
 
 const filters = computed<BoardFilterOption[]>(() => [
     {
@@ -61,80 +60,162 @@ const filters = computed<BoardFilterOption[]>(() => [
     })),
 ]);
 
+const pageLinks = computed(() =>
+    paginationBar(props.pagination, (page) =>
+        index({ query: { status: props.status, page } }),
+    ),
+);
+
 const isBlocked = computed(() => props.refusals.length > 0);
+
+const selectedId = ref<number | null>(null);
+
+const selected = computed(
+    () =>
+        props.registrations.find(
+            (registration) => registration.id === selectedId.value,
+        ) ?? null,
+);
+
+const isWide = useMediaQuery('(min-width: 64rem)');
+
+const isDossierOpen = computed({
+    get: () => !isWide.value && selected.value !== null,
+    set: (open: boolean) => {
+        if (!open) {
+            selectedId.value = null;
+        }
+    },
+});
+
+const dossierTitle = computed(() =>
+    selected.value === null
+        ? ''
+        : `${selected.value.first_name} ${selected.value.last_name}`,
+);
 </script>
 
 <template>
     <Head :title="t('registration.manage.title')" />
 
-    <div class="flex flex-col gap-6 p-4">
-        <Heading
-            :title="t('registration.manage.title')"
-            :description="t('registration.manage.description')"
-        />
+    <BoardPage>
+        <div class="grid gap-6">
+            <Heading
+                :title="t('registration.manage.title')"
+                :description="t('registration.manage.description')"
+            />
 
-        <AlertError
-            v-if="isBlocked"
-            id="registration-refusals"
-            :title="t('registration.transition.blocked_title')"
-            :errors="refusals"
-        />
+            <AlertError
+                v-if="isBlocked"
+                id="registration-refusals"
+                :title="t('registration.transition.blocked_title')"
+                :errors="refusals"
+            />
 
-        <SeatCounter :confirmed="seats.confirmed" :capacity="seats.capacity" />
+            <SeatCounter
+                :confirmed="seats.confirmed"
+                :capacity="seats.capacity"
+            />
 
-        <BoardFilter
-            :label="t('registration.manage.filter_label')"
-            :options="filters"
-            :active-value="status"
-        />
+            <BoardFilter
+                :label="t('registration.manage.filter_label')"
+                :options="filters"
+                :active-value="status"
+            />
 
-        <div v-if="registrations.length" class="slats">
-            <RegistrationSlat
-                v-for="registration in registrations"
-                :key="registration.id"
-                :bib="registration.bib_label"
-                :first-name="registration.first_name"
-                :last-name="registration.last_name"
-                :status="registration.status"
-                :href="edit(registration.id)"
+            <div
+                v-if="registrations.length"
+                class="grid items-start gap-6 lg:grid-cols-12 lg:gap-8"
             >
-                <template #cell>
-                    <RegistrationActionForm
-                        v-if="registration.allowed_transitions.length"
-                        :registration-id="registration.id"
-                        :runner-name="`${registration.first_name} ${registration.last_name}`"
-                        :transition="registration.allowed_transitions[0]"
-                        :disabled="
-                            isBlocked &&
-                            registration.allowed_transitions[0] === 'confirm'
-                        "
-                        :described-by="
-                            isBlocked ? 'registration-refusals' : undefined
-                        "
-                        class="w-auto px-3"
+                <div class="slats min-w-0 lg:col-span-5">
+                    <RegistrationSlat
+                        v-for="registration in registrations"
+                        :key="registration.id"
+                        as="button"
+                        type="button"
+                        :bib="registration.bib_label"
+                        :first-name="registration.first_name"
+                        :last-name="registration.last_name"
+                        :status="registration.status"
+                        :active="registration.id === selectedId"
+                        @click="selectedId = registration.id"
                     />
+                </div>
+
+                <div class="hidden lg:col-span-7 lg:block">
+                    <div class="lg:sticky lg:top-0">
+                        <RegistrationDossier
+                            v-if="selected"
+                            :registration="selected"
+                            variant="board"
+                            :blocked="isBlocked"
+                            described-by="registration-refusals"
+                            :deletion-refusal="deletionRefusal"
+                            @close="selectedId = null"
+                        />
+
+                        <EmptyState
+                            v-else
+                            :icon="MousePointerClick"
+                            :title="t('registration.manage.select_title')"
+                            :description="
+                                t('registration.manage.select_description')
+                            "
+                        />
+                    </div>
+                </div>
+            </div>
+
+            <EmptyState
+                v-else-if="status"
+                :icon="ClipboardList"
+                :title="t('registration.manage.empty_filtered_title')"
+                :description="
+                    t('registration.manage.empty_filtered_description')
+                "
+            >
+                <template #action>
+                    <Link :href="index()" class="text-sm underline">
+                        {{ t('registration.manage.show_all') }}
+                    </Link>
                 </template>
-            </RegistrationSlat>
+            </EmptyState>
+
+            <EmptyState
+                v-else
+                :icon="ClipboardList"
+                :title="t('registration.manage.empty_title')"
+                :description="t('registration.manage.empty_description')"
+            />
+
+            <BoardPagination
+                v-if="pagination.last_page > 1"
+                :label="t('registration.manage.pages_label')"
+                :pages="pageLinks.pages"
+                :previous="pageLinks.previous"
+                :next="pageLinks.next"
+            />
         </div>
 
-        <EmptyState
-            v-else-if="status"
-            :icon="ClipboardList"
-            :title="t('registration.manage.empty_filtered_title')"
-            :description="t('registration.manage.empty_filtered_description')"
-        >
-            <template #action>
-                <Link :href="index()" class="text-sm underline">
-                    {{ t('registration.manage.show_all') }}
-                </Link>
-            </template>
-        </EmptyState>
+        <DialogRoot v-model:open="isDossierOpen">
+            <DialogPortal>
+                <DialogOverlay :class="overlayBackdrop" />
+                <DialogContent :class="[overlayDrawer, 'overflow-y-auto p-4']">
+                    <VisuallyHidden>
+                        <DialogTitle>{{ dossierTitle }}</DialogTitle>
+                    </VisuallyHidden>
 
-        <EmptyState
-            v-else
-            :icon="ClipboardList"
-            :title="t('registration.manage.empty_title')"
-            :description="t('registration.manage.empty_description')"
-        />
-    </div>
+                    <RegistrationDossier
+                        v-if="selected"
+                        :registration="selected"
+                        variant="drawer"
+                        :blocked="isBlocked"
+                        described-by="registration-refusals"
+                        :deletion-refusal="deletionRefusal"
+                        @close="selectedId = null"
+                    />
+                </DialogContent>
+            </DialogPortal>
+        </DialogRoot>
+    </BoardPage>
 </template>

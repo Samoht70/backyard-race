@@ -25,7 +25,7 @@ const meta = computed(() =>
 
 <template>
     <div
-        class="flex min-h-[4.25rem] min-w-0 items-center gap-3 bg-card px-3 py-2.5"
+        class="flex min-h-[4.25rem] min-w-0 items-center gap-3 rounded-sm border border-border bg-card px-3 py-2.5"
     >
         <FileText
             class="size-5 shrink-0 text-muted-foreground"

@@ -8,18 +8,24 @@ vi.mock('@inertiajs/vue3', () => ({
     usePage: () => page,
 }));
 
-const { BOTTOM_NAV_LIMIT, mainNavItems } = await import('@/lib/mainNav');
+const { mainNavItems } = await import('@/lib/mainNav');
 const { toUrl } = await import('@/lib/utils');
 
 type Areas = {
     event?: boolean;
     documents?: boolean;
     registration?: boolean;
+    register?: boolean;
 };
 
-function signIn(areas: Areas, abilities: string[] = []): void {
+function share(
+    areas: Areas,
+    user: { id: number } | null,
+    abilities: string[],
+): void {
     page.props = {
         auth: {
+            user,
             permissions: Object.fromEntries(
                 abilities.map((ability) => [ability, true]),
             ),
@@ -28,21 +34,60 @@ function signIn(areas: Areas, abilities: string[] = []): void {
             event: areas.event === true,
             documents: areas.documents === true,
             registration: areas.registration === true,
+            register: areas.register === true,
         },
     };
+}
+
+function signIn(areas: Areas, abilities: string[] = []): void {
+    share(areas, { id: 1 }, abilities);
+}
+
+function visitAsGuest(areas: Areas): void {
+    share(areas, null, []);
 }
 
 function titles(): string[] {
     return mainNavItems().map((item) => item.title);
 }
 
-function bottomBarTitles(): string[] {
-    return titles().slice(0, BOTTOM_NAV_LIMIT);
-}
-
 describe('mainNavItems', () => {
     beforeEach(() => {
         page.props = {};
+    });
+
+    it('offers a guest the race, the documents, a way in and a way to register', () => {
+        visitAsGuest({ event: true, documents: true, register: true });
+
+        expect(titles()).toEqual([
+            'ui.nav.event',
+            'ui.nav.documents',
+            'ui.nav.registration',
+            'ui.nav.register',
+        ]);
+    });
+
+    it('withholds the account creation from a guest once the window is shut', () => {
+        visitAsGuest({ event: true, documents: true });
+
+        expect(titles()).not.toContain('ui.nav.register');
+    });
+
+    it('keeps the race entry for a guest while the event is a draft', () => {
+        visitAsGuest({});
+
+        expect(titles()).toEqual(['ui.nav.event', 'ui.nav.registration']);
+    });
+
+    it('points a guest at the public race page and the login screen', () => {
+        visitAsGuest({ event: true, documents: true, register: true });
+
+        expect(mainNavItems().map((item) => toUrl(item.href))).toEqual([
+            '/',
+            '/documents',
+            '/login',
+            '/account/create',
+        ]);
     });
 
     it('offers a registered runner their registration, the briefing and the documents', () => {
@@ -54,17 +99,6 @@ describe('mainNavItems', () => {
             'ui.nav.briefing',
             'ui.nav.documents',
             'ui.nav.event',
-        ]);
-    });
-
-    it('folds the event entry out of a registered runner bottom bar', () => {
-        signIn({ event: true, documents: true, registration: true });
-
-        expect(bottomBarTitles()).toEqual([
-            'ui.nav.home',
-            'ui.nav.registration',
-            'ui.nav.briefing',
-            'ui.nav.documents',
         ]);
     });
 
@@ -85,14 +119,15 @@ describe('mainNavItems', () => {
         ]);
     });
 
-    it('keeps the management hub in a manager bottom bar', () => {
+    it('opens a manager rail on the management hub', () => {
         signIn({ event: true, documents: true }, ['manage-event']);
 
-        expect(bottomBarTitles()).toEqual([
+        expect(titles()).toEqual([
             'ui.nav.home',
             'ui.nav.manage',
             'ui.nav.briefing',
             'ui.nav.documents',
+            'ui.nav.event',
         ]);
     });
 
@@ -101,11 +136,13 @@ describe('mainNavItems', () => {
             'manage-event',
         ]);
 
-        expect(bottomBarTitles()).toEqual([
+        expect(titles()).toEqual([
             'ui.nav.home',
             'ui.nav.manage',
             'ui.nav.registration',
             'ui.nav.briefing',
+            'ui.nav.documents',
+            'ui.nav.event',
         ]);
     });
 
@@ -126,7 +163,7 @@ describe('mainNavItems', () => {
             '/registration',
             '/briefing',
             '/documents',
-            '/event',
+            '/',
         ]);
     });
 });

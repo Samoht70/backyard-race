@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ActionButton from '@/components/race/ActionButton.vue';
+import ActionButton from '@/components/ActionButton.vue';
 import RegistrationSlat from '@/components/registration/RegistrationSlat.vue';
 import { t } from '@/lib/i18n';
 import {

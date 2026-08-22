@@ -3,6 +3,7 @@
 namespace App\Services\EventLifecycle;
 
 use App\Enums\EventStatus;
+use App\Enums\Permission;
 use App\Exceptions\EventTransitionRefusedException;
 use App\Models\Event;
 
@@ -12,15 +13,29 @@ interface EventLifecycleState
 
     public function nextStatus(): ?EventStatus;
 
+    public function advancePermission(): ?Permission;
+
+    public function previousStatus(): ?EventStatus;
+
     /**
      * @return list<string>
      */
     public function refusals(Event $event): array;
 
     /**
+     * @return list<string>
+     */
+    public function revertRefusals(Event $event): array;
+
+    /**
      * @throws EventTransitionRefusedException
      */
     public function advance(Event $event): EventLifecycleState;
+
+    /**
+     * @throws EventTransitionRefusedException
+     */
+    public function revert(Event $event): EventLifecycleState;
 
     public function allowsRegistration(): bool;
 

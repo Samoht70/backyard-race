@@ -21,7 +21,6 @@ export type RegistrationSection = (typeof REGISTRATION_SECTIONS)[number];
 export type RegistrationDetails = {
     status: RegistrationStatus;
     status_label: string;
-    bib_number: number | null;
     bib_label: string | null;
     first_name: string;
     last_name: string;

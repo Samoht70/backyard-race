@@ -1889,3 +1889,848 @@ déduit du schéma de la requête. La déduction est désormais juste, mais le r
 appartient à BR-28. En revanche, ce qu'on craignait sur les liens signés n'existait pas : sans
 `trustProxies`, la signature était produite et vérifiée sur le même schéma, donc cohérente. Le lien
 partait simplement en clair dans le mail.
+
+## D-58 — Le grand format : la coquille passe du téléphone élargi au panneau replié
+
+Arrêtée le 2026-08-21 avec le propriétaire du projet, après maquettage de la refonte
+(`project/design/grand-format.html`). Elle ne touche ni la palette, ni les familles, ni les quatre
+statuts : D-46 tient en totalité. Ce qui change est l'écran de référence.
+
+**Le mobile-first coûtait au bureau, et la cause tenait en une ligne.** `ActionButton` portait
+`w-full` dans sa base `cva`, donc ses quatre-vingt-douze usages s'étiraient jusqu'au bord sur tout
+écran. Là où il fallait un lien plutôt qu'un bouton, `Dashboard.vue` l'avait contourné en recopiant
+`primaryLinkClasses` et `outlineLinkClasses` — le symptôme, pas la maladie. La base perd `w-full`
+au profit de `w-full sm:w-auto`, et le composant gagne `as-child` sur la primitive `Primitive` de
+reka-ui : un `<Link>` d'Inertia entre désormais dans un `ActionButton` sans recopier une classe.
+Le contournement disparaît, et avec lui l'imbrication `<button>` dans `<a>` de `Welcome.vue`, qui
+était du HTML invalide.
+
+**La coquille SaaS sort, le panneau la remplace.** `BoardBand` porte les faits de l'événement,
+partagés par Inertia via `BoardResource` — un seul `Event::query()->first()` mémoïsé sert le
+bandeau et `access()`. `BoardRail` porte les six destinations de `mainNavItems()`, ce qui règle
+`BOTTOM_NAV_LIMIT` : le rail défile au téléphone au lieu de tronquer à quatre, et son test change
+de sujet plutôt que de disparaître. Sortent `AppSidebar`, `AppSidebarHeader`, `AppSidebarLayout`,
+`AppShell`, `AppContent`, `AppBottomNav`, `NavMain`, `NavFooter`, `NavUser`, `Breadcrumbs`, et les
+habillages `ui/sidebar`, `ui/breadcrumb`, `ui/card`. Les tokens `--sidebar-*` partent avec eux, des
+deux blocs de `app.css` et des deux paires de `PaletteContrastTest`.
+
+**Aucune primitive reka-ui n'est perdue dans l'opération, et une est gagnée.** `ui/sidebar`
+n'était pas une primitive — reka-ui n'en a pas — mais un assemblage shadcn empruntant `Sheet`,
+`Tooltip`, `Separator` et `Primitive`, tous conservés. `breadcrumb` et `card` ne prenaient que
+`Primitive`. Le rail est monté directement sur `NavigationMenuRoot / List / Item / Link` plutôt que
+sur l'habillage `ui/navigation-menu`, dont les `rounded-sm`, `bg-accent` et le viewport des
+sous-menus auraient été annulés ligne à ligne pour une charte sans arrondi ni sous-menu.
+`AlertDialog` est ajouté et remplace le `Dialog` d'`EventStatusPanel` : une transition
+irréversible mérite le focus sur l'action sûre et pas de fermeture au clic extérieur.
+
+**Trois règles portées par des composants, pas par des classes recopiées.** La largeur du bouton
+vit dans `ActionButton` et `ActionBar`. Les points de rupture vivent dans `BoardColumns` (5/7 au
+bureau, deux colonnes égales en tablette, une au téléphone) et dans `EventFieldset`, passé en
+grille de six colonnes où chaque `EventField` déclare son `span` — la naissance en prend deux,
+l'e-mail quatre, les remarques six. La largeur de lecture du briefing est bornée à 68 caractères
+sur tous les écrans. La densité suit le pointeur : 44 px au doigt, 40 à la souris, par
+`sm:min-h-10` et `sm:[&_input]:h-10`. *Corrigé par D-59 : les trois seuils étaient posés à `sm`,
+soit 640 px, et la grille de champs se déclenchait sur la largeur de l'écran au lieu de la sienne.*
+
+**L'échelle typographique gagne un sixième cran, `marquee`** (5,5 rem). D-46 impose qu'une taille
+se nomme au lieu de se choisir ; le dossard héroïque du bureau n'entrait dans aucun des cinq.
+`BibDisplay` pose chaque chiffre sur sa latte et étend `animate-flip` — jusqu'ici cantonné à
+`SlatCell` — aux chiffres qui font autorité, décalés de 60 ms, une fois à l'affichage,
+`motion-reduce` respecté. C'est le seul mouvement ajouté, et D-25 tient : pas d'horloge, pas de
+barre de progression.
+
+**Ce que cette décision ne règle pas.** Le master/detail de la console — la liste des quarante qui
+garde le détail à droite au lieu de changer d'écran — n'est pas livré : il déplace un flux, pas une
+mise en page. La liste reste une page, la fiche une autre. *Corrigé par D-59 : la raison invoquée
+ici — « demande une visite partielle Inertia » — était fausse, l'index expédie déjà la fiche
+complète de chaque inscrit.* L'écart des 72 px relevé par D-46 sur la variante `validate` n'est
+pas tranché non plus : il
+appartient toujours à BR-09 ou BR-13, qui posent le bouton en situation réelle. La refonte n'y
+touche pas, mais elle en rend le choix plus net — une règle conditionnelle au pointeur
+(`pointer: coarse`) rendrait les 72 px au doigt sans imposer la même hauteur à la souris.
+
+## D-59 — Le retour de terrain sur le grand format
+
+Arrêtée le 2026-08-21 après essai du panneau sur téléphone et sur ordinateur. Six écarts relevés
+par le propriétaire du projet, tous portés par un composant plutôt que par un écran.
+
+**Le master/detail de la console arrive, et il ne coûte rien au serveur.** D-58 l'avait écarté au
+motif qu'il demandait une visite partielle Inertia. C'était faux :
+`Manage\RegistrationController@index` sérialise déjà la `RegistrationResource` entière de chaque
+inscrit, coordonnées d'urgence et transitions autorisées comprises. La sélection est donc un `ref`
+local, la fiche une dérivation de la liste déjà en mémoire, et le back ne bouge pas d'une ligne.
+Au-dessus de 1024 px la liste tient cinq colonnes sur douze et `RegistrationDossier` occupe les
+sept autres en `sticky`. En dessous, la même fiche s'ouvre dans un `Sheet` monté sur le `Dialog`
+de reka-ui, glissé par la droite.
+
+**Le glissement demandé sur la latte est rendu par le volet, pas par un geste.** La question posée
+était : faire glisser la carte à gauche ou à droite pour révéler ses actions. Un tel geste n'a pas
+de primitive dans reka-ui, ne s'annonce pas à l'œil, et n'a pas d'équivalent au clavier. Le volet
+qui glisse tient le même besoin — plus de gros bouton dans la ligne, donc plus de bord droit
+rogné — en restant découvrable et accessible au clavier. La latte perd son `#cell` sur cet écran
+et devient un `button` entier, marqué à la sélection par un filet gauche et le fond `accent`.
+
+**La navigation du téléphone cesse de cacher sa fin.** Le rail défilait sans le dire : les
+destinations passées la sixième n'existaient pas pour qui ne devinait pas le geste. En dessous de
+768 px le rail laisse la place à un `Sheet` gauche qui liste les destinations verticalement, une
+par ligne, l'active marquée par `aria-current`. Au-dessus, le rail horizontal reste : six libellés
+en `text-label` mono tiennent sous 700 px, contrôles compris. `scroll-rail` reste en garde-fou.
+
+**Un dossard absent ne se dessine pas avec un tiret.** `BibDisplay` traçait la pliure de la latte
+en `after:top-1/2`, et le `—` du dossard non attribué tombait pile dessus : la pliure coupait le
+tiret en deux. Trois lattes vides remplacent le tiret. C'est ce que montre un panneau de gare qui
+n'a rien à afficher, et la pliure redevient ce qu'elle est.
+
+**Deux actions du même groupe ont désormais la même largeur.** Une transition qui demande
+confirmation posait l'`ActionButton` directement dans le groupe flex ; une transition directe
+l'enveloppait dans un `<Form>` sans largeur, qui se réduisait à son contenu. D'où « Confirmer »
+plus étroit qu'« Annuler » au téléphone, pour une raison purement structurelle. Le `<Form>` prend
+`w-full sm:w-auto`, la largeur que l'`ActionButton` porte déjà dans l'autre branche.
+
+**La fiche gagne son retour, et l'accueil du gérant cesse de lui parler d'inscription.**
+`manage/registrations/{id}/edit` s'atteint depuis le volet et depuis un lien direct : sans retour,
+la seule sortie était le rail. Sur l'accueil, un compte qui tient `manage-event` sans inscription
+lisait « Tu n'es pas encore inscrit » — une invitation adressée à quelqu'un qui ne court pas. Il
+lit maintenant son poste de gestion. La branche s'appuie sur `auth.permissions.manage-event`, déjà
+partagé, et `DashboardTest` verrouille le contrat côté serveur.
+
+**Le seuil des deux dimensions passe de 640 px à la largeur réellement disponible.** Deuxième
+tour du même essai : sur téléphone et sur tablette, le formulaire d'inscription et la fiche du
+coureur tronquaient. Trois causes, un seul défaut de raisonnement — la mise en page à deux
+dimensions se déclenchait à `sm`, c'est-à-dire 640 px, qui est un grand téléphone et pas un
+bureau. `BoardColumns` posait ses deux colonnes égales dès 640 px, si bien qu'une tablette lisait
+la fiche dans la moitié de sa largeur ; il attend maintenant `lg`. `BoardRow` mettait l'étiquette
+et la valeur sur la même ligne au même seuil ; il les empile jusqu'à `lg`, l'étiquette au-dessus
+comme sur le bandeau, et la valeur peut désormais se couper (`min-w-0`, `break-words`).
+
+**La grille de champs interroge son conteneur, pas la fenêtre.** C'est le cas qui tranche le
+débat : `auth/register/Complete.vue` — le formulaire d'inscription du coureur — vit dans la carte
+`max-w-sm` d'`AuthSimpleLayout`, soit 384 px, à toutes les tailles d'écran. Un seuil de fenêtre y
+posait trois champs de front dans 384 px dès qu'on ouvrait la page sur un écran large. Aucune
+valeur de `sm`, `md` ou `lg` ne pouvait avoir raison, parce que la question n'est pas la taille de
+l'écran mais celle de la place disponible. `EventFieldset` devient donc un `@container` et les
+`span` d'`EventField` des variantes de conteneur, franchies à 52 rem. La carte d'inscription reste
+en colonne partout, `registration/Edit` et les écrans de gestion en `max-w-4xl` (56 rem) passent à
+six colonnes au bureau, et la fiche imbriquée dans le volet 7/12 de `manage/registrations/Edit`
+reste en colonne tant que ce volet ne dépasse pas 52 rem. Le seuil est posé sous les 56 rem des
+conteneurs réels pour ne pas se jouer sur une égalité stricte. `Profile.vue` suit la même règle et
+passe de `max-w-3xl` à `max-w-4xl` pour y entrer.
+
+**La densité suit le pointeur pour de bon.** D-58 énonçait 44 px au doigt et 40 à la souris, puis
+plaçait la bascule à 640 px — où l'on est encore au doigt. `ActionButton` et la hauteur des champs
+d'`EventField` passent à `lg`. Ce qui reste à `sm` est la largeur des boutons : un bouton
+dimensionné par son texte ne tronque rien, et c'est la demande d'origine.
+
+## D-60 — La course est publique : l'accueil porte l'événement, les documents s'ouvrent aux invités
+
+Arrêté le 2026-08-22 par le propriétaire du projet. C'est une reprise (R-05) : elle rouvre ce que
+BR-33 avait branché (D-55) et ce que BR-18 avait fermé, sans qu'aucune story ne le demande.
+
+**Le constat qui la déclenche.** Tout est derrière `auth` sauf `/` et `/design-system`. Or `/` est un
+splash de deux boutons : le lien qu'on partage à un coureur ouvre un formulaire de connexion, pas la
+course. Personne ne peut savoir quand, où, sur quelle boucle et pour combien de places il s'engage
+avant d'avoir un compte.
+
+### Ce qui s'ouvre, et ce qui ne s'ouvre pas
+
+**Public :** l'événement — nom, description, date et heure du premier départ, distance et durée de
+boucle, adresse, coordonnées, places — et les documents.
+
+**Fermé, inchangé :** l'accueil du coureur, le briefing, l'inscription, `/manage`.
+
+**L'accueil du coureur n'était pas le bon écran**, alors que c'est par lui que la demande est
+arrivée. `DashboardController` ne projette que du nominatif : statut d'inscription, dossard, date de
+dépôt, modifiable ou non. Ouvert à un invité, il n'affiche que son propre état vide — les trois
+branches d'`EmptyState` se réduisent à « pas d'inscription ». L'écran qui porte les informations de
+la course est `Event.vue`, et c'est lui qui devient public.
+
+**Les documents s'ouvrent parce qu'ils décident, ils n'exploitent pas.** Règlement, consignes,
+logement et trace GPX sont ce qu'on lit *avant* de s'engager. Le briefing reste fermé pour la raison
+inverse : il dit comment se déroule la nuit à quelqu'un qui y sera. Conséquence assumée, sur D-52 :
+l'URL signée de cinq minutes devient joignable sans compte, donc le fichier est publiquement
+téléchargeable pendant sa fenêtre. Le disque n'est pas public et rien ne s'énumère ; c'est le
+document lui-même qu'on accepte de rendre public, ce qui est exactement la demande.
+
+### `/` porte l'événement, et `/event` disparaît
+
+Il y a une seule course, donc une seule page pour la décrire. `Welcome.vue` et `pages/Event.vue`
+disaient deux moitiés de la même chose ; `/` porte la page, `/event` quitte le routage avec son
+entrée de navigation, et `BareLayout` perd son seul écran — `app.ts` perd la branche `Welcome` de sa
+résolution de layout. La reprise **supprime deux écrans au lieu d'en ajouter un**.
+
+D-55 avait posé que `/event` répond 404 sur une base sans événement, parce qu'un écran qui parle de
+l'événement a raison de disparaître avec lui. La règle ne survit pas au déménagement : **l'accueil
+d'un site répond 200**, y compris avant que le gérant ait créé la course, et y compris quand elle est
+en `draft`. Il lit donc l'événement avec `first()`, comme l'accueil du coureur, et montre un état
+vide quand il n'y a rien à annoncer. Un événement en `draft` est traité comme une absence : le
+brouillon reste invisible sans passer par un refus.
+
+### Les deux entrées de l'invité
+
+**« Mon inscription » est un bouton de connexion nommé par sa destination.** Il n'existe aucun moyen
+de voir une inscription sans compte — statut et dossard sont nominatifs — donc l'entrée pointe sur
+`/login`. La nommer par ce qu'elle apporte plutôt que par le geste qu'elle demande est le seul écart
+avec la navigation connectée, et il est volontaire.
+
+**« S'inscrire » n'apparaît que si l'événement accepte les inscriptions.** D-45 a fait remonter la
+fenêtre — statut `registration` et capacité non atteinte — sur la création de compte : hors fenêtre,
+`/account/create` affiche un refus et le compteur de places. Une entrée toujours visible enverrait
+donc dans un cul-de-sac.
+
+**Connecté, les deux entrées ne se comportent pas pareil.** « S'inscrire » disparaît — le groupe
+`account` est en `guest`, la garder ne produirait qu'une redirection. « Mon inscription » ne reste
+que si `access.registration` est vrai : un gérant qui ne court pas n'a pas d'inscription, et une
+inscription annulée renvoie sur l'accueil (D-48, Q-03).
+
+### Ce que la reprise retourne dans le code
+
+**`access()` cesse de sortir avant les requêtes pour un invité.** C'est le point de D-55 que cette
+décision renverse : « un invité sort avant les deux requêtes, ce qui laisse la page publique et
+l'écran de connexion à coût nul » n'est plus tenable quand la page publique *est* la course. Les deux
+requêtes deviennent le prix de l'accueil. `EventPolicy::view()` et `DocumentPolicy::viewAny()`
+prennent un `?User` — sans ça le `Gate` refuse l'invité avant d'entrer dans la méthode, et l'ouverture
+ne se voit nulle part. `access.registration` reste `false` pour un invité : pas de compte, pas
+d'inscription. Le patron de D-55 ne change pas — chaque valeur reste le résultat du `Gate` que le
+serveur applique.
+
+**`board` suit la même visibilité que l'événement.** La prop est aujourd'hui partagée sans condition,
+donc le JSON de `/login` porte déjà le nom de l'événement, les places et l'heure du premier départ —
+même en `draft`. Aucun écran ne l'affiche, et c'est précisément ce qui l'a laissé passer. Puisque la
+course devient publique, la fuite devient une décision : `board` est nul tant que l'événement n'est
+pas visible, et le bandeau disparaît avec lui.
+
+**`mainNavItems()` devient réactif, et c'est un bug latent qu'on solde.** La liste est calculée une
+fois au montage de `BoardRail` et de `BoardMenu`, or `BoardLayout` persiste entre les visites
+Inertia : après connexion, le menu resterait celui de l'invité jusqu'à un rechargement complet.
+Invisible aujourd'hui — un invité ne voit jamais la coquille — et garanti dès qu'on la lui ouvre.
+La liste passe en `computed`. L'entrée d'accueil, elle, cesse de pointer inconditionnellement sur
+`dashboard()` : elle mène l'invité sur la course et le connecté sur son accueil.
+
+**Q-02 monte d'un cran sans changer de porteur, et elle change de porte.** Un invité qui tape
+`/dashboard` ou `/briefing` est redirigé sur la connexion — le middleware `auth` passe avant la
+policy. Mais `/documents` n'a plus de middleware : sur un événement en `draft`, un invité y reçoit
+un 403 sur la page Symfony non traduite. C'est le premier refus qu'une adresse publique peut
+produire, et une adresse publique attire les curieux et les robots là où une application fermée
+n'en voyait aucun. BR-13 reste le porteur ; l'exposition, elle, n'est plus théorique.
+
+### Quatre points relevés à l'implémentation
+
+**`access` gagne une quatrième clé, `register`.** La navigation doit savoir si l'écran de création de
+compte a un sens, et ni `event` ni `documents` ne le disent : la fenêtre d'inscription (D-45) est une
+autre condition que la visibilité. La clé vaut vrai pour un invité quand l'événement accepte les
+inscriptions — statut `registration` et capacité non atteinte — et faux pour tout compte connecté,
+ce qui reproduit exactement les deux gardes de la route : le middleware `guest` et la fenêtre.
+
+**Le bouton « S'inscrire » revient sur l'écran d'événement, pour les invités seulement.** D-45
+l'avait retiré en fusionnant les deux inscriptions. Il revient parce que la page est désormais la
+première qu'un coureur voit, et qu'une page d'accueil sans porte d'entrée est une impasse. Ce que
+D-45 a fermé reste fermé : un compte connecté sans inscription n'a toujours aucun écran pour en
+créer une.
+
+**`auth.user` était typé non-nullable côté TypeScript, et c'était faux.** `BoardAccount` testait déjà
+`v-if="user"` sur une valeur que le type promettait présente. Le type passe à `User | null`, ce que
+la navigation invité exige, et `pages/Profile.vue` — le seul écran qui lisait les champs du compte
+sans garde — porte maintenant un `v-if`.
+
+**`wayfinder:generate` sans `--with-form` casse la vérification de types.** Le plugin Vite déclare
+`formVariants: true` ; la commande, elle, ne les génère que sur demande. Régénérer les routes après
+un changement de routage sans ce drapeau retire `.form()` de tous les helpers et produit une
+vingtaine d'erreurs `vue-tsc` sans rapport avec le changement.
+
+## D-61 — La charte de l'instrument, et le starter kit remplacé par les primitives reka-ui
+
+Arrêté le 2026-08-22, sur demande du propriétaire, et mis en œuvre par la reprise R-06. Elle
+**révoque deux points de D-46** et en laisse tout le reste debout.
+
+### Ce que D-46 disait, et ce qui change
+
+D-46 avait conclu que « la couleur ne sert plus qu'aux quatre statuts, un écran de course est noir et
+blanc partout où aucun statut ne parle », et posait un rayon nul. Les deux points tombent, à la
+demande du propriétaire : le produit lisait comme une maquette, pas comme une marque.
+
+**Le premier arbitrage a été un accent de marque seul, et il n'a pas tenu.** `--primary` est passé à
+un ambre brûlé `oklch(0.48 0.11 62)`, tenu AA sur les cartes. Le propriétaire l'a renvoyé en trois
+mots : « jaune moutarde ». Le balayage a montré que ce n'était pas un défaut de dosage mais une
+limite du gamut — **au-delà de `C 0.12`, un orange à `L 0.52` sort de sRGB**. Un orange moyen-sombre
+ne *peut pas* être saturé : il lira moutarde quelle que soit la main. Un ambre franc exige `L 0.70`,
+et à cette clarté il ne porte plus de texte sur fond clair, ni ne fait un anneau de focus visible sur
+du blanc. La piste est close par la colorimétrie, pas par le goût — c'est ce qui la rend inutile à
+rouvrir.
+
+**La palette retenue est la troisième charte de `project/design/chartes-alternatives.html`**,
+l'instrument à cristaux liquides. Le jour, une dalle gris-bleu sans rétroéclairage — et donc, tout à
+fait délibérément, **aucune couleur d'accent** : `--primary` vaut l'encre `#14181B`. La nuit, le
+rétroéclairage s'allume et `--primary` devient le cyan `#4FD8E8`. La couleur ne vient plus de
+l'accent mais du **corps** : la dalle est teintée, et les surfaces de statut sont teintées dans le
+gris de la dalle au lieu d'être des pastels web. C'est une réponse différente à la même demande, et
+c'est celle que le propriétaire a arrêtée charte en main.
+
+**L'inversion qui compte.** Jusqu'ici le fond était blanc et la carte grise. Désormais la dalle
+`oklch(0.8382)` est le fond et la carte `oklch(0.8819)` est **plus claire** que lui : une latte est
+une fenêtre éclairée dans un boîtier, pas une zone assombrie sur une page.
+
+**La charte donne vingt couleurs, la palette en exige trente.** `--secondary`, `--muted` et
+`--accent` n'y figurent pas et sont dérivés : les deux premiers sur `#BFC7CD`, en retrait de la dalle
+comme un creux d'appareil ; le troisième sur `#B4BCC2` pour l'état survolé. C'est le seul endroit où
+cette entrée invente, et c'est là que se trouve la marge la plus fine de toute la palette —
+`muted-foreground` sur `--muted`, à 4,59:1. Un futur ajustement de `--muted` doit repasser par le
+test avant d'être écrit.
+
+**Les soixante paires de contraste passent**, dans les deux thèmes, avec `PaletteContrastTest`
+inchangé. Le filet de chargement d'Inertia suit `--primary` sans intervention ; son secours codé en
+dur dans `app.ts` valait encore `#2f43c8`, un bleu d'avant D-46, et passe à `#14181B`.
+
+### Le rayon n'est plus nul
+
+D-46 posait zéro, au motif qu'un tableau des départs n'a pas de coins arrondis. La charte de
+l'instrument pose **4 px** : un boîtier a des angles adoucis, une dalle non. `--radius` passe de
+`0px` à `4px`.
+
+Changer le token ne suffisait pas. **Le front ne portait que deux `rounded-md`** dans tout
+`resources/js`, ce qui est la conséquence logique d'un rayon nul — personne n'écrit `rounded` quand
+il ne produit rien. L'arrondi a donc été *posé* là où la charte le met : champs de lecture, lattes,
+boutons, saisies, pastilles, volets des dossards, surfaces flottantes, filtres de vue, encarts.
+
+**Les cartes gagnent un filet.** Dans la charte, chaque fenêtre est cernée d'un pixel de `--line` ;
+les lattes et les cartes n'en avaient aucun et se détachaient du fond par leur seule valeur. Avec un
+fond désormais proche en clarté, le filet devient nécessaire et non décoratif.
+
+**Les lattes gagnent la signature de la charte** : une barre de statut de 4 px au bord gauche, que
+l'`overflow-hidden` de la latte clipe à l'arrondi. Elle double le pictogramme, elle ne le remplace
+pas — la règle de D-46, « couleur, pictogramme et libellé, jamais la couleur seule », tient. Sur la
+latte d'inscription cette barre prend la place que tenait le filet gauche de l'état sélectionné, qui
+passe sur le filet complet et le fond `accent` ; `aria-current` ne bouge pas.
+
+**Ce que cette charte n'apporte pas encore : sa typographie.** Elle demande Overpass et Overpass
+Mono là où le projet tient Instrument Sans et Martian Mono. Le propriétaire a demandé la couleur, les
+cartes, les boutons et l'arrondi — pas les fontes. Le mono porte déjà toutes les lectures, donc la
+structure est compatible ; le remplacement reste entier et n'est pas fait.
+
+Ce qui ne bouge pas de D-46 : notation oklch ; palette déclarée en trois endroits avec un test qui
+affirme leur concordance ; AA vérifié par `PaletteContrastTest` et non par la revue ; aucun
+graphique ; plancher tactile de 44 px.
+
+### `components/ui/` n'existe plus
+
+Le constat qui la déclenche : vingt-et-un dossiers shadcn, dont **sept sans un seul import** —
+`badge`, `collapsible`, `input-otp`, `navigation-menu`, `select`, `skeleton`, `tooltip` — pendant que
+des primitives reka-ui utiles étaient réécrites à la main. La dépendance `vue-input-otp` sort avec
+`input-otp` : aucun écran ne saisit le code d'accès, il n'est qu'affiché une fois.
+
+**Les habillages disparaissent, les primitives montent au point d'appel.** `DialogRoot`,
+`DropdownMenuRoot`, `AlertDialogRoot`, `Separator`, `Label`, `Primitive` sont désormais importés
+depuis `reka-ui` dans les composants métier. Ce que l'habillage portait — les classes de la surface —
+vit là où ce projet met déjà ses classes partagées : deux feuilles, `lib/fieldClasses.ts` et
+`lib/overlayClasses.ts`. **Aucune variante n'est recopiée dans les quarante appels** ; c'est ce que le
+retrait de la couche menaçait de produire, et la feuille de classes est ce qui l'évite.
+
+**Le tiroir latéral n'était pas une primitive.** `ui/sheet` était un `Dialog` habillé ; les deux
+écrans qui l'utilisaient montent `DialogRoot` avec `overlayRail` ou `overlayDrawer`. `ui/sonner`
+n'était pas reka non plus — c'est `vue-sonner` — il devient `components/Toaster.vue`, maison.
+
+**Trois composants du starter kit sont morts sans remplaçant un-pour-un.** `ui/alert` et ses trois
+sous-composants deviennent un seul `Notice` à `tone` et `title`. `UserMenuContent` et `UserInfo`
+n'existaient que pour découper un menu à deux entrées : ils rentrent dans `BoardAccount`.
+`ui/button` avait six appels quand `ActionButton` en avait quatre-vingt-douze : `ActionButton` gagne
+une taille `icon`, un ton `ghost`, et reste le seul bouton. Il quitte `components/race/` — il n'a
+jamais été propre à la course.
+
+**Le bouton du starter kit portait une garde qui n'avait pas été reportée.** `ui/button` avait
+`whitespace-nowrap` ; `ActionButton` ne l'a jamais eu, et le propriétaire a signalé « Voir mon
+inscription » sur deux lignes en desktop. La cause n'est pas la longueur du libellé mais le
+rétrécissement : dans une rangée `ActionBar` en `sm:flex-row`, un bouton en `w-auto` garde
+`flex-shrink: 1` et est comprimé sous la largeur de son texte dès que la rangée est chargée. Le
+correctif porte sur les trois pièces plutôt que sur le point d'appel : `shrink-0` sur le bouton, pour
+qu'une commande ne cède jamais ; `min-w-0` sur la note, pour que la prose cède à sa place ;
+`sm:flex-wrap` sur la rangée, pour qu'elle passe à la ligne au lieu de déborder — la rangée à trois
+boutons du tableau de bord ne gardait que quarante-cinq pixels de marge au point de rupture `lg`.
+
+### Les champs : reka-ui en a, ils ne s'appellent pas « Input »
+
+`reka-ui` ne fournit pas d'`Input`, et c'est ce qui avait fait conclure à tort qu'il n'avait rien pour
+les formulaires. Il a `NumberField`, `DateField`, `TimeField`, `PinInput`, `Select`, `Checkbox`.
+
+**Ce qui monte sur une primitive** : les cinq champs numériques (distance, durée, capacité, latitude,
+longitude) sur `NumberField` avec ses pas ; les deux dates (naissance, premier départ) sur
+`DateField` ; l'heure du premier départ sur `TimeField` ; la case « se souvenir de moi » sur
+`Checkbox`. Les repères d'étape de l'inscription montent sur `Stepper`, qui remplace un `<ol>` de
+boutons faits main.
+
+**Ce qui reste en HTML, faute de primitive** : texte, email, téléphone, mot de passe, zone de texte,
+fichier. Ils vivent dans `components/form/` et partagent `fieldClasses` — même hauteur, même bordure,
+même arrondi, même filet au focus — donc ils ne se distinguent pas à l'œil des champs montés sur
+reka-ui.
+
+**Trois primitives ont été écartées après examen, et c'est délibéré.** `Tooltip` sur le motif de gel
+d'un champ **retirerait** l'information au doigt : le motif est un texte visible, il le reste.
+`ToggleGroup` sur les filtres de vue casserait la navigation — chaque filtre est une URL, avec
+`aria-current="page"`, et un groupe de bascules n'est pas un jeu de liens. `Select` et `PinInput`
+n'ont aucun consommateur. Brancher une primitive sans besoin est exactement le défaut que cette
+reprise corrige.
+
+### Deux effets de bord assumés
+
+**`start_time` accepte les secondes.** `TimeField` soumet `HH:MM:SS` là où `<input type="time">`
+envoyait `HH:MM` ; la règle passe de `date_format:H:i` à `date_format:H:i,H:i:s`, et un test nomme le
+cas. Le contrat de l'écran change parce que le contrôle change — c'est la formulation honnête, plutôt
+que de tronquer en silence dans `prepareForValidation`.
+
+**`@internationalized/date` devient une dépendance directe.** C'était une dépendance transitive de
+reka-ui ; `lib/temporal.ts` l'importe pour construire les valeurs des deux champs, et s'appuyer sur le
+graphe d'un tiers pour un import direct est fragile. Ses deux fonctions rendent `undefined` sur une
+valeur illisible plutôt que de lever : une date malformée venue du serveur laisserait sinon un écran
+blanc, et un champ vide est le pire acceptable. Un `.spec.ts` épingle les deux sens.
+
+**Zéro couleur Tailwind brute subsiste dans le front.** Les pages d'authentification traînaient encore
+`bg-red-50`, `text-amber-700`, `text-green-600`, `decoration-neutral-300` — la palette du starter kit,
+qui ignorait les tokens et donc les deux thèmes. Elles passent sur `destructive`, `status-running` et
+`primary`. Les `shadow-xs` hérités partaient avec : la charte de l'instrument n'a pas d'ombre, un
+appareil n'en projette pas.
+
+### Le retour depuis les pages d'authentification manquait
+
+Signalé par le propriétaire pendant la reprise : arrivé sur la connexion ou l'inscription, on ne peut
+plus revenir à l'événement. La page de l'événement *est* `home`, et le logo y menait déjà — mais son
+libellé était `sr-only` et valait le titre de la page, donc le lien était à la fois invisible et mal
+nommé. Un lien explicite, libellé et de 44 px se pose en haut à gauche, en miroir de la bascule de
+thème qui occupait déjà le haut à droite. Le logo n'est pas touché.
+
+**Ce que cette reprise ne vérifie pas.** Les contrôles compilent, passent `vue-tsc`, `eslint`, les
+soixante paires de contraste et les 394 tests PHP, et `lib/temporal.ts` est couvert. Mais **aucun
+rendu navigateur n'a été observé** : le dépôt n'a ni `@vue/test-utils` ni pilote de navigateur. Donc
+ni la dalle gris-bleu, ni le rétroéclairage cyan, ni l'arrondi de 4 px, ni les barres de statut, ni
+les segments de `DateField` et de `TimeField`, ni la mise en forme française de `NumberField`, ni le
+passage au clavier du `Stepper` n'ont été vus. Tout cela reste à regarder à l'écran — la galerie
+`/design-system` est faite pour ça — avant de considérer R-06 close.
+
+## D-62 — Une seule commande pour le compte organisateur, et la normalisation d'adresse sort du formulaire
+
+Arrêté le 2026-08-22 pendant BR-35, première entrée du lot 3. La séquence `tinker` de dix lignes
+devient `php artisan race:manager-account`, et trois arbitrages la façonnent.
+
+**Une commande, deux gestes.** Créer un compte et regénérer son code sont le même geste vu deux
+fois : la même adresse, le même `AccessCode::generate()`, la même unique occasion de lire le code.
+Deux commandes auraient dupliqué la normalisation, les gardes et l'affichage pour se distinguer par
+une seule branche. La signature est donc `race:manager-account {email} {first-name?} {last-name?}
+{--regenerate}` — les noms ne sont exigés que sur le chemin de création, parce qu'une regénération
+ne touche pas à l'identité. Le nom de la commande dit le compte, pas le verbe, faute de quoi
+`--regenerate` mentirait sur un `create`.
+
+**La garde sur le rôle passe avant toute écriture, y compris pour une regénération.** Le rôle
+`manager` n'est pourtant nécessaire qu'à la création. La garde reste inconditionnelle parce qu'elle
+répond à une question — « cette base est-elle seedée ? » — qui vaut avant n'importe quel geste sur
+les comptes, et parce que la seule autre forme possible était de la déplacer dans la branche de
+création, où elle aurait laissé passer un `--regenerate` sur une base à moitié installée. Elle nomme
+`db:seed --class=RolesAndPermissionsSeeder` et non `DatabaseSeeder` : celui-ci crée deux comptes
+d'essai, ce qui est exactement ce que le lot 3 s'apprête à purger.
+
+**La regénération n'attribue aucun rôle.** Un coureur qui a perdu son code le récupère par cette
+commande — c'est le même mécanisme d'accès pour tout le monde — et il en ressort coureur. Élever un
+compte au rôle `manager` reste un geste qu'on demande explicitement, et aucune option ne le fait
+aujourd'hui.
+
+**`EmailAddress::normalise()` devient la forme unique de l'adresse.** La règle vivait dans
+`AccountStoreRequest::prepareForValidation()`, et `FortifyServiceProvider` la recopiait au moment de
+chercher le compte à la connexion. La commande aurait été le troisième exemplaire : c'est un de trop
+pour une règle dont l'écart ne se voit pas — un compte qui existe et ne peut pas se connecter. Les
+trois appelants passent par `App\Support\EmailAddress`.
+
+**Ce qui reste ouvert.** `ProfileUpdateRequest` ne normalise pas l'adresse qu'un utilisateur saisit
+pour lui-même : une majuscule y suffit à se fermer la porte, puisque la connexion cherche en
+minuscules. Le défaut est antérieur à BR-35 et hors de son périmètre ; il se corrige désormais par
+un appel de plus à `EmailAddress::normalise()`.
+
+## D-63 — Le mail se compose en composants du paquet, et sa palette reste sous test
+
+Arrêté le 2026-08-22 pendant BR-36, deuxième entrée du lot 3. La story avait tranché la voie —
+surcharger `notifications::email` plutôt qu'écrire une vue par notification — et laissé trois
+questions ouvertes derrière elle.
+
+**Un composant, deux formats : c'est le seul endroit où le HTML et le texte divergent.** Le même
+`notifications::email` est rendu deux fois, une fois avec les composants de `mail/html`, une fois
+avec ceux de `mail/text`. La vue ne peut donc pas se brancher sur le format — mais un composant, si.
+Les trois restes de markdown de la version texte se règlent chacun par un composant qui a un jumeau
+texte : `heading` (le `#` du titre), `link` (le `[url](url)` sous le bouton), `header` (le
+`Nom: http://…` de l'en-tête). Écrire ces phrases en dur dans la vue aurait été l'autre voie ; elle
+duplique l'habillage à la première notification suivante.
+
+**Le code d'accès voyage comme vue, pas comme chaîne.** `->line(view('mail.access-code', …))` :
+`SimpleMessage::formatLine()` rend tout `Htmlable` tel quel, et `Illuminate\View\View` en est un.
+Le bloc atterrit donc exactement là où la prose le place — entre « Ton code d'inscription : » et
+« Garde-le en sécurité ». Le passer par le gabarit, en donnée de vue, était la voie évidente et
+elle est fausse : le gabarit n'a que deux positions à offrir, avant ou après le bouton, et les deux
+séparent le code de la phrase qui le désigne. Le fragment ne porte aucune ligne vide, faute de quoi
+CommonMark refermerait le bloc HTML brut au milieu du tableau.
+
+**La quatrième déclaration de la palette n'échappe pas au test.** La story annonçait qu'aplatir
+`oklch` en hexadécimal ferait sortir le mail du test de concordance. C'est faux : la conversion
+oklch → sRGB est exacte au canal près sur les six couleurs employées, vérifiée avant d'écrire le
+test. `MailTemplateTest` compare donc l'hexadécimal du mail **rendu** au token de `app.css` converti
+— pas un hexadécimal figé à la main. La conversion sort de `Tests\Support\Contrast`, qui n'en
+gardait que la moitié linéaire, vers `Tests\Support\Srgb`.
+
+**Ce que le thème du mail ne style plus.** Il couvre ce que les deux notifications rendent, plus les
+boutons `success` et `error` — sans eux, une notification de niveau erreur afficherait un bouton
+sans fond, donc du texte clair sur une surface claire. Il ne style ni `x-mail::panel` ni
+`x-mail::table` : la story qui s'en servira les habillera.
+
+**Deux affirmations du contexte de BR-36 étaient périmées**, et le sont restées jusqu'à ce que le
+mail soit rendu pour de vrai. L'habillage n'était pas en anglais — `lang/fr.json` portait déjà le
+repli sous le bouton et le pied depuis D-45 ; il restait `Hello!`, `Whoops!` et `Regards,`, que
+personne n'affichait puisque les deux notifications posent titre et salutation. Et le bouton du
+paquet n'est plus bleu depuis longtemps : il vaut `#18181b`, à deux pas de l'encre de la charte. Le
+défaut visible était le gabarit de démonstration au complet — carte blanche, fond `#fafafa`, gris
+zinc, ombre portée — pas une couleur fausse.
+
+**Ce qui reste ouvert.** Le mail annonce `color-scheme: light` et rien d'autre : un client qui
+inverse d'autorité affichera ce qu'il veut, et c'était déjà hors périmètre. La coupure de mot sur
+tous les liens de la fenêtre (`.inner-body a`) est retirée du thème du paquet, où elle cassait aussi
+les libellés de bouton en portrait ; seule l'adresse de repli la porte, par sa classe.
+
+## D-64 — La purge nomme le rôle `manager`, et refuse plutôt que de supposer une réponse
+
+Arrêté le 2026-08-22 pendant BR-37, dernière entrée du lot 3. La story avait tranché la définition —
+un compte coureur est un compte qui ne porte pas le rôle `manager` — et laissé la mécanique ouverte.
+
+**L'exception à `laravel:permissions-not-roles` est nommée, pas subie.** `race:purge-registrations`
+teste un nom de rôle, ce qu'aucune décision d'accès du projet ne fait. Elle ne laisse entrer
+personne : elle choisit qui elle n'emporte pas, et cette question n'a pas d'autre réponse ici. La
+définir par la présence d'une inscription était l'autre voie, plus étroite et fausse : elle épargne
+les comptes orphelins, que `RegisterRunner` ne crée jamais et qui sont donc exactement ce qu'une
+purge doit balayer.
+
+**Repris le même jour par [R-07](README.md) :** le rôle n'est plus la seule règle. L'adresse de
+l'organisateur, en configuration, épargne un compte elle aussi — en plus du rôle et jamais à sa
+place. Voir D-65.
+
+**Le rôle se teste par son nom en sous-requête, pas par le scope `withoutRole()` du paquet.** Le
+scope résout d'abord le rôle par `Role::findByName()`, qui lève `RoleDoesNotExist` quand la table
+des rôles n'a pas été semée. Une commande de purge qui casse sur une base incomplète est pire
+qu'inutile — elle doit pouvoir compter, dire ce qu'elle voit, et refuser. `whereDoesntHave('roles',
+…)` sur le nom ne dépend que de la ligne de jointure, et inclut au passage les comptes sans aucun
+rôle.
+
+**Il ne reste plus de manager quand tous les comptes sont des comptes coureurs.** Le décompte des
+coureurs et celui des comptes suffisent : leur égalité est l'avertissement, et il tombe avant la
+confirmation. Une seconde requête sur le rôle aurait dit la même chose deux fois.
+
+**Symfony ne devine plus l'absence de terminal.** `Application::configureIO()` ne teste plus
+`posix_isatty` : seul `--no-interaction` — ou `-n` — coupe l'interactivité. S'en remettre à la valeur
+par défaut de `confirm()` reviendrait donc à répondre « non » sans le dire dans un cas, et à
+attendre une entrée qui ne viendra pas dans l'autre. La commande lit `isInteractive()` elle-même,
+refuse en nommant `--force`, et sort en échec : une purge non faite est un échec, pas un succès
+silencieux.
+
+**Une seule écriture ne passe pas par un modèle.** Les inscriptions puis les comptes partent ligne à
+ligne, parce que `HasRoles` détache les attributions sur l'événement `deleting` et qu'une
+suppression en masse laisserait `model_has_roles` peuplé de références mortes. Les sessions, elles,
+n'ont pas de modèle : `DB::table('sessions')->whereIn('user_id', …)` ferme la porte des comptes
+emportés, dans la même transaction.
+
+**Pas de classe d'action, pas d'écran.** La logique vit entière dans la commande, seul appelant
+qu'elle aura jamais : la story exclut le bouton, et une action extraite pour un appelant unique
+n'aurait déplacé que le nom.
+
+## D-65 — L'adresse de l'organisateur en configuration, mais en plus du rôle et jamais à sa place
+
+Arrêté le 2026-08-22, juste après BR-37, et porté par la reprise R-07. Le constat du propriétaire :
+il n'y aura jamais qu'un seul manager, donc son adresse est une donnée d'installation et non quelque
+chose à retaper à chaque geste. La proposition initiale allait plus loin — purger tous les comptes
+sauf cette adresse, et retirer l'argument des deux commandes.
+
+**La liste blanche est une disjonction, pas un remplacement.** Un compte est épargné s'il porte le
+rôle `manager` **ou** si son adresse est celle configurée. Faire de la configuration la source unique
+était la voie demandée, et elle déplace le rempart de la commande la plus destructrice du dépôt
+depuis une ligne en base vers un fichier non versionné : une variable absente, une faute de frappe ou
+un cache de configuration périmé — BR-28 T3, encore ouverte — et la purge emporte tous les comptes et
+se ferme la porte derrière elle. En disjonction, la même erreur retombe sur le comportement de D-64
+au lieu d'ouvrir la trappe.
+
+**`OrganiserAddress::configured()` est le seul lecteur, et il valide.** Le fichier de configuration
+lit et donne un défaut, il ne répare pas : le défaut de `env()` ne couvre que la clé absente, une
+valeur vide ou illisible passe. Le lecteur normalise donc par `EmailAddress` et filtre par
+`filter_var`, et rend `null` — pas la chaîne vide, qui aurait produit un `where('email', '!=', '')`
+épargnant zéro ligne tout en ayant l'air d'épargner quelqu'un.
+
+**La purge dit à voix haute que la porte ne tient qu'à une ligne.** Quand l'adresse n'est pas
+configurée, l'avertissement tombe avant la confirmation, à côté de celui qui signale qu'aucun compte
+ne serait épargné. Elle ne refuse pas pour autant : BR-37 demandait qu'elle le dise avant, pas
+qu'elle s'arrête.
+
+**`race:manager-account` garde son argument, la configuration n'en est que le défaut.** L'adresse
+explicite reste la voie de la première installation et celle des tests ; le geste courant devient
+`race:manager-account --regenerate`, sans rien à taper. `RACE_ORGANISER_EMAIL` entre dans
+`.env.example` au passage, ce que BR-28 T4 reproche justement aux variables nées en production.
+
+## D-66 — Le code perdu se règle en libérant l'adresse, et la page d'erreur sort en story propre
+
+Arrêté le 2026-08-22 en ouvrant le lot 4, à la question « l'inscription est-elle finie et
+déployable ? ». Elle l'est, et l'examen a fait remonter quatre choses qui cassent dès qu'un inconnu
+arrive sur l'adresse. Deux d'entre elles demandaient un arbitrage.
+
+**Un coureur qui perd son code ne reçoit pas un second chemin d'authentification.**
+`config/fortify.php` porte `'features' => []` : ni réinitialisation, ni renvoi de code, parce que
+D-43 a réduit l'authentification au seul mot de passe et D-45 a fait du mail le seul chemin de
+création de compte. Le réflexe — ajouter un renvoi de code — rouvre exactement ce que ces deux
+décisions avaient fermé, et il faudrait le protéger comme une porte : limitation de débit, lien
+signé, expiration, énumération d'adresses. Le geste retenu est plus étroit et n'ouvre rien : le
+gérant **supprime l'inscription et le compte**, l'adresse redevient libre, et le coureur reprend le
+parcours public d'inscription — qui envoie déjà un lien signé puis un code neuf. BR-39 le porte.
+
+**La suppression est ouverte quel que soit le statut de l'inscription.** Exiger une annulation
+d'abord aurait fait du geste destructeur un geste en deux temps, ce qui se défend ; mais le cas
+courant est un coureur confirmé qui a perdu son mail, et l'aller-retour n'ajoute aucune sécurité que
+la confirmation à l'écran n'apporte pas déjà. Une confirmée part donc avec son dossard : la place se
+libère, le numéro laisse un trou, conformément à BR-37 — les dossards ne rebouchent pas leurs trous.
+
+**Q-02 est fermée : la page d'erreur ne suit plus BR-13.** La question laissait le choix entre une
+story dédiée dans l'epic 1 et un rattachement à BR-13, premier écran où un refus serait banal. La
+mise en ligne a tranché : le besoin est devenu public — un lien recopié, un lien d'inscription
+expiré, un onglet resté ouvert la nuit — alors que BR-13 est un écran de gérant qui n'arrive pas
+avant le moteur de course. C'est aussi la dernière surface publique que BR-38 n'a pas habillée.
+BR-40 la porte, dans l'epic 1. Q-04 reste sur BR-13, qui pose le bouton de validation en situation.
+
+**Le retour en brouillon exige zéro inscription, annulées comprises.** BR-03 avait livré une chaîne à
+sens unique, et c'était juste : aucune de ces transitions ne s'annule une fois qu'un coureur a couru.
+La première marche est l'exception, parce qu'une ouverture prématurée n'a rien produit tant que
+personne ne s'est inscrit. Ne compter que les inscriptions actives aurait laissé un « brouillon »
+porter des lignes annulées et les comptes qui vont avec — un brouillon qui garde des traces n'en est
+pas un. La règle stricte est tenable précisément parce que BR-39 donne l'outil pour atteindre la
+condition. BR-41 le porte.
+
+## D-67 — La file se surveille par un second point de contrôle, parce qu'Horizon ne peut pas signaler sa propre mort
+
+Arrêté le 2026-08-22 en implémentant BR-30 T5. La question était de savoir qui émet l'alerte quand la
+file cesse d'être consommée, et la réponse évidente — la notification de longue attente d'Horizon,
+`Horizon::routeMailNotificationsTo()` — est celle qui ne peut pas marcher.
+
+**Horizon surveille les attentes depuis son propre processus maître.** `MonitorWaitTimes` est un
+écouteur du superviseur : il ne tourne que tant que le superviseur tourne. Un worker mort n'émet donc
+rien, et c'est exactement la panne à couvrir. Le second chemin écarté est le mail : les deux mails du
+parcours passent par la file, et un mail d'alerte émis depuis une file arrêtée reste dans la file.
+L'alerte doit venir d'un observateur qui ne dépend ni du worker ni de la file.
+
+**Le sondage est une seconde URL, sur le patron de `/up`.** `up/queue` répond `200 {"queue":
+"consuming"}` quand la file est consommée, `503` sinon, et la surveillance déjà installée par BR-31 T3
+appelle les deux : `/up` dit si l'application répond, `up/queue` dit si le worker travaille. C'est la
+distinction que D-19 exigeait, tenue par deux points de contrôle plutôt que par deux mécanismes, et
+l'observateur reste hébergé hors du VPS — une machine éteinte fait tomber les deux.
+
+**Trois états valent refus, et le troisième est celui d'Horizon.** Aucun maître qui bat (absent
+depuis quinze secondes, la durée de vie de son enregistrement Redis), un maître en pause, ou une
+attente estimée au-delà du seuil de `horizon.waits` — le même seuil que la notification écartée, lu au
+même endroit, pour ne pas installer un second réglage à côté du premier. Un seuil à `0` tait la file,
+comme chez Horizon.
+
+**La route est déclarée hors du groupe `web`, à côté de `health:`.** C'est ce que fait le point de
+contrôle du framework, et ce n'est pas cosmétique : dans le groupe `web`, chaque appel de la
+surveillance ouvrirait une session et ferait travailler le partage de props d'Inertia, donc la base,
+pour une réponse qui n'en a pas besoin. Un test le tient.
+
+**Ce que le sondage ne fait pas** — il ne prévient personne. Il rend un état ; l'alerte est émise par
+la surveillance externe, qui doit appeler `up/queue` comme elle appelle déjà `/up`, avec deux échecs
+consécutifs avant de sonner : un déploiement laisse le maître absent le temps du redémarrage du
+conteneur, et une alerte à chaque mise en ligne est une alerte qu'on finit par ignorer.
+
+**Le sondage seul laissait le planificateur invisible, et un second signal le couvre.** Interrogé de
+l'extérieur, `up/queue` dit tout du worker et rien du planificateur — qui n'a pas de contrôle de santé
+non plus (D-56 l'assume), alors que la user story de BR-30 est précisément « les éliminations tombent
+sans navigateur ouvert ». `race:queue-heartbeat` ferme ce trou par renversement : le planificateur
+l'exécute chaque minute, la commande ping `HEALTHCHECKS_QUEUE_URL` **seulement si la file est
+consommée**, et c'est l'absence de ping qui alerte. Un planificateur mort n'appelle plus, un worker
+mort fait taire l'appel : les deux pannes de BR-30 tiennent dans un signal, et le VPS éteint aussi.
+
+Le ping conditionnel est le motif déjà retenu pour la sauvegarde en BR-29, et pour la même raison :
+ce qui doit alerter, c'est le silence. `up/queue` reste, parce que le battement dit qu'une des deux
+choses a lâché sans dire laquelle, là où le sondage nomme l'état — worker absent, en pause, ou en
+retard. Les deux ne se remplacent pas : l'un porte l'alerte, l'autre le diagnostic.
+
+**La commande ne rattrape pas une URL illisible, et n'avale pas un hôte injoignable.** Une valeur qui
+n'est pas une URL est traitée comme une absence, avec le nom de la variable dans la sortie : la
+réparer silencieusement enverrait le ping nulle part en ayant l'air de fonctionner. Un hôte
+injoignable laisse remonter `ConnectionException` — la règle maison interdit le `try`/`catch`, le
+planificateur la journalise, et le check alerte de lui-même faute de ping.
+
+## D-68 — Le demi-tour est une quatrième question posée à l'état, et l'écran cesse de promettre l'irréversible
+
+Arrêté le 2026-08-22 en implémentant BR-41. D-66 avait fixé la règle métier — zéro inscription,
+annulées comprises. Restait à décider où elle vit et ce qu'elle change à l'écran.
+
+**Le retour est une méthode de plus sur `EventLifecycleState`, pas une seconde machine.** Chaque état
+répond déjà pour lui-même à « quelle est la suite », « qu'est-ce qui la bloque », « avance ». Il
+répond maintenant aussi à « quel est le retour », « qu'est-ce qui le bloque », « recule ». Trois états
+sur quatre rendent `null`, `[]` et un refus : c'est la forme que la chaîne montante avait déjà, où
+`refusals()` rend `[]` dans trois classes sur quatre. Un état ajouté sans son demi-tour échoue à
+l'analyse statique, comme il échouait déjà sans sa suite — le `match` exhaustif de la fabrique reste
+le seul endroit qui énumère les statuts.
+
+**La règle vit dans l'état, et l'écriture la porte une seconde fois.** `revertRefusals()` compte les
+inscriptions et produit le message que le gérant lit ; `revert()` refuse avant d'écrire. Le `update`
+ajoute `whereDoesntHave('participants')` à côté du `where('status', $from)` déjà posé par D-32 sur la
+transition montante, et pour la même raison : la vérification et l'écriture ne sont pas simultanées.
+Ce n'est pas la même règle dite deux fois, c'est la même règle tenue à deux instants — le contrôle
+nomme ce qui bloque, l'écriture interdit qu'une inscription se glisse entre les deux. Aucun test ne
+couvre ce créneau : il ne s'ouvre que sous concurrence réelle, et le prétendre testé serait faux.
+
+**L'exception refuse, le formulaire compte.** `registrationsExist()` porte un message sans chiffre,
+parce que l'exception est le filet et non le canal — c'est ce que son propre docblock énonçait déjà.
+Le décompte au pluriel arrive par l'erreur de validation, qui est le chemin que le gérant voit. Le
+message est une forme plurielle de `trans_choice`, donc « une inscription » et « 2 inscriptions »
+disent quoi supprimer, pas seulement qu'on ne peut pas.
+
+**L'écran d'ouverture disait « on ne revient jamais en arrière », et c'était devenu faux.** La story
+ne le demandait pas ; le laisser aurait mis un mensonge à côté du bouton qui le contredit. La
+confirmation de l'ouverture annonce désormais que l'étape se referme tant qu'aucune inscription
+n'existe. Ce qui décide entre les deux textes n'est pas dans le client : le serveur rend
+`nextIsReversible`, calculé en demandant à l'état suivant s'il a un retour. Le client choisit une
+phrase, il ne rejoue pas la règle.
+
+**Le dialogue de confirmation est sorti du panneau.** Les deux gestes ont la même forme — bouton,
+alerte de refus, dialogue, champ `to` caché, pied de page — et un second bloc copié aurait poussé
+`EventStatusPanel.vue` au-delà de la limite de 200 lignes. `EventTransitionDialog.vue` prend les deux
+appels ; le panneau garde la frise des étapes et ne fait plus que nommer les deux gestes. Le ton
+distingue le sens de la marche : plein pour avancer, sobre pour refermer.
+
+**Ce que le retour ne fait pas** — il n'efface rien. Le briefing, les documents et les horaires
+calculés traversent le demi-tour intacts, et un test les nomme un par un. Le coureur qui remplissait
+le formulaire public au moment du retour est refusé par le contrôle de période déjà en place : le
+statut `brouillon` referme le parcours, aucun code neuf n'a été écrit pour ça.
+
+## D-69 — La suppression unitaire fournit l'appelant qui manquait à la purge, et se refuse par le formulaire
+
+Arrêté le 2026-08-22 pendant BR-39, troisième entrée du lot 4. D-64 avait laissé la logique de
+suppression entière dans `race:purge-registrations`, en notant qu'une classe d'action n'aurait
+déplacé qu'un nom faute de second appelant. L'écran en fournit un, donc la logique sort.
+
+**Deux actions et non une, parce que la purge balaie plus que des inscriptions.**
+`DeleteRegistration` prend une ligne — la fiche, puis son compte — et `DeleteAccount` prend un
+compte seul. La purge appelle les deux : la première pour chaque inscription, la seconde pour les
+comptes qui n'en portent aucune, que `RegisterRunner` ne crée jamais et qui sont donc exactement ce
+qu'un balai doit emporter. Réduire la purge à une boucle sur les inscriptions les aurait laissés
+derrière.
+
+**La règle du compte épargné se dit deux fois parce qu'on l'interroge de deux endroits.**
+`SparedAccount::runners()` est une contrainte de requête — la purge compte, annonce et itère ;
+`SparedAccount::spares()` est un prédicat sur un compte déjà chargé — l'action décide ligne à ligne.
+Ce sont deux formes de la même définition, dans une classe qui les tient ensemble, et non deux
+définitions. Les deux exceptions à `laravel:permissions-not-roles` que D-64 et D-65 avaient nommées
+vivent maintenant là, et nulle part ailleurs.
+
+**Le décompte des sessions est pris avant la boucle, pas rendu par elle.** Une action qui rendrait
+« combien de portes j'ai fermées » ferait porter à son type de retour un besoin d'affichage qui
+n'appartient qu'à la commande. La purge compte les sessions des comptes condamnés avant de les
+supprimer, dans la même transaction : le chiffre annoncé est celui qui part.
+
+**Le refus en course vit dans la requête de formulaire, pas dans l'action.** La voie évidente était
+une `RegistrationDeletionRefusedException`, sur le modèle de la transition. Elle rendrait un 409 là
+où le gérant a besoin d'une phrase sous le bouton, et l'action serait alors le seul endroit à
+connaître un statut d'événement — ce qui la rendrait inappelable par la purge, qui porte déjà son
+propre garde-fou. `RegistrationDeletion::refusal()` produit la phrase, la requête l'ajoute aux
+erreurs, l'écran désactive le bouton avec la même phrase en `aria-describedby`. La règle est écrite
+une fois ; c'est son rendu qui a deux formes.
+
+**Le geste n'a pas de garde-fou d'écriture concurrente, contrairement aux transitions.** D-32 et le
+demi-tour de BR-41 ajoutent un `where` sur l'état quitté parce que deux requêtes peuvent se marcher
+dessus. Ici la seconde suppression ne trouve plus la ligne : la liaison de modèle rend 404 avant
+d'entrer dans le contrôleur, et c'est le refus lisible que demandait le cas du second onglet.
+
+**Le bouton « Modifier la fiche » a été retiré du dossier, à la demande du propriétaire.** C'est le
+seul chemin que BR-06 avait posé vers `manage/registrations/{id}/edit` ; l'écran et ses routes
+restent, sans lien depuis l'application.
+
+**L'annulation reste, et c'est la couleur qui sépare les deux gestes.** La question posée était de
+retirer l'annulation, puisqu'on n'annule que pour ne plus rien faire. Elle reste pour une raison que
+cette story a elle-même créée : la suppression est refusée pendant la course, alors qu'aucune
+transition d'inscription ne l'est. La nuit de la course, un inscrit qui ne se présente pas ne peut
+être qu'annulé. S'ajoutent le retour en arrière — `reopen` rend l'inscription au coureur avec ce
+qu'il avait tapé — et le compte, qui survit à l'annulation et pas à la suppression. Le rouge plein ne
+désigne donc plus que l'irréversible : `cancel` passe en ton sobre, `destroy` garde `danger`.
+
+**La rangée d'actions descend en bas du tiroir par `order`, pas par un second bloc.** Les trois
+gestes tiennent dans une seule section, placée en tête sur le tableau et en pied dans le tiroir :
+comme les sections sont les items d'une même grille, `order-last` suffit à la déplacer. Dupliquer le
+bloc derrière un point de rupture aurait laissé deux fois le même `id` dans le document, puisque la
+colonne du tableau reste rendue sous le tiroir mobile. Le dossier reçoit tout de même `variant` —
+`board` ou `drawer` — pour suffixer l'identifiant du refus et choisir l'ordre : le parent sait
+laquelle des deux instances il rend, et le composant n'interroge aucune media query.
+
+**Les boutons s'empilent sous 640 px et passent en ligne au-dessus.** La rangée est une grille à une
+colonne sur mobile et un `flex flex-wrap` à partir de `sm`, ce qui reprend le point de rupture que
+`ActionButton` utilise déjà pour passer de `w-full` à `w-auto`.
+
+**La fermeture du dossier est un événement, pas un `DialogClose`.** Le tiroir mobile se fermait à la
+touche d'échappement et au voile, la colonne du tableau ne se fermait pas du tout — aucune des deux
+n'offrait de bouton. Le dossier émet `close` et le parent remet `selectedId` à `null` : le tiroir se
+referme parce que son ouverture est dérivée de la sélection, et la colonne rend de nouveau son état
+vide. Un `DialogClose` n'aurait servi qu'une des deux instances.
+
+## D-70 — Une seule page rend les quatre refus, et le diagnostic ne se perd que sur l'erreur serveur
+
+Arrêté le 2026-08-22 pendant BR-40, dernière entrée du lot 4. Q-02 avait laissé ouverte la forme du
+refus depuis BR-01 ; D-66 l'avait sortie en story propre. Ce qui restait à trancher tenait en trois
+points : où brancher le rendu, ce qu'on sacrifie au mode développement, et qui décide du retour.
+
+**Le rendu se branche sur `$exceptions->respond()`, après le handler, pas devant lui.** La voie
+concurrente était une vue `errors/404.blade.php` par statut, que Laravel prend tout seul. Elle
+sortait du site : la charte, la marque et la navigation vivent dans Inertia, et quatre gabarits Blade
+les auraient réimplémentés quatre fois. `RenderErrorPage` reçoit la réponse déjà construite, lit son
+statut et la remplace par une page Inertia — l'autorisation, elle, n'est pas touchée : ce qui était
+refusé l'est toujours, avec le même code.
+
+**Une page pour quatre situations, et le statut passe en prop.** Les libellés diffèrent, la structure
+non — un pictogramme, un titre, une phrase, un retour. `Error.vue` reçoit `status` et
+`errorSituation()` le traduit en `not_found` / `forbidden` / `expired` / `server`. Un statut hors des
+quatre retombe sur le comportement du framework côté serveur, et sur `server` côté client si jamais
+la prop arrivait autrement.
+
+**Le mode développement n'est préservé que sur le 500, parce que lui seul porte un diagnostic.** Une
+404, une 403 et une 419 sont des `HttpException` : le framework leur rend déjà une vue, jamais une
+trace, et les intercepter en développement ne cache rien. L'écran détaillé n'apparaît que sur une
+erreur non-HTTP, donc `app()->hasDebugModeEnabled()` ne garde que celle-là. Tester la page de 500
+demande en retour de poser `app.debug` à faux, ce que le test fait explicitement — et son jumeau
+vérifie que le message d'exception reste visible quand le débogage est actif.
+
+**Pas de filet autour du rendu, parce que la règle maison l'interdit et que l'analyse le permet.** Le
+cas limite de la story demandait que le repli du framework survive à une page d'erreur qui échoue,
+et le premier jet enveloppait le rendu Inertia dans un `try`. `xefi.noTryCatch` l'a refusé. La
+vérification a montré que la précaution était creuse : `Inertia\Middleware::handle()` résout les
+props partagées avant le contrôleur, donc au moment où le renderer s'exécute, `Event::query()` a déjà
+été jouée ou l'exception est déjà celle qu'on rend. Le rendu ne rejoue aucune requête.
+
+**L'adresse inconnue passe par une route `fallback`, parce que sans route il n'y a pas de groupe
+`web`.** Le raisonnement ci-dessus s'arrêtait une marche trop tôt, et la première visite manuelle
+l'a montré : sur une adresse sans route, `HandleInertiaRequests` ne s'exécute pas du tout — le
+groupe `web` est attaché aux routes, pas à l'application. La page sortait avec
+`{"component":"Error","props":{"status":404}}` pour toutes props, donc sans `auth`, sans `access` et
+sans traductions : écran blanc côté client, libellés en clés brutes si le rendu avait tenu.
+`Route::fallback(MissingPageController::class)`, déclarée après les `require`, fait de la 404
+non routée une route ordinaire du site — mêmes middlewares, mêmes props, même charte. C'est le
+second point de décision de la story, là où le contexte n'en annonçait qu'un.
+
+**Ce trou n'était pas visible en test, et il l'est maintenant.** Les six premiers tests
+interrogeaient le composant et le statut, jamais ce que la page reçoit avec : ils passaient au vert
+sur une page qui ne pouvait pas s'afficher. `it_carries_the_shared_props_on_an_unknown_address`
+assure la présence de `auth`, `access` et `translations`, et retomber le `fallback` le fait échouer
+sur « Property [auth] does not exist ». Une page Inertia ne se teste pas seulement par son nom.
+
+**`BoardAccount` lisait `props.auth.user` sans garde, seul de sa famille.** `lib/auth.ts`,
+`lib/access.ts` et `lib/permissions.ts` protègent tous leur accès aux props partagées ; ce composant
+ne le faisait pas, et c'est lui qui levait « Cannot read properties of undefined ». Le `fallback`
+règle le cas de la 404, mais une erreur rendue hors du groupe `web` — sur `horizon`, sur `up` —
+reste possible, et le garde d'une ligne coûte moins que le crash qu'il évite.
+
+**Le JSON se reconnaît à la réponse, pas à la requête.** `shouldRenderJsonWhen` produit déjà un
+`JsonResponse` pour `api/*` et pour un appel qui l'attend ; tester `$response instanceof
+JsonResponse` reprend cette décision au lieu de la dupliquer. Une visite Inertia, elle, envoie
+`Accept: text/html` et n'est jamais prise pour un appel JSON.
+
+**Le retour est calculé côté client, dans `lib/`, sur le modèle de `mainNav`.** Le serveur ne dit que
+le statut. `errorReturnItem()` interroge `isAuthenticated()` et rend un `NavItem` : l'accueil pour un
+visiteur, le tableau de bord pour un compte connecté — les deux seules destinations qu'on est sûr de
+ne pas refermer au nez de celui qui lit la page. Le placer dans un module plutôt que dans le
+composant le rend testable en Vitest, comme la navigation principale, puisque le projet ne monte pas
+de composants dans ses specs.
+
+**Le libellé du refus ne nomme rien.** « Accès refusé · Ton compte n'a pas accès à cette adresse » ne
+dit pas si la ressource existe. C'est la seule des quatre phrases qui devait se surveiller : les
+trois autres ne peuvent rien révéler.

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Enums\Permission;
+use App\Enums\RegistrationStatus;
 use App\Models\Event;
 use App\Models\Participant;
 use App\Models\User;
@@ -25,9 +26,26 @@ class SharedAccessTest extends TestCase
     }
 
     #[Test]
-    public function it_closes_every_area_to_a_guest(): void
+    public function it_opens_the_event_and_the_documents_to_a_guest(): void
     {
         $this->openEvent();
+
+        $this->get(route('home'))
+            ->assertInertia(
+                fn (AssertableInertia $page) => $page
+                    ->where('access', [
+                        'event' => true,
+                        'documents' => true,
+                        'registration' => false,
+                        'register' => true,
+                    ]),
+            );
+    }
+
+    #[Test]
+    public function it_keeps_a_draft_shut_to_a_guest(): void
+    {
+        Event::factory()->create();
 
         $this->get(route('home'))
             ->assertInertia(
@@ -36,8 +54,35 @@ class SharedAccessTest extends TestCase
                         'event' => false,
                         'documents' => false,
                         'registration' => false,
+                        'register' => false,
                     ]),
             );
+    }
+
+    #[Test]
+    public function it_withholds_the_account_creation_from_a_full_event(): void
+    {
+        $event = $this->openEvent(['max_participants' => 1]);
+        Participant::factory()->for($event)->for(User::factory())->create([
+            'status' => RegistrationStatus::Confirmed,
+        ]);
+
+        $this->get(route('home'))
+            ->assertInertia(
+                fn (AssertableInertia $page) => $page
+                    ->where('access.event', true)
+                    ->where('access.register', false),
+            );
+    }
+
+    #[Test]
+    public function it_withholds_the_account_creation_from_a_signed_in_runner(): void
+    {
+        $this->openEvent();
+
+        $this->actingAs(User::factory()->participant()->create())
+            ->get(route('dashboard'))
+            ->assertInertia(fn (AssertableInertia $page) => $page->where('access.register', false));
     }
 
     #[Test]
@@ -147,6 +192,7 @@ class SharedAccessTest extends TestCase
                         'event' => true,
                         'documents' => true,
                         'registration' => true,
+                        'register' => false,
                     ])
                     ->where('auth.permissions.'.Permission::ManageEvent->value, true),
             );

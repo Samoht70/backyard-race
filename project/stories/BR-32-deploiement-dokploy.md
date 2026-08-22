@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Epic** | 7 — Déploiement |
-| **Statut** | À faire |
+| **Statut** | 🚧 En cours |
 | **Estimation** | 3 pts |
 | **Dépend de** | BR-31 |
 
@@ -103,8 +103,21 @@ d'avant-course sont ce qui protège la soirée.
 
 ## Tâches
 
-- [ ] **T1** — Créer `develop` et protéger `main` : pull request obligatoire, CI vert exigé `1 pt`
-- [ ] **T2** — Configurer le déploiement Dokploy depuis `main` : construction, migrations, bascule, workers `1 pt`
+- [x] **T1** — Créer `develop` et protéger `main` : pull request obligatoire, CI vert exigé `1 pt`
+- [x] **T2** — Configurer le déploiement Dokploy depuis `main` : construction, migrations, bascule, workers `1 pt`
 - [ ] **T3** — Exposer la version déployée `1 pt`
-- [ ] **T4** — Essayer le retour à la version précédente une fois `1 pt`
+- [x] **T4** — Essayer le retour à la version précédente une fois `1 pt`
 - [ ] **T5** — Garde-fou de gel des déploiements pendant l'événement `1 pt`
+
+## Ce qui reste au 2026-08-22
+
+Dokploy construit et bascule depuis `main` — migrations comprises, workers redémarrés — et le retour
+à la version précédente a été exécuté une fois pour de vrai, pas seulement supposé possible. `develop`
+existe et porte le travail ; la protection de `main` est un réglage GitHub que le dépôt ne montre pas,
+elle se relit dans l'interface.
+
+- **T3** — La version déployée n'est pas lisible de l'extérieur. Devant un écran qui ne se comporte
+  pas comme attendu, rien ne dit quel code tourne, et le premier réflexe — redéployer — efface la
+  question.
+- **T5** — Aucun garde-fou de gel. Rien n'empêche une poussée sur `main` de reconstruire l'image
+  pendant la nuit de course, au moment où l'application est le moins remplaçable.

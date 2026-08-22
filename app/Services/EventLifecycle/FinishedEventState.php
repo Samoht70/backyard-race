@@ -3,6 +3,7 @@
 namespace App\Services\EventLifecycle;
 
 use App\Enums\EventStatus;
+use App\Enums\Permission;
 use App\Exceptions\EventTransitionRefusedException;
 use App\Models\Event;
 
@@ -18,12 +19,32 @@ final class FinishedEventState implements EventLifecycleState
         return null;
     }
 
+    public function previousStatus(): ?EventStatus
+    {
+        return null;
+    }
+
+    public function advancePermission(): ?Permission
+    {
+        return null;
+    }
+
     public function refusals(Event $event): array
     {
         return [__('event.refusal.finished')];
     }
 
+    public function revertRefusals(Event $event): array
+    {
+        return [__('event.refusal.finished')];
+    }
+
     public function advance(Event $event): EventLifecycleState
+    {
+        throw EventTransitionRefusedException::terminal();
+    }
+
+    public function revert(Event $event): EventLifecycleState
     {
         throw EventTransitionRefusedException::terminal();
     }
@@ -50,16 +71,6 @@ final class FinishedEventState implements EventLifecycleState
 
     public function frozenAttributes(): array
     {
-        return [
-            'name',
-            'description',
-            'first_start_at',
-            'lap_distance_meters',
-            'lap_duration_minutes',
-            'address',
-            'latitude',
-            'longitude',
-            'max_participants',
-        ];
+        return array_values(new Event()->getFillable());
     }
 }

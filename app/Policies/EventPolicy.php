@@ -2,17 +2,16 @@
 
 namespace App\Policies;
 
-use App\Enums\EventStatus;
 use App\Enums\Permission;
 use App\Models\Event;
 use App\Models\User;
 
 class EventPolicy
 {
-    public function view(User $user, Event $event): bool
+    public function view(?User $user, Event $event): bool
     {
         return $event->lifecycle()->isVisibleToParticipants()
-            || $user->can(Permission::ManageEvent->value);
+            || $user?->can(Permission::ManageEvent->value) === true;
     }
 
     public function update(User $user, Event $event): bool
@@ -29,16 +28,14 @@ class EventPolicy
 
     public function advance(User $user, Event $event): bool
     {
-        $next = $event->lifecycle()->nextStatus();
+        $permission = $event->lifecycle()->advancePermission();
 
-        if ($next === null) {
-            return false;
-        }
+        return $permission !== null && $user->can($permission->value);
+    }
 
-        if ($next === EventStatus::Finished) {
-            return $user->can(Permission::FinishEvent->value);
-        }
-
-        return $user->can(Permission::ManageEvent->value);
+    public function revert(User $user, Event $event): bool
+    {
+        return $event->lifecycle()->previousStatus() !== null
+            && $user->can(Permission::ManageEvent->value);
     }
 }

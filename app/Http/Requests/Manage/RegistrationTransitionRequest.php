@@ -41,7 +41,7 @@ class RegistrationTransitionRequest extends FormRequest
             $participant = $this->participant();
             $requested = $this->string('transition')->value();
 
-            if (! in_array($requested, $this->allowedTransitions($participant), true)) {
+            if (! in_array($requested, $participant->allowedTransitionValues(), true)) {
                 $validator->errors()->add('transition', __('registration.refusal.illegal_transition'));
 
                 return;
@@ -51,16 +51,5 @@ class RegistrationTransitionRequest extends FormRequest
                 $validator->errors()->add('transition', __('registration.refusal.full'));
             }
         }];
-    }
-
-    /**
-     * @return list<string>
-     */
-    private function allowedTransitions(Participant $participant): array
-    {
-        return array_map(
-            fn (RegistrationTransition $transition): string => $transition->value,
-            $participant->lifecycle()->allowedTransitions(),
-        );
     }
 }

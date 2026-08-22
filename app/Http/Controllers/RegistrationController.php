@@ -47,7 +47,7 @@ class RegistrationController extends Controller
     {
         $request->participant()->fill($request->validated())->save();
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => __('registration.updated')]);
+        $this->flashSuccess(__('registration.updated'));
 
         return to_route('registration.show');
     }

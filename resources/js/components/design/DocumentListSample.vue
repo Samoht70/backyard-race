@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Trash2 } from '@lucide/vue';
+import ActionButton from '@/components/ActionButton.vue';
 import DocumentRow from '@/components/document/DocumentRow.vue';
-import ActionButton from '@/components/race/ActionButton.vue';
 import type { EventDocument } from '@/types/document';
 
 const documents: EventDocument[] = [

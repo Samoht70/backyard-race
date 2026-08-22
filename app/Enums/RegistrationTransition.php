@@ -22,13 +22,4 @@ enum RegistrationTransition: string
             self::Reopen => $state->reopen(),
         };
     }
-
-    public function label(): string
-    {
-        return match ($this) {
-            self::Confirm => __('registration.transition.confirm'),
-            self::Cancel => __('registration.transition.cancel'),
-            self::Reopen => __('registration.transition.reopen'),
-        };
-    }
 }

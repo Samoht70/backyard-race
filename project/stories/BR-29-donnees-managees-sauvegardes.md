@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Epic** | 7 — Déploiement |
-| **Statut** | À faire |
+| **Statut** | ✅ Terminé |
 | **Estimation** | 8 pts |
 | **Dépend de** | BR-28 |
 
@@ -97,9 +97,14 @@ mais « j'ai restauré une sauvegarde et j'ai revu les boucles de la course ».
 
 ## Tâches
 
-- [ ] **T1** — Déployer MySQL 8.4 et Redis persistant via Dokploy, volumes et réseau interne `2 pts`
-- [ ] **T2** — Fermer tout accès externe à la base et à Redis `1 pt`
-- [ ] **T3** — Exécuter les migrations au déploiement, à l'abri des exécutions concurrentes `2 pts`
-- [ ] **T4** — Sauvegarde quotidienne vers le stockage objet, avec rétention et alerte en cas d'échec `2 pts`
-- [ ] **T5** — Écrire la procédure de restauration et l'exécuter une fois `2 pts`
+- [x] **T1** — Déployer MySQL 8.4 et Redis persistant via Dokploy, volumes et réseau interne `2 pts`
+- [x] **T2** — Fermer tout accès externe à la base et à Redis `1 pt`
+- [x] **T3** — Exécuter les migrations au déploiement, à l'abri des exécutions concurrentes `2 pts`
+- [x] **T4** — Sauvegarde quotidienne vers le stockage objet, avec rétention et alerte en cas d'échec `2 pts`
+- [x] **T5** — Écrire la procédure de restauration et l'exécuter une fois `2 pts`
 - [ ] **T6** — Sauvegarde manuelle et instantané de la machine la veille de la course `1 pt`
+
+**T6 attend une date, pas du travail.** La sauvegarde manuelle et l'instantané de la machine se
+prennent la veille de la course : c'est un geste de calendrier. La story est close parce
+que le mécanisme quotidien tourne et qu'il a été restauré une fois — une sauvegarde jamais rejouée
+n'est pas une sauvegarde, celle-ci l'a été.

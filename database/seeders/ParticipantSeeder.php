@@ -16,7 +16,7 @@ class ParticipantSeeder extends Seeder
 
     public function run(): void
     {
-        $event = Event::query()->first();
+        $event = Event::currentOrNull();
 
         if ($event === null || Participant::query()->exists()) {
             return;

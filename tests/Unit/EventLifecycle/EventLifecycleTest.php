@@ -80,6 +80,37 @@ class EventLifecycleTest extends TestCase
     }
 
     #[Test]
+    public function it_offers_a_way_back_only_from_the_open_registrations(): void
+    {
+        $this->assertSame(
+            EventStatus::Draft,
+            $this->event(EventStatus::Registration)->lifecycle()->previousStatus(),
+        );
+
+        foreach ([EventStatus::Draft, EventStatus::Running, EventStatus::Finished] as $status) {
+            $this->assertNull(
+                $this->event($status)->lifecycle()->previousStatus(),
+                $status->value,
+            );
+        }
+    }
+
+    #[Test]
+    public function it_refuses_to_reopen_any_status_but_the_open_registrations(): void
+    {
+        foreach ([EventStatus::Draft, EventStatus::Running, EventStatus::Finished] as $status) {
+            $event = $this->event($status);
+
+            try {
+                $event->lifecycle()->revert($event);
+                $this->fail("{$status->value} accepted a way back");
+            } catch (EventTransitionRefusedException) {
+                $this->addToAssertionCount(1);
+            }
+        }
+    }
+
+    #[Test]
     public function it_refuses_to_start_a_race_without_a_first_start_time(): void
     {
         $event = $this->event(EventStatus::Registration, ['first_start_at' => null]);

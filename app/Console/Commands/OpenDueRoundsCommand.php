@@ -14,7 +14,7 @@ class OpenDueRoundsCommand extends Command
 
     public function handle(OpenDueRounds $openDueRounds): int
     {
-        $this->info(count($openDueRounds(Event::query()->firstOrNew())).' round(s) opened.');
+        $this->info(count($openDueRounds(Event::currentOrNew())).' round(s) opened.');
 
         return self::SUCCESS;
     }

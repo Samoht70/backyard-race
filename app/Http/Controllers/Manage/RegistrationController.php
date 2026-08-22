@@ -2,30 +2,44 @@
 
 namespace App\Http\Controllers\Manage;
 
+use App\Actions\DeleteRegistration;
 use App\Actions\UpdateRegistration;
 use App\Enums\RegistrationStatus;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Manage\RegistrationDestroyRequest;
 use App\Http\Requests\Manage\RegistrationIndexRequest;
 use App\Http\Requests\Manage\RegistrationUpdateRequest;
 use App\Http\Resources\Manage\RegistrationResource;
 use App\Models\Event;
 use App\Models\Participant;
+use App\Support\RegistrationDeletion;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class RegistrationController extends Controller
 {
-    public function index(RegistrationIndexRequest $request): Response
+    public const PER_PAGE = 10;
+
+    public function index(RegistrationIndexRequest $request): Response|RedirectResponse
     {
-        $event = Event::query()->firstOrNew();
+        $event = Event::currentOrNew();
         $status = $request->status();
+        $registrations = $this->registrations($event, $status);
+
+        if ($registrations->currentPage() > $registrations->lastPage()) {
+            return $this->backToTheLastPage($registrations->lastPage(), $status);
+        }
 
         return Inertia::render('manage/registrations/Index', [
-            'registrations' => RegistrationResource::collection($this->registrations($event, $status))->resolve(),
+            'registrations' => RegistrationResource::collection($registrations)->resolve(),
+            'pagination' => [
+                'current_page' => $registrations->currentPage(),
+                'last_page' => $registrations->lastPage(),
+            ],
             'counts' => $this->counts($event),
             'seats' => [
                 'confirmed' => $event->confirmedParticipantsCount(),
@@ -33,6 +47,7 @@ class RegistrationController extends Controller
             ],
             'status' => $status?->value,
             'refusals' => $event->isFull() ? [__('registration.refusal.full')] : [],
+            'deletionRefusal' => RegistrationDeletion::refusal($event),
         ]);
     }
 
@@ -52,15 +67,29 @@ class RegistrationController extends Controller
     ): RedirectResponse {
         $update($participant, $request->validated());
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => __('registration.manage.saved')]);
+        $this->flashSuccess(__('registration.manage.saved'));
 
         return to_route('manage.registrations.edit', $participant);
     }
 
+    public function destroy(
+        RegistrationDestroyRequest $request,
+        DeleteRegistration $delete,
+        Participant $participant,
+    ): RedirectResponse {
+        $runner = $participant->user->name;
+
+        $delete($participant);
+
+        $this->flashSuccess(__('registration.manage.deleted', ['name' => $runner]));
+
+        return to_route('manage.registrations.index');
+    }
+
     /**
-     * @return Collection<int, Participant>
+     * @return LengthAwarePaginator<int, Participant>
      */
-    private function registrations(Event $event, ?RegistrationStatus $status): Collection
+    private function registrations(Event $event, ?RegistrationStatus $status): LengthAwarePaginator
     {
         return $event->participants()
             ->with('user')
@@ -69,7 +98,15 @@ class RegistrationController extends Controller
             ->orderBy('users.last_name')
             ->orderBy('users.first_name')
             ->select('participants.*')
-            ->get();
+            ->paginate(self::PER_PAGE);
+    }
+
+    private function backToTheLastPage(int $lastPage, ?RegistrationStatus $status): RedirectResponse
+    {
+        $query = $status === null ? [] : ['status' => $status->value];
+        $query['page'] = $lastPage;
+
+        return to_route('manage.registrations.index', $query);
     }
 
     /**
