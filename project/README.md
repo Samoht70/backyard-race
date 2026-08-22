@@ -161,11 +161,11 @@ ce qui se voit dès qu'un inconnu arrive sur l'adresse, et il précède l'epic 2
 | Ordre | ID | Story | Pts | Pourquoi dans le lot |
 |-------|----|-------|-----|----------------------|
 | ✅ | [BR-30](stories/BR-30-workers-horizon-scheduler.md) T5 | Alerte sur file non consommée | 2 | Un worker mort emporte les mails de code en silence |
-| 1 | [BR-41](stories/BR-41-retour-en-brouillon.md) | Remettre l'événement en brouillon | 3 | Le demi-tour n'existe que tant qu'il n'y a personne |
-| 2 | [BR-39](stories/BR-39-suppression-inscription-et-compte.md) | Supprimer une inscription et son compte | 3 | La réponse à « j'ai perdu mon code » |
-| 3 | [BR-40](stories/BR-40-page-erreur.md) | Rendre les refus et les erreurs dans le site | 3 | La dernière surface publique non habillée |
+| ✅ | [BR-41](stories/BR-41-retour-en-brouillon.md) | Remettre l'événement en brouillon | 3 | Le demi-tour n'existe que tant qu'il n'y a personne |
+| 1 | [BR-39](stories/BR-39-suppression-inscription-et-compte.md) | Supprimer une inscription et son compte | 3 | La réponse à « j'ai perdu mon code » |
+| 2 | [BR-40](stories/BR-40-page-erreur.md) | Rendre les refus et les erreurs dans le site | 3 | La dernière surface publique non habillée |
 
-**11 pts, dont 2 livrés le 2026-08-22.** L'ordre suit ce que chaque entrée coûte si elle attend :
+**11 pts, dont 5 livrés le 2026-08-22.** L'ordre suit ce que chaque entrée coûte si elle attend :
 
 - **BR-30 T5 d'abord et close**, parce que c'était la seule qui coûtait déjà. Les deux mails du
   parcours — le lien signé et le code d'accès — sont mis en file, et un worker mort ne se signalait
@@ -213,7 +213,7 @@ par BR-33. Elle reste avec les écrans de course, dont elle dépend.
 | [BR-38](stories/BR-38-identite-de-marque.md) | Identité : la forme, le lockup et les icônes | 3 | ✅ Terminé |
 | [BR-39](stories/BR-39-suppression-inscription-et-compte.md) | Supprimer une inscription et le compte qui va avec | 3 | 🔥 Lot 4 |
 | [BR-40](stories/BR-40-page-erreur.md) | Rendre les refus et les erreurs dans le site | 3 | 🔥 Lot 4 |
-| [BR-41](stories/BR-41-retour-en-brouillon.md) | Remettre l'événement en brouillon | 3 | 🔥 Lot 4 |
+| [BR-41](stories/BR-41-retour-en-brouillon.md) | Remettre l'événement en brouillon | 3 | ✅ Terminé |
 
 ### EPIC 2 — Moteur de course
 
@@ -311,8 +311,9 @@ trois gestes faits sur la machine le même jour.
 
 **Lot 4 — tenir une adresse annoncée (11 pts) — en cours.** L'ordre : BR-30 T5 → BR-41 → BR-39 →
 BR-40. C'est le dernier lot avant le moteur, et le seul dont une entrée coûtait déjà quelque chose :
-BR-30 T5 est close le 2026-08-22, sondage et battement livrés, surveillance inscrite. **BR-41 est en
-tête de ce qui reste.**
+BR-30 T5 est close le 2026-08-22, sondage et battement livrés, surveillance inscrite. BR-41 est close
+le même jour, avant que l'adresse ne circule : le demi-tour existe dans l'application, sous la seule
+condition de zéro inscription. **BR-39 est en tête de ce qui reste.**
 
 **Le reste du reliquat du lot 2 avant le moteur, ou après ?** Après. BR-30 T5 est passée dans le lot 4
 parce qu'une file qui cesse d'être consommée coûtait des coureurs dès aujourd'hui ; la version exposée

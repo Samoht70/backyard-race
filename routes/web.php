@@ -41,6 +41,7 @@ Route::middleware('auth')
                             ->only(['edit', 'update']);
 
                         Route::post('event/advance', Manage\AdvanceEventController::class)->name('event.advance');
+                        Route::post('event/revert', Manage\RevertEventController::class)->name('event.revert');
                     });
 
                 Route::middleware('can:'.Permission::ManageDocuments->value)

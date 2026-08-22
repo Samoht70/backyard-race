@@ -18,12 +18,27 @@ final class FinishedEventState implements EventLifecycleState
         return null;
     }
 
+    public function previousStatus(): ?EventStatus
+    {
+        return null;
+    }
+
     public function refusals(Event $event): array
     {
         return [__('event.refusal.finished')];
     }
 
+    public function revertRefusals(Event $event): array
+    {
+        return [__('event.refusal.finished')];
+    }
+
     public function advance(Event $event): EventLifecycleState
+    {
+        throw EventTransitionRefusedException::terminal();
+    }
+
+    public function revert(Event $event): EventLifecycleState
     {
         throw EventTransitionRefusedException::terminal();
     }

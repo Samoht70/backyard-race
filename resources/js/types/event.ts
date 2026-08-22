@@ -39,5 +39,8 @@ export type EventDetails = {
 export type EventTransition = {
     current: EventStatus;
     next: EventStatus | null;
+    nextIsReversible: boolean;
+    previous: EventStatus | null;
     refusals: string[];
+    revertRefusals: string[];
 };

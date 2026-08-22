@@ -2550,3 +2550,48 @@ n'est pas une URL est traitée comme une absence, avec le nom de la variable dan
 réparer silencieusement enverrait le ping nulle part en ayant l'air de fonctionner. Un hôte
 injoignable laisse remonter `ConnectionException` — la règle maison interdit le `try`/`catch`, le
 planificateur la journalise, et le check alerte de lui-même faute de ping.
+
+## D-68 — Le demi-tour est une quatrième question posée à l'état, et l'écran cesse de promettre l'irréversible
+
+Arrêté le 2026-08-22 en implémentant BR-41. D-66 avait fixé la règle métier — zéro inscription,
+annulées comprises. Restait à décider où elle vit et ce qu'elle change à l'écran.
+
+**Le retour est une méthode de plus sur `EventLifecycleState`, pas une seconde machine.** Chaque état
+répond déjà pour lui-même à « quelle est la suite », « qu'est-ce qui la bloque », « avance ». Il
+répond maintenant aussi à « quel est le retour », « qu'est-ce qui le bloque », « recule ». Trois états
+sur quatre rendent `null`, `[]` et un refus : c'est la forme que la chaîne montante avait déjà, où
+`refusals()` rend `[]` dans trois classes sur quatre. Un état ajouté sans son demi-tour échoue à
+l'analyse statique, comme il échouait déjà sans sa suite — le `match` exhaustif de la fabrique reste
+le seul endroit qui énumère les statuts.
+
+**La règle vit dans l'état, et l'écriture la porte une seconde fois.** `revertRefusals()` compte les
+inscriptions et produit le message que le gérant lit ; `revert()` refuse avant d'écrire. Le `update`
+ajoute `whereDoesntHave('participants')` à côté du `where('status', $from)` déjà posé par D-32 sur la
+transition montante, et pour la même raison : la vérification et l'écriture ne sont pas simultanées.
+Ce n'est pas la même règle dite deux fois, c'est la même règle tenue à deux instants — le contrôle
+nomme ce qui bloque, l'écriture interdit qu'une inscription se glisse entre les deux. Aucun test ne
+couvre ce créneau : il ne s'ouvre que sous concurrence réelle, et le prétendre testé serait faux.
+
+**L'exception refuse, le formulaire compte.** `registrationsExist()` porte un message sans chiffre,
+parce que l'exception est le filet et non le canal — c'est ce que son propre docblock énonçait déjà.
+Le décompte au pluriel arrive par l'erreur de validation, qui est le chemin que le gérant voit. Le
+message est une forme plurielle de `trans_choice`, donc « une inscription » et « 2 inscriptions »
+disent quoi supprimer, pas seulement qu'on ne peut pas.
+
+**L'écran d'ouverture disait « on ne revient jamais en arrière », et c'était devenu faux.** La story
+ne le demandait pas ; le laisser aurait mis un mensonge à côté du bouton qui le contredit. La
+confirmation de l'ouverture annonce désormais que l'étape se referme tant qu'aucune inscription
+n'existe. Ce qui décide entre les deux textes n'est pas dans le client : le serveur rend
+`nextIsReversible`, calculé en demandant à l'état suivant s'il a un retour. Le client choisit une
+phrase, il ne rejoue pas la règle.
+
+**Le dialogue de confirmation est sorti du panneau.** Les deux gestes ont la même forme — bouton,
+alerte de refus, dialogue, champ `to` caché, pied de page — et un second bloc copié aurait poussé
+`EventStatusPanel.vue` au-delà de la limite de 200 lignes. `EventTransitionDialog.vue` prend les deux
+appels ; le panneau garde la frise des étapes et ne fait plus que nommer les deux gestes. Le ton
+distingue le sens de la marche : plein pour avancer, sobre pour refermer.
+
+**Ce que le retour ne fait pas** — il n'efface rien. Le briefing, les documents et les horaires
+calculés traversent le demi-tour intacts, et un test les nomme un par un. Le coureur qui remplissait
+le formulaire public au moment du retour est refusé par le contrôle de période déjà en place : le
+statut `brouillon` referme le parcours, aucun code neuf n'a été écrit pour ça.
