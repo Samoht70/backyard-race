@@ -54,6 +54,11 @@ return [
         'retry' => 'Réessayer',
         'validation_title' => 'Vérifie les informations saisies',
     ],
+    'pagination' => [
+        'previous' => 'Page précédente',
+        'next' => 'Page suivante',
+        'page' => 'Page :page',
+    ],
     'appearance' => [
         'to_dark' => 'Passer en thème sombre',
         'to_light' => 'Passer en thème clair',

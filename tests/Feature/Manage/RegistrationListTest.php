@@ -4,6 +4,7 @@ namespace Tests\Feature\Manage;
 
 use App\Enums\Permission;
 use App\Enums\RegistrationStatus;
+use App\Http\Controllers\Manage\RegistrationController;
 use App\Models\Event;
 use App\Models\Participant;
 use App\Models\User;
@@ -16,6 +17,8 @@ use Tests\TestCase;
 class RegistrationListTest extends TestCase
 {
     use RefreshDatabase;
+
+    private const PER_PAGE = RegistrationController::PER_PAGE;
 
     #[Test]
     public function it_redirects_a_guest_to_the_login_page(): void
@@ -172,6 +175,96 @@ class RegistrationListTest extends TestCase
             ->assertInertia(fn (AssertableInertia $page) => $page->has('refusals', 0));
     }
 
+    #[Test]
+    public function it_fills_a_page_before_opening_the_next_one(): void
+    {
+        $event = $this->openEvent();
+        $this->registerMany($event, self::PER_PAGE + 1);
+
+        $this->actingAs($this->manager())
+            ->get(route('manage.registrations.index'))
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->has('registrations', self::PER_PAGE)
+                ->where('registrations.0.last_name', $this->runnerName(1))
+                ->where('pagination.current_page', 1)
+                ->where('pagination.last_page', 2));
+    }
+
+    #[Test]
+    public function it_serves_the_overflow_on_the_next_page(): void
+    {
+        $event = $this->openEvent();
+        $this->registerMany($event, self::PER_PAGE + 1);
+
+        $this->actingAs($this->manager())
+            ->get(route('manage.registrations.index', ['page' => 2]))
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->has('registrations', 1)
+                ->where('registrations.0.last_name', $this->runnerName(self::PER_PAGE + 1))
+                ->where('pagination.current_page', 2));
+    }
+
+    #[Test]
+    public function it_keeps_the_status_filter_on_the_next_page(): void
+    {
+        $event = $this->openEvent();
+        $this->registerMany($event, self::PER_PAGE + 1);
+        $this->register($event, 'Adrien', 'Zeller', RegistrationStatus::Confirmed);
+
+        $this->actingAs($this->manager())
+            ->get(route('manage.registrations.index', [
+                'status' => RegistrationStatus::Pending->value,
+                'page' => 2,
+            ]))
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->has('registrations', 1)
+                ->where('registrations.0.last_name', $this->runnerName(self::PER_PAGE + 1))
+                ->where('pagination.last_page', 2));
+    }
+
+    #[Test]
+    public function it_sends_a_page_past_the_last_one_back_to_the_last_page(): void
+    {
+        $event = $this->openEvent();
+        $this->registerMany($event, self::PER_PAGE + 1);
+
+        $this->actingAs($this->manager())
+            ->get(route('manage.registrations.index', ['page' => 9]))
+            ->assertRedirect(route('manage.registrations.index', ['page' => 2]));
+    }
+
+    #[Test]
+    public function it_keeps_the_status_filter_when_it_sends_a_page_back(): void
+    {
+        $event = $this->openEvent();
+        $this->register($event, 'Zoé', 'Ancel', RegistrationStatus::Pending);
+
+        $this->actingAs($this->manager())
+            ->get(route('manage.registrations.index', [
+                'status' => RegistrationStatus::Pending->value,
+                'page' => 9,
+            ]))
+            ->assertRedirect(route('manage.registrations.index', [
+                'status' => RegistrationStatus::Pending->value,
+                'page' => 1,
+            ]));
+    }
+
+    /** A trafficked page number on a navigation must land on the list, not on an error page. */
+    #[Test]
+    public function it_falls_back_to_the_first_page_on_an_unreadable_page_number(): void
+    {
+        $event = $this->openEvent();
+        $this->registerMany($event, self::PER_PAGE + 1);
+
+        $this->actingAs($this->manager())
+            ->get(route('manage.registrations.index', ['page' => 'archived']))
+            ->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->has('registrations', self::PER_PAGE)
+                ->where('pagination.current_page', 1));
+    }
+
     /**
      * @param  array<string, mixed>  $attributes
      */
@@ -192,6 +285,23 @@ class RegistrationListTest extends TestCase
             ])->id,
             'status' => $status,
         ]);
+    }
+
+    private function registerMany(Event $event, int $count): void
+    {
+        foreach (range(1, $count) as $rank) {
+            $this->register(
+                $event,
+                'Test',
+                $this->runnerName($rank),
+                RegistrationStatus::Pending,
+            );
+        }
+    }
+
+    private function runnerName(int $rank): string
+    {
+        return sprintf('Coureur%04d', $rank);
     }
 
     private function manager(): User

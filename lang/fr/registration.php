@@ -66,6 +66,7 @@ return [
         'description' => 'Confirmer, annuler et corriger les inscriptions avant le départ.',
         'filter_label' => 'Filtrer par statut',
         'filter_all' => 'Toutes',
+        'pages_label' => 'Pages d’inscriptions',
         'open_runner' => 'Ouvrir la fiche de :name',
         'close' => 'Fermer la fiche',
         'empty_title' => 'Aucune inscription',

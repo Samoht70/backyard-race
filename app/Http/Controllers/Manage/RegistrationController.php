@@ -14,21 +14,32 @@ use App\Models\Event;
 use App\Models\Participant;
 use App\Support\RegistrationDeletion;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class RegistrationController extends Controller
 {
-    public function index(RegistrationIndexRequest $request): Response
+    public const PER_PAGE = 10;
+
+    public function index(RegistrationIndexRequest $request): Response|RedirectResponse
     {
         $event = Event::currentOrNew();
         $status = $request->status();
+        $registrations = $this->registrations($event, $status);
+
+        if ($registrations->currentPage() > $registrations->lastPage()) {
+            return $this->backToTheLastPage($registrations->lastPage(), $status);
+        }
 
         return Inertia::render('manage/registrations/Index', [
-            'registrations' => RegistrationResource::collection($this->registrations($event, $status))->resolve(),
+            'registrations' => RegistrationResource::collection($registrations)->resolve(),
+            'pagination' => [
+                'current_page' => $registrations->currentPage(),
+                'last_page' => $registrations->lastPage(),
+            ],
             'counts' => $this->counts($event),
             'seats' => [
                 'confirmed' => $event->confirmedParticipantsCount(),
@@ -76,9 +87,9 @@ class RegistrationController extends Controller
     }
 
     /**
-     * @return Collection<int, Participant>
+     * @return LengthAwarePaginator<int, Participant>
      */
-    private function registrations(Event $event, ?RegistrationStatus $status): Collection
+    private function registrations(Event $event, ?RegistrationStatus $status): LengthAwarePaginator
     {
         return $event->participants()
             ->with('user')
@@ -87,7 +98,15 @@ class RegistrationController extends Controller
             ->orderBy('users.last_name')
             ->orderBy('users.first_name')
             ->select('participants.*')
-            ->get();
+            ->paginate(self::PER_PAGE);
+    }
+
+    private function backToTheLastPage(int $lastPage, ?RegistrationStatus $status): RedirectResponse
+    {
+        $query = $status === null ? [] : ['status' => $status->value];
+        $query['page'] = $lastPage;
+
+        return to_route('manage.registrations.index', $query);
     }
 
     /**

@@ -15,12 +15,14 @@ import AlertError from '@/components/AlertError.vue';
 import BoardPage from '@/components/board/BoardPage.vue';
 import Heading from '@/components/Heading.vue';
 import BoardFilter from '@/components/race/BoardFilter.vue';
+import BoardPagination from '@/components/race/BoardPagination.vue';
 import RegistrationDossier from '@/components/registration/RegistrationDossier.vue';
 import RegistrationSlat from '@/components/registration/RegistrationSlat.vue';
 import SeatCounter from '@/components/registration/SeatCounter.vue';
 import EmptyState from '@/components/state/EmptyState.vue';
 import { t } from '@/lib/i18n';
 import { overlayBackdrop, overlayDrawer } from '@/lib/overlayClasses';
+import { paginationBar } from '@/lib/pagination';
 import { registrationStatusLabelKey } from '@/lib/registrationStatus';
 import { index } from '@/routes/manage/registrations';
 import { REGISTRATION_STATUSES } from '@/types/registration';
@@ -29,10 +31,11 @@ import type {
     RegistrationCounts,
     RegistrationSeats,
 } from '@/types/registration';
-import type { BoardFilterOption } from '@/types/ui';
+import type { BoardFilterOption, Pagination } from '@/types/ui';
 
 type Props = {
     registrations: ManagedRegistration[];
+    pagination: Pagination;
     counts: RegistrationCounts;
     seats: RegistrationSeats;
     status: string | null;
@@ -56,6 +59,12 @@ const filters = computed<BoardFilterOption[]>(() => [
         count: props.counts[status],
     })),
 ]);
+
+const pageLinks = computed(() =>
+    paginationBar(props.pagination, (page) =>
+        index({ query: { status: props.status, page } }),
+    ),
+);
 
 const isBlocked = computed(() => props.refusals.length > 0);
 
@@ -177,6 +186,14 @@ const dossierTitle = computed(() =>
                 :icon="ClipboardList"
                 :title="t('registration.manage.empty_title')"
                 :description="t('registration.manage.empty_description')"
+            />
+
+            <BoardPagination
+                v-if="pagination.last_page > 1"
+                :label="t('registration.manage.pages_label')"
+                :pages="pageLinks.pages"
+                :previous="pageLinks.previous"
+                :next="pageLinks.next"
             />
         </div>
 
