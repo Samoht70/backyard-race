@@ -26,4 +26,9 @@ final class EventTransitionRefusedException extends ConflictHttpException
     {
         return new self(__('event.refusal.finished'));
     }
+
+    public static function registrationsExist(): self
+    {
+        return new self(__('event.refusal.registrations_exist'));
+    }
 }

@@ -18,6 +18,11 @@ final class RegistrationEventState implements EventLifecycleState
         return EventStatus::Running;
     }
 
+    public function previousStatus(): EventStatus
+    {
+        return EventStatus::Draft;
+    }
+
     public function refusals(Event $event): array
     {
         $missing = [];
@@ -37,6 +42,17 @@ final class RegistrationEventState implements EventLifecycleState
         return $missing;
     }
 
+    public function revertRefusals(Event $event): array
+    {
+        $blocking = $event->participants()->count();
+
+        if ($blocking === 0) {
+            return [];
+        }
+
+        return [trans_choice('event.refusal.registrations_block_draft', $blocking)];
+    }
+
     public function advance(Event $event): EventLifecycleState
     {
         if ($this->refusals($event) !== []) {
@@ -44,6 +60,15 @@ final class RegistrationEventState implements EventLifecycleState
         }
 
         return new RunningEventState;
+    }
+
+    public function revert(Event $event): EventLifecycleState
+    {
+        if ($this->revertRefusals($event) !== []) {
+            throw EventTransitionRefusedException::registrationsExist();
+        }
+
+        return new DraftEventState;
     }
 
     public function allowsRegistration(): bool

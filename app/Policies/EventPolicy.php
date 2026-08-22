@@ -41,4 +41,10 @@ class EventPolicy
 
         return $user->can(Permission::ManageEvent->value);
     }
+
+    public function revert(User $user, Event $event): bool
+    {
+        return $event->lifecycle()->previousStatus() !== null
+            && $user->can(Permission::ManageEvent->value);
+    }
 }

@@ -12,15 +12,27 @@ interface EventLifecycleState
 
     public function nextStatus(): ?EventStatus;
 
+    public function previousStatus(): ?EventStatus;
+
     /**
      * @return list<string>
      */
     public function refusals(Event $event): array;
 
     /**
+     * @return list<string>
+     */
+    public function revertRefusals(Event $event): array;
+
+    /**
      * @throws EventTransitionRefusedException
      */
     public function advance(Event $event): EventLifecycleState;
+
+    /**
+     * @throws EventTransitionRefusedException
+     */
+    public function revert(Event $event): EventLifecycleState;
 
     public function allowsRegistration(): bool;
 
