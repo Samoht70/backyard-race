@@ -2595,3 +2595,71 @@ distingue le sens de la marche : plein pour avancer, sobre pour refermer.
 calculés traversent le demi-tour intacts, et un test les nomme un par un. Le coureur qui remplissait
 le formulaire public au moment du retour est refusé par le contrôle de période déjà en place : le
 statut `brouillon` referme le parcours, aucun code neuf n'a été écrit pour ça.
+
+## D-69 — La suppression unitaire fournit l'appelant qui manquait à la purge, et se refuse par le formulaire
+
+Arrêté le 2026-08-22 pendant BR-39, troisième entrée du lot 4. D-64 avait laissé la logique de
+suppression entière dans `race:purge-registrations`, en notant qu'une classe d'action n'aurait
+déplacé qu'un nom faute de second appelant. L'écran en fournit un, donc la logique sort.
+
+**Deux actions et non une, parce que la purge balaie plus que des inscriptions.**
+`DeleteRegistration` prend une ligne — la fiche, puis son compte — et `DeleteAccount` prend un
+compte seul. La purge appelle les deux : la première pour chaque inscription, la seconde pour les
+comptes qui n'en portent aucune, que `RegisterRunner` ne crée jamais et qui sont donc exactement ce
+qu'un balai doit emporter. Réduire la purge à une boucle sur les inscriptions les aurait laissés
+derrière.
+
+**La règle du compte épargné se dit deux fois parce qu'on l'interroge de deux endroits.**
+`SparedAccount::runners()` est une contrainte de requête — la purge compte, annonce et itère ;
+`SparedAccount::spares()` est un prédicat sur un compte déjà chargé — l'action décide ligne à ligne.
+Ce sont deux formes de la même définition, dans une classe qui les tient ensemble, et non deux
+définitions. Les deux exceptions à `laravel:permissions-not-roles` que D-64 et D-65 avaient nommées
+vivent maintenant là, et nulle part ailleurs.
+
+**Le décompte des sessions est pris avant la boucle, pas rendu par elle.** Une action qui rendrait
+« combien de portes j'ai fermées » ferait porter à son type de retour un besoin d'affichage qui
+n'appartient qu'à la commande. La purge compte les sessions des comptes condamnés avant de les
+supprimer, dans la même transaction : le chiffre annoncé est celui qui part.
+
+**Le refus en course vit dans la requête de formulaire, pas dans l'action.** La voie évidente était
+une `RegistrationDeletionRefusedException`, sur le modèle de la transition. Elle rendrait un 409 là
+où le gérant a besoin d'une phrase sous le bouton, et l'action serait alors le seul endroit à
+connaître un statut d'événement — ce qui la rendrait inappelable par la purge, qui porte déjà son
+propre garde-fou. `RegistrationDeletion::refusal()` produit la phrase, la requête l'ajoute aux
+erreurs, l'écran désactive le bouton avec la même phrase en `aria-describedby`. La règle est écrite
+une fois ; c'est son rendu qui a deux formes.
+
+**Le geste n'a pas de garde-fou d'écriture concurrente, contrairement aux transitions.** D-32 et le
+demi-tour de BR-41 ajoutent un `where` sur l'état quitté parce que deux requêtes peuvent se marcher
+dessus. Ici la seconde suppression ne trouve plus la ligne : la liaison de modèle rend 404 avant
+d'entrer dans le contrôleur, et c'est le refus lisible que demandait le cas du second onglet.
+
+**Le bouton « Modifier la fiche » a été retiré du dossier, à la demande du propriétaire.** C'est le
+seul chemin que BR-06 avait posé vers `manage/registrations/{id}/edit` ; l'écran et ses routes
+restent, sans lien depuis l'application.
+
+**L'annulation reste, et c'est la couleur qui sépare les deux gestes.** La question posée était de
+retirer l'annulation, puisqu'on n'annule que pour ne plus rien faire. Elle reste pour une raison que
+cette story a elle-même créée : la suppression est refusée pendant la course, alors qu'aucune
+transition d'inscription ne l'est. La nuit de la course, un inscrit qui ne se présente pas ne peut
+être qu'annulé. S'ajoutent le retour en arrière — `reopen` rend l'inscription au coureur avec ce
+qu'il avait tapé — et le compte, qui survit à l'annulation et pas à la suppression. Le rouge plein ne
+désigne donc plus que l'irréversible : `cancel` passe en ton sobre, `destroy` garde `danger`.
+
+**La rangée d'actions descend en bas du tiroir par `order`, pas par un second bloc.** Les trois
+gestes tiennent dans une seule section, placée en tête sur le tableau et en pied dans le tiroir :
+comme les sections sont les items d'une même grille, `order-last` suffit à la déplacer. Dupliquer le
+bloc derrière un point de rupture aurait laissé deux fois le même `id` dans le document, puisque la
+colonne du tableau reste rendue sous le tiroir mobile. Le dossier reçoit tout de même `variant` —
+`board` ou `drawer` — pour suffixer l'identifiant du refus et choisir l'ordre : le parent sait
+laquelle des deux instances il rend, et le composant n'interroge aucune media query.
+
+**Les boutons s'empilent sous 640 px et passent en ligne au-dessus.** La rangée est une grille à une
+colonne sur mobile et un `flex flex-wrap` à partir de `sm`, ce qui reprend le point de rupture que
+`ActionButton` utilise déjà pour passer de `w-full` à `w-auto`.
+
+**La fermeture du dossier est un événement, pas un `DialogClose`.** Le tiroir mobile se fermait à la
+touche d'échappement et au voile, la colonne du tableau ne se fermait pas du tout — aucune des deux
+n'offrait de bouton. Le dossier émet `close` et le parent remet `selectedId` à `null` : le tiroir se
+referme parce que son ouverture est dérivée de la sélection, et la colonne rend de nouveau son état
+vide. Un `DialogClose` n'aurait servi qu'une des deux instances.

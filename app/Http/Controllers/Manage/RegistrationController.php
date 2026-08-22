@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers\Manage;
 
+use App\Actions\DeleteRegistration;
 use App\Actions\UpdateRegistration;
 use App\Enums\RegistrationStatus;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Manage\RegistrationDestroyRequest;
 use App\Http\Requests\Manage\RegistrationIndexRequest;
 use App\Http\Requests\Manage\RegistrationUpdateRequest;
 use App\Http\Resources\Manage\RegistrationResource;
 use App\Models\Event;
 use App\Models\Participant;
+use App\Support\RegistrationDeletion;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
@@ -33,6 +36,7 @@ class RegistrationController extends Controller
             ],
             'status' => $status?->value,
             'refusals' => $event->isFull() ? [__('registration.refusal.full')] : [],
+            'deletionRefusal' => RegistrationDeletion::refusal($event),
         ]);
     }
 
@@ -55,6 +59,23 @@ class RegistrationController extends Controller
         Inertia::flash('toast', ['type' => 'success', 'message' => __('registration.manage.saved')]);
 
         return to_route('manage.registrations.edit', $participant);
+    }
+
+    public function destroy(
+        RegistrationDestroyRequest $request,
+        DeleteRegistration $delete,
+        Participant $participant,
+    ): RedirectResponse {
+        $runner = $participant->user->name;
+
+        $delete($participant);
+
+        Inertia::flash('toast', [
+            'type' => 'success',
+            'message' => __('registration.manage.deleted', ['name' => $runner]),
+        ]);
+
+        return to_route('manage.registrations.index');
     }
 
     /**

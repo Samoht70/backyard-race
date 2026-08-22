@@ -65,7 +65,7 @@ type RegistrationTransitionPresentation = {
 
 export const registrationTransitions = {
     confirm: { icon: Check, tone: 'primary', needsConfirmation: false },
-    cancel: { icon: CircleSlash, tone: 'danger', needsConfirmation: true },
+    cancel: { icon: CircleSlash, tone: 'quiet', needsConfirmation: true },
     reopen: { icon: Undo2, tone: 'quiet', needsConfirmation: false },
 } satisfies Record<RegistrationTransition, RegistrationTransitionPresentation>;
 

@@ -1,62 +1,109 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
+import { X } from '@lucide/vue';
 import { computed } from 'vue';
 import ActionButton from '@/components/ActionButton.vue';
 import BoardRow from '@/components/board/BoardRow.vue';
 import BoardRows from '@/components/board/BoardRows.vue';
 import BoardSection from '@/components/board/BoardSection.vue';
+import Notice from '@/components/Notice.vue';
 import BibDisplay from '@/components/race/BibDisplay.vue';
 import RegistrationActionForm from '@/components/registration/RegistrationActionForm.vue';
+import RegistrationDeleteForm from '@/components/registration/RegistrationDeleteForm.vue';
 import RegistrationStatusBadge from '@/components/registration/RegistrationStatusBadge.vue';
 import { t } from '@/lib/i18n';
-import { edit } from '@/routes/manage/registrations';
 import type { ManagedRegistration } from '@/types/registration';
 
 type Props = {
     registration: ManagedRegistration;
+    variant?: 'board' | 'drawer';
     blocked?: boolean;
     describedBy?: string;
+    deletionRefusal?: string | null;
 };
 
-const props = withDefaults(defineProps<Props>(), { blocked: false });
+const props = withDefaults(defineProps<Props>(), {
+    variant: 'board',
+    blocked: false,
+    deletionRefusal: null,
+});
+
+const emit = defineEmits<{ close: [] }>();
 
 const fullName = computed(
     () => `${props.registration.first_name} ${props.registration.last_name}`,
+);
+
+const isDrawer = computed(() => props.variant === 'drawer');
+const isDeletionRefused = computed(() => props.deletionRefusal !== null);
+const deletionRefusalId = computed(
+    () =>
+        `registration-${props.registration.id}-${props.variant}-deletion-refusal`,
 );
 </script>
 
 <template>
     <div class="grid content-start gap-6">
-        <div class="grid justify-items-start gap-3">
-            <BibDisplay
-                :value="registration.bib_label"
-                :label="t('registration.manage.bib')"
+        <div class="flex items-start justify-between gap-3">
+            <div class="grid justify-items-start gap-3">
+                <BibDisplay
+                    :value="registration.bib_label"
+                    :label="t('registration.manage.bib')"
+                />
+                <h2 class="text-title">{{ fullName }}</h2>
+                <RegistrationStatusBadge :status="registration.status" />
+                <p
+                    v-if="registration.bib_label === null"
+                    class="text-sm text-muted-foreground"
+                >
+                    {{ t('registration.manage.no_bib') }}
+                </p>
+            </div>
+
+            <ActionButton
+                tone="ghost"
+                size="icon"
+                :icon="X"
+                :aria-label="t('registration.manage.close')"
+                data-test="close-dossier"
+                @click="emit('close')"
             />
-            <h2 class="text-title">{{ fullName }}</h2>
-            <RegistrationStatusBadge :status="registration.status" />
-            <p
-                v-if="registration.bib_label === null"
-                class="text-sm text-muted-foreground"
-            >
-                {{ t('registration.manage.no_bib') }}
-            </p>
         </div>
 
         <BoardSection
-            v-if="registration.allowed_transitions.length"
+            :class="isDrawer ? 'order-last' : undefined"
             :title="t('registration.manage.actions_title')"
             level="h3"
         >
-            <div class="flex flex-wrap items-start gap-2">
-                <RegistrationActionForm
-                    v-for="transition in registration.allowed_transitions"
-                    :key="transition"
-                    :registration-id="registration.id"
-                    :runner-name="fullName"
-                    :transition="transition"
-                    :disabled="blocked && transition === 'confirm'"
-                    :described-by="blocked ? describedBy : undefined"
-                />
+            <div class="grid gap-3">
+                <div class="grid gap-2 sm:flex sm:flex-wrap sm:items-start">
+                    <RegistrationActionForm
+                        v-for="transition in registration.allowed_transitions"
+                        :key="transition"
+                        :registration-id="registration.id"
+                        :runner-name="fullName"
+                        :transition="transition"
+                        :disabled="blocked && transition === 'confirm'"
+                        :described-by="blocked ? describedBy : undefined"
+                    />
+
+                    <RegistrationDeleteForm
+                        :registration-id="registration.id"
+                        :runner-name="fullName"
+                        :disabled="isDeletionRefused"
+                        :described-by="
+                            isDeletionRefused ? deletionRefusalId : undefined
+                        "
+                    />
+                </div>
+
+                <Notice
+                    v-if="isDeletionRefused"
+                    :id="deletionRefusalId"
+                    tone="danger"
+                    :title="t('registration.delete.blocked_title')"
+                >
+                    {{ deletionRefusal }}
+                </Notice>
             </div>
         </BoardSection>
 
@@ -102,13 +149,5 @@ const fullName = computed(
         >
             <p class="text-sm whitespace-pre-line">{{ registration.notes }}</p>
         </BoardSection>
-
-        <div class="flex justify-start">
-            <ActionButton tone="quiet" as-child>
-                <Link :href="edit(registration.id)">
-                    {{ t('registration.manage.open_form') }}
-                </Link>
-            </ActionButton>
-        </div>
     </div>
 </template>

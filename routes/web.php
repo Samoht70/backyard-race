@@ -56,7 +56,7 @@ Route::middleware('auth')
                 Route::middleware('can:'.Permission::ManageParticipants->value)
                     ->group(function () {
                         Route::resource('registrations', Manage\RegistrationController::class)
-                            ->only(['index', 'edit', 'update'])
+                            ->only(['index', 'edit', 'update', 'destroy'])
                             ->parameters(['registrations' => 'participant']);
 
                         Route::post('registrations/{participant}/transition', Manage\RegistrationTransitionController::class)

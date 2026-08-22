@@ -37,6 +37,7 @@ type Props = {
     seats: RegistrationSeats;
     status: string | null;
     refusals: string[];
+    deletionRefusal: string | null;
 };
 
 const props = defineProps<Props>();
@@ -137,8 +138,11 @@ const dossierTitle = computed(() =>
                         <RegistrationDossier
                             v-if="selected"
                             :registration="selected"
+                            variant="board"
                             :blocked="isBlocked"
                             described-by="registration-refusals"
+                            :deletion-refusal="deletionRefusal"
+                            @close="selectedId = null"
                         />
 
                         <EmptyState
@@ -187,8 +191,11 @@ const dossierTitle = computed(() =>
                     <RegistrationDossier
                         v-if="selected"
                         :registration="selected"
+                        variant="drawer"
                         :blocked="isBlocked"
                         described-by="registration-refusals"
+                        :deletion-refusal="deletionRefusal"
+                        @close="selectedId = null"
                     />
                 </DialogContent>
             </DialogPortal>

@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Epic** | 1 — Fondations |
-| **Statut** | 🔥 Lot 4 |
+| **Statut** | ✅ Terminé — 2026-08-22 |
 | **Estimation** | 3 pts |
 | **Créée** | 2026-08-22 — relevé au moment d'ouvrir les inscriptions au public, lot 4 |
 | **Dépend de** | BR-06, BR-37 |
@@ -130,9 +130,32 @@ l'événement.
 
 ## Tâches
 
-- [ ] **T1** — Suppression d'une inscription et de son compte, factorisée avec la purge de masse
+- [x] **T1** — Suppression d'une inscription et de son compte, factorisée avec la purge de masse
   `1 pt`
-- [ ] **T2** — Geste dans l'écran de gestion : autorisation, confirmation nommant le coureur, refus
+- [x] **T2** — Geste dans l'écran de gestion : autorisation, confirmation nommant le coureur, refus
   en course `1 pt`
-- [ ] **T3** — Tests : suppression d'une confirmée avec sa place et son dossard, compte épargné qui
+- [x] **T3** — Tests : suppression d'une confirmée avec sa place et son dossard, compte épargné qui
   perd son inscription, adresse redevenue libre, refus en course, refus d'autorisation `1 pt`
+
+## Ce que la livraison a appris
+
+`race:purge-registrations` ne porte plus la suppression : elle appelle `DeleteRegistration` pour
+chaque inscription et `DeleteAccount` pour les comptes qui n'en portent aucune, et la règle du compte
+épargné vit dans `SparedAccount`, sous ses deux formes — contrainte de requête pour compter, prédicat
+pour décider ligne à ligne. Le refus en course est produit par `RegistrationDeletion::refusal()`, lu
+par la requête de formulaire et par l'écran, qui désactive le bouton en le nommant.
+
+Le cas du second onglet ne demande aucun garde-fou d'écriture : la liaison de modèle rend 404 avant
+le contrôleur. Voir [D-69](../DECISIONS.md).
+
+**Hors périmètre, demandé en prenant la story** — le bouton « Modifier la fiche » a été retiré du
+dossier ; l'écran d'édition de BR-06 et ses routes restent, sans lien depuis l'application. La
+suppression rejoint la rangée d'actions sur le tableau, et garde un bloc à elle en bas du tiroir
+mobile. L'annulation passe en ton sobre pour que le rouge plein ne désigne plus que le geste
+irréversible. Le dossier porte enfin un bouton de fermeture : ni le tiroir mobile ni la colonne du
+tableau n'en avaient, et rien ne permettait de revenir à la liste sans en ouvrir une autre.
+
+**L'annulation a failli être retirée**, au motif qu'on n'annule que pour ne plus rien faire. Elle
+reste : elle se rattrape sans que le coureur retape quoi que ce soit, elle lui laisse son compte et
+son code, et surtout c'est le seul geste disponible pendant la course, où la suppression est refusée
+par la règle métier de cette story même.
