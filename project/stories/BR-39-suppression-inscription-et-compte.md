@@ -149,5 +149,13 @@ Le cas du second onglet ne demande aucun garde-fou d'écriture : la liaison de m
 le contrôleur. Voir [D-69](../DECISIONS.md).
 
 **Hors périmètre, demandé en prenant la story** — le bouton « Modifier la fiche » a été retiré du
-dossier, et la suppression rejoint la rangée d'actions plutôt qu'un bloc à elle. L'écran d'édition de
-BR-06 et ses routes restent, sans lien depuis l'application.
+dossier ; l'écran d'édition de BR-06 et ses routes restent, sans lien depuis l'application. La
+suppression rejoint la rangée d'actions sur le tableau, et garde un bloc à elle en bas du tiroir
+mobile. L'annulation passe en ton sobre pour que le rouge plein ne désigne plus que le geste
+irréversible. Le dossier porte enfin un bouton de fermeture : ni le tiroir mobile ni la colonne du
+tableau n'en avaient, et rien ne permettait de revenir à la liste sans en ouvrir une autre.
+
+**L'annulation a failli être retirée**, au motif qu'on n'annule que pour ne plus rien faire. Elle
+reste : elle se rattrape sans que le coureur retape quoi que ce soit, elle lui laisse son compte et
+son code, et surtout c'est le seul geste disponible pendant la course, où la suppression est refusée
+par la règle métier de cette story même.

@@ -67,6 +67,7 @@ return [
         'filter_label' => 'Filtrer par statut',
         'filter_all' => 'Toutes',
         'open_runner' => 'Ouvrir la fiche de :name',
+        'close' => 'Fermer la fiche',
         'empty_title' => 'Aucune inscription',
         'empty_description' => 'Personne ne s’est encore inscrit à cet événement.',
         'empty_filtered_title' => 'Aucune inscription dans cette vue',
@@ -99,6 +100,7 @@ return [
         'keep' => 'Ne rien changer',
     ],
     'delete' => [
+        'title' => 'Supprimer l’inscription',
         'open' => 'Supprimer',
         'aria_open' => 'Supprimer l’inscription de :name et son compte',
         'confirm_title' => 'Supprimer l’inscription de :name ?',

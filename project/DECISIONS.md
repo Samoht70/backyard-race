@@ -2636,5 +2636,25 @@ d'entrer dans le contrôleur, et c'est le refus lisible que demandait le cas du 
 
 **Le bouton « Modifier la fiche » a été retiré du dossier, à la demande du propriétaire.** C'est le
 seul chemin que BR-06 avait posé vers `manage/registrations/{id}/edit` ; l'écran et ses routes
-restent, sans lien depuis l'application. Le dossier ne porte plus qu'une rangée d'actions, où la
-suppression rejoint les changements de statut.
+restent, sans lien depuis l'application.
+
+**L'annulation reste, et c'est la couleur qui sépare les deux gestes.** La question posée était de
+retirer l'annulation, puisqu'on n'annule que pour ne plus rien faire. Elle reste pour une raison que
+cette story a elle-même créée : la suppression est refusée pendant la course, alors qu'aucune
+transition d'inscription ne l'est. La nuit de la course, un inscrit qui ne se présente pas ne peut
+être qu'annulé. S'ajoutent le retour en arrière — `reopen` rend l'inscription au coureur avec ce
+qu'il avait tapé — et le compte, qui survit à l'annulation et pas à la suppression. Le rouge plein ne
+désigne donc plus que l'irréversible : `cancel` passe en ton sobre, `destroy` garde `danger`.
+
+**Le dossier place la suppression à deux endroits selon l'instance qui le rend.** Une règle CSS ne
+déplace pas un élément d'un parent à l'autre, et dupliquer le composant derrière `hidden`/`lg:hidden`
+laisserait deux fois le même `id` dans le document, puisque la colonne du tableau reste rendue sous
+le tiroir mobile. Le dossier reçoit donc `variant` — `board` ou `drawer` — qui décide de la place du
+bouton et suffixe l'identifiant du refus. Le parent sait laquelle des deux instances il rend ; le
+composant n'interroge aucune media query.
+
+**La fermeture du dossier est un événement, pas un `DialogClose`.** Le tiroir mobile se fermait à la
+touche d'échappement et au voile, la colonne du tableau ne se fermait pas du tout — aucune des deux
+n'offrait de bouton. Le dossier émet `close` et le parent remet `selectedId` à `null` : le tiroir se
+referme parce que son ouverture est dérivée de la sélection, et la colonne rend de nouveau son état
+vide. Un `DialogClose` n'aurait servi qu'une des deux instances.

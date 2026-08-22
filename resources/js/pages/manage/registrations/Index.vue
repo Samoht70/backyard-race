@@ -138,9 +138,11 @@ const dossierTitle = computed(() =>
                         <RegistrationDossier
                             v-if="selected"
                             :registration="selected"
+                            variant="board"
                             :blocked="isBlocked"
                             described-by="registration-refusals"
                             :deletion-refusal="deletionRefusal"
+                            @close="selectedId = null"
                         />
 
                         <EmptyState
@@ -189,9 +191,11 @@ const dossierTitle = computed(() =>
                     <RegistrationDossier
                         v-if="selected"
                         :registration="selected"
+                        variant="drawer"
                         :blocked="isBlocked"
                         described-by="registration-refusals"
                         :deletion-refusal="deletionRefusal"
+                        @close="selectedId = null"
                     />
                 </DialogContent>
             </DialogPortal>
