@@ -17,7 +17,7 @@ import { overlayMenu, overlayMenuItem } from '@/lib/overlayClasses';
 import { logout } from '@/routes';
 import { edit } from '@/routes/profile';
 
-const user = computed(() => usePage().props.auth.user);
+const user = computed(() => usePage().props.auth?.user ?? null);
 const { getInitials } = useInitials();
 
 function flushBeforeLogout(): void {

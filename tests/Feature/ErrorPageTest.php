@@ -41,6 +41,21 @@ class ErrorPageTest extends TestCase
         );
     }
 
+    /** An unrouted address never enters the web group, so the page renders without the shared props. */
+    #[Test]
+    public function it_carries_the_shared_props_on_an_unknown_address(): void
+    {
+        $response = $this->get('/nowhere');
+
+        $response->assertInertia(
+            fn (AssertableInertia $page) => $page
+                ->component('Error')
+                ->has('auth')
+                ->has('access')
+                ->has('translations'),
+        );
+    }
+
     #[Test]
     public function it_renders_a_refused_access_in_the_site(): void
     {
