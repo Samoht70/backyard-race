@@ -1,5 +1,6 @@
 <?php
 
+use App\Exceptions\RenderErrorPage;
 use App\Http\Controllers\QueueHealthController;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
@@ -40,4 +41,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
+
+        $exceptions->respond(new RenderErrorPage);
     })->create();
