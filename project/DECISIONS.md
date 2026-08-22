@@ -2386,3 +2386,43 @@ zinc, ombre portée — pas une couleur fausse.
 inverse d'autorité affichera ce qu'il veut, et c'était déjà hors périmètre. La coupure de mot sur
 tous les liens de la fenêtre (`.inner-body a`) est retirée du thème du paquet, où elle cassait aussi
 les libellés de bouton en portrait ; seule l'adresse de repli la porte, par sa classe.
+
+## D-64 — La purge nomme le rôle `manager`, et refuse plutôt que de supposer une réponse
+
+Arrêté le 2026-08-22 pendant BR-37, dernière entrée du lot 3. La story avait tranché la définition —
+un compte coureur est un compte qui ne porte pas le rôle `manager` — et laissé la mécanique ouverte.
+
+**L'exception à `laravel:permissions-not-roles` est nommée, pas subie.** `race:purge-registrations`
+teste un nom de rôle, ce qu'aucune décision d'accès du projet ne fait. Elle ne laisse entrer
+personne : elle choisit qui elle n'emporte pas, et cette question n'a pas d'autre réponse ici. La
+définir par la présence d'une inscription était l'autre voie, plus étroite et fausse : elle épargne
+les comptes orphelins, que `RegisterRunner` ne crée jamais et qui sont donc exactement ce qu'une
+purge doit balayer.
+
+**Le rôle se teste par son nom en sous-requête, pas par le scope `withoutRole()` du paquet.** Le
+scope résout d'abord le rôle par `Role::findByName()`, qui lève `RoleDoesNotExist` quand la table
+des rôles n'a pas été semée. Une commande de purge qui casse sur une base incomplète est pire
+qu'inutile — elle doit pouvoir compter, dire ce qu'elle voit, et refuser. `whereDoesntHave('roles',
+…)` sur le nom ne dépend que de la ligne de jointure, et inclut au passage les comptes sans aucun
+rôle.
+
+**Il ne reste plus de manager quand tous les comptes sont des comptes coureurs.** Le décompte des
+coureurs et celui des comptes suffisent : leur égalité est l'avertissement, et il tombe avant la
+confirmation. Une seconde requête sur le rôle aurait dit la même chose deux fois.
+
+**Symfony ne devine plus l'absence de terminal.** `Application::configureIO()` ne teste plus
+`posix_isatty` : seul `--no-interaction` — ou `-n` — coupe l'interactivité. S'en remettre à la valeur
+par défaut de `confirm()` reviendrait donc à répondre « non » sans le dire dans un cas, et à
+attendre une entrée qui ne viendra pas dans l'autre. La commande lit `isInteractive()` elle-même,
+refuse en nommant `--force`, et sort en échec : une purge non faite est un échec, pas un succès
+silencieux.
+
+**Une seule écriture ne passe pas par un modèle.** Les inscriptions puis les comptes partent ligne à
+ligne, parce que `HasRoles` détache les attributions sur l'événement `deleting` et qu'une
+suppression en masse laisserait `model_has_roles` peuplé de références mortes. Les sessions, elles,
+n'ont pas de modèle : `DB::table('sessions')->whereIn('user_id', …)` ferme la porte des comptes
+emportés, dans la même transaction.
+
+**Pas de classe d'action, pas d'écran.** La logique vit entière dans la commande, seul appelant
+qu'elle aura jamais : la story exclut le bouton, et une action extraite pour un appelant unique
+n'aurait déplacé que le nom.
