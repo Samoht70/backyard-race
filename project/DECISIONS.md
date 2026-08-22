@@ -2302,3 +2302,40 @@ ni la dalle gris-bleu, ni le rétroéclairage cyan, ni l'arrondi de 4 px, ni les
 les segments de `DateField` et de `TimeField`, ni la mise en forme française de `NumberField`, ni le
 passage au clavier du `Stepper` n'ont été vus. Tout cela reste à regarder à l'écran — la galerie
 `/design-system` est faite pour ça — avant de considérer R-06 close.
+
+## D-62 — Une seule commande pour le compte organisateur, et la normalisation d'adresse sort du formulaire
+
+Arrêté le 2026-08-22 pendant BR-35, première entrée du lot 3. La séquence `tinker` de dix lignes
+devient `php artisan race:manager-account`, et trois arbitrages la façonnent.
+
+**Une commande, deux gestes.** Créer un compte et regénérer son code sont le même geste vu deux
+fois : la même adresse, le même `AccessCode::generate()`, la même unique occasion de lire le code.
+Deux commandes auraient dupliqué la normalisation, les gardes et l'affichage pour se distinguer par
+une seule branche. La signature est donc `race:manager-account {email} {first-name?} {last-name?}
+{--regenerate}` — les noms ne sont exigés que sur le chemin de création, parce qu'une regénération
+ne touche pas à l'identité. Le nom de la commande dit le compte, pas le verbe, faute de quoi
+`--regenerate` mentirait sur un `create`.
+
+**La garde sur le rôle passe avant toute écriture, y compris pour une regénération.** Le rôle
+`manager` n'est pourtant nécessaire qu'à la création. La garde reste inconditionnelle parce qu'elle
+répond à une question — « cette base est-elle seedée ? » — qui vaut avant n'importe quel geste sur
+les comptes, et parce que la seule autre forme possible était de la déplacer dans la branche de
+création, où elle aurait laissé passer un `--regenerate` sur une base à moitié installée. Elle nomme
+`db:seed --class=RolesAndPermissionsSeeder` et non `DatabaseSeeder` : celui-ci crée deux comptes
+d'essai, ce qui est exactement ce que le lot 3 s'apprête à purger.
+
+**La regénération n'attribue aucun rôle.** Un coureur qui a perdu son code le récupère par cette
+commande — c'est le même mécanisme d'accès pour tout le monde — et il en ressort coureur. Élever un
+compte au rôle `manager` reste un geste qu'on demande explicitement, et aucune option ne le fait
+aujourd'hui.
+
+**`EmailAddress::normalise()` devient la forme unique de l'adresse.** La règle vivait dans
+`AccountStoreRequest::prepareForValidation()`, et `FortifyServiceProvider` la recopiait au moment de
+chercher le compte à la connexion. La commande aurait été le troisième exemplaire : c'est un de trop
+pour une règle dont l'écart ne se voit pas — un compte qui existe et ne peut pas se connecter. Les
+trois appelants passent par `App\Support\EmailAddress`.
+
+**Ce qui reste ouvert.** `ProfileUpdateRequest` ne normalise pas l'adresse qu'un utilisateur saisit
+pour lui-même : une majuscule y suffit à se fermer la porte, puisque la connexion cherche en
+minuscules. Le défaut est antérieur à BR-35 et hors de son périmètre ; il se corrige désormais par
+un appel de plus à `EmailAddress::normalise()`.

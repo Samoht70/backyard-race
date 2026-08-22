@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\User;
 use App\Support\AccessCode;
+use App\Support\EmailAddress;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -31,7 +32,7 @@ class FortifyServiceProvider extends ServiceProvider
     {
         Fortify::authenticateUsing(function (Request $request): ?User {
             $user = User::query()
-                ->where('email', Str::lower(trim($request->string('email')->value())))
+                ->where('email', EmailAddress::normalise($request->string('email')->value()))
                 ->first();
 
             if ($user === null) {

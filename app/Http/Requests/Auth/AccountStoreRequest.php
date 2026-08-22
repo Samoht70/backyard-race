@@ -5,9 +5,9 @@ namespace App\Http\Requests\Auth;
 use App\Concerns\ProfileValidationRules;
 use App\Concerns\RegistrationValidationRules;
 use App\Models\Event;
+use App\Support\EmailAddress;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Validator;
 
 class AccountStoreRequest extends FormRequest
@@ -38,7 +38,7 @@ class AccountStoreRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'email' => Str::lower(trim($this->string('email')->value())),
+            'email' => EmailAddress::normalise($this->string('email')->value()),
         ]);
     }
 }
