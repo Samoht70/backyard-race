@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Epic** | 1 — Fondations |
-| **Statut** | 🔥 Lot 4 |
+| **Statut** | ✅ Terminé |
 | **Estimation** | 3 pts |
 | **Créée** | 2026-08-22 — relevé au moment d'ouvrir les inscriptions au public, lot 4 |
 | **Dépend de** | BR-03, BR-39 |
@@ -115,9 +115,9 @@ doivent être la même règle, sinon l'écran promet un geste que l'écriture re
 
 ## Tâches
 
-- [ ] **T1** — Marche descendante « inscriptions ouvertes » → « brouillon », condition de zéro
+- [x] **T1** — Marche descendante « inscriptions ouvertes » → « brouillon », condition de zéro
   inscription vérifiée à l'écriture `1 pt`
-- [ ] **T2** — Geste dans l'écran de configuration : proposé quand il est possible, refus qui compte
+- [x] **T2** — Geste dans l'écran de configuration : proposé quand il est possible, refus qui compte
   les inscriptions bloquantes `1 pt`
-- [ ] **T3** — Tests : retour réussi sur base vide, refus sur une annulée qui traîne, refus depuis les
+- [x] **T3** — Tests : retour réussi sur base vide, refus sur une annulée qui traîne, refus depuis les
   autres statuts, refus d'autorisation, fermeture du parcours public `1 pt`
