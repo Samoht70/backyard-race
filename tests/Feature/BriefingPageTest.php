@@ -75,7 +75,7 @@ class BriefingPageTest extends TestCase
             $response->assertOk();
             $response->assertInertia(
                 fn (AssertableInertia $page) => $page
-                    ->where('html', fn (string $html): bool => str_contains($html, 'Lampe frontale obligatoire')),
+                    ->where('html', fn (string $html): bool => str_contains($html, 'Backyard Ultra du Quart de Siècle')),
             );
 
             Event::query()->delete();

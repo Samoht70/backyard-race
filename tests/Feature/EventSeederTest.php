@@ -34,7 +34,7 @@ class EventSeederTest extends TestCase
         $briefing = Event::query()->sole()->briefing;
 
         $this->assertNotNull($briefing);
-        $this->assertStringContainsString('Lampe frontale', $briefing);
+        $this->assertStringContainsString('Backyard Ultra du Quart de Siècle', $briefing);
     }
 
     #[Test]
