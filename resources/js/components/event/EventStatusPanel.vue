@@ -1,36 +1,16 @@
 <script setup lang="ts">
-import { Form } from '@inertiajs/vue3';
 import { Check } from '@lucide/vue';
-import {
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogOverlay,
-    AlertDialogPortal,
-    AlertDialogRoot,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from 'reka-ui';
 import { computed } from 'vue';
 import AdvanceEventController from '@/actions/App/Http/Controllers/Manage/AdvanceEventController';
-import ActionButton from '@/components/ActionButton.vue';
-import AlertError from '@/components/AlertError.vue';
+import RevertEventController from '@/actions/App/Http/Controllers/Manage/RevertEventController';
 import EventStatusBadge from '@/components/event/EventStatusBadge.vue';
-import FieldError from '@/components/form/FieldError.vue';
+import EventTransitionDialog from '@/components/event/EventTransitionDialog.vue';
 import {
     eventStatusIcons,
     eventStatusLabelKey,
     eventTransitionLabelKey,
 } from '@/lib/eventStatus';
 import { t } from '@/lib/i18n';
-import {
-    overlayBackdrop,
-    overlayDescription,
-    overlayFooter,
-    overlayPanel,
-    overlayTitle,
-} from '@/lib/overlayClasses';
 import { EVENT_STATUSES } from '@/types/event';
 import type { EventTransition } from '@/types/event';
 
@@ -49,8 +29,6 @@ const steps = computed(() => {
         current: position === reached,
     }));
 });
-
-const isBlocked = computed(() => props.transition.refusals.length > 0);
 </script>
 
 <template>
@@ -116,82 +94,32 @@ const isBlocked = computed(() => props.transition.refusals.length > 0);
                 {{ t('event.transition.none') }}
             </p>
 
-            <template v-else>
-                <AlertError
-                    v-if="isBlocked"
-                    id="transition-refusals"
-                    :title="t('event.transition.blocked_title')"
-                    :errors="transition.refusals"
-                />
+            <EventTransitionDialog
+                v-else
+                :action="AdvanceEventController.form()"
+                :to="transition.next"
+                :label="t(eventTransitionLabelKey(transition.next))"
+                :description="
+                    transition.nextIsReversible
+                        ? t('event.transition.confirm_reversible')
+                        : t('event.transition.confirm_irreversible')
+                "
+                :refusals="transition.refusals"
+                :refusals-title="t('event.transition.blocked_title')"
+            />
 
-                <AlertDialogRoot>
-                    <AlertDialogTrigger as-child>
-                        <ActionButton
-                            :disabled="isBlocked"
-                            :aria-describedby="
-                                isBlocked ? 'transition-refusals' : undefined
-                            "
-                        >
-                            {{ t(eventTransitionLabelKey(transition.next)) }}
-                        </ActionButton>
-                    </AlertDialogTrigger>
-
-                    <AlertDialogPortal>
-                        <AlertDialogOverlay :class="overlayBackdrop" />
-                        <AlertDialogContent :class="overlayPanel">
-                            <Form
-                                v-bind="AdvanceEventController.form()"
-                                :options="{ preserveScroll: true }"
-                                class="flex flex-col gap-4"
-                                v-slot="{ errors, processing }"
-                            >
-                                <input
-                                    type="hidden"
-                                    name="to"
-                                    :value="transition.next"
-                                />
-
-                                <AlertDialogTitle :class="overlayTitle">
-                                    {{
-                                        t(
-                                            eventTransitionLabelKey(
-                                                transition.next,
-                                            ),
-                                        )
-                                    }}
-                                </AlertDialogTitle>
-                                <AlertDialogDescription
-                                    :class="overlayDescription"
-                                >
-                                    {{
-                                        t(
-                                            'event.transition.confirm_irreversible',
-                                        )
-                                    }}
-                                </AlertDialogDescription>
-
-                                <FieldError :message="errors.to" />
-
-                                <div :class="overlayFooter">
-                                    <AlertDialogCancel as-child>
-                                        <ActionButton tone="quiet">
-                                            {{ t('event.transition.cancel') }}
-                                        </ActionButton>
-                                    </AlertDialogCancel>
-                                    <AlertDialogAction as-child>
-                                        <ActionButton
-                                            type="submit"
-                                            :loading="processing"
-                                        >
-                                            {{ t('event.transition.confirm') }}
-                                        </ActionButton>
-                                    </AlertDialogAction>
-                                </div>
-                            </Form>
-                        </AlertDialogContent>
-                    </AlertDialogPortal>
-                </AlertDialogRoot>
-            </template>
+            <EventTransitionDialog
+                v-if="transition.previous"
+                :action="RevertEventController.form()"
+                :to="transition.previous"
+                tone="quiet"
+                :label="t('event.transition.back_to_draft')"
+                :description="t('event.transition.back_to_draft_confirm')"
+                :refusals="transition.revertRefusals"
+                :refusals-title="
+                    t('event.transition.back_to_draft_blocked_title')
+                "
+            />
         </div>
     </section>
 </template>
