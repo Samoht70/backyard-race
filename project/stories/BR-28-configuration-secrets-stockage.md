@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Epic** | 7 — Déploiement |
-| **Statut** | À faire |
+| **Statut** | 🚧 En cours |
 | **Estimation** | 5 pts |
 | **Dépend de** | BR-27 |
 
@@ -88,8 +88,22 @@ redémarrage suivant serait irrécupérable, sans message d'erreur.
 
 ## Tâches
 
-- [ ] **T1** — Inventorier les variables de production et distinguer les secrets `1 pt`
-- [ ] **T2** — Créer le bucket objet de production hors du VPS et brancher le disque `s3` `2 pts`
+- [x] **T1** — Inventorier les variables de production et distinguer les secrets `1 pt`
+- [x] **T2** — Créer le bucket objet de production hors du VPS et brancher le disque `s3` `2 pts`
 - [ ] **T3** — Mise en cache de configuration, routes et vues au démarrage `1 pt`
 - [ ] **T4** — Mettre `.env.example` à jour et vérifier l'absence de secret dans le dépôt `1 pt`
-- [ ] **T5** — Vérifier la persistance d'un fichier après redémarrage `1 pt`
+- [x] **T5** — Vérifier la persistance d'un fichier après redémarrage `1 pt`
+
+## Ce qui reste au 2026-08-22
+
+L'application est en ligne. Ses fichiers atterrissent dans un bucket hors du VPS et y survivent au
+redémarrage, donc les documents de l'événement ne dépendent plus de la machine. Restent deux tâches,
+toutes deux dans le dépôt, aucune n'empêchant de servir :
+
+- **T3** — `docker/entrypoint.sh` lance `frankenphp` sans passer par `config:cache`, `route:cache` ni
+  `view:cache`. Le cache ne peut pas être construit dans l'image sans y figer l'environnement, donc
+  c'est au démarrage qu'il doit se faire, et il ne s'y fait pas encore. L'application sert plus
+  lentement qu'elle ne le devrait, sans que rien ne le signale.
+- **T4** — `.env.example` décrit le poste de développement et ne nomme pas les variables que la
+  production a fait apparaître : `DB_ROOT_PASSWORD`, que `compose.prod.yaml` exige, et `APP_IMAGE`.
+  Qui remonte la pile depuis le dépôt les découvre au refus de démarrage de l'entrypoint.

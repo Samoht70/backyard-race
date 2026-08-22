@@ -37,6 +37,11 @@ permettre de rater :
 Quatre pièges dans un geste unique, joué une fois, sur une machine où il n'y a encore rien à
 consulter pour comprendre l'échec. C'est exactement ce qu'une commande doit porter.
 
+**Le compte a été créé à la main le 2026-08-22**, par cette séquence, et la production sert depuis.
+La story ne bloque donc plus la mise en ligne : elle sort du lot 2 sans avoir été faite. Ce qu'elle
+porte reste entier — le code d'accès n'a existé en clair que dans une sortie de terminal aujourd'hui
+fermée, aucun geste ne le regénère, et la prochaine installation rejouerait les quatre pièges.
+
 ## Périmètre fonctionnel
 
 **Inclus**

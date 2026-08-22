@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Epic** | 7 — Déploiement |
-| **Statut** | À faire |
+| **Statut** | 🚧 En cours |
 | **Estimation** | 5 pts |
 | **Dépend de** | BR-29 |
 
@@ -99,9 +99,20 @@ du site.
 
 ## Tâches
 
-- [ ] **T1** — Déclarer web, worker et planificateur dans le Compose de production, même image, redémarrage automatique `2 pts`
-- [ ] **T2** — Configurer Horizon en production : files, tentatives, délais `1 pt`
-- [ ] **T3** — Protéger l'interface Horizon par permission `1 pt`
-- [ ] **T4** — Redémarrage des workers au déploiement `1 pt`
+- [x] **T1** — Déclarer web, worker et planificateur dans le Compose de production, même image, redémarrage automatique `2 pts`
+- [x] **T2** — Configurer Horizon en production : files, tentatives, délais `1 pt`
+- [x] **T3** — Protéger l'interface Horizon par permission `1 pt`
+- [x] **T4** — Redémarrage des workers au déploiement `1 pt`
 - [ ] **T5** — Alerte sur file non consommée `2 pts`
-- [ ] **T6** — Vérifier de bout en bout qu'une élimination tombe sans navigateur ouvert `1 pt`
+- [x] **T6** — Vérifier de bout en bout qu'une élimination tombe sans navigateur ouvert `1 pt`
+
+## Ce qui reste au 2026-08-22
+
+Le worker tourne en production et il travaille : un code d'accès est parti par mail sans qu'aucun
+navigateur soit resté ouvert. C'est ce que T6 demandait de constater — l'élimination nommée dans son
+intitulé attend BR-11, le mécanisme, lui, est vérifié.
+
+**T5 reste ouverte, et c'est le trou du lot 2.** Rien ne prévient si la file cesse d'être consommée.
+Un worker mort ne se signale pas : les inscriptions continuent d'être acceptées, les mails de lien
+n'arrivent plus, et aucun écran ne le dit — ni au coureur, qui attend un code, ni au gérant. C'est le
+seul reste du lot qui puisse coûter une inscription.
