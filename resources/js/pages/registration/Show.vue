@@ -1,17 +1,16 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import { CircleSlash } from '@lucide/vue';
 import { computed } from 'vue';
+import ActionButton from '@/components/ActionButton.vue';
 import ActionBar from '@/components/board/ActionBar.vue';
 import BoardColumns from '@/components/board/BoardColumns.vue';
 import BoardPage from '@/components/board/BoardPage.vue';
 import BoardRow from '@/components/board/BoardRow.vue';
 import BoardRows from '@/components/board/BoardRows.vue';
 import BoardSection from '@/components/board/BoardSection.vue';
-import ActionButton from '@/components/race/ActionButton.vue';
+import Notice from '@/components/Notice.vue';
 import BibDisplay from '@/components/race/BibDisplay.vue';
 import RegistrationStatusBadge from '@/components/registration/RegistrationStatusBadge.vue';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { t } from '@/lib/i18n';
 import { edit } from '@/routes/registration';
 import type { RegistrationDetails } from '@/types/registration';
@@ -46,15 +45,13 @@ const fullName = computed(
                 </div>
             </template>
 
-            <Alert v-if="isCancelled" variant="destructive">
-                <CircleSlash class="size-4" />
-                <AlertTitle>
-                    {{ t('registration.show.cancelled_title') }}
-                </AlertTitle>
-                <AlertDescription>
-                    {{ t('registration.show.cancelled_description') }}
-                </AlertDescription>
-            </Alert>
+            <Notice
+                v-if="isCancelled"
+                tone="danger"
+                :title="t('registration.show.cancelled_title')"
+            >
+                {{ t('registration.show.cancelled_description') }}
+            </Notice>
 
             <BoardSection :title="t('registration.section.runner')">
                 <BoardRows>

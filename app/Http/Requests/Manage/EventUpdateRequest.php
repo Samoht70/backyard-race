@@ -48,7 +48,7 @@ class EventUpdateRequest extends FormRequest
             'name' => ['required', 'string', 'max:120'],
             'description' => ['nullable', 'string', 'max:5000'],
             'start_date' => ['nullable', 'date_format:Y-m-d', 'required_with:start_time'],
-            'start_time' => ['nullable', 'date_format:H:i', 'required_with:start_date'],
+            'start_time' => ['nullable', 'date_format:H:i,H:i:s', 'required_with:start_date'],
             'first_start_at' => [
                 'nullable',
                 'date',

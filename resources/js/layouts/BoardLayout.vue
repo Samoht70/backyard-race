@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import BoardBand from '@/components/board/BoardBand.vue';
 import BoardRail from '@/components/board/BoardRail.vue';
-import { Toaster } from '@/components/ui/sonner';
+import Toaster from '@/components/Toaster.vue';
 </script>
 
 <template>

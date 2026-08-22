@@ -200,6 +200,24 @@ class EventConfigurationTest extends TestCase
     }
 
     #[Test]
+    public function it_accepts_a_start_time_carrying_seconds(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+        Event::factory()->create();
+
+        $this->actingAs($this->manager())
+            ->put(route('manage.event.update'), $this->payload([
+                'start_time' => '13:00:00',
+            ]))
+            ->assertSessionHasNoErrors();
+
+        $this->assertSame(
+            '2026-09-12 13:00:00',
+            Event::query()->sole()->first_start_at?->toDateTimeString(),
+        );
+    }
+
+    #[Test]
     public function it_reports_the_frozen_field_when_a_stale_tab_resubmits_it(): void
     {
         $this->seed(RolesAndPermissionsSeeder::class);

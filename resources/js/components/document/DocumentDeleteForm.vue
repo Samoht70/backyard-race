@@ -1,20 +1,27 @@
 <script setup lang="ts">
 import { Form } from '@inertiajs/vue3';
 import { Trash2 } from '@lucide/vue';
-import { computed } from 'vue';
-import DocumentController from '@/actions/App/Http/Controllers/Manage/DocumentController';
-import ActionButton from '@/components/race/ActionButton.vue';
 import {
-    Dialog,
     DialogClose,
     DialogContent,
     DialogDescription,
-    DialogFooter,
-    DialogHeader,
+    DialogOverlay,
+    DialogPortal,
+    DialogRoot,
     DialogTitle,
     DialogTrigger,
-} from '@/components/ui/dialog';
+} from 'reka-ui';
+import { computed } from 'vue';
+import DocumentController from '@/actions/App/Http/Controllers/Manage/DocumentController';
+import ActionButton from '@/components/ActionButton.vue';
 import { t } from '@/lib/i18n';
+import {
+    overlayBackdrop,
+    overlayDescription,
+    overlayFooter,
+    overlayPanel,
+    overlayTitle,
+} from '@/lib/overlayClasses';
 
 type Props = {
     documentId: number;
@@ -27,7 +34,7 @@ const errorBag = computed(() => `document-${props.documentId}`);
 </script>
 
 <template>
-    <Dialog>
+    <DialogRoot>
         <DialogTrigger as-child>
             <ActionButton
                 tone="danger"
@@ -39,38 +46,39 @@ const errorBag = computed(() => `document-${props.documentId}`);
             </ActionButton>
         </DialogTrigger>
 
-        <DialogContent>
-            <Form
-                v-bind="DocumentController.destroy.form(documentId)"
-                :error-bag="errorBag"
-                :options="{ preserveScroll: true }"
-                class="flex flex-col gap-4"
-                v-slot="{ processing }"
-            >
-                <DialogHeader class="space-y-3">
-                    <DialogTitle>
+        <DialogPortal>
+            <DialogOverlay :class="overlayBackdrop" />
+            <DialogContent :class="overlayPanel">
+                <Form
+                    v-bind="DocumentController.destroy.form(documentId)"
+                    :error-bag="errorBag"
+                    :options="{ preserveScroll: true }"
+                    class="flex flex-col gap-4"
+                    v-slot="{ processing }"
+                >
+                    <DialogTitle :class="overlayTitle">
                         {{ t('document.manage.delete_title') }}
                     </DialogTitle>
-                    <DialogDescription>
+                    <DialogDescription :class="overlayDescription">
                         {{ t('document.manage.delete_description') }}
                     </DialogDescription>
-                </DialogHeader>
 
-                <DialogFooter class="gap-2">
-                    <DialogClose as-child>
-                        <ActionButton tone="quiet">
-                            {{ t('document.manage.cancel') }}
+                    <div :class="overlayFooter">
+                        <DialogClose as-child>
+                            <ActionButton tone="quiet">
+                                {{ t('document.manage.cancel') }}
+                            </ActionButton>
+                        </DialogClose>
+                        <ActionButton
+                            type="submit"
+                            tone="danger"
+                            :loading="processing"
+                        >
+                            {{ t('document.manage.delete_confirm') }}
                         </ActionButton>
-                    </DialogClose>
-                    <ActionButton
-                        type="submit"
-                        tone="danger"
-                        :loading="processing"
-                    >
-                        {{ t('document.manage.delete_confirm') }}
-                    </ActionButton>
-                </DialogFooter>
-            </Form>
-        </DialogContent>
-    </Dialog>
+                    </div>
+                </Form>
+            </DialogContent>
+        </DialogPortal>
+    </DialogRoot>
 </template>

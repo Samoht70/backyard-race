@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { Form, Head, setLayoutProps } from '@inertiajs/vue3';
 import { ref } from 'vue';
-import EventField from '@/components/event/EventField.vue';
-import EventFieldset from '@/components/event/EventFieldset.vue';
-import InputError from '@/components/InputError.vue';
-import ActionButton from '@/components/race/ActionButton.vue';
+import ActionButton from '@/components/ActionButton.vue';
+import FieldError from '@/components/form/FieldError.vue';
+import FormField from '@/components/form/FormField.vue';
+import FormFieldset from '@/components/form/FormFieldset.vue';
+import TextField from '@/components/form/TextField.vue';
 import RegistrationFields from '@/components/registration/RegistrationFields.vue';
 import RegistrationStep from '@/components/registration/RegistrationStep.vue';
 import RegistrationStepper from '@/components/registration/RegistrationStepper.vue';
 import SeatCounter from '@/components/registration/SeatCounter.vue';
-import { Input } from '@/components/ui/input';
 import { useFormSteps } from '@/composables/useFormSteps';
 import { t } from '@/lib/i18n';
 import {
@@ -65,33 +65,31 @@ function returnToError(errors: Record<string, string>): void {
             class="flex flex-col gap-6"
             @error="returnToError"
         >
-            <InputError :message="errors.event" />
+            <FieldError :message="errors.event" />
 
             <RegistrationStepper :current="current" @go="goTo" />
 
             <div ref="steps" class="flex flex-col gap-6">
                 <RegistrationStep :index="0" :current="current">
-                    <EventFieldset
-                        :title="t('auth.register.complete.identity')"
-                    >
-                        <EventField
+                    <FormFieldset :title="t('auth.register.complete.identity')">
+                        <FormField
                             name="email"
                             :label="t('auth.register.complete.email')"
                         >
-                            <Input
+                            <TextField
                                 id="email"
                                 type="email"
                                 :model-value="email"
                                 disabled
                             />
-                        </EventField>
+                        </FormField>
 
-                        <EventField
+                        <FormField
                             name="first_name"
                             :label="t('auth.register.complete.first_name')"
                             :error="errors.first_name"
                         >
-                            <Input
+                            <TextField
                                 id="first_name"
                                 name="first_name"
                                 required
@@ -99,22 +97,22 @@ function returnToError(errors: Record<string, string>): void {
                                 autocomplete="given-name"
                                 maxlength="120"
                             />
-                        </EventField>
+                        </FormField>
 
-                        <EventField
+                        <FormField
                             name="last_name"
                             :label="t('auth.register.complete.last_name')"
                             :error="errors.last_name"
                         >
-                            <Input
+                            <TextField
                                 id="last_name"
                                 name="last_name"
                                 required
                                 autocomplete="family-name"
                                 maxlength="120"
                             />
-                        </EventField>
-                    </EventFieldset>
+                        </FormField>
+                    </FormFieldset>
                 </RegistrationStep>
 
                 <RegistrationStep :index="1" :current="current">

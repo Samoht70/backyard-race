@@ -3,6 +3,7 @@
 return [
     'nav' => [
         'home' => 'Accueil',
+        'back_to_event' => 'Retour à l’événement',
         'race' => 'Course',
         'registration' => 'Mon inscription',
         'register' => 'S’inscrire',
@@ -39,6 +40,12 @@ return [
         'editable' => 'Modifiable',
         'editable_yes' => 'Oui, jusqu’à la confirmation',
         'editable_no' => 'Non, elle est confirmée',
+    ],
+    'field' => [
+        'reveal' => 'Afficher le mot de passe',
+        'hide' => 'Masquer le mot de passe',
+        'increase' => 'Augmenter',
+        'decrease' => 'Diminuer',
     ],
     'state' => [
         'loading' => 'Chargement…',

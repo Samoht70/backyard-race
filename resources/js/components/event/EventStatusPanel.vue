@@ -1,29 +1,36 @@
 <script setup lang="ts">
 import { Form } from '@inertiajs/vue3';
 import { Check } from '@lucide/vue';
-import { computed } from 'vue';
-import AdvanceEventController from '@/actions/App/Http/Controllers/Manage/AdvanceEventController';
-import AlertError from '@/components/AlertError.vue';
-import EventStatusBadge from '@/components/event/EventStatusBadge.vue';
-import InputError from '@/components/InputError.vue';
-import ActionButton from '@/components/race/ActionButton.vue';
 import {
-    AlertDialog,
     AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
+    AlertDialogOverlay,
+    AlertDialogPortal,
+    AlertDialogRoot,
     AlertDialogTitle,
     AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
+} from 'reka-ui';
+import { computed } from 'vue';
+import AdvanceEventController from '@/actions/App/Http/Controllers/Manage/AdvanceEventController';
+import ActionButton from '@/components/ActionButton.vue';
+import AlertError from '@/components/AlertError.vue';
+import EventStatusBadge from '@/components/event/EventStatusBadge.vue';
+import FieldError from '@/components/form/FieldError.vue';
 import {
     eventStatusIcons,
     eventStatusLabelKey,
     eventTransitionLabelKey,
 } from '@/lib/eventStatus';
 import { t } from '@/lib/i18n';
+import {
+    overlayBackdrop,
+    overlayDescription,
+    overlayFooter,
+    overlayPanel,
+    overlayTitle,
+} from '@/lib/overlayClasses';
 import { EVENT_STATUSES } from '@/types/event';
 import type { EventTransition } from '@/types/event';
 
@@ -47,7 +54,7 @@ const isBlocked = computed(() => props.transition.refusals.length > 0);
 </script>
 
 <template>
-    <section class="grid gap-4 border border-border bg-card p-4">
+    <section class="grid gap-4 rounded-sm border border-border bg-card p-4">
         <h2 class="font-mono text-label text-muted-foreground uppercase">
             {{ t('event.status.section_title') }}
         </h2>
@@ -117,7 +124,7 @@ const isBlocked = computed(() => props.transition.refusals.length > 0);
                     :errors="transition.refusals"
                 />
 
-                <AlertDialog>
+                <AlertDialogRoot>
                     <AlertDialogTrigger as-child>
                         <ActionButton
                             :disabled="isBlocked"
@@ -129,21 +136,22 @@ const isBlocked = computed(() => props.transition.refusals.length > 0);
                         </ActionButton>
                     </AlertDialogTrigger>
 
-                    <AlertDialogContent>
-                        <Form
-                            v-bind="AdvanceEventController.form()"
-                            :options="{ preserveScroll: true }"
-                            class="flex flex-col gap-4"
-                            v-slot="{ errors, processing }"
-                        >
-                            <input
-                                type="hidden"
-                                name="to"
-                                :value="transition.next"
-                            />
+                    <AlertDialogPortal>
+                        <AlertDialogOverlay :class="overlayBackdrop" />
+                        <AlertDialogContent :class="overlayPanel">
+                            <Form
+                                v-bind="AdvanceEventController.form()"
+                                :options="{ preserveScroll: true }"
+                                class="flex flex-col gap-4"
+                                v-slot="{ errors, processing }"
+                            >
+                                <input
+                                    type="hidden"
+                                    name="to"
+                                    :value="transition.next"
+                                />
 
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>
+                                <AlertDialogTitle :class="overlayTitle">
                                     {{
                                         t(
                                             eventTransitionLabelKey(
@@ -152,35 +160,37 @@ const isBlocked = computed(() => props.transition.refusals.length > 0);
                                         )
                                     }}
                                 </AlertDialogTitle>
-                                <AlertDialogDescription>
+                                <AlertDialogDescription
+                                    :class="overlayDescription"
+                                >
                                     {{
                                         t(
                                             'event.transition.confirm_irreversible',
                                         )
                                     }}
                                 </AlertDialogDescription>
-                            </AlertDialogHeader>
 
-                            <InputError :message="errors.to" />
+                                <FieldError :message="errors.to" />
 
-                            <AlertDialogFooter>
-                                <AlertDialogCancel as-child>
-                                    <ActionButton tone="quiet">
-                                        {{ t('event.transition.cancel') }}
-                                    </ActionButton>
-                                </AlertDialogCancel>
-                                <AlertDialogAction as-child>
-                                    <ActionButton
-                                        type="submit"
-                                        :loading="processing"
-                                    >
-                                        {{ t('event.transition.confirm') }}
-                                    </ActionButton>
-                                </AlertDialogAction>
-                            </AlertDialogFooter>
-                        </Form>
-                    </AlertDialogContent>
-                </AlertDialog>
+                                <div :class="overlayFooter">
+                                    <AlertDialogCancel as-child>
+                                        <ActionButton tone="quiet">
+                                            {{ t('event.transition.cancel') }}
+                                        </ActionButton>
+                                    </AlertDialogCancel>
+                                    <AlertDialogAction as-child>
+                                        <ActionButton
+                                            type="submit"
+                                            :loading="processing"
+                                        >
+                                            {{ t('event.transition.confirm') }}
+                                        </ActionButton>
+                                    </AlertDialogAction>
+                                </div>
+                            </Form>
+                        </AlertDialogContent>
+                    </AlertDialogPortal>
+                </AlertDialogRoot>
             </template>
         </div>
     </section>

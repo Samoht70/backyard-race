@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
 import RegistrationController from '@/actions/App/Http/Controllers/RegistrationController';
+import ActionButton from '@/components/ActionButton.vue';
 import ActionBar from '@/components/board/ActionBar.vue';
 import BoardPage from '@/components/board/BoardPage.vue';
-import ActionButton from '@/components/race/ActionButton.vue';
 import RegistrationFields from '@/components/registration/RegistrationFields.vue';
 import { t } from '@/lib/i18n';
 import type { RegistrationDetails } from '@/types/registration';

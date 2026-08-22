@@ -2,17 +2,18 @@
 import { Form, Head } from '@inertiajs/vue3';
 import { FolderOpen } from '@lucide/vue';
 import DocumentController from '@/actions/App/Http/Controllers/Manage/DocumentController';
+import ActionButton from '@/components/ActionButton.vue';
 import BoardPage from '@/components/board/BoardPage.vue';
 import DocumentDeleteForm from '@/components/document/DocumentDeleteForm.vue';
 import DocumentRow from '@/components/document/DocumentRow.vue';
-import EventField from '@/components/event/EventField.vue';
-import EventFieldset from '@/components/event/EventFieldset.vue';
+import FileField from '@/components/form/FileField.vue';
+import FormField from '@/components/form/FormField.vue';
+import FormFieldset from '@/components/form/FormFieldset.vue';
+import TextAreaField from '@/components/form/TextAreaField.vue';
+import TextField from '@/components/form/TextField.vue';
 import Heading from '@/components/Heading.vue';
-import ActionButton from '@/components/race/ActionButton.vue';
+import Notice from '@/components/Notice.vue';
 import EmptyState from '@/components/state/EmptyState.vue';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { t } from '@/lib/i18n';
 import type { EventDocument } from '@/types/document';
 
@@ -35,14 +36,12 @@ defineProps<Props>();
                 :description="t('document.manage.description')"
             />
 
-            <Alert v-if="!isEditable">
-                <AlertTitle>{{
-                    t('document.manage.readonly_title')
-                }}</AlertTitle>
-                <AlertDescription>
-                    {{ t('document.manage.readonly_description') }}
-                </AlertDescription>
-            </Alert>
+            <Notice
+                v-if="!isEditable"
+                :title="t('document.manage.readonly_title')"
+            >
+                {{ t('document.manage.readonly_description') }}
+            </Notice>
 
             <div v-if="documents.length" class="slats">
                 <DocumentRow
@@ -75,30 +74,30 @@ defineProps<Props>();
                 class="flex flex-col gap-8"
                 v-slot="{ errors, processing }"
             >
-                <EventFieldset :title="t('document.manage.add_title')">
-                    <EventField
+                <FormFieldset :title="t('document.manage.add_title')">
+                    <FormField
                         name="title"
                         :label="t('document.manage.field.title')"
                         :hint="t('document.manage.hint.title')"
                         :error="errors.title"
                     >
-                        <Input id="title" name="title" required />
-                    </EventField>
+                        <TextField id="title" name="title" required />
+                    </FormField>
 
-                    <EventField
+                    <FormField
                         name="description"
                         :label="t('document.manage.field.description')"
                         :hint="t('document.manage.hint.description')"
                         :error="errors.description"
                     >
-                        <Textarea
+                        <TextAreaField
                             id="description"
                             name="description"
                             rows="3"
                         />
-                    </EventField>
+                    </FormField>
 
-                    <EventField
+                    <FormField
                         name="file"
                         :label="t('document.manage.field.file')"
                         :hint="
@@ -108,15 +107,9 @@ defineProps<Props>();
                         "
                         :error="errors.file"
                     >
-                        <input
-                            id="file"
-                            name="file"
-                            type="file"
-                            required
-                            class="h-11 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base file:mr-3 file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none md:text-sm"
-                        />
-                    </EventField>
-                </EventFieldset>
+                        <FileField id="file" name="file" required />
+                    </FormField>
+                </FormFieldset>
 
                 <div
                     class="sticky bottom-0 -mx-4 border-t border-border bg-background/95 px-4 py-3 backdrop-blur"

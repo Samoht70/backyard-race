@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
 import EventController from '@/actions/App/Http/Controllers/Manage/EventController';
+import ActionButton from '@/components/ActionButton.vue';
 import BoardPage from '@/components/board/BoardPage.vue';
 import EventDetailsFields from '@/components/event/EventDetailsFields.vue';
 import EventRaceFields from '@/components/event/EventRaceFields.vue';
 import EventStatusPanel from '@/components/event/EventStatusPanel.vue';
 import EventSummary from '@/components/event/EventSummary.vue';
 import Heading from '@/components/Heading.vue';
-import ActionButton from '@/components/race/ActionButton.vue';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import Notice from '@/components/Notice.vue';
 import { t } from '@/lib/i18n';
 import type {
     EventDetails,
@@ -39,14 +39,9 @@ defineProps<Props>();
             <EventStatusPanel :transition="transition" />
 
             <template v-if="!isEditable">
-                <Alert>
-                    <AlertTitle>{{
-                        t('event.manage.readonly_title')
-                    }}</AlertTitle>
-                    <AlertDescription>
-                        {{ t('event.manage.readonly_description') }}
-                    </AlertDescription>
-                </Alert>
+                <Notice :title="t('event.manage.readonly_title')">
+                    {{ t('event.manage.readonly_description') }}
+                </Notice>
 
                 <EventSummary :event="event" />
             </template>

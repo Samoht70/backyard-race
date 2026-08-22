@@ -6,6 +6,7 @@ import type { Component } from 'vue';
 import { computed } from 'vue';
 import { t } from '@/lib/i18n';
 import {
+    registrationStatusBar,
     registrationStatusIcons,
     registrationStatusLabelKey,
     registrationStatusTone,
@@ -30,6 +31,7 @@ const props = withDefaults(defineProps<Props>(), {
 const fullName = computed(() => `${props.firstName} ${props.lastName}`);
 const icon = computed(() => registrationStatusIcons[props.status]);
 const tone = computed(() => registrationStatusTone[props.status]);
+const bar = computed(() => registrationStatusBar[props.status]);
 const statusLabel = computed(() => t(registrationStatusLabelKey(props.status)));
 const element = computed(() => (props.href ? Link : props.as));
 const isInteractive = computed(
@@ -47,13 +49,18 @@ const isInteractive = computed(
                 ? t('registration.manage.open_runner', { name: fullName })
                 : undefined
         "
-        class="flex min-h-[4.25rem] w-full min-w-0 touch-manipulation items-center gap-3 border-l-2 bg-card px-3 py-2.5 text-left outline-none"
+        class="flex min-h-[4.25rem] w-full min-w-0 touch-manipulation items-center gap-3 overflow-hidden rounded-sm border border-border bg-card py-2.5 pr-3 text-left outline-none"
         :class="[
-            active ? 'border-l-foreground bg-accent' : 'border-l-transparent',
+            active && 'border-foreground bg-accent',
             isInteractive &&
                 'transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset',
         ]"
     >
+        <span
+            class="w-1 shrink-0 self-stretch"
+            :class="bar"
+            aria-hidden="true"
+        />
         <span class="w-9 shrink-0 font-mono text-data font-bold tabular-nums">
             {{ bib ?? '—' }}
         </span>

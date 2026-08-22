@@ -26,8 +26,15 @@ export const runnerStatusTone = {
     finished: 'text-status-finished',
 } satisfies Record<RunnerStatus, string>;
 
+export const runnerStatusBar = {
+    running: 'bg-status-running',
+    eliminated: 'bg-status-eliminated',
+    withdrawn: 'bg-status-abandoned',
+    finished: 'bg-status-finished',
+} satisfies Record<RunnerStatus, string>;
+
 export const runnerStatusVariants = cva(
-    'inline-flex shrink-0 items-center gap-1.5 font-bold tracking-wide uppercase',
+    'inline-flex shrink-0 items-center gap-1.5 rounded-sm font-bold tracking-wide uppercase',
     {
         variants: {
             status: {

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
+import ActionButton from '@/components/ActionButton.vue';
 import BoardRow from '@/components/board/BoardRow.vue';
 import BoardRows from '@/components/board/BoardRows.vue';
 import BoardSection from '@/components/board/BoardSection.vue';
-import ActionButton from '@/components/race/ActionButton.vue';
 import BibDisplay from '@/components/race/BibDisplay.vue';
 import RegistrationActionForm from '@/components/registration/RegistrationActionForm.vue';
 import RegistrationStatusBadge from '@/components/registration/RegistrationStatusBadge.vue';

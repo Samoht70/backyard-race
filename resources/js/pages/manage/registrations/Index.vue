@@ -3,6 +3,13 @@ import { Head, Link } from '@inertiajs/vue3';
 import { ClipboardList, MousePointerClick } from '@lucide/vue';
 import { useMediaQuery } from '@vueuse/core';
 import { VisuallyHidden } from 'reka-ui';
+import {
+    DialogContent,
+    DialogOverlay,
+    DialogPortal,
+    DialogRoot,
+    DialogTitle,
+} from 'reka-ui';
 import { computed, ref } from 'vue';
 import AlertError from '@/components/AlertError.vue';
 import BoardPage from '@/components/board/BoardPage.vue';
@@ -12,13 +19,8 @@ import RegistrationDossier from '@/components/registration/RegistrationDossier.v
 import RegistrationSlat from '@/components/registration/RegistrationSlat.vue';
 import SeatCounter from '@/components/registration/SeatCounter.vue';
 import EmptyState from '@/components/state/EmptyState.vue';
-import {
-    Sheet,
-    SheetContent,
-    SheetHeader,
-    SheetTitle,
-} from '@/components/ui/sheet';
 import { t } from '@/lib/i18n';
+import { overlayBackdrop, overlayDrawer } from '@/lib/overlayClasses';
 import { registrationStatusLabelKey } from '@/lib/registrationStatus';
 import { index } from '@/routes/manage/registrations';
 import { REGISTRATION_STATUSES } from '@/types/registration';
@@ -174,24 +176,22 @@ const dossierTitle = computed(() =>
             />
         </div>
 
-        <Sheet v-model:open="isDossierOpen">
-            <SheetContent
-                side="right"
-                class="w-full overflow-y-auto p-4 sm:max-w-lg"
-            >
-                <VisuallyHidden>
-                    <SheetHeader>
-                        <SheetTitle>{{ dossierTitle }}</SheetTitle>
-                    </SheetHeader>
-                </VisuallyHidden>
+        <DialogRoot v-model:open="isDossierOpen">
+            <DialogPortal>
+                <DialogOverlay :class="overlayBackdrop" />
+                <DialogContent :class="[overlayDrawer, 'overflow-y-auto p-4']">
+                    <VisuallyHidden>
+                        <DialogTitle>{{ dossierTitle }}</DialogTitle>
+                    </VisuallyHidden>
 
-                <RegistrationDossier
-                    v-if="selected"
-                    :registration="selected"
-                    :blocked="isBlocked"
-                    described-by="registration-refusals"
-                />
-            </SheetContent>
-        </Sheet>
+                    <RegistrationDossier
+                        v-if="selected"
+                        :registration="selected"
+                        :blocked="isBlocked"
+                        described-by="registration-refusals"
+                    />
+                </DialogContent>
+            </DialogPortal>
+        </DialogRoot>
     </BoardPage>
 </template>

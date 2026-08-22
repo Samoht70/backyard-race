@@ -16,7 +16,7 @@ withDefaults(defineProps<Props>(), {
         <div
             v-for="row in rows"
             :key="row"
-            class="min-h-[4.25rem] bg-card"
+            class="min-h-[4.25rem] rounded-sm border border-border bg-card"
             aria-hidden="true"
         />
     </div>

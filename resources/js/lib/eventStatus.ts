@@ -15,7 +15,7 @@ export const eventStatusIcons = {
 } satisfies Record<EventStatus, LucideIcon>;
 
 export const eventStatusVariants = cva(
-    'inline-flex shrink-0 items-center gap-1.5 rounded-md border font-medium',
+    'inline-flex shrink-0 items-center gap-1.5 rounded-sm border font-medium',
     {
         variants: {
             status: {

@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
 import BriefingController from '@/actions/App/Http/Controllers/Manage/BriefingController';
+import ActionButton from '@/components/ActionButton.vue';
 import BoardPage from '@/components/board/BoardPage.vue';
 import BriefingContent from '@/components/briefing/BriefingContent.vue';
-import EventField from '@/components/event/EventField.vue';
-import EventFieldset from '@/components/event/EventFieldset.vue';
+import FormField from '@/components/form/FormField.vue';
+import FormFieldset from '@/components/form/FormFieldset.vue';
+import TextAreaField from '@/components/form/TextAreaField.vue';
 import Heading from '@/components/Heading.vue';
-import ActionButton from '@/components/race/ActionButton.vue';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Textarea } from '@/components/ui/textarea';
+import Notice from '@/components/Notice.vue';
 import { t } from '@/lib/i18n';
 
 type Props = {
@@ -31,14 +31,9 @@ defineProps<Props>();
             />
 
             <template v-if="!isEditable">
-                <Alert>
-                    <AlertTitle>{{
-                        t('event.briefing.readonly_title')
-                    }}</AlertTitle>
-                    <AlertDescription>
-                        {{ t('event.briefing.readonly_description') }}
-                    </AlertDescription>
-                </Alert>
+                <Notice :title="t('event.briefing.readonly_title')">
+                    {{ t('event.briefing.readonly_description') }}
+                </Notice>
 
                 <BriefingContent :html="html" />
             </template>
@@ -50,22 +45,22 @@ defineProps<Props>();
                 class="flex flex-col gap-8"
                 v-slot="{ errors, processing }"
             >
-                <EventFieldset :title="t('event.briefing.title')">
-                    <EventField
+                <FormFieldset :title="t('event.briefing.title')">
+                    <FormField
                         name="briefing"
                         :label="t('event.briefing.field')"
                         :hint="t('event.briefing.hint')"
                         :error="errors.briefing"
                     >
-                        <Textarea
+                        <TextAreaField
                             id="briefing"
                             name="briefing"
                             rows="16"
                             required
                             :default-value="markdown"
                         />
-                    </EventField>
-                </EventFieldset>
+                    </FormField>
+                </FormFieldset>
 
                 <div
                     class="sticky bottom-0 -mx-4 border-t border-border bg-background/95 px-4 py-3 backdrop-blur"

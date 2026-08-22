@@ -2136,3 +2136,169 @@ sans garde — porte maintenant un `v-if`.
 `formVariants: true` ; la commande, elle, ne les génère que sur demande. Régénérer les routes après
 un changement de routage sans ce drapeau retire `.form()` de tous les helpers et produit une
 vingtaine d'erreurs `vue-tsc` sans rapport avec le changement.
+
+## D-61 — La charte de l'instrument, et le starter kit remplacé par les primitives reka-ui
+
+Arrêté le 2026-08-22, sur demande du propriétaire, et mis en œuvre par la reprise R-06. Elle
+**révoque deux points de D-46** et en laisse tout le reste debout.
+
+### Ce que D-46 disait, et ce qui change
+
+D-46 avait conclu que « la couleur ne sert plus qu'aux quatre statuts, un écran de course est noir et
+blanc partout où aucun statut ne parle », et posait un rayon nul. Les deux points tombent, à la
+demande du propriétaire : le produit lisait comme une maquette, pas comme une marque.
+
+**Le premier arbitrage a été un accent de marque seul, et il n'a pas tenu.** `--primary` est passé à
+un ambre brûlé `oklch(0.48 0.11 62)`, tenu AA sur les cartes. Le propriétaire l'a renvoyé en trois
+mots : « jaune moutarde ». Le balayage a montré que ce n'était pas un défaut de dosage mais une
+limite du gamut — **au-delà de `C 0.12`, un orange à `L 0.52` sort de sRGB**. Un orange moyen-sombre
+ne *peut pas* être saturé : il lira moutarde quelle que soit la main. Un ambre franc exige `L 0.70`,
+et à cette clarté il ne porte plus de texte sur fond clair, ni ne fait un anneau de focus visible sur
+du blanc. La piste est close par la colorimétrie, pas par le goût — c'est ce qui la rend inutile à
+rouvrir.
+
+**La palette retenue est la troisième charte de `project/design/chartes-alternatives.html`**,
+l'instrument à cristaux liquides. Le jour, une dalle gris-bleu sans rétroéclairage — et donc, tout à
+fait délibérément, **aucune couleur d'accent** : `--primary` vaut l'encre `#14181B`. La nuit, le
+rétroéclairage s'allume et `--primary` devient le cyan `#4FD8E8`. La couleur ne vient plus de
+l'accent mais du **corps** : la dalle est teintée, et les surfaces de statut sont teintées dans le
+gris de la dalle au lieu d'être des pastels web. C'est une réponse différente à la même demande, et
+c'est celle que le propriétaire a arrêtée charte en main.
+
+**L'inversion qui compte.** Jusqu'ici le fond était blanc et la carte grise. Désormais la dalle
+`oklch(0.8382)` est le fond et la carte `oklch(0.8819)` est **plus claire** que lui : une latte est
+une fenêtre éclairée dans un boîtier, pas une zone assombrie sur une page.
+
+**La charte donne vingt couleurs, la palette en exige trente.** `--secondary`, `--muted` et
+`--accent` n'y figurent pas et sont dérivés : les deux premiers sur `#BFC7CD`, en retrait de la dalle
+comme un creux d'appareil ; le troisième sur `#B4BCC2` pour l'état survolé. C'est le seul endroit où
+cette entrée invente, et c'est là que se trouve la marge la plus fine de toute la palette —
+`muted-foreground` sur `--muted`, à 4,59:1. Un futur ajustement de `--muted` doit repasser par le
+test avant d'être écrit.
+
+**Les soixante paires de contraste passent**, dans les deux thèmes, avec `PaletteContrastTest`
+inchangé. Le filet de chargement d'Inertia suit `--primary` sans intervention ; son secours codé en
+dur dans `app.ts` valait encore `#2f43c8`, un bleu d'avant D-46, et passe à `#14181B`.
+
+### Le rayon n'est plus nul
+
+D-46 posait zéro, au motif qu'un tableau des départs n'a pas de coins arrondis. La charte de
+l'instrument pose **4 px** : un boîtier a des angles adoucis, une dalle non. `--radius` passe de
+`0px` à `4px`.
+
+Changer le token ne suffisait pas. **Le front ne portait que deux `rounded-md`** dans tout
+`resources/js`, ce qui est la conséquence logique d'un rayon nul — personne n'écrit `rounded` quand
+il ne produit rien. L'arrondi a donc été *posé* là où la charte le met : champs de lecture, lattes,
+boutons, saisies, pastilles, volets des dossards, surfaces flottantes, filtres de vue, encarts.
+
+**Les cartes gagnent un filet.** Dans la charte, chaque fenêtre est cernée d'un pixel de `--line` ;
+les lattes et les cartes n'en avaient aucun et se détachaient du fond par leur seule valeur. Avec un
+fond désormais proche en clarté, le filet devient nécessaire et non décoratif.
+
+**Les lattes gagnent la signature de la charte** : une barre de statut de 4 px au bord gauche, que
+l'`overflow-hidden` de la latte clipe à l'arrondi. Elle double le pictogramme, elle ne le remplace
+pas — la règle de D-46, « couleur, pictogramme et libellé, jamais la couleur seule », tient. Sur la
+latte d'inscription cette barre prend la place que tenait le filet gauche de l'état sélectionné, qui
+passe sur le filet complet et le fond `accent` ; `aria-current` ne bouge pas.
+
+**Ce que cette charte n'apporte pas encore : sa typographie.** Elle demande Overpass et Overpass
+Mono là où le projet tient Instrument Sans et Martian Mono. Le propriétaire a demandé la couleur, les
+cartes, les boutons et l'arrondi — pas les fontes. Le mono porte déjà toutes les lectures, donc la
+structure est compatible ; le remplacement reste entier et n'est pas fait.
+
+Ce qui ne bouge pas de D-46 : notation oklch ; palette déclarée en trois endroits avec un test qui
+affirme leur concordance ; AA vérifié par `PaletteContrastTest` et non par la revue ; aucun
+graphique ; plancher tactile de 44 px.
+
+### `components/ui/` n'existe plus
+
+Le constat qui la déclenche : vingt-et-un dossiers shadcn, dont **sept sans un seul import** —
+`badge`, `collapsible`, `input-otp`, `navigation-menu`, `select`, `skeleton`, `tooltip` — pendant que
+des primitives reka-ui utiles étaient réécrites à la main. La dépendance `vue-input-otp` sort avec
+`input-otp` : aucun écran ne saisit le code d'accès, il n'est qu'affiché une fois.
+
+**Les habillages disparaissent, les primitives montent au point d'appel.** `DialogRoot`,
+`DropdownMenuRoot`, `AlertDialogRoot`, `Separator`, `Label`, `Primitive` sont désormais importés
+depuis `reka-ui` dans les composants métier. Ce que l'habillage portait — les classes de la surface —
+vit là où ce projet met déjà ses classes partagées : deux feuilles, `lib/fieldClasses.ts` et
+`lib/overlayClasses.ts`. **Aucune variante n'est recopiée dans les quarante appels** ; c'est ce que le
+retrait de la couche menaçait de produire, et la feuille de classes est ce qui l'évite.
+
+**Le tiroir latéral n'était pas une primitive.** `ui/sheet` était un `Dialog` habillé ; les deux
+écrans qui l'utilisaient montent `DialogRoot` avec `overlayRail` ou `overlayDrawer`. `ui/sonner`
+n'était pas reka non plus — c'est `vue-sonner` — il devient `components/Toaster.vue`, maison.
+
+**Trois composants du starter kit sont morts sans remplaçant un-pour-un.** `ui/alert` et ses trois
+sous-composants deviennent un seul `Notice` à `tone` et `title`. `UserMenuContent` et `UserInfo`
+n'existaient que pour découper un menu à deux entrées : ils rentrent dans `BoardAccount`.
+`ui/button` avait six appels quand `ActionButton` en avait quatre-vingt-douze : `ActionButton` gagne
+une taille `icon`, un ton `ghost`, et reste le seul bouton. Il quitte `components/race/` — il n'a
+jamais été propre à la course.
+
+**Le bouton du starter kit portait une garde qui n'avait pas été reportée.** `ui/button` avait
+`whitespace-nowrap` ; `ActionButton` ne l'a jamais eu, et le propriétaire a signalé « Voir mon
+inscription » sur deux lignes en desktop. La cause n'est pas la longueur du libellé mais le
+rétrécissement : dans une rangée `ActionBar` en `sm:flex-row`, un bouton en `w-auto` garde
+`flex-shrink: 1` et est comprimé sous la largeur de son texte dès que la rangée est chargée. Le
+correctif porte sur les trois pièces plutôt que sur le point d'appel : `shrink-0` sur le bouton, pour
+qu'une commande ne cède jamais ; `min-w-0` sur la note, pour que la prose cède à sa place ;
+`sm:flex-wrap` sur la rangée, pour qu'elle passe à la ligne au lieu de déborder — la rangée à trois
+boutons du tableau de bord ne gardait que quarante-cinq pixels de marge au point de rupture `lg`.
+
+### Les champs : reka-ui en a, ils ne s'appellent pas « Input »
+
+`reka-ui` ne fournit pas d'`Input`, et c'est ce qui avait fait conclure à tort qu'il n'avait rien pour
+les formulaires. Il a `NumberField`, `DateField`, `TimeField`, `PinInput`, `Select`, `Checkbox`.
+
+**Ce qui monte sur une primitive** : les cinq champs numériques (distance, durée, capacité, latitude,
+longitude) sur `NumberField` avec ses pas ; les deux dates (naissance, premier départ) sur
+`DateField` ; l'heure du premier départ sur `TimeField` ; la case « se souvenir de moi » sur
+`Checkbox`. Les repères d'étape de l'inscription montent sur `Stepper`, qui remplace un `<ol>` de
+boutons faits main.
+
+**Ce qui reste en HTML, faute de primitive** : texte, email, téléphone, mot de passe, zone de texte,
+fichier. Ils vivent dans `components/form/` et partagent `fieldClasses` — même hauteur, même bordure,
+même arrondi, même filet au focus — donc ils ne se distinguent pas à l'œil des champs montés sur
+reka-ui.
+
+**Trois primitives ont été écartées après examen, et c'est délibéré.** `Tooltip` sur le motif de gel
+d'un champ **retirerait** l'information au doigt : le motif est un texte visible, il le reste.
+`ToggleGroup` sur les filtres de vue casserait la navigation — chaque filtre est une URL, avec
+`aria-current="page"`, et un groupe de bascules n'est pas un jeu de liens. `Select` et `PinInput`
+n'ont aucun consommateur. Brancher une primitive sans besoin est exactement le défaut que cette
+reprise corrige.
+
+### Deux effets de bord assumés
+
+**`start_time` accepte les secondes.** `TimeField` soumet `HH:MM:SS` là où `<input type="time">`
+envoyait `HH:MM` ; la règle passe de `date_format:H:i` à `date_format:H:i,H:i:s`, et un test nomme le
+cas. Le contrat de l'écran change parce que le contrôle change — c'est la formulation honnête, plutôt
+que de tronquer en silence dans `prepareForValidation`.
+
+**`@internationalized/date` devient une dépendance directe.** C'était une dépendance transitive de
+reka-ui ; `lib/temporal.ts` l'importe pour construire les valeurs des deux champs, et s'appuyer sur le
+graphe d'un tiers pour un import direct est fragile. Ses deux fonctions rendent `undefined` sur une
+valeur illisible plutôt que de lever : une date malformée venue du serveur laisserait sinon un écran
+blanc, et un champ vide est le pire acceptable. Un `.spec.ts` épingle les deux sens.
+
+**Zéro couleur Tailwind brute subsiste dans le front.** Les pages d'authentification traînaient encore
+`bg-red-50`, `text-amber-700`, `text-green-600`, `decoration-neutral-300` — la palette du starter kit,
+qui ignorait les tokens et donc les deux thèmes. Elles passent sur `destructive`, `status-running` et
+`primary`. Les `shadow-xs` hérités partaient avec : la charte de l'instrument n'a pas d'ombre, un
+appareil n'en projette pas.
+
+### Le retour depuis les pages d'authentification manquait
+
+Signalé par le propriétaire pendant la reprise : arrivé sur la connexion ou l'inscription, on ne peut
+plus revenir à l'événement. La page de l'événement *est* `home`, et le logo y menait déjà — mais son
+libellé était `sr-only` et valait le titre de la page, donc le lien était à la fois invisible et mal
+nommé. Un lien explicite, libellé et de 44 px se pose en haut à gauche, en miroir de la bascule de
+thème qui occupait déjà le haut à droite. Le logo n'est pas touché.
+
+**Ce que cette reprise ne vérifie pas.** Les contrôles compilent, passent `vue-tsc`, `eslint`, les
+soixante paires de contraste et les 394 tests PHP, et `lib/temporal.ts` est couvert. Mais **aucun
+rendu navigateur n'a été observé** : le dépôt n'a ni `@vue/test-utils` ni pilote de navigateur. Donc
+ni la dalle gris-bleu, ni le rétroéclairage cyan, ni l'arrondi de 4 px, ni les barres de statut, ni
+les segments de `DateField` et de `TimeField`, ni la mise en forme française de `NumberField`, ni le
+passage au clavier du `Stepper` n'ont été vus. Tout cela reste à regarder à l'écran — la galerie
+`/design-system` est faite pour ça — avant de considérer R-06 close.

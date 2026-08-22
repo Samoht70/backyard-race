@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { Form, Head, setLayoutProps } from '@inertiajs/vue3';
-import InputError from '@/components/InputError.vue';
+import { Label } from 'reka-ui';
+import ActionButton from '@/components/ActionButton.vue';
+import FieldError from '@/components/form/FieldError.vue';
+import TextField from '@/components/form/TextField.vue';
+import Notice from '@/components/Notice.vue';
 import SeatCounter from '@/components/registration/SeatCounter.vue';
 import TextLink from '@/components/TextLink.vue';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Spinner } from '@/components/ui/spinner';
 import { t } from '@/lib/i18n';
 import { login } from '@/routes';
 import { store } from '@/routes/account';
@@ -33,21 +33,21 @@ setLayoutProps({
             :capacity="seats.capacity"
         />
 
-        <div
+        <p
             v-if="status"
-            class="text-center text-sm font-medium text-green-600"
+            class="border-l-2 border-status-running bg-status-running-surface px-3 py-2 text-sm text-status-running"
             data-test="register-status"
         >
             {{ status }}
-        </div>
+        </p>
 
-        <p
+        <Notice
             v-if="!open"
-            class="rounded-lg border border-amber-200 bg-amber-50 p-4 text-center text-sm text-amber-700 dark:border-amber-200/10 dark:bg-amber-700/10 dark:text-amber-100"
+            :title="t('auth.register.start.closed_title')"
             data-test="register-closed"
         >
             {{ t('auth.register.start.closed') }}
-        </p>
+        </Notice>
 
         <Form
             v-else
@@ -57,13 +57,13 @@ setLayoutProps({
             class="flex flex-col gap-6"
         >
             <div class="grid gap-6">
-                <InputError :message="errors.event" />
+                <FieldError :message="errors.event" />
 
                 <div class="grid gap-2">
                     <Label for="email">{{
                         t('auth.register.start.email')
                     }}</Label>
-                    <Input
+                    <TextField
                         id="email"
                         type="email"
                         name="email"
@@ -73,19 +73,20 @@ setLayoutProps({
                         autocomplete="email"
                         placeholder="email@example.com"
                     />
-                    <InputError :message="errors.email" />
+                    <FieldError :message="errors.email" />
                 </div>
 
-                <Button
+                <ActionButton
                     type="submit"
-                    class="mt-2 w-full"
+                    block
+                    class="mt-2"
                     :tabindex="2"
+                    :loading="processing"
                     :disabled="processing"
                     data-test="register-request-button"
                 >
-                    <Spinner v-if="processing" />
                     {{ t('auth.register.start.submit') }}
-                </Button>
+                </ActionButton>
             </div>
         </Form>
 

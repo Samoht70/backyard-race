@@ -31,7 +31,7 @@ const description = computed(() =>
                 v-for="(character, index) in characters"
                 :key="`${index}-${character}`"
                 aria-hidden="true"
-                class="relative grid size-14 animate-flip place-items-center bg-card font-mono text-readout tabular-nums after:absolute after:inset-x-0 after:top-1/2 after:h-px after:bg-background motion-reduce:animate-none lg:size-22 lg:text-marquee"
+                class="relative grid size-14 animate-flip place-items-center rounded-sm bg-card font-mono text-readout tabular-nums after:absolute after:inset-x-0 after:top-1/2 after:h-px after:bg-background motion-reduce:animate-none lg:size-22 lg:text-marquee"
                 :class="value === null && 'text-muted-foreground/40'"
                 :style="{ animationDelay: `${index * 60}ms` }"
             >

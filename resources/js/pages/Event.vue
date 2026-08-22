@@ -2,15 +2,15 @@
 import { Head, Link } from '@inertiajs/vue3';
 import { CalendarOff } from '@lucide/vue';
 import { computed } from 'vue';
+import ActionButton from '@/components/ActionButton.vue';
 import ActionBar from '@/components/board/ActionBar.vue';
 import BoardColumns from '@/components/board/BoardColumns.vue';
 import BoardPage from '@/components/board/BoardPage.vue';
 import EventStatusBadge from '@/components/event/EventStatusBadge.vue';
 import EventSummary from '@/components/event/EventSummary.vue';
-import ActionButton from '@/components/race/ActionButton.vue';
+import Notice from '@/components/Notice.vue';
 import SeatCounter from '@/components/registration/SeatCounter.vue';
 import EmptyState from '@/components/state/EmptyState.vue';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { isAuthenticated } from '@/lib/auth';
 import { t } from '@/lib/i18n';
 import { can } from '@/lib/permissions';
@@ -49,14 +49,12 @@ const title = computed(() => {
         />
 
         <div v-else class="grid gap-6">
-            <Alert v-if="isDraft && can('manage-event')">
-                <AlertTitle>
-                    {{ t('event.public.draft_notice_title') }}
-                </AlertTitle>
-                <AlertDescription>
-                    {{ t('event.public.draft_notice_description') }}
-                </AlertDescription>
-            </Alert>
+            <Notice
+                v-if="isDraft && can('manage-event')"
+                :title="t('event.public.draft_notice_title')"
+            >
+                {{ t('event.public.draft_notice_description') }}
+            </Notice>
 
             <BoardColumns>
                 <template #lead>

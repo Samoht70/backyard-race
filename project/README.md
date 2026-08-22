@@ -179,8 +179,9 @@ pas de fichier de story : c'est la décision qui les porte, et elles prennent un
 | R-03 | Direction artistique « Tableau des départs » à la place de « Corral » | 8 | ✅ Livrée | [D-46](DECISIONS.md) |
 | R-04 | Formulaire d'inscription en quatre étapes au lieu d'une page scrollable | 5 | ✅ Livrée | [D-50](DECISIONS.md), D-54 |
 | R-05 | Course publique : l'accueil porte l'événement, les documents s'ouvrent aux invités | 5 | ✅ Livrée | [D-60](DECISIONS.md) |
+| R-06 | Charte de l’instrument, et primitives reka-ui à la place du starter kit | 5 | ✅ Livrée | [D-61](DECISIONS.md) |
 
-**Total : 33 stories actives + 5 reprises · 238 pts · 114 pts livrés (48 %)**
+**Total : 33 stories actives + 6 reprises · 243 pts · 119 pts livrés (49 %)**
 
 **Hors périmètre : 4 stories abandonnées, 32 pts non engagés** — voir [D-47](DECISIONS.md).
 
@@ -204,7 +205,8 @@ Neuf remarques sur cet ordre :
 - R-04 est une **reprise**, pas une story : elle refait l'écran que D-45 avait livré, donc elle vit
   dans une décision (D-50, mise en œuvre par D-54) et dans le tableau des reprises, comme R-01 à
   R-03. R-05 suit la même règle : elle rouvre la navigation de BR-33 et les documents de BR-18, et
-  c'est D-60 qui la porte.
+  c'est D-60 qui la porte. R-06 aussi : elle révoque le parti monochrome de D-46 et retire la couche
+  `components/ui/`, portée par D-61.
 - BR-24 sort de la fin du backlog pour rejoindre les écrans de course : elle dépend de BR-08 et
   reprend l'accueil que BR-33 a livré.
 - BR-09 et BR-11 restent le cœur métier — c'est là que les tests comptent le plus.

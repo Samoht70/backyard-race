@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { usePage } from '@inertiajs/vue3';
+import { Separator } from 'reka-ui';
 import { computed } from 'vue';
-import { Separator } from '@/components/ui/separator';
 import { t } from '@/lib/i18n';
 
 const board = computed(() => usePage().props.board);
@@ -42,7 +42,8 @@ const hasFirstStart = computed(() => board.value?.first_start_time !== null);
             <template v-if="hasFirstStart">
                 <Separator
                     orientation="vertical"
-                    class="hidden h-8! sm:block"
+                    decorative
+                    class="hidden h-8 w-px shrink-0 bg-border sm:block"
                 />
 
                 <div class="shrink-0 sm:px-4 sm:last:pr-0">

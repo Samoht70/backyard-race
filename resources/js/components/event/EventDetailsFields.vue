@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import EventField from '@/components/event/EventField.vue';
-import EventFieldset from '@/components/event/EventFieldset.vue';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import FormField from '@/components/form/FormField.vue';
+import FormFieldset from '@/components/form/FormFieldset.vue';
+import NumberField from '@/components/form/NumberField.vue';
+import TextAreaField from '@/components/form/TextAreaField.vue';
+import TextField from '@/components/form/TextField.vue';
 import { t } from '@/lib/i18n';
 import type { EventDetails } from '@/types/event';
 
@@ -19,103 +20,96 @@ defineProps<Props>();
 </script>
 
 <template>
-    <EventFieldset :title="t('event.section.identity')">
-        <EventField
+    <FormFieldset :title="t('event.section.identity')">
+        <FormField
             name="name"
             :label="t('event.field.name')"
             :error="errors.name"
         >
-            <Input
+            <TextField
                 id="name"
                 name="name"
                 :default-value="event.name ?? undefined"
                 required
                 maxlength="120"
             />
-        </EventField>
+        </FormField>
 
-        <EventField
+        <FormField
             name="description"
             :label="t('event.field.description')"
             :error="errors.description"
         >
-            <Textarea
+            <TextAreaField
                 id="description"
                 name="description"
                 rows="4"
                 :default-value="event.description ?? undefined"
             />
-        </EventField>
-    </EventFieldset>
+        </FormField>
+    </FormFieldset>
 
-    <EventFieldset :title="t('event.section.place')">
-        <EventField
+    <FormFieldset :title="t('event.section.place')">
+        <FormField
             name="address"
             :label="t('event.field.address')"
             :error="errors.address"
         >
-            <Input
+            <TextField
                 id="address"
                 name="address"
                 :default-value="event.address ?? undefined"
             />
-        </EventField>
+        </FormField>
 
-        <EventField
+        <FormField
             name="latitude"
             :label="t('event.field.latitude')"
             :hint="t('event.hint.coordinates')"
             :error="errors.latitude"
         >
-            <Input
+            <NumberField
                 id="latitude"
-                type="number"
-                inputmode="decimal"
-                step="any"
-                min="-90"
-                max="90"
                 name="latitude"
-                class="tabular-nums"
+                :min="-90"
+                :max="90"
+                :step="0.000001"
+                :fraction-digits="6"
                 :default-value="event.latitude ?? undefined"
             />
-        </EventField>
+        </FormField>
 
-        <EventField
+        <FormField
             name="longitude"
             :label="t('event.field.longitude')"
             :error="errors.longitude"
         >
-            <Input
+            <NumberField
                 id="longitude"
-                type="number"
-                inputmode="decimal"
-                step="any"
-                min="-180"
-                max="180"
                 name="longitude"
-                class="tabular-nums"
+                :min="-180"
+                :max="180"
+                :step="0.000001"
+                :fraction-digits="6"
                 :default-value="event.longitude ?? undefined"
             />
-        </EventField>
-    </EventFieldset>
+        </FormField>
+    </FormFieldset>
 
-    <EventFieldset :title="t('event.section.capacity')">
-        <EventField
+    <FormFieldset :title="t('event.section.capacity')">
+        <FormField
             name="max_participants"
             :label="t('event.field.max_participants')"
             :hint="t('event.hint.max_participants')"
             :error="errors.max_participants"
         >
-            <Input
+            <NumberField
                 id="max_participants"
-                type="number"
-                inputmode="numeric"
-                min="1"
-                step="1"
                 name="max_participants"
-                class="tabular-nums"
+                :min="1"
+                :max="1000"
                 :default-value="event.max_participants ?? undefined"
             />
-        </EventField>
-    </EventFieldset>
+        </FormField>
+    </FormFieldset>
 </template>

@@ -3,19 +3,19 @@ import { Form, Head, Link } from '@inertiajs/vue3';
 import { ArrowLeft } from '@lucide/vue';
 import { computed } from 'vue';
 import RegistrationController from '@/actions/App/Http/Controllers/Manage/RegistrationController';
+import ActionButton from '@/components/ActionButton.vue';
 import ActionBar from '@/components/board/ActionBar.vue';
 import BoardColumns from '@/components/board/BoardColumns.vue';
 import BoardPage from '@/components/board/BoardPage.vue';
 import BoardSection from '@/components/board/BoardSection.vue';
-import EventField from '@/components/event/EventField.vue';
-import EventFieldset from '@/components/event/EventFieldset.vue';
+import FormField from '@/components/form/FormField.vue';
+import FormFieldset from '@/components/form/FormFieldset.vue';
+import TextField from '@/components/form/TextField.vue';
 import Heading from '@/components/Heading.vue';
-import ActionButton from '@/components/race/ActionButton.vue';
 import BibDisplay from '@/components/race/BibDisplay.vue';
 import RegistrationActionForm from '@/components/registration/RegistrationActionForm.vue';
 import RegistrationFields from '@/components/registration/RegistrationFields.vue';
 import RegistrationStatusBadge from '@/components/registration/RegistrationStatusBadge.vue';
-import { Input } from '@/components/ui/input';
 import { t } from '@/lib/i18n';
 import { index } from '@/routes/manage/registrations';
 import type { ManagedRegistration } from '@/types/registration';
@@ -88,14 +88,14 @@ const fullName = computed(
                 v-slot="{ errors, processing }"
                 class="grid gap-6"
             >
-                <EventFieldset :title="t('registration.section.identity')">
-                    <EventField
+                <FormFieldset :title="t('registration.section.identity')">
+                    <FormField
                         name="first_name"
                         :span="3"
                         :label="t('registration.field.first_name')"
                         :error="errors.first_name"
                     >
-                        <Input
+                        <TextField
                             id="first_name"
                             name="first_name"
                             required
@@ -103,15 +103,15 @@ const fullName = computed(
                             maxlength="120"
                             :default-value="registration.first_name"
                         />
-                    </EventField>
+                    </FormField>
 
-                    <EventField
+                    <FormField
                         name="last_name"
                         :span="3"
                         :label="t('registration.field.last_name')"
                         :error="errors.last_name"
                     >
-                        <Input
+                        <TextField
                             id="last_name"
                             name="last_name"
                             required
@@ -119,15 +119,15 @@ const fullName = computed(
                             maxlength="120"
                             :default-value="registration.last_name"
                         />
-                    </EventField>
+                    </FormField>
 
-                    <EventField
+                    <FormField
                         name="email"
                         :span="4"
                         :label="t('registration.field.email')"
                         :error="errors.email"
                     >
-                        <Input
+                        <TextField
                             id="email"
                             type="email"
                             name="email"
@@ -136,8 +136,8 @@ const fullName = computed(
                             maxlength="255"
                             :default-value="registration.email"
                         />
-                    </EventField>
-                </EventFieldset>
+                    </FormField>
+                </FormFieldset>
 
                 <RegistrationFields
                     :registration="registration"

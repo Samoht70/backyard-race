@@ -1,17 +1,18 @@
 <script setup lang="ts">
 import { CircleOff } from '@lucide/vue';
+import ActionButton from '@/components/ActionButton.vue';
 import BoardFilterSample from '@/components/design/BoardFilterSample.vue';
 import DesignSection from '@/components/design/DesignSection.vue';
 import DocumentListSample from '@/components/design/DocumentListSample.vue';
-import EventFieldSample from '@/components/design/EventFieldSample.vue';
 import EventStatusGallery from '@/components/design/EventStatusGallery.vue';
+import FormFieldSample from '@/components/design/FormFieldSample.vue';
 import RegistrationListSample from '@/components/design/RegistrationListSample.vue';
 import RegistrationStatusGallery from '@/components/design/RegistrationStatusGallery.vue';
 import RegistrationStepperSample from '@/components/design/RegistrationStepperSample.vue';
 import RunnerListSample from '@/components/design/RunnerListSample.vue';
 import StatusGallery from '@/components/design/StatusGallery.vue';
 import TypeSpecimen from '@/components/design/TypeSpecimen.vue';
-import ActionButton from '@/components/race/ActionButton.vue';
+import Notice from '@/components/Notice.vue';
 import RoundHeader from '@/components/race/RoundHeader.vue';
 import RoundTally from '@/components/race/RoundTally.vue';
 import StatCounter from '@/components/race/StatCounter.vue';
@@ -52,7 +53,7 @@ const counts = [
 
             <DesignSection
                 title="La planche et les lattes"
-                note="Le blanc est la planche : entête, compteurs, titres de colonnes. Le gris est la latte : un coureur, rien d’autre."
+                note="La dalle gris-bleu est le fond de l’appareil. Chaque latte est une fenêtre encadrée, plus claire que la dalle, avec une barre de statut au bord gauche."
             >
                 <RunnerListSample />
             </DesignSection>
@@ -114,12 +115,12 @@ const counts = [
                 title="Champs de formulaire"
                 note="Le plancher de 44 px vaut pour les saisies comme pour les boutons. Un champ figé est un fait, pas un champ désactivé."
             >
-                <EventFieldSample />
+                <FormFieldSample />
             </DesignSection>
 
             <DesignSection
                 title="Champs de lecture"
-                note="Étiquette au-dessus, valeur en largeur fixe."
+                note="Un cadran : étiquette minuscule au-dessus, valeur en largeur fixe, le tout encadré d’un filet."
             >
                 <div class="grid grid-cols-2 gap-1.5">
                     <StatCounter :value="7" label="Boucles" />
@@ -131,7 +132,7 @@ const counts = [
 
             <DesignSection
                 title="Boutons d’action"
-                note="44 px minimum, 50 px et 90 px de large pour valider une boucle."
+                note="44 px minimum, 50 px de haut et 96 px de large pour valider une boucle."
             >
                 <div class="flex flex-col gap-1.5">
                     <ActionButton size="validate">
@@ -144,6 +145,22 @@ const counts = [
                     <ActionButton tone="quiet">Action secondaire</ActionButton>
                     <ActionButton loading>Enregistrement</ActionButton>
                     <ActionButton disabled>Indisponible</ActionButton>
+                </div>
+            </DesignSection>
+
+            <DesignSection
+                title="Encarts"
+                note="L’encre annonce un fait à connaître, le rouge un refus. Le filet de gauche porte le ton, jamais le fond."
+            >
+                <div class="flex flex-col gap-4">
+                    <Notice title="Événement en brouillon">
+                        Seuls les gérants voient cette page tant que l’événement
+                        n’est pas publié.
+                    </Notice>
+                    <Notice tone="danger" title="Inscription annulée">
+                        Le gérant a annulé cette inscription. Reprends contact
+                        avec lui pour comprendre.
+                    </Notice>
                 </div>
             </DesignSection>
 

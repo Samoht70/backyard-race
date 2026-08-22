@@ -2,17 +2,17 @@
 import { Head, Link } from '@inertiajs/vue3';
 import { CalendarOff, SlidersHorizontal, Ticket } from '@lucide/vue';
 import { computed } from 'vue';
+import ActionButton from '@/components/ActionButton.vue';
 import ActionBar from '@/components/board/ActionBar.vue';
 import BoardColumns from '@/components/board/BoardColumns.vue';
 import BoardPage from '@/components/board/BoardPage.vue';
 import BoardRow from '@/components/board/BoardRow.vue';
 import BoardRows from '@/components/board/BoardRows.vue';
 import BoardSection from '@/components/board/BoardSection.vue';
-import ActionButton from '@/components/race/ActionButton.vue';
+import Notice from '@/components/Notice.vue';
 import BibDisplay from '@/components/race/BibDisplay.vue';
 import RegistrationStatusBadge from '@/components/registration/RegistrationStatusBadge.vue';
 import EmptyState from '@/components/state/EmptyState.vue';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { canReach } from '@/lib/access';
 import { t } from '@/lib/i18n';
 import { can } from '@/lib/permissions';
@@ -93,14 +93,13 @@ const isManager = computed(() => can('manage-event'));
                 <RegistrationStatusBadge :status="registration.status" />
             </template>
 
-            <Alert v-if="status === 'cancelled'" variant="destructive">
-                <AlertTitle>
-                    {{ t('registration.show.cancelled_title') }}
-                </AlertTitle>
-                <AlertDescription>
-                    {{ t('registration.show.cancelled_description') }}
-                </AlertDescription>
-            </Alert>
+            <Notice
+                v-if="status === 'cancelled'"
+                tone="danger"
+                :title="t('registration.show.cancelled_title')"
+            >
+                {{ t('registration.show.cancelled_description') }}
+            </Notice>
 
             <BoardSection :title="t('ui.dashboard.my_registration')">
                 <BoardRows>

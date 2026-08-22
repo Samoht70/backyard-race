@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Spinner } from '@/components/ui/spinner';
+import Spinner from '@/components/Spinner.vue';
 import { t } from '@/lib/i18n';
 
 type Props = {

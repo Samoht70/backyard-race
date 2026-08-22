@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { Form, Head, usePage } from '@inertiajs/vue3';
+import { Label } from 'reka-ui';
 import { computed } from 'vue';
 import ProfileController from '@/actions/App/Http/Controllers/ProfileController';
+import ActionButton from '@/components/ActionButton.vue';
 import ActionBar from '@/components/board/ActionBar.vue';
 import BoardPage from '@/components/board/BoardPage.vue';
 import DeleteUser from '@/components/DeleteUser.vue';
-import InputError from '@/components/InputError.vue';
-import ActionButton from '@/components/race/ActionButton.vue';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import FieldError from '@/components/form/FieldError.vue';
+import TextField from '@/components/form/TextField.vue';
 import { t } from '@/lib/i18n';
 
 const user = computed(() => usePage().props.auth.user);
@@ -36,7 +36,7 @@ const user = computed(() => usePage().props.auth.user);
                         <Label for="first_name">{{
                             t('ui.profile.first_name')
                         }}</Label>
-                        <Input
+                        <TextField
                             id="first_name"
                             name="first_name"
                             :default-value="user.first_name"
@@ -44,14 +44,14 @@ const user = computed(() => usePage().props.auth.user);
                             autocomplete="given-name"
                             :placeholder="t('ui.profile.first_name')"
                         />
-                        <InputError :message="errors.first_name" />
+                        <FieldError :message="errors.first_name" />
                     </div>
 
                     <div class="grid gap-2 @min-[52rem]:col-span-3">
                         <Label for="last_name">{{
                             t('ui.profile.last_name')
                         }}</Label>
-                        <Input
+                        <TextField
                             id="last_name"
                             name="last_name"
                             :default-value="user.last_name"
@@ -59,12 +59,12 @@ const user = computed(() => usePage().props.auth.user);
                             autocomplete="family-name"
                             :placeholder="t('ui.profile.last_name')"
                         />
-                        <InputError :message="errors.last_name" />
+                        <FieldError :message="errors.last_name" />
                     </div>
 
                     <div class="grid gap-2 @min-[52rem]:col-span-4">
                         <Label for="email">{{ t('ui.profile.email') }}</Label>
-                        <Input
+                        <TextField
                             id="email"
                             type="email"
                             name="email"
@@ -73,7 +73,7 @@ const user = computed(() => usePage().props.auth.user);
                             autocomplete="username"
                             :placeholder="t('ui.profile.email')"
                         />
-                        <InputError :message="errors.email" />
+                        <FieldError :message="errors.email" />
                     </div>
                 </div>
 
