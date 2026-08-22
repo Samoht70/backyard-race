@@ -101,6 +101,21 @@ img {
     text-align: center;
 }
 
+.header img {
+    display: inline-block;
+    height: 28px;
+    vertical-align: middle;
+    width: 28px;
+}
+
+.header .brand-name {
+    border-left: 1px solid #a6afb6;
+    display: inline-block;
+    margin-left: 12px;
+    padding-left: 12px;
+    vertical-align: middle;
+}
+
 .header a {
     color: #14181b;
     display: inline-block;

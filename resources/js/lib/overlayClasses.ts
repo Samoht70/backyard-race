@@ -21,4 +21,4 @@ export const overlayMenu =
     'z-50 min-w-52 rounded-sm border border-border border-t-2 border-t-primary bg-popover p-1 text-popover-foreground shadow-lg outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0';
 
 export const overlayMenuItem =
-    'flex min-h-11 cursor-pointer items-center gap-2 rounded-sm px-3 font-mono text-label uppercase outline-none select-none data-highlighted:bg-accent data-highlighted:text-accent-foreground lg:min-h-10';
+    'flex min-h-11 w-full cursor-pointer items-center gap-2 rounded-sm px-3 font-mono text-label uppercase outline-none select-none data-highlighted:bg-accent data-highlighted:text-accent-foreground lg:min-h-10';

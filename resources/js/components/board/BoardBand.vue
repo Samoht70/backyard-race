@@ -2,6 +2,7 @@
 import { usePage } from '@inertiajs/vue3';
 import { Separator } from 'reka-ui';
 import { computed } from 'vue';
+import AppLogo from '@/components/AppLogo.vue';
 import { t } from '@/lib/i18n';
 
 const board = computed(() => usePage().props.board);
@@ -20,12 +21,13 @@ const hasFirstStart = computed(() => board.value?.first_start_time !== null);
 
 <template>
     <header
-        v-if="board"
-        class="flex shrink-0 flex-col gap-2 border-b-2 border-foreground px-4 py-3 sm:h-15 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:py-0 sm:pr-6 sm:pl-6 lg:h-17 lg:px-8"
+        class="shrink-0 flex-col gap-2 border-b-2 border-foreground px-4 py-3 sm:h-15 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:py-0 sm:pr-6 sm:pl-6 lg:h-17 lg:px-8"
+        :class="board ? 'flex' : 'hidden sm:flex'"
     >
-        <p class="truncate text-title">{{ board.name }}</p>
+        <AppLogo class="hidden min-w-0 sm:flex" />
 
         <dl
+            v-if="board"
             class="flex shrink-0 gap-4 overflow-x-auto sm:items-center sm:gap-0 sm:overflow-visible"
         >
             <div class="shrink-0 sm:px-4 sm:first:pl-0 sm:last:pr-0">

@@ -134,6 +134,14 @@ monochrome et que D-61 avait posé la charte de l'instrument. Le travail demand�
 c'est la palette du site, thème jour, qui est passée dans le mail, et [D-63](DECISIONS.md) porte ce
 que la livraison a appris — dont deux affirmations du contexte qui étaient périmées.
 
+**BR-38 a été prise hors du lot**, et ses 3 pts ne s'y ajoutent pas. Le site tournait avec la marque
+du paquet de démarrage : le losange de Laravel dans la barre, ses icônes dans l'onglet, et le nom du
+produit nulle part. C'est le genre de défaut qui ne bloque personne et que tout le monde voit, donc
+il ne méritait pas d'attendre la fin du lot 3 — mais il ne méritait pas non plus d'y entrer, parce
+que le lot 3 parle des gestes d'exploitation et pas du produit. Elle a coûté un peu plus que son
+habillage : le logo fourni était une capture de carte d'interface, et la forme a dû être remesurée
+puis retracée en géométrie. [BR-38](stories/BR-38-identite-de-marque.md) porte le détail.
+
 **Ce que le lot ne contient pas** — le reliquat du lot 2. BR-30 T5, l'alerte sur file non consommée,
 en est le seul point qui coûte dès aujourd'hui : il se prend avec le lot 3 ou juste après. Le reste
 attend la semaine de la course.
@@ -158,6 +166,7 @@ attend la semaine de la course.
 | [BR-06](stories/BR-06-gestion-inscriptions.md) | Gestion des inscriptions par le gérant | 5 | ✅ Terminé |
 | [BR-07](stories/BR-07-numero-dossard.md) | Attribution automatique du numéro de dossard | 5 | ✅ Terminé |
 | [BR-34](stories/BR-34-numero-pps.md) | Numéro PPS demandé à l'inscription | 2 | ✅ Terminé |
+| [BR-38](stories/BR-38-identite-de-marque.md) | Identité : la forme, le lockup et les icônes | 3 | ✅ Terminé |
 
 ### EPIC 2 — Moteur de course
 
@@ -237,7 +246,7 @@ pas de fichier de story : c'est la décision qui les porte, et elles prennent un
 | R-05 | Course publique : l'accueil porte l'événement, les documents s'ouvrent aux invités | 5 | ✅ Livrée | [D-60](DECISIONS.md) |
 | R-06 | Charte de l’instrument, et primitives reka-ui à la place du starter kit | 5 | ✅ Livrée | [D-61](DECISIONS.md) |
 
-**Total : 34 stories actives + 6 reprises · 248 pts · 142 pts livrés (57 %)**
+**Total : 35 stories actives + 6 reprises · 251 pts · 145 pts livrés (58 %)**
 
 **Hors périmètre : 4 stories abandonnées, 32 pts non engagés** — voir [D-47](DECISIONS.md).
 
