@@ -73,7 +73,7 @@ qu'une plateforme managée aurait fait tomber une vingtaine de ces points pour 3
 | ✅ | [BR-26](stories/BR-26-provisionner-vps-dokploy.md) | VPS et Dokploy | 9 | Sur la machine | — |
 | ✅ | [BR-29](stories/BR-29-donnees-managees-sauvegardes.md) | MySQL, Redis, sauvegardes | 8 | Sur la machine | T6, la veille de la course |
 | 🚧 | [BR-28](stories/BR-28-configuration-secrets-stockage.md) | Environnement, secrets, stockage objet | 5 | Les deux | T3, T4 |
-| 🚧 | [BR-30](stories/BR-30-workers-horizon-scheduler.md) | Files, Horizon, planificateur | 5 | Les deux | T5 |
+| 🚧 | [BR-30](stories/BR-30-workers-horizon-scheduler.md) | Files, Horizon, planificateur | 5 | Les deux | T5, la surveillance à inscrire |
 | 🚧 | [BR-31](stories/BR-31-domaine-https-supervision.md) | Domaine, HTTPS, supervision | 5 | Sur la machine | T4, T5 |
 | 🚧 | [BR-32](stories/BR-32-deploiement-dokploy.md) | Déploiement depuis Dokploy | 3 | Les deux | T3, T5 |
 | ↪ | [BR-35](stories/BR-35-compte-organisateur-en-commande.md) | Compte organisateur en une commande | 3 | Dans le dépôt | Passe au lot 3, entière |
@@ -86,9 +86,10 @@ migrations comprises, et le retour à la version précédente a été essayé.
 
 Ce qui reste ne met plus rien en ligne : **ça prévient quand ça casse, ou ça dit ce qui tourne.**
 
-- **BR-30 T5 — alerte sur file non consommée.** Le trou le plus coûteux du lot. Un worker mort ne se
-  signale pas : les inscriptions continuent de passer, les mails de code n'arrivent plus, et aucun
-  écran ne le dit — ni au coureur qui attend, ni au gérant.
+- **BR-30 T5 — alerte sur file non consommée.** Le sondage `up/queue` est livré et refuse dès que le
+  worker s'arrête, se met en pause ou prend du retard ([D-67](DECISIONS.md)). Reste à l'inscrire dans
+  la surveillance externe : sans observateur, il sait dire que la file décroche et personne ne
+  l'écoute.
 - **BR-31 T4 — notification des erreurs applicatives.** La supervision externe couvre la machine
   morte, pas l'application qui répond faux.
 - **BR-31 T5** — l'alerte n'a pas été éprouvée sur une extinction volontaire, seulement installée.
@@ -168,12 +169,15 @@ ce qui se voit dès qu'un inconnu arrive sur l'adresse, et il précède l'epic 2
 | 3 | [BR-39](stories/BR-39-suppression-inscription-et-compte.md) | Supprimer une inscription et son compte | 3 | La réponse à « j'ai perdu mon code » |
 | 4 | [BR-40](stories/BR-40-page-erreur.md) | Rendre les refus et les erreurs dans le site | 3 | La dernière surface publique non habillée |
 
-**11 pts, aucun livré.** L'ordre suit ce que chaque entrée coûte si elle attend :
+**11 pts, dont 2 dans le dépôt et en attente de leur observateur.** L'ordre suit ce que chaque entrée
+coûte si elle attend :
 
 - **BR-30 T5 d'abord**, parce que c'est la seule qui coûte déjà. Les deux mails du parcours — le lien
   signé et le code d'accès — sont mis en file. Un worker mort ne se signale pas : le formulaire
   continue de répondre « regarde tes mails », personne ne reçoit rien, et ni le coureur ni le gérant
   ne l'apprennent. C'est le reliquat du lot 2, il n'appartient pas au lot 4, et il passe devant.
+  Le sondage `up/queue` est livré et éprouvé sur file mise en pause ; il reste à l'appeler depuis la
+  surveillance externe, deux échecs consécutifs avant de sonner ([D-67](DECISIONS.md)).
 - **BR-41 ensuite**, parce que sa condition d'usage est vraie aujourd'hui et fausse demain : le retour
   en brouillon exige zéro inscription, et l'adresse est sur le point de circuler. Ce n'est pas une
   fenêtre qui se referme définitivement — BR-39 et la purge savent recréer la condition — mais c'est
@@ -312,6 +316,8 @@ trois gestes faits sur la machine le même jour.
 
 **Lot 4 — tenir une adresse annoncée (11 pts) — en cours.** L'ordre : BR-30 T5 → BR-41 → BR-39 →
 BR-40. C'est le dernier lot avant le moteur, et le seul dont une entrée coûte déjà quelque chose.
+BR-30 T5 a livré son sondage `up/queue` ; sa case ne se ferme qu'une fois la surveillance externe
+inscrite dessus.
 
 **Le reste du reliquat du lot 2 avant le moteur, ou après ?** Après. BR-30 T5 passe dans le lot 4
 parce qu'une file qui cesse d'être consommée coûte des coureurs dès aujourd'hui ; la version exposée

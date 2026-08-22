@@ -103,7 +103,7 @@ du site.
 - [x] **T2** — Configurer Horizon en production : files, tentatives, délais `1 pt`
 - [x] **T3** — Protéger l'interface Horizon par permission `1 pt`
 - [x] **T4** — Redémarrage des workers au déploiement `1 pt`
-- [ ] **T5** — Alerte sur file non consommée `2 pts`
+- [ ] **T5** — Alerte sur file non consommée `2 pts` — sondage livré, surveillance à inscrire
 - [x] **T6** — Vérifier de bout en bout qu'une élimination tombe sans navigateur ouvert `1 pt`
 
 ## Ce qui reste au 2026-08-22
@@ -115,7 +115,16 @@ intitulé attend BR-11, le mécanisme, lui, est vérifié.
 **T5 est passée en tête du lot 4** le 2026-08-22, juste avant que l'adresse circule : c'est la seule
 entrée de ce lot qui coûte déjà quelque chose.
 
-**T5 reste ouverte, et c'est le trou du lot 2.** Rien ne prévient si la file cesse d'être consommée.
-Un worker mort ne se signale pas : les inscriptions continuent d'être acceptées, les mails de lien
-n'arrivent plus, et aucun écran ne le dit — ni au coureur, qui attend un code, ni au gérant. C'est le
-seul reste du lot qui puisse coûter une inscription.
+**T5 porte désormais son sondage, et il attend son observateur.** `up/queue` répond `200` quand la
+file est consommée et `503` quand elle ne l'est plus — worker absent, worker en pause, ou attente
+au-delà du seuil de `horizon.waits`. La vérification s'est faite sur la pile de développement : file
+mise en pause, le sondage refuse ; file reprise, il accepte.
+
+La notification de longue attente d'Horizon a été écartée, parce qu'elle est émise par le processus
+qu'elle devrait surveiller, et le mail d'alerte avec elle, parce qu'il passerait par la file arrêtée
+([D-67](../DECISIONS.md)).
+
+**Ce qui reste à T5 : inscrire `up/queue` dans la surveillance externe déjà posée par BR-31 T3**, avec
+deux échecs consécutifs avant l'alerte pour laisser passer le redémarrage du worker au déploiement.
+Tant que cette inscription n'est pas faite, le sondage sait dire que la file décroche mais personne ne
+l'écoute — la case reste donc ouverte.

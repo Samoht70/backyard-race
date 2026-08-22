@@ -2497,3 +2497,37 @@ personne ne s'est inscrit. Ne compter que les inscriptions actives aurait laiss�
 porter des lignes annulées et les comptes qui vont avec — un brouillon qui garde des traces n'en est
 pas un. La règle stricte est tenable précisément parce que BR-39 donne l'outil pour atteindre la
 condition. BR-41 le porte.
+
+## D-67 — La file se surveille par un second point de contrôle, parce qu'Horizon ne peut pas signaler sa propre mort
+
+Arrêté le 2026-08-22 en implémentant BR-30 T5. La question était de savoir qui émet l'alerte quand la
+file cesse d'être consommée, et la réponse évidente — la notification de longue attente d'Horizon,
+`Horizon::routeMailNotificationsTo()` — est celle qui ne peut pas marcher.
+
+**Horizon surveille les attentes depuis son propre processus maître.** `MonitorWaitTimes` est un
+écouteur du superviseur : il ne tourne que tant que le superviseur tourne. Un worker mort n'émet donc
+rien, et c'est exactement la panne à couvrir. Le second chemin écarté est le mail : les deux mails du
+parcours passent par la file, et un mail d'alerte émis depuis une file arrêtée reste dans la file.
+L'alerte doit venir d'un observateur qui ne dépend ni du worker ni de la file.
+
+**Le sondage est une seconde URL, sur le patron de `/up`.** `up/queue` répond `200 {"queue":
+"consuming"}` quand la file est consommée, `503` sinon, et la surveillance déjà installée par BR-31 T3
+appelle les deux : `/up` dit si l'application répond, `up/queue` dit si le worker travaille. C'est la
+distinction que D-19 exigeait, tenue par deux points de contrôle plutôt que par deux mécanismes, et
+l'observateur reste hébergé hors du VPS — une machine éteinte fait tomber les deux.
+
+**Trois états valent refus, et le troisième est celui d'Horizon.** Aucun maître qui bat (absent
+depuis quinze secondes, la durée de vie de son enregistrement Redis), un maître en pause, ou une
+attente estimée au-delà du seuil de `horizon.waits` — le même seuil que la notification écartée, lu au
+même endroit, pour ne pas installer un second réglage à côté du premier. Un seuil à `0` tait la file,
+comme chez Horizon.
+
+**La route est déclarée hors du groupe `web`, à côté de `health:`.** C'est ce que fait le point de
+contrôle du framework, et ce n'est pas cosmétique : dans le groupe `web`, chaque appel de la
+surveillance ouvrirait une session et ferait travailler le partage de props d'Inertia, donc la base,
+pour une réponse qui n'en a pas besoin. Un test le tient.
+
+**Ce que le sondage ne fait pas** — il ne prévient personne. Il rend un état ; l'alerte est émise par
+la surveillance externe, qui doit appeler `up/queue` comme elle appelle déjà `/up`, avec deux échecs
+consécutifs avant de sonner : un déploiement laisse le maître absent le temps du redémarrage du
+conteneur, et une alerte à chaque mise en ligne est une alerte qu'on finit par ignorer.
