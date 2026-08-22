@@ -10,25 +10,22 @@ use App\Http\Controllers\Manage;
 use App\Http\Controllers\RegistrationController;
 use Illuminate\Support\Facades\Route;
 
-Route::inertia('/', 'Welcome')
+Route::get('/', EventController::class)
     ->name('home');
 
 Route::get('design-system', DesignSystemController::class)
     ->name('design-system');
+
+Route::resource('documents', DocumentController::class)
+    ->only(['index']);
 
 Route::middleware('auth')
     ->group(function () {
         Route::get('dashboard', DashboardController::class)
             ->name('dashboard');
 
-        Route::singleton('event', EventController::class)
-            ->only(['show']);
-
         Route::singleton('briefing', BriefingController::class)
             ->only(['show']);
-
-        Route::resource('documents', DocumentController::class)
-            ->only(['index']);
 
         Route::singleton('registration', RegistrationController::class)
             ->only(['show', 'edit', 'update']);

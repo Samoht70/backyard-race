@@ -85,6 +85,9 @@ return [
         'cancel' => 'Annuler',
     ],
     'public' => [
+        'empty_title' => 'Aucune course annoncée',
+        'empty_description' => 'La prochaine édition n’est pas encore publiée.',
+        'register' => 'S’inscrire à la course',
         'draft_notice_title' => 'Brouillon',
         'draft_notice_description' => 'Les participants ne voient pas encore cet événement.',
         'no_coordinates' => 'Coordonnées non renseignées.',

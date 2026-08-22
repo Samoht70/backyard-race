@@ -2,7 +2,7 @@
 import { Link } from '@inertiajs/vue3';
 import { Menu } from '@lucide/vue';
 import { useMediaQuery } from '@vueuse/core';
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import {
     Sheet,
     SheetClose,
@@ -15,7 +15,7 @@ import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { t } from '@/lib/i18n';
 import { mainNavItems } from '@/lib/mainNav';
 
-const items = mainNavItems();
+const items = computed(() => mainNavItems());
 const { isCurrentUrl } = useCurrentUrl();
 const isOpen = ref(false);
 const isRailVisible = useMediaQuery('(min-width: 48rem)');

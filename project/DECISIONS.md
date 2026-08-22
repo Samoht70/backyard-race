@@ -2020,3 +2020,119 @@ passe de `max-w-3xl` à `max-w-4xl` pour y entrer.
 plaçait la bascule à 640 px — où l'on est encore au doigt. `ActionButton` et la hauteur des champs
 d'`EventField` passent à `lg`. Ce qui reste à `sm` est la largeur des boutons : un bouton
 dimensionné par son texte ne tronque rien, et c'est la demande d'origine.
+
+## D-60 — La course est publique : l'accueil porte l'événement, les documents s'ouvrent aux invités
+
+Arrêté le 2026-08-22 par le propriétaire du projet. C'est une reprise (R-05) : elle rouvre ce que
+BR-33 avait branché (D-55) et ce que BR-18 avait fermé, sans qu'aucune story ne le demande.
+
+**Le constat qui la déclenche.** Tout est derrière `auth` sauf `/` et `/design-system`. Or `/` est un
+splash de deux boutons : le lien qu'on partage à un coureur ouvre un formulaire de connexion, pas la
+course. Personne ne peut savoir quand, où, sur quelle boucle et pour combien de places il s'engage
+avant d'avoir un compte.
+
+### Ce qui s'ouvre, et ce qui ne s'ouvre pas
+
+**Public :** l'événement — nom, description, date et heure du premier départ, distance et durée de
+boucle, adresse, coordonnées, places — et les documents.
+
+**Fermé, inchangé :** l'accueil du coureur, le briefing, l'inscription, `/manage`.
+
+**L'accueil du coureur n'était pas le bon écran**, alors que c'est par lui que la demande est
+arrivée. `DashboardController` ne projette que du nominatif : statut d'inscription, dossard, date de
+dépôt, modifiable ou non. Ouvert à un invité, il n'affiche que son propre état vide — les trois
+branches d'`EmptyState` se réduisent à « pas d'inscription ». L'écran qui porte les informations de
+la course est `Event.vue`, et c'est lui qui devient public.
+
+**Les documents s'ouvrent parce qu'ils décident, ils n'exploitent pas.** Règlement, consignes,
+logement et trace GPX sont ce qu'on lit *avant* de s'engager. Le briefing reste fermé pour la raison
+inverse : il dit comment se déroule la nuit à quelqu'un qui y sera. Conséquence assumée, sur D-52 :
+l'URL signée de cinq minutes devient joignable sans compte, donc le fichier est publiquement
+téléchargeable pendant sa fenêtre. Le disque n'est pas public et rien ne s'énumère ; c'est le
+document lui-même qu'on accepte de rendre public, ce qui est exactement la demande.
+
+### `/` porte l'événement, et `/event` disparaît
+
+Il y a une seule course, donc une seule page pour la décrire. `Welcome.vue` et `pages/Event.vue`
+disaient deux moitiés de la même chose ; `/` porte la page, `/event` quitte le routage avec son
+entrée de navigation, et `BareLayout` perd son seul écran — `app.ts` perd la branche `Welcome` de sa
+résolution de layout. La reprise **supprime deux écrans au lieu d'en ajouter un**.
+
+D-55 avait posé que `/event` répond 404 sur une base sans événement, parce qu'un écran qui parle de
+l'événement a raison de disparaître avec lui. La règle ne survit pas au déménagement : **l'accueil
+d'un site répond 200**, y compris avant que le gérant ait créé la course, et y compris quand elle est
+en `draft`. Il lit donc l'événement avec `first()`, comme l'accueil du coureur, et montre un état
+vide quand il n'y a rien à annoncer. Un événement en `draft` est traité comme une absence : le
+brouillon reste invisible sans passer par un refus.
+
+### Les deux entrées de l'invité
+
+**« Mon inscription » est un bouton de connexion nommé par sa destination.** Il n'existe aucun moyen
+de voir une inscription sans compte — statut et dossard sont nominatifs — donc l'entrée pointe sur
+`/login`. La nommer par ce qu'elle apporte plutôt que par le geste qu'elle demande est le seul écart
+avec la navigation connectée, et il est volontaire.
+
+**« S'inscrire » n'apparaît que si l'événement accepte les inscriptions.** D-45 a fait remonter la
+fenêtre — statut `registration` et capacité non atteinte — sur la création de compte : hors fenêtre,
+`/account/create` affiche un refus et le compteur de places. Une entrée toujours visible enverrait
+donc dans un cul-de-sac.
+
+**Connecté, les deux entrées ne se comportent pas pareil.** « S'inscrire » disparaît — le groupe
+`account` est en `guest`, la garder ne produirait qu'une redirection. « Mon inscription » ne reste
+que si `access.registration` est vrai : un gérant qui ne court pas n'a pas d'inscription, et une
+inscription annulée renvoie sur l'accueil (D-48, Q-03).
+
+### Ce que la reprise retourne dans le code
+
+**`access()` cesse de sortir avant les requêtes pour un invité.** C'est le point de D-55 que cette
+décision renverse : « un invité sort avant les deux requêtes, ce qui laisse la page publique et
+l'écran de connexion à coût nul » n'est plus tenable quand la page publique *est* la course. Les deux
+requêtes deviennent le prix de l'accueil. `EventPolicy::view()` et `DocumentPolicy::viewAny()`
+prennent un `?User` — sans ça le `Gate` refuse l'invité avant d'entrer dans la méthode, et l'ouverture
+ne se voit nulle part. `access.registration` reste `false` pour un invité : pas de compte, pas
+d'inscription. Le patron de D-55 ne change pas — chaque valeur reste le résultat du `Gate` que le
+serveur applique.
+
+**`board` suit la même visibilité que l'événement.** La prop est aujourd'hui partagée sans condition,
+donc le JSON de `/login` porte déjà le nom de l'événement, les places et l'heure du premier départ —
+même en `draft`. Aucun écran ne l'affiche, et c'est précisément ce qui l'a laissé passer. Puisque la
+course devient publique, la fuite devient une décision : `board` est nul tant que l'événement n'est
+pas visible, et le bandeau disparaît avec lui.
+
+**`mainNavItems()` devient réactif, et c'est un bug latent qu'on solde.** La liste est calculée une
+fois au montage de `BoardRail` et de `BoardMenu`, or `BoardLayout` persiste entre les visites
+Inertia : après connexion, le menu resterait celui de l'invité jusqu'à un rechargement complet.
+Invisible aujourd'hui — un invité ne voit jamais la coquille — et garanti dès qu'on la lui ouvre.
+La liste passe en `computed`. L'entrée d'accueil, elle, cesse de pointer inconditionnellement sur
+`dashboard()` : elle mène l'invité sur la course et le connecté sur son accueil.
+
+**Q-02 monte d'un cran sans changer de porteur, et elle change de porte.** Un invité qui tape
+`/dashboard` ou `/briefing` est redirigé sur la connexion — le middleware `auth` passe avant la
+policy. Mais `/documents` n'a plus de middleware : sur un événement en `draft`, un invité y reçoit
+un 403 sur la page Symfony non traduite. C'est le premier refus qu'une adresse publique peut
+produire, et une adresse publique attire les curieux et les robots là où une application fermée
+n'en voyait aucun. BR-13 reste le porteur ; l'exposition, elle, n'est plus théorique.
+
+### Quatre points relevés à l'implémentation
+
+**`access` gagne une quatrième clé, `register`.** La navigation doit savoir si l'écran de création de
+compte a un sens, et ni `event` ni `documents` ne le disent : la fenêtre d'inscription (D-45) est une
+autre condition que la visibilité. La clé vaut vrai pour un invité quand l'événement accepte les
+inscriptions — statut `registration` et capacité non atteinte — et faux pour tout compte connecté,
+ce qui reproduit exactement les deux gardes de la route : le middleware `guest` et la fenêtre.
+
+**Le bouton « S'inscrire » revient sur l'écran d'événement, pour les invités seulement.** D-45
+l'avait retiré en fusionnant les deux inscriptions. Il revient parce que la page est désormais la
+première qu'un coureur voit, et qu'une page d'accueil sans porte d'entrée est une impasse. Ce que
+D-45 a fermé reste fermé : un compte connecté sans inscription n'a toujours aucun écran pour en
+créer une.
+
+**`auth.user` était typé non-nullable côté TypeScript, et c'était faux.** `BoardAccount` testait déjà
+`v-if="user"` sur une valeur que le type promettait présente. Le type passe à `User | null`, ce que
+la navigation invité exige, et `pages/Profile.vue` — le seul écran qui lisait les champs du compte
+sans garde — porte maintenant un `v-if`.
+
+**`wayfinder:generate` sans `--with-form` casse la vérification de types.** Le plugin Vite déclare
+`formVariants: true` ; la commande, elle, ne les génère que sur demande. Régénérer les routes après
+un changement de routage sans ce drapeau retire `.form()` de tous les helpers et produit une
+vingtaine d'erreurs `vue-tsc` sans rapport avec le changement.

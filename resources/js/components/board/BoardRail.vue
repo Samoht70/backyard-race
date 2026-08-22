@@ -6,6 +6,7 @@ import {
     NavigationMenuList,
     NavigationMenuRoot,
 } from 'reka-ui';
+import { computed } from 'vue';
 import AppearanceToggle from '@/components/AppearanceToggle.vue';
 import BoardAccount from '@/components/board/BoardAccount.vue';
 import BoardMenu from '@/components/board/BoardMenu.vue';
@@ -13,7 +14,7 @@ import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { t } from '@/lib/i18n';
 import { mainNavItems } from '@/lib/mainNav';
 
-const items = mainNavItems();
+const items = computed(() => mainNavItems());
 const { isCurrentUrl } = useCurrentUrl();
 </script>
 

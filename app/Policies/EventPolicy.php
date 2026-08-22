@@ -9,10 +9,10 @@ use App\Models\User;
 
 class EventPolicy
 {
-    public function view(User $user, Event $event): bool
+    public function view(?User $user, Event $event): bool
     {
         return $event->lifecycle()->isVisibleToParticipants()
-            || $user->can(Permission::ManageEvent->value);
+            || $user?->can(Permission::ManageEvent->value) === true;
     }
 
     public function update(User $user, Event $event): bool

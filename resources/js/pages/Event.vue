@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
+import { CalendarOff } from '@lucide/vue';
 import { computed } from 'vue';
 import ActionBar from '@/components/board/ActionBar.vue';
 import BoardColumns from '@/components/board/BoardColumns.vue';
@@ -8,29 +9,46 @@ import EventStatusBadge from '@/components/event/EventStatusBadge.vue';
 import EventSummary from '@/components/event/EventSummary.vue';
 import ActionButton from '@/components/race/ActionButton.vue';
 import SeatCounter from '@/components/registration/SeatCounter.vue';
+import EmptyState from '@/components/state/EmptyState.vue';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { isAuthenticated } from '@/lib/auth';
 import { t } from '@/lib/i18n';
 import { can } from '@/lib/permissions';
+import { create as createAccount } from '@/routes/account';
 import { show as showRegistration } from '@/routes/registration';
 import type { EventDetails } from '@/types/event';
 
 type Props = {
-    event: EventDetails;
+    event: EventDetails | null;
     canRegister: boolean;
     isRegistered: boolean;
 };
 
 const props = defineProps<Props>();
 
-const isDraft = computed(() => props.event.status === 'draft');
-const title = computed(() => props.event.name ?? t('event.public.untitled'));
+const isDraft = computed(() => props.event?.status === 'draft');
+const canJoin = computed(() => props.canRegister && !isAuthenticated());
+const title = computed(() => {
+    if (props.event === null) {
+        return t('event.public.empty_title');
+    }
+
+    return props.event.name ?? t('event.public.untitled');
+});
 </script>
 
 <template>
     <Head :title="title" />
 
     <BoardPage>
-        <div class="grid gap-6">
+        <EmptyState
+            v-if="event === null"
+            :icon="CalendarOff"
+            :title="t('event.public.empty_title')"
+            :description="t('event.public.empty_description')"
+        />
+
+        <div v-else class="grid gap-6">
             <Alert v-if="isDraft && can('manage-event')">
                 <AlertTitle>
                     {{ t('event.public.draft_notice_title') }}
@@ -64,6 +82,12 @@ const title = computed(() => props.event.name ?? t('event.public.untitled'));
                     <ActionButton v-if="isRegistered" as-child>
                         <Link :href="showRegistration()">
                             {{ t('registration.show.call_to_action') }}
+                        </Link>
+                    </ActionButton>
+
+                    <ActionButton v-if="canJoin" as-child>
+                        <Link :href="createAccount()">
+                            {{ t('event.public.register') }}
                         </Link>
                     </ActionButton>
                 </ActionBar>

@@ -5,6 +5,7 @@ return [
         'home' => 'Accueil',
         'race' => 'Course',
         'registration' => 'Mon inscription',
+        'register' => 'S’inscrire',
         'briefing' => 'Briefing',
         'documents' => 'Documents',
         'event' => 'Événement',

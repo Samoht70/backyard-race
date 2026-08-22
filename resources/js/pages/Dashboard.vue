@@ -16,9 +16,9 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { canReach } from '@/lib/access';
 import { t } from '@/lib/i18n';
 import { can } from '@/lib/permissions';
+import { home } from '@/routes';
 import { show as showBriefing } from '@/routes/briefing';
 import { index as showDocuments } from '@/routes/documents';
-import { show as showEvent } from '@/routes/event';
 import { index as showManage } from '@/routes/manage';
 import { show as showRegistration } from '@/routes/registration';
 import type { RegistrationStatus } from '@/types/registration';
@@ -76,7 +76,7 @@ const isManager = computed(() => can('manage-event'));
         >
             <template #action>
                 <ActionButton v-if="canReach('event')" as-child>
-                    <Link :href="showEvent()">
+                    <Link :href="home()">
                         {{ t('ui.dashboard.no_registration_action') }}
                     </Link>
                 </ActionButton>

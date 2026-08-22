@@ -18,7 +18,7 @@ const user = computed(() => usePage().props.auth.user);
     <Head :title="t('ui.profile.title')" />
 
     <BoardPage>
-        <div class="grid max-w-4xl gap-6">
+        <div v-if="user" class="grid max-w-4xl gap-6">
             <header class="flex flex-col gap-2">
                 <h1 class="text-title">{{ t('ui.profile.title') }}</h1>
                 <p class="text-sm text-muted-foreground">

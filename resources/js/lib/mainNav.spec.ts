@@ -15,11 +15,17 @@ type Areas = {
     event?: boolean;
     documents?: boolean;
     registration?: boolean;
+    register?: boolean;
 };
 
-function signIn(areas: Areas, abilities: string[] = []): void {
+function share(
+    areas: Areas,
+    user: { id: number } | null,
+    abilities: string[],
+): void {
     page.props = {
         auth: {
+            user,
             permissions: Object.fromEntries(
                 abilities.map((ability) => [ability, true]),
             ),
@@ -28,8 +34,17 @@ function signIn(areas: Areas, abilities: string[] = []): void {
             event: areas.event === true,
             documents: areas.documents === true,
             registration: areas.registration === true,
+            register: areas.register === true,
         },
     };
+}
+
+function signIn(areas: Areas, abilities: string[] = []): void {
+    share(areas, { id: 1 }, abilities);
+}
+
+function visitAsGuest(areas: Areas): void {
+    share(areas, null, []);
 }
 
 function titles(): string[] {
@@ -39,6 +54,40 @@ function titles(): string[] {
 describe('mainNavItems', () => {
     beforeEach(() => {
         page.props = {};
+    });
+
+    it('offers a guest the race, the documents, a way in and a way to register', () => {
+        visitAsGuest({ event: true, documents: true, register: true });
+
+        expect(titles()).toEqual([
+            'ui.nav.event',
+            'ui.nav.documents',
+            'ui.nav.registration',
+            'ui.nav.register',
+        ]);
+    });
+
+    it('withholds the account creation from a guest once the window is shut', () => {
+        visitAsGuest({ event: true, documents: true });
+
+        expect(titles()).not.toContain('ui.nav.register');
+    });
+
+    it('keeps the race entry for a guest while the event is a draft', () => {
+        visitAsGuest({});
+
+        expect(titles()).toEqual(['ui.nav.event', 'ui.nav.registration']);
+    });
+
+    it('points a guest at the public race page and the login screen', () => {
+        visitAsGuest({ event: true, documents: true, register: true });
+
+        expect(mainNavItems().map((item) => toUrl(item.href))).toEqual([
+            '/',
+            '/documents',
+            '/login',
+            '/account/create',
+        ]);
     });
 
     it('offers a registered runner their registration, the briefing and the documents', () => {
@@ -114,7 +163,7 @@ describe('mainNavItems', () => {
             '/registration',
             '/briefing',
             '/documents',
-            '/event',
+            '/',
         ]);
     });
 });

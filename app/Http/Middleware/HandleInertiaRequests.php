@@ -55,6 +55,8 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $access = $this->access($request->user());
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
@@ -62,8 +64,8 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
                 'permissions' => $this->permissions($request->user()),
             ],
-            'access' => $this->access($request->user()),
-            'board' => $this->board(),
+            'access' => $access,
+            'board' => $this->board($access['event']),
             'translations' => $this->translations(),
         ];
     }
@@ -91,28 +93,25 @@ class HandleInertiaRequests extends Middleware
      */
     private function access(?User $user): array
     {
-        if ($user === null) {
-            return ['event' => false, 'documents' => false, 'registration' => false];
-        }
-
         $event = $this->event();
         $gate = Gate::forUser($user);
 
         return [
             'event' => $event !== null && $gate->allows('view', $event),
             'documents' => $event !== null && $gate->allows('viewAny', [Document::class, $event]),
-            'registration' => $user->participant()->exists(),
+            'registration' => $user?->participant()->exists() === true,
+            'register' => $user === null && $event !== null && $event->acceptsRegistrations(),
         ];
     }
 
     /**
      * @return array<string, mixed>|null
      */
-    private function board(): ?array
+    private function board(bool $isEventVisible): ?array
     {
         $event = $this->event();
 
-        return $event === null ? null : new BoardResource($event)->resolve();
+        return $event === null || ! $isEventVisible ? null : new BoardResource($event)->resolve();
     }
 
     private function event(): ?Event

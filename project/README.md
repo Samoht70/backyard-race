@@ -53,10 +53,10 @@ les informations de la course ; il ne voit encore aucune boucle, parce qu'aucune
 
 ### Lot 2 — mettre en ligne · en cours
 
-L'epic 7 de bout en bout, BR-26 → BR-32 plus BR-35, 47 pts. Le lot 1 n'a aucune valeur tant que
-rien n'est joignable depuis l'extérieur ; c'est la mise en ligne qui transforme « l'inscription est
-développée » en « les inscriptions sont ouvertes ». D-19 rappelle qu'une plateforme managée ferait
-tomber une vingtaine de ces points pour 30 à 60 €.
+L'epic 7 de bout en bout, BR-26 → BR-32, plus BR-35 et la reprise R-05, 52 pts. Le lot 1 n'a
+aucune valeur tant que rien n'est joignable depuis l'extérieur ; c'est la mise en ligne qui
+transforme « l'inscription est développée » en « les inscriptions sont ouvertes ». D-19 rappelle
+qu'une plateforme managée ferait tomber une vingtaine de ces points pour 30 à 60 €.
 
 | Ordre | ID | Story | Pts | Où ça se joue |
 |-------|----|-------|-----|----------------|
@@ -68,14 +68,21 @@ tomber une vingtaine de ces points pour 30 à 60 €.
 | 5 | [BR-30](stories/BR-30-workers-horizon-scheduler.md) | Files, Horizon, planificateur | 5 | Les deux |
 | 6 | [BR-31](stories/BR-31-domaine-https-supervision.md) | Domaine, HTTPS, supervision | 5 | Sur la machine |
 | 7 | [BR-32](stories/BR-32-deploiement-dokploy.md) | Déploiement depuis Dokploy | 3 | Les deux |
+| ✅ | R-05 | Course publique, portée par [D-60](DECISIONS.md) | 5 | Dans le dépôt |
 
-**47 pts, dont 9 livrés.** BR-27 est passée avant BR-26 : elle est la seule story du lot qui
+**52 pts, dont 14 livrés.** BR-27 est passée avant BR-26 : elle est la seule story du lot qui
 s'écrive et se vérifie entièrement dans le dépôt, sans machine. Le reste attend un VPS.
 
 BR-35 est entrée dans le lot le 2026-08-21, relevée sur la machine : la base était migrée et il
 n'existait aucun moyen d'entrer dans l'application. Elle prend le rang 2 parce qu'elle bloque tout
 ce qui se vérifie par l'écran — la course elle-même naît de l'écran d'organisation, donc derrière
 l'authentification.
+
+R-05 est entrée dans le lot le 2026-08-22, sur demande du propriétaire, et livrée le même jour.
+Elle ne bloque pas la mise en ligne — elle décide de ce qu'on en fait : le lot 2 rend l'application
+joignable, R-05 décide de ce que voit la personne à qui on envoie l'adresse. Elle est passée tôt
+parce qu'elle se vérifie entièrement dans le dépôt, comme BR-27, et parce que le lien devait cesser
+d'ouvrir un formulaire de connexion avant de circuler.
 
 BR-30 est la story à ne pas bâcler. Le README le disait des éliminations automatiques ; c'est vrai
 bien avant elles — `RegistrationLink` est `ShouldQueue`, donc **sans worker en production, personne
@@ -171,8 +178,9 @@ pas de fichier de story : c'est la décision qui les porte, et elles prennent un
 | R-02 | Inscription par mail en cinq étapes, code d'accès en guise de mot de passe | 8 | ✅ Livrée | [D-45](DECISIONS.md) |
 | R-03 | Direction artistique « Tableau des départs » à la place de « Corral » | 8 | ✅ Livrée | [D-46](DECISIONS.md) |
 | R-04 | Formulaire d'inscription en quatre étapes au lieu d'une page scrollable | 5 | ✅ Livrée | [D-50](DECISIONS.md), D-54 |
+| R-05 | Course publique : l'accueil porte l'événement, les documents s'ouvrent aux invités | 5 | ✅ Livrée | [D-60](DECISIONS.md) |
 
-**Total : 33 stories actives + 4 reprises · 233 pts · 109 pts livrés (47 %)**
+**Total : 33 stories actives + 5 reprises · 238 pts · 114 pts livrés (48 %)**
 
 **Hors périmètre : 4 stories abandonnées, 32 pts non engagés** — voir [D-47](DECISIONS.md).
 
@@ -180,8 +188,8 @@ pas de fichier de story : c'est la décision qui les porte, et elles prennent un
 
 **Lot 1 — ouvrir les inscriptions (18 pts) — clos.**
 
-**Lot 2, en cours — mettre en ligne (47 pts)** — BR-27 (faite) → BR-26 → BR-35 → BR-28 → BR-29 →
-BR-30 → BR-31 → BR-32
+**Lot 2, en cours — mettre en ligne (52 pts)** — BR-27 (faite) → BR-26 → BR-35 → BR-28 → BR-29 →
+BR-30 → BR-31 → BR-32, R-05 (faite)
 
 **Ensuite, le moteur et les écrans de course** — BR-08 → BR-09 → BR-10 → BR-11 → BR-12 → BR-13 →
 BR-14 → BR-15 → BR-16 → BR-24 → BR-20 → BR-23
@@ -195,7 +203,8 @@ Neuf remarques sur cet ordre :
   BR-18 et BR-34 ont posé, et vers ce que R-04 a remis en forme.
 - R-04 est une **reprise**, pas une story : elle refait l'écran que D-45 avait livré, donc elle vit
   dans une décision (D-50, mise en œuvre par D-54) et dans le tableau des reprises, comme R-01 à
-  R-03.
+  R-03. R-05 suit la même règle : elle rouvre la navigation de BR-33 et les documents de BR-18, et
+  c'est D-60 qui la porte.
 - BR-24 sort de la fin du backlog pour rejoindre les écrans de course : elle dépend de BR-08 et
   reprend l'accueil que BR-33 a livré.
 - BR-09 et BR-11 restent le cœur métier — c'est là que les tests comptent le plus.
