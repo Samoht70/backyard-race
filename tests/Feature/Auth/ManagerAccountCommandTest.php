@@ -94,6 +94,48 @@ class ManagerAccountCommandTest extends TestCase
     }
 
     #[Test]
+    public function it_takes_the_address_from_the_configuration_when_none_is_typed(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+        config()->set('race.organiser_email', 'orga@backyard.test');
+
+        $status = Artisan::call('race:manager-account', ['first-name' => 'Claire', 'last-name' => 'Fontaine']);
+
+        $account = User::query()->where('email', 'orga@backyard.test')->sole();
+
+        $this->assertSame(Command::SUCCESS, $status);
+        $this->assertTrue($account->hasRole(Role::Manager));
+    }
+
+    #[Test]
+    public function it_regenerates_the_configured_account_without_being_told_which(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+        config()->set('race.organiser_email', 'orga@backyard.test');
+        $account = User::factory()->manager()->create(['email' => 'orga@backyard.test']);
+
+        $status = Artisan::call('race:manager-account', ['--regenerate' => true]);
+
+        $this->assertSame(Command::SUCCESS, $status);
+
+        $this->post(route('login.store'), ['email' => 'orga@backyard.test', 'password' => $this->shownCode()]);
+
+        $this->assertAuthenticatedAs($account);
+    }
+
+    #[Test]
+    public function it_refuses_when_nothing_is_typed_and_nothing_is_configured(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+
+        $status = Artisan::call('race:manager-account', ['first-name' => 'Claire', 'last-name' => 'Fontaine']);
+
+        $this->assertSame(Command::FAILURE, $status);
+        $this->assertStringContainsString('RACE_ORGANISER_EMAIL', Artisan::output());
+        $this->assertDatabaseCount('users', 0);
+    }
+
+    #[Test]
     public function it_refuses_an_address_that_is_not_one(): void
     {
         $this->seed(RolesAndPermissionsSeeder::class);

@@ -104,7 +104,7 @@ BR-27 est passée avant BR-26 : elle était la seule story du lot à s'écrire e
 dans le dépôt, sans machine. R-05 a suivi la même logique, et le lien devait cesser d'ouvrir un
 formulaire de connexion avant de circuler.
 
-### Lot 3 — tenir la production à la main · en cours
+### Lot 3 — tenir la production à la main · clos le 2026-08-22
 
 Trois stories, 11 pts, dont aucune ne touche au produit de course. Le lot 2 a rendu l'application
 joignable ; le lot 3 rend son exploitation tenable par une personne seule, avant que l'adresse
@@ -114,9 +114,9 @@ circule pour de vrai.
 |-------|----|-------|-----|----------------------|
 | ✅ | [BR-35](stories/BR-35-compte-organisateur-en-commande.md) | Compte organisateur en une commande | 3 | La porte, et le filet de BR-37 |
 | ✅ | [BR-36](stories/BR-36-gabarit-de-mail.md) | Habiller les mails aux couleurs de la course | 3 | Le mail est le seul chemin de création de compte (D-45) |
-| 1 | [BR-37](stories/BR-37-purge-des-inscriptions.md) | Purger les inscriptions et les comptes coureurs | 5 | La production porte des données d'essai |
+| ✅ | [BR-37](stories/BR-37-purge-des-inscriptions.md) | Purger les inscriptions et les comptes coureurs | 5 | La production porte des données d'essai |
 
-**11 pts, dont 6 livrés.** L'ordre n'est pas indifférent :
+**11 pts, tous livrés.** L'ordre n'est pas indifférent :
 
 - **BR-35 d'abord, close le 2026-08-22**, parce qu'elle est le filet de BR-37. Une commande qui
   supprime des comptes se lance plus sereinement quand une autre sait recréer celui de
@@ -124,9 +124,16 @@ circule pour de vrai.
 - **BR-36 ensuite, close le 2026-08-22**, avant le premier vrai inscrit. Chaque coureur reçoit ce
   mail une fois, et cette fois-là ne se rattrape pas : qui s'inscrit avant garde le gabarit de
   démonstration du paquet. Aucune autre story du backlog n'a cette propriété d'irréversibilité.
-- **BR-37 en dernier**, parce qu'éprouver BR-36 en production y crée de nouvelles inscriptions
-  d'essai. Purger avant reviendrait à purger deux fois. C'est le dernier geste avant d'annoncer
-  l'adresse.
+- **BR-37 en dernier, close le 2026-08-22**, parce qu'éprouver BR-36 en production y crée de
+  nouvelles inscriptions d'essai. Purger avant reviendrait à purger deux fois.
+  `race:purge-registrations` est livrée et couverte ([D-64](DECISIONS.md)) ; le geste sur la
+  machine reste à faire, et c'est le dernier avant d'annoncer l'adresse.
+
+**R-07 a suivi BR-37 le même jour.** Il n'y aura jamais qu'un seul manager, donc son adresse est une
+donnée d'installation : `RACE_ORGANISER_EMAIL` épargne désormais un compte à la purge, et sert de
+défaut à `race:manager-account`. Elle vient **en plus** du rôle, pas à sa place, pour qu'une variable
+absente ou fautive retombe sur le comportement de BR-37 au lieu de fermer la porte
+([D-65](DECISIONS.md)).
 
 **BR-36 a été recalée en la prenant.** Son contexte s'appuyait sur D-46 — « un bouton bleu de
 démonstration », la palette de D-46 à aplatir en hexadécimal — alors que R-06 avait révoqué le parti
@@ -225,7 +232,7 @@ attend la semaine de la course.
 | [BR-31](stories/BR-31-domaine-https-supervision.md) | Domaine, HTTPS et supervision | 5 | 🚧 En cours |
 | [BR-32](stories/BR-32-deploiement-dokploy.md) | Déploiement depuis Dokploy et branche develop | 3 | 🚧 En cours |
 | [BR-35](stories/BR-35-compte-organisateur-en-commande.md) | Créer le compte organisateur en une commande | 3 | ✅ Terminé |
-| [BR-37](stories/BR-37-purge-des-inscriptions.md) | Purger les inscriptions et les comptes coureurs | 5 | 🔥 Lot 3 |
+| [BR-37](stories/BR-37-purge-des-inscriptions.md) | Purger les inscriptions et les comptes coureurs | 5 | ✅ Terminé |
 
 Les quatre stories `En cours` sont en production et il leur manque une ou deux tâches, nommées dans
 leur fichier sous « Ce qui reste au 2026-08-22 » et récapitulées dans le lot 2. Leurs points ne
@@ -245,8 +252,9 @@ pas de fichier de story : c'est la décision qui les porte, et elles prennent un
 | R-04 | Formulaire d'inscription en quatre étapes au lieu d'une page scrollable | 5 | ✅ Livrée | [D-50](DECISIONS.md), D-54 |
 | R-05 | Course publique : l'accueil porte l'événement, les documents s'ouvrent aux invités | 5 | ✅ Livrée | [D-60](DECISIONS.md) |
 | R-06 | Charte de l’instrument, et primitives reka-ui à la place du starter kit | 5 | ✅ Livrée | [D-61](DECISIONS.md) |
+| R-07 | Adresse de l'organisateur en configuration, en plus du rôle `manager` | 2 | ✅ Livrée | [D-65](DECISIONS.md) |
 
-**Total : 35 stories actives + 6 reprises · 251 pts · 145 pts livrés (58 %)**
+**Total : 35 stories actives + 7 reprises · 253 pts · 152 pts livrés (60 %)**
 
 **Hors périmètre : 4 stories abandonnées, 32 pts non engagés** — voir [D-47](DECISIONS.md).
 
@@ -258,8 +266,8 @@ pas de fichier de story : c'est la décision qui les porte, et elles prennent un
 → BR-26 → BR-29, les quatre entrées closes. Reste, dans cet ordre : BR-30 T5 → BR-31 T4 et T5 →
 BR-32 T3 et T5 → BR-28 T3 et T4.
 
-**Lot 3, en cours — tenir la production à la main (11 pts, 6 livrés)** — BR-35 et BR-36 closes,
-reste BR-37, plus BR-30 T5 qui vient avec.
+**Lot 3 — tenir la production à la main (11 pts) — les trois stories closes le 2026-08-22.** Reste
+BR-30 T5, qui venait avec le lot sans lui appartenir.
 
 **Ce reliquat du lot 2 avant le moteur, ou après ?** Après, sauf BR-30 T5. Les inscriptions sont
 ouvertes, donc une file qui cesse d'être consommée coûte des coureurs dès aujourd'hui ; la version

@@ -3,9 +3,10 @@
 | | |
 |---|---|
 | **Epic** | 7 — Déploiement |
-| **Statut** | 🔥 Lot 3 |
+| **Statut** | ✅ Terminé |
 | **Estimation** | 5 pts |
 | **Créée** | 2026-08-22 — relevé après la mise en ligne, lot 3 |
+| **Livrée** | 2026-08-22 — lot 3 |
 | **Dépend de** | BR-05, BR-07, BR-35 |
 
 ## User story
@@ -149,10 +150,10 @@ a pas.
 
 ## Tâches
 
-- [ ] **T1** — Commande de purge : décompte affiché, confirmation, transaction, ordre participants
+- [x] **T1** — Commande de purge : décompte affiché, confirmation, transaction, ordre participants
   puis comptes `2 pts`
-- [ ] **T2** — Garde-fous : refus en course, exclusion du rôle `manager`, avertissement quand aucun
+- [x] **T2** — Garde-fous : refus en course, exclusion du rôle `manager`, avertissement quand aucun
   manager ne subsisterait, option non interactive `1 pt`
-- [ ] **T3** — Suppression des sessions des comptes purgés `1 pt`
-- [ ] **T4** — Tests : purge complète, organisateur épargné, inscription d'un manager supprimée,
+- [x] **T3** — Suppression des sessions des comptes purgés `1 pt`
+- [x] **T4** — Tests : purge complète, organisateur épargné, inscription d'un manager supprimée,
   rôles détachés, refus en course, base déjà propre, dossard qui repart à 1 `2 pts`
