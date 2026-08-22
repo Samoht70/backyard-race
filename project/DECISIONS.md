@@ -2663,3 +2663,74 @@ touche d'échappement et au voile, la colonne du tableau ne se fermait pas du to
 n'offrait de bouton. Le dossier émet `close` et le parent remet `selectedId` à `null` : le tiroir se
 referme parce que son ouverture est dérivée de la sélection, et la colonne rend de nouveau son état
 vide. Un `DialogClose` n'aurait servi qu'une des deux instances.
+
+## D-70 — Une seule page rend les quatre refus, et le diagnostic ne se perd que sur l'erreur serveur
+
+Arrêté le 2026-08-22 pendant BR-40, dernière entrée du lot 4. Q-02 avait laissé ouverte la forme du
+refus depuis BR-01 ; D-66 l'avait sortie en story propre. Ce qui restait à trancher tenait en trois
+points : où brancher le rendu, ce qu'on sacrifie au mode développement, et qui décide du retour.
+
+**Le rendu se branche sur `$exceptions->respond()`, après le handler, pas devant lui.** La voie
+concurrente était une vue `errors/404.blade.php` par statut, que Laravel prend tout seul. Elle
+sortait du site : la charte, la marque et la navigation vivent dans Inertia, et quatre gabarits Blade
+les auraient réimplémentés quatre fois. `RenderErrorPage` reçoit la réponse déjà construite, lit son
+statut et la remplace par une page Inertia — l'autorisation, elle, n'est pas touchée : ce qui était
+refusé l'est toujours, avec le même code.
+
+**Une page pour quatre situations, et le statut passe en prop.** Les libellés diffèrent, la structure
+non — un pictogramme, un titre, une phrase, un retour. `Error.vue` reçoit `status` et
+`errorSituation()` le traduit en `not_found` / `forbidden` / `expired` / `server`. Un statut hors des
+quatre retombe sur le comportement du framework côté serveur, et sur `server` côté client si jamais
+la prop arrivait autrement.
+
+**Le mode développement n'est préservé que sur le 500, parce que lui seul porte un diagnostic.** Une
+404, une 403 et une 419 sont des `HttpException` : le framework leur rend déjà une vue, jamais une
+trace, et les intercepter en développement ne cache rien. L'écran détaillé n'apparaît que sur une
+erreur non-HTTP, donc `app()->hasDebugModeEnabled()` ne garde que celle-là. Tester la page de 500
+demande en retour de poser `app.debug` à faux, ce que le test fait explicitement — et son jumeau
+vérifie que le message d'exception reste visible quand le débogage est actif.
+
+**Pas de filet autour du rendu, parce que la règle maison l'interdit et que l'analyse le permet.** Le
+cas limite de la story demandait que le repli du framework survive à une page d'erreur qui échoue,
+et le premier jet enveloppait le rendu Inertia dans un `try`. `xefi.noTryCatch` l'a refusé. La
+vérification a montré que la précaution était creuse : `Inertia\Middleware::handle()` résout les
+props partagées avant le contrôleur, donc au moment où le renderer s'exécute, `Event::query()` a déjà
+été jouée ou l'exception est déjà celle qu'on rend. Le rendu ne rejoue aucune requête.
+
+**L'adresse inconnue passe par une route `fallback`, parce que sans route il n'y a pas de groupe
+`web`.** Le raisonnement ci-dessus s'arrêtait une marche trop tôt, et la première visite manuelle
+l'a montré : sur une adresse sans route, `HandleInertiaRequests` ne s'exécute pas du tout — le
+groupe `web` est attaché aux routes, pas à l'application. La page sortait avec
+`{"component":"Error","props":{"status":404}}` pour toutes props, donc sans `auth`, sans `access` et
+sans traductions : écran blanc côté client, libellés en clés brutes si le rendu avait tenu.
+`Route::fallback(MissingPageController::class)`, déclarée après les `require`, fait de la 404
+non routée une route ordinaire du site — mêmes middlewares, mêmes props, même charte. C'est le
+second point de décision de la story, là où le contexte n'en annonçait qu'un.
+
+**Ce trou n'était pas visible en test, et il l'est maintenant.** Les six premiers tests
+interrogeaient le composant et le statut, jamais ce que la page reçoit avec : ils passaient au vert
+sur une page qui ne pouvait pas s'afficher. `it_carries_the_shared_props_on_an_unknown_address`
+assure la présence de `auth`, `access` et `translations`, et retomber le `fallback` le fait échouer
+sur « Property [auth] does not exist ». Une page Inertia ne se teste pas seulement par son nom.
+
+**`BoardAccount` lisait `props.auth.user` sans garde, seul de sa famille.** `lib/auth.ts`,
+`lib/access.ts` et `lib/permissions.ts` protègent tous leur accès aux props partagées ; ce composant
+ne le faisait pas, et c'est lui qui levait « Cannot read properties of undefined ». Le `fallback`
+règle le cas de la 404, mais une erreur rendue hors du groupe `web` — sur `horizon`, sur `up` —
+reste possible, et le garde d'une ligne coûte moins que le crash qu'il évite.
+
+**Le JSON se reconnaît à la réponse, pas à la requête.** `shouldRenderJsonWhen` produit déjà un
+`JsonResponse` pour `api/*` et pour un appel qui l'attend ; tester `$response instanceof
+JsonResponse` reprend cette décision au lieu de la dupliquer. Une visite Inertia, elle, envoie
+`Accept: text/html` et n'est jamais prise pour un appel JSON.
+
+**Le retour est calculé côté client, dans `lib/`, sur le modèle de `mainNav`.** Le serveur ne dit que
+le statut. `errorReturnItem()` interroge `isAuthenticated()` et rend un `NavItem` : l'accueil pour un
+visiteur, le tableau de bord pour un compte connecté — les deux seules destinations qu'on est sûr de
+ne pas refermer au nez de celui qui lit la page. Le placer dans un module plutôt que dans le
+composant le rend testable en Vitest, comme la navigation principale, puisque le projet ne monte pas
+de composants dans ses specs.
+
+**Le libellé du refus ne nomme rien.** « Accès refusé · Ton compte n'a pas accès à cette adresse » ne
+dit pas si la ressource existe. C'est la seule des quatre phrases qui devait se surveiller : les
+trois autres ne peuvent rien révéler.

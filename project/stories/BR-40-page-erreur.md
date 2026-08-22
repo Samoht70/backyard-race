@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Epic** | 1 — Fondations |
-| **Statut** | 🔥 Lot 4 |
+| **Statut** | ✅ Terminé — 2026-08-22 |
 | **Estimation** | 3 pts |
 | **Créée** | 2026-08-22 — tranche Q-02, ouverte par BR-01 le 2026-08-19, lot 4 |
 | **Dépend de** | BR-02, BR-38 |
@@ -113,7 +113,7 @@ traductions, et la page hérite de la charte comme n'importe quel autre écran.
 
 ## Tâches
 
-- [ ] **T1** — Rendu des quatre situations dans le site, JSON et mode développement préservés `1 pt`
-- [ ] **T2** — Page du site : libellés français par situation, retour adapté à qui regarde `1 pt`
-- [ ] **T3** — Tests : les quatre statuts, le retour du coureur connecté et du visiteur, le JSON qui
+- [x] **T1** — Rendu des quatre situations dans le site, JSON et mode développement préservés `1 pt`
+- [x] **T2** — Page du site : libellés français par situation, retour adapté à qui regarde `1 pt`
+- [x] **T3** — Tests : les quatre statuts, le retour du coureur connecté et du visiteur, le JSON qui
   reste du JSON `1 pt`
