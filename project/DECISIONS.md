@@ -2339,3 +2339,50 @@ trois appelants passent par `App\Support\EmailAddress`.
 pour lui-même : une majuscule y suffit à se fermer la porte, puisque la connexion cherche en
 minuscules. Le défaut est antérieur à BR-35 et hors de son périmètre ; il se corrige désormais par
 un appel de plus à `EmailAddress::normalise()`.
+
+## D-63 — Le mail se compose en composants du paquet, et sa palette reste sous test
+
+Arrêté le 2026-08-22 pendant BR-36, deuxième entrée du lot 3. La story avait tranché la voie —
+surcharger `notifications::email` plutôt qu'écrire une vue par notification — et laissé trois
+questions ouvertes derrière elle.
+
+**Un composant, deux formats : c'est le seul endroit où le HTML et le texte divergent.** Le même
+`notifications::email` est rendu deux fois, une fois avec les composants de `mail/html`, une fois
+avec ceux de `mail/text`. La vue ne peut donc pas se brancher sur le format — mais un composant, si.
+Les trois restes de markdown de la version texte se règlent chacun par un composant qui a un jumeau
+texte : `heading` (le `#` du titre), `link` (le `[url](url)` sous le bouton), `header` (le
+`Nom: http://…` de l'en-tête). Écrire ces phrases en dur dans la vue aurait été l'autre voie ; elle
+duplique l'habillage à la première notification suivante.
+
+**Le code d'accès voyage comme vue, pas comme chaîne.** `->line(view('mail.access-code', …))` :
+`SimpleMessage::formatLine()` rend tout `Htmlable` tel quel, et `Illuminate\View\View` en est un.
+Le bloc atterrit donc exactement là où la prose le place — entre « Ton code d'inscription : » et
+« Garde-le en sécurité ». Le passer par le gabarit, en donnée de vue, était la voie évidente et
+elle est fausse : le gabarit n'a que deux positions à offrir, avant ou après le bouton, et les deux
+séparent le code de la phrase qui le désigne. Le fragment ne porte aucune ligne vide, faute de quoi
+CommonMark refermerait le bloc HTML brut au milieu du tableau.
+
+**La quatrième déclaration de la palette n'échappe pas au test.** La story annonçait qu'aplatir
+`oklch` en hexadécimal ferait sortir le mail du test de concordance. C'est faux : la conversion
+oklch → sRGB est exacte au canal près sur les six couleurs employées, vérifiée avant d'écrire le
+test. `MailTemplateTest` compare donc l'hexadécimal du mail **rendu** au token de `app.css` converti
+— pas un hexadécimal figé à la main. La conversion sort de `Tests\Support\Contrast`, qui n'en
+gardait que la moitié linéaire, vers `Tests\Support\Srgb`.
+
+**Ce que le thème du mail ne style plus.** Il couvre ce que les deux notifications rendent, plus les
+boutons `success` et `error` — sans eux, une notification de niveau erreur afficherait un bouton
+sans fond, donc du texte clair sur une surface claire. Il ne style ni `x-mail::panel` ni
+`x-mail::table` : la story qui s'en servira les habillera.
+
+**Deux affirmations du contexte de BR-36 étaient périmées**, et le sont restées jusqu'à ce que le
+mail soit rendu pour de vrai. L'habillage n'était pas en anglais — `lang/fr.json` portait déjà le
+repli sous le bouton et le pied depuis D-45 ; il restait `Hello!`, `Whoops!` et `Regards,`, que
+personne n'affichait puisque les deux notifications posent titre et salutation. Et le bouton du
+paquet n'est plus bleu depuis longtemps : il vaut `#18181b`, à deux pas de l'encre de la charte. Le
+défaut visible était le gabarit de démonstration au complet — carte blanche, fond `#fafafa`, gris
+zinc, ombre portée — pas une couleur fausse.
+
+**Ce qui reste ouvert.** Le mail annonce `color-scheme: light` et rien d'autre : un client qui
+inverse d'autorité affichera ce qu'il veut, et c'était déjà hors périmètre. La coupure de mot sur
+tous les liens de la fenêtre (`.inner-body a`) est retirée du thème du paquet, où elle cassait aussi
+les libellés de bouton en portrait ; seule l'adresse de repli la porte, par sa classe.

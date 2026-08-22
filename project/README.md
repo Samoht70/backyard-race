@@ -113,25 +113,26 @@ circule pour de vrai.
 | Ordre | ID | Story | Pts | Pourquoi dans le lot |
 |-------|----|-------|-----|----------------------|
 | ✅ | [BR-35](stories/BR-35-compte-organisateur-en-commande.md) | Compte organisateur en une commande | 3 | La porte, et le filet de BR-37 |
-| 1 | [BR-36](stories/BR-36-gabarit-de-mail.md) | Habiller les mails aux couleurs de la course | 3 | Le mail est le seul chemin de création de compte (D-45) |
-| 2 | [BR-37](stories/BR-37-purge-des-inscriptions.md) | Purger les inscriptions et les comptes coureurs | 5 | La production porte des données d'essai |
+| ✅ | [BR-36](stories/BR-36-gabarit-de-mail.md) | Habiller les mails aux couleurs de la course | 3 | Le mail est le seul chemin de création de compte (D-45) |
+| 1 | [BR-37](stories/BR-37-purge-des-inscriptions.md) | Purger les inscriptions et les comptes coureurs | 5 | La production porte des données d'essai |
 
-**11 pts, dont 3 livrés.** L'ordre n'est pas indifférent :
+**11 pts, dont 6 livrés.** L'ordre n'est pas indifférent :
 
 - **BR-35 d'abord, close le 2026-08-22**, parce qu'elle est le filet de BR-37. Une commande qui
   supprime des comptes se lance plus sereinement quand une autre sait recréer celui de
   l'organisateur : `race:manager-account` crée le compte et regénère son code d'accès ([D-62](DECISIONS.md)).
-- **BR-36 ensuite**, avant le premier vrai inscrit. Chaque coureur reçoit ce mail une fois, et cette
-  fois-là ne se rattrape pas : qui s'inscrit avant garde l'habillage anglais du paquet. Aucune autre
-  story du backlog n'a cette propriété d'irréversibilité.
+- **BR-36 ensuite, close le 2026-08-22**, avant le premier vrai inscrit. Chaque coureur reçoit ce
+  mail une fois, et cette fois-là ne se rattrape pas : qui s'inscrit avant garde le gabarit de
+  démonstration du paquet. Aucune autre story du backlog n'a cette propriété d'irréversibilité.
 - **BR-37 en dernier**, parce qu'éprouver BR-36 en production y crée de nouvelles inscriptions
   d'essai. Purger avant reviendrait à purger deux fois. C'est le dernier geste avant d'annoncer
   l'adresse.
 
-**BR-36 a besoin d'un recalage avant d'être prise.** Son contexte s'appuie sur D-46 — « un bouton
-bleu de démonstration », la palette de D-46 à aplatir en hexadécimal — mais R-06 a révoqué le parti
-monochrome et D-61 a posé la charte de l'instrument. La story décrit une charte qui n'est plus celle
-du produit ; le travail qu'elle demande, lui, ne change pas.
+**BR-36 a été recalée en la prenant.** Son contexte s'appuyait sur D-46 — « un bouton bleu de
+démonstration », la palette de D-46 à aplatir en hexadécimal — alors que R-06 avait révoqué le parti
+monochrome et que D-61 avait posé la charte de l'instrument. Le travail demandé n'a pas changé ;
+c'est la palette du site, thème jour, qui est passée dans le mail, et [D-63](DECISIONS.md) porte ce
+que la livraison a appris — dont deux affirmations du contexte qui étaient périmées.
 
 **Ce que le lot ne contient pas** — le reliquat du lot 2. BR-30 T5, l'alerte sur file non consommée,
 en est le seul point qui coûte dès aujourd'hui : il se prend avec le lot 3 ou juste après. Le reste
@@ -200,7 +201,7 @@ attend la semaine de la course.
 |----|-------|-----|--------|
 | [BR-33](stories/BR-33-acces-parcours-coureur.md) | Accès du coureur à son inscription | 5 | ✅ Terminé |
 | [BR-24](stories/BR-24-dashboard-participant.md) | Dashboard participant | 8 | À faire |
-| [BR-36](stories/BR-36-gabarit-de-mail.md) | Habiller les mails aux couleurs de la course | 3 | 🔥 Lot 3 |
+| [BR-36](stories/BR-36-gabarit-de-mail.md) | Habiller les mails aux couleurs de la course | 3 | ✅ Terminé |
 | [BR-25](stories/BR-25-mon-dossard.md) | ~~Dossard imprimable~~ | — | ⛔ Abandonné |
 
 ### EPIC 7 — Déploiement
@@ -236,7 +237,7 @@ pas de fichier de story : c'est la décision qui les porte, et elles prennent un
 | R-05 | Course publique : l'accueil porte l'événement, les documents s'ouvrent aux invités | 5 | ✅ Livrée | [D-60](DECISIONS.md) |
 | R-06 | Charte de l’instrument, et primitives reka-ui à la place du starter kit | 5 | ✅ Livrée | [D-61](DECISIONS.md) |
 
-**Total : 34 stories actives + 6 reprises · 248 pts · 139 pts livrés (56 %)**
+**Total : 34 stories actives + 6 reprises · 248 pts · 142 pts livrés (57 %)**
 
 **Hors périmètre : 4 stories abandonnées, 32 pts non engagés** — voir [D-47](DECISIONS.md).
 
@@ -248,8 +249,8 @@ pas de fichier de story : c'est la décision qui les porte, et elles prennent un
 → BR-26 → BR-29, les quatre entrées closes. Reste, dans cet ordre : BR-30 T5 → BR-31 T4 et T5 →
 BR-32 T3 et T5 → BR-28 T3 et T4.
 
-**Lot 3, en cours — tenir la production à la main (11 pts, 3 livrés)** — BR-35 close, reste
-BR-36 → BR-37, plus BR-30 T5 qui vient avec.
+**Lot 3, en cours — tenir la production à la main (11 pts, 6 livrés)** — BR-35 et BR-36 closes,
+reste BR-37, plus BR-30 T5 qui vient avec.
 
 **Ce reliquat du lot 2 avant le moteur, ou après ?** Après, sauf BR-30 T5. Les inscriptions sont
 ouvertes, donc une file qui cesse d'être consommée coûte des coureurs dès aujourd'hui ; la version
@@ -279,10 +280,10 @@ Dix remarques sur cet ordre :
   main le 2026-08-22, donc elle ne barre plus la porte d'entrée. Elle reprend la tête du lot 3 pour
   une autre raison — BR-37 supprime des comptes, et on lance mieux un balai quand on sait recoller
   ce qu'il emporterait par erreur.
-- BR-36 ne dépend d'aucune autre et se laisse avancer à n'importe quel moment. L'argument pour la
-  prendre tôt n'est pas esthétique : le mail de lien est le seul chemin de création de compte
-  (D-45), il part déjà en production avec un habillage anglais, et c'est lui qui décide si un
-  coureur clique.
+- BR-36 ne dépendait d'aucune autre et se laissait avancer à n'importe quel moment. L'argument pour
+  la prendre tôt n'était pas esthétique : le mail de lien est le seul chemin de création de compte
+  (D-45), il partait en production dans le gabarit de démonstration du paquet, et c'est lui qui
+  décide si un coureur clique.
 - BR-37 ferme le lot 3 et non l'inverse, parce que les essais de BR-36 en production créeront eux
   aussi des comptes. Elle est aussi la seule story du backlog qui **détruise** : d'où le garde-fou
   sur le rôle `manager` dans ses règles métier, et d'où sa dépendance à BR-35.

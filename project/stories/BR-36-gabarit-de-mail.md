@@ -3,10 +3,11 @@
 | | |
 |---|---|
 | **Epic** | 6 — Expérience participant |
-| **Statut** | À faire |
+| **Statut** | ✅ Terminé |
 | **Estimation** | 3 pts |
 | **Créée** | 2026-08-21 — relevé pendant la mise en ligne |
-| **Dépend de** | BR-05, D-46 |
+| **Livrée** | 2026-08-22 — lot 3 |
+| **Dépend de** | BR-05, D-61 |
 
 ## User story
 
@@ -18,18 +19,21 @@ Afin de **reconnaître l'expéditeur et cliquer sans hésiter sur le seul lien q
 
 Les deux notifications du produit — `RegistrationLink` et `RegistrationConfirmed` — sortent
 aujourd'hui dans le gabarit de démonstration de Laravel. `resources/views/` ne contient que
-`app.blade.php` : aucune vue de `notifications::email` n'est surchargée, aucune traduction de son
-habillage n'est publiée.
+`app.blade.php` : aucune vue de `notifications::email` n'est surchargée, et aucun composant de
+`mail::` ne l'est non plus.
 
 Deux conséquences, dont une est un défaut visible :
 
-- **L'habillage est en anglais dans un mail français.** Le paragraphe de repli sous le bouton
-  — « If you're having trouble clicking … copy and paste the URL below » — et le pied
-  « © Backyard Race. All rights reserved. » viennent du paquet, non traduits. Le corps du message
-  est soigné (`lang/fr/mail.php` est entièrement rédigé), l'emballage ne l'est pas.
-- **La charte n'y est pas.** D-46 a posé deux familles aux rôles séparés, une échelle en cinq crans
-  et une palette où la couleur ne sert qu'aux quatre statuts. Le mail ignore tout cela et affiche
-  un bouton bleu de démonstration.
+- **La version texte porte du balisage brut.** Le titre y sort en `# Encore une étape`, l'adresse
+  de repli en `[https://…](https://…)`, et le code d'accès en `**K7QP-3M9X-RTBD**` : trois restes
+  de markdown, dans le mail que lit un client qui refuse le HTML. L'habillage lui-même est déjà en
+  français — `lang/fr.json` porte le repli sous le bouton et le pied depuis D-45 — mais trois
+  chaînes du paquet restent non traduites (`Hello!`, `Whoops!`, `Regards,`), et la première
+  notification qui omet salutation ou titre les fera apparaître.
+- **La charte n'y est pas.** D-61 a posé la dalle gris-bleu, le filet d'un pixel autour de chaque
+  fenêtre et l'arrondi de 4 px. Le mail ignore tout cela : carte blanche sur fond `#fafafa`, gris
+  zinc du paquet, ombre portée. Le bouton, lui, est déjà l'encre presque noire du paquet — le
+  défaut n'est pas une couleur fausse, c'est le gabarit de démonstration au complet.
 
 Le second point n'est pas de la coquetterie : D-45 fait du lien envoyé par mail **le seul chemin de
 création de compte**. Ce mail est la première chose que voit un coureur du produit, et il décide
@@ -64,27 +68,29 @@ paragraphe.
 - Le code d'accès de l'organisateur, qui s'affiche dans un terminal (BR-35) et ne passe pas par le
   mail.
 
-**Dépendances** — BR-05 pour les deux notifications, D-46 pour la charte.
+**Dépendances** — BR-05 pour les deux notifications, D-61 pour la charte.
 
 ## La charte ne se transpose pas telle quelle
 
-Trois règles de D-46 ne survivent pas au passage au mail, et il vaut mieux l'écrire que le
+Trois règles de D-61 ne survivent pas au passage au mail, et il vaut mieux l'écrire que le
 redécouvrir :
 
 - **`oklch` n'est pas lisible par les clients de messagerie.** La palette doit être aplatie en
-  hexadécimal dans le gabarit. Elle cesse donc d'être tenue par le test de concordance des trois
-  déclarations : c'est une quatrième déclaration, et il faut assumer qu'elle vive à part.
+  hexadécimal dans le gabarit : c'est une quatrième déclaration. Elle n'échappe pas pour autant au
+  contrôle — la conversion oklch → sRGB est exacte au canal près sur les six couleurs employées,
+  donc un test compare l'hexadécimal du mail rendu au token converti de `app.css` au lieu de le
+  figer à la main.
 - **Les polices auto-hébergées ne s'affichent pas.** Instrument Sans et Martian Mono viennent de
   `resources/fonts/` par le fournisseur `local()` de Vite ; un mail n'a pas accès à ces fichiers, et
   les charger depuis un tiers est exclu. Le gabarit s'appuie donc sur des piles système, avec une
-  pile monospace pour le code d'accès et les chiffres — l'intention de D-46 est conservée, la police
-  exacte ne l'est pas.
+  pile monospace pour le code d'accès et les libellés en capitales — l'intention de D-61 est
+  conservée, la police exacte ne l'est pas.
 - **Pas de flex, pas de grid.** Un mail se compose en tableaux et en styles en ligne. Le gabarit ne
   partage aucun code avec le design system de l'interface, et c'est normal.
 
-L'accent est un non-problème : depuis D-46 la couleur ne sert qu'aux quatre statuts, et aucun des
-deux mails n'en affiche un. Ces mails sont noir et blanc, ce qui est aussi la façon la plus sûre de
-traverser un client de messagerie intact.
+L'accent est un non-problème : le thème jour de D-61 n'en a pas — `--primary` y vaut l'encre — et
+aucun des deux mails n'affiche de statut. Ces mails sont donc gris-bleu et encre, ce qui est aussi
+la façon la plus sûre de traverser un client de messagerie intact.
 
 ## Règles métier
 
@@ -147,7 +153,7 @@ les phrases dans les vues, pour que `lang/fr` reste le seul endroit où le fran�
 
 ## Tâches
 
-- [ ] **T1** — Habillage du mail : en-tête, corps, bouton, pied, palette aplatie et piles système
+- [x] **T1** — Habillage du mail : en-tête, corps, bouton, pied, palette aplatie et piles système
   `1 pt`
-- [ ] **T2** — Habillage traduit en français, repli sous le bouton et pied compris `1 pt`
-- [ ] **T3** — Bloc du code d'accès, et vérification de la version texte des deux mails `1 pt`
+- [x] **T2** — Habillage traduit en français, repli sous le bouton et pied compris `1 pt`
+- [x] **T3** — Bloc du code d'accès, et vérification de la version texte des deux mails `1 pt`
