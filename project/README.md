@@ -12,7 +12,7 @@ Pas de Jira, pas d'outil externe : le backlog vit dans le repo.
 
 Statuts : `À faire` · `En cours` · `En revue` · `Terminé` · `Bloqué` · `Abandonné`
 
-Une story du lot prioritaire porte `🔥 Lot N` à la place de `À faire` : c'est le même statut, signalé. Voir la section « Priorité actuelle » ci-dessous. Aucune story ne le porte depuis le 2026-08-22 : les deux lots arrêtés sont servis.
+Une story du lot prioritaire porte `🔥 Lot N` à la place de `À faire` : c'est le même statut, signalé. Voir la section « Priorité actuelle » ci-dessous.
 
 Quand une story passe à `Terminé`, on met à jour la ligne du board **et** l'entête du fichier story.
 
@@ -23,14 +23,16 @@ voit revenir.
 Le travail demandé en cours de route, qui refait ce qu'une story avait déjà livré, n'a pas de
 fichier de story : il vit dans une **décision** et prend une ligne dans le tableau des reprises.
 
-## Priorité actuelle — le produit, maintenant que le site est en ligne
+## Priorité actuelle — lot 3 : tenir la production à la main
 
 Le lot 1 a ouvert les inscriptions, le lot 2 a mis le site en ligne le 2026-08-22. Les deux
 priorités arrêtées avec le propriétaire sont tenues : un coureur s'inscrit depuis l'extérieur, sur un
 nom de domaine, et reçoit son code d'accès sans que personne ne garde un terminal ouvert.
 
-Aucun lot 3 n'est arrêté. L'ordre conseillé en bas de page part du moteur de course, faute d'autre
-décision : c'est ce qui reste entre une inscription et une course qui existe.
+Le lot 3 est arrêté le même jour, et il ne parle pas du produit : il parle des **trois gestes que le
+propriétaire doit pouvoir faire seul sur une machine ouverte** avant d'annoncer l'adresse. Accueillir
+— le mail est la première chose que voit un coureur. Entrer — le compte organisateur n'a pas de
+porte. Remettre à zéro — la production porte des données d'essai.
 
 ### Lot 1 — ouvrir les inscriptions · clos le 2026-08-20
 
@@ -71,7 +73,7 @@ qu'une plateforme managée aurait fait tomber une vingtaine de ces points pour 3
 | 🚧 | [BR-30](stories/BR-30-workers-horizon-scheduler.md) | Files, Horizon, planificateur | 5 | Les deux | T5 |
 | 🚧 | [BR-31](stories/BR-31-domaine-https-supervision.md) | Domaine, HTTPS, supervision | 5 | Sur la machine | T4, T5 |
 | 🚧 | [BR-32](stories/BR-32-deploiement-dokploy.md) | Déploiement depuis Dokploy | 3 | Les deux | T3, T5 |
-| — | [BR-35](stories/BR-35-compte-organisateur-en-commande.md) | Compte organisateur en une commande | 3 | Dans le dépôt | Sort du lot, entière |
+| ↪ | [BR-35](stories/BR-35-compte-organisateur-en-commande.md) | Compte organisateur en une commande | 3 | Dans le dépôt | Passe au lot 3, entière |
 
 **52 pts, dont 31 livrés — et l'objectif du lot est atteint.** Le domaine répond en HTTPS, un compte
 organisateur existe, l'événement est public, un coureur s'inscrit et reçoit son code par mail depuis
@@ -95,11 +97,44 @@ Ce qui reste ne met plus rien en ligne : **ça prévient quand ça casse, ou ça
 **BR-35 sort du lot sans avoir été faite.** Le compte organisateur a été créé à la main le
 2026-08-22, par la séquence `tinker` que la story voulait remplacer. Elle ne bloque donc plus rien,
 et elle garde sa valeur entière : le code d'accès n'existe plus en clair, aucun geste ne le regénère,
-et la prochaine installation rejouerait les quatre pièges que son contexte nomme.
+et la prochaine installation rejouerait les quatre pièges que son contexte nomme. Elle passe au
+lot 3.
 
 BR-27 est passée avant BR-26 : elle était la seule story du lot à s'écrire et se vérifier entièrement
 dans le dépôt, sans machine. R-05 a suivi la même logique, et le lien devait cesser d'ouvrir un
 formulaire de connexion avant de circuler.
+
+### Lot 3 — tenir la production à la main · en cours
+
+Trois stories, 11 pts, dont aucune ne touche au produit de course. Le lot 2 a rendu l'application
+joignable ; le lot 3 rend son exploitation tenable par une personne seule, avant que l'adresse
+circule pour de vrai.
+
+| Ordre | ID | Story | Pts | Pourquoi dans le lot |
+|-------|----|-------|-----|----------------------|
+| 1 | [BR-35](stories/BR-35-compte-organisateur-en-commande.md) | Compte organisateur en une commande | 3 | La porte, et le filet de BR-37 |
+| 2 | [BR-36](stories/BR-36-gabarit-de-mail.md) | Habiller les mails aux couleurs de la course | 3 | Le mail est le seul chemin de création de compte (D-45) |
+| 3 | [BR-37](stories/BR-37-purge-des-inscriptions.md) | Purger les inscriptions et les comptes coureurs | 5 | La production porte des données d'essai |
+
+**11 pts, aucun livré.** L'ordre n'est pas indifférent :
+
+- **BR-35 d'abord**, parce qu'elle est le filet de BR-37. Une commande qui supprime des comptes se
+  lance plus sereinement quand une autre sait recréer celui de l'organisateur.
+- **BR-36 ensuite**, avant le premier vrai inscrit. Chaque coureur reçoit ce mail une fois, et cette
+  fois-là ne se rattrape pas : qui s'inscrit avant garde l'habillage anglais du paquet. Aucune autre
+  story du backlog n'a cette propriété d'irréversibilité.
+- **BR-37 en dernier**, parce qu'éprouver BR-36 en production y crée de nouvelles inscriptions
+  d'essai. Purger avant reviendrait à purger deux fois. C'est le dernier geste avant d'annoncer
+  l'adresse.
+
+**BR-36 a besoin d'un recalage avant d'être prise.** Son contexte s'appuie sur D-46 — « un bouton
+bleu de démonstration », la palette de D-46 à aplatir en hexadécimal — mais R-06 a révoqué le parti
+monochrome et D-61 a posé la charte de l'instrument. La story décrit une charte qui n'est plus celle
+du produit ; le travail qu'elle demande, lui, ne change pas.
+
+**Ce que le lot ne contient pas** — le reliquat du lot 2. BR-30 T5, l'alerte sur file non consommée,
+en est le seul point qui coûte dès aujourd'hui : il se prend avec le lot 3 ou juste après. Le reste
+attend la semaine de la course.
 
 ## Board
 
@@ -164,7 +199,7 @@ formulaire de connexion avant de circuler.
 |----|-------|-----|--------|
 | [BR-33](stories/BR-33-acces-parcours-coureur.md) | Accès du coureur à son inscription | 5 | ✅ Terminé |
 | [BR-24](stories/BR-24-dashboard-participant.md) | Dashboard participant | 8 | À faire |
-| [BR-36](stories/BR-36-gabarit-de-mail.md) | Habiller les mails aux couleurs de la course | 3 | À faire |
+| [BR-36](stories/BR-36-gabarit-de-mail.md) | Habiller les mails aux couleurs de la course | 3 | 🔥 Lot 3 |
 | [BR-25](stories/BR-25-mon-dossard.md) | ~~Dossard imprimable~~ | — | ⛔ Abandonné |
 
 ### EPIC 7 — Déploiement
@@ -178,7 +213,8 @@ formulaire de connexion avant de circuler.
 | [BR-30](stories/BR-30-workers-horizon-scheduler.md) | Files, Horizon et planificateur en production | 5 | 🚧 En cours |
 | [BR-31](stories/BR-31-domaine-https-supervision.md) | Domaine, HTTPS et supervision | 5 | 🚧 En cours |
 | [BR-32](stories/BR-32-deploiement-dokploy.md) | Déploiement depuis Dokploy et branche develop | 3 | 🚧 En cours |
-| [BR-35](stories/BR-35-compte-organisateur-en-commande.md) | Créer le compte organisateur en une commande | 3 | À faire |
+| [BR-35](stories/BR-35-compte-organisateur-en-commande.md) | Créer le compte organisateur en une commande | 3 | 🔥 Lot 3 |
+| [BR-37](stories/BR-37-purge-des-inscriptions.md) | Purger les inscriptions et les comptes coureurs | 5 | 🔥 Lot 3 |
 
 Les quatre stories `En cours` sont en production et il leur manque une ou deux tâches, nommées dans
 leur fichier sous « Ce qui reste au 2026-08-22 » et récapitulées dans le lot 2. Leurs points ne
@@ -199,7 +235,7 @@ pas de fichier de story : c'est la décision qui les porte, et elles prennent un
 | R-05 | Course publique : l'accueil porte l'événement, les documents s'ouvrent aux invités | 5 | ✅ Livrée | [D-60](DECISIONS.md) |
 | R-06 | Charte de l’instrument, et primitives reka-ui à la place du starter kit | 5 | ✅ Livrée | [D-61](DECISIONS.md) |
 
-**Total : 33 stories actives + 6 reprises · 243 pts · 136 pts livrés (56 %)**
+**Total : 34 stories actives + 6 reprises · 248 pts · 136 pts livrés (55 %)**
 
 **Hors périmètre : 4 stories abandonnées, 32 pts non engagés** — voir [D-47](DECISIONS.md).
 
@@ -209,16 +245,19 @@ pas de fichier de story : c'est la décision qui les porte, et elles prennent un
 
 **Lot 2 — mettre en ligne (52 pts) — objectif atteint le 2026-08-22.** L'ordre suivi : BR-27 → R-05
 → BR-26 → BR-29, les quatre entrées closes. Reste, dans cet ordre : BR-30 T5 → BR-31 T4 et T5 →
-BR-32 T3 et T5 → BR-28 T3 et T4, puis BR-35 quand un code d'accès devra être regénéré.
+BR-32 T3 et T5 → BR-28 T3 et T4.
 
-**Ce reliquat avant le moteur, ou après ?** Après, sauf BR-30 T5. Les inscriptions sont ouvertes,
-donc une file qui cesse d'être consommée coûte des coureurs dès aujourd'hui ; la version exposée et
-le garde-fou de gel, eux, ne coûtent que la nuit de course, et il reste du temps.
+**Lot 3, en cours — tenir la production à la main (11 pts)** — BR-35 → BR-36 → BR-37, plus BR-30 T5
+qui vient avec.
+
+**Ce reliquat du lot 2 avant le moteur, ou après ?** Après, sauf BR-30 T5. Les inscriptions sont
+ouvertes, donc une file qui cesse d'être consommée coûte des coureurs dès aujourd'hui ; la version
+exposée et le garde-fou de gel, eux, ne coûtent que la nuit de course, et il reste du temps.
 
 **Ensuite, le moteur et les écrans de course** — BR-08 → BR-09 → BR-10 → BR-11 → BR-12 → BR-13 →
 BR-14 → BR-15 → BR-16 → BR-24 → BR-20 → BR-23
 
-Neuf remarques sur cet ordre :
+Dix remarques sur cet ordre :
 
 - Les deux premiers lots livrent un produit **incomplet mais utile**, et il est en ligne : un coureur
   s'inscrit, lit le briefing, télécharge le règlement et déclare son numéro PPS. Rien de la nuit de
@@ -236,12 +275,16 @@ Neuf remarques sur cet ordre :
 - BR-13 est le porteur naturel de **Q-02** (page d'erreur Inertia) et de **Q-04**, l'écart de cible
   tactile relevé en D-46 : le bouton de validation a perdu un tiers de sa hauteur.
 - BR-35 a perdu son urgence sans rien perdre de sa valeur : le compte organisateur a été créé à la
-  main le 2026-08-22, donc elle ne barre plus la porte d'entrée. Ce qu'elle porte reste vrai — le
-  code d'accès n'existe plus en clair, et rien ne le regénère.
+  main le 2026-08-22, donc elle ne barre plus la porte d'entrée. Elle reprend la tête du lot 3 pour
+  une autre raison — BR-37 supprime des comptes, et on lance mieux un balai quand on sait recoller
+  ce qu'il emporterait par erreur.
 - BR-36 ne dépend d'aucune autre et se laisse avancer à n'importe quel moment. L'argument pour la
   prendre tôt n'est pas esthétique : le mail de lien est le seul chemin de création de compte
   (D-45), il part déjà en production avec un habillage anglais, et c'est lui qui décide si un
   coureur clique.
+- BR-37 ferme le lot 3 et non l'inverse, parce que les essais de BR-36 en production créeront eux
+  aussi des comptes. Elle est aussi la seule story du backlog qui **détruise** : d'où le garde-fou
+  sur le rôle `manager` dans ses règles métier, et d'où sa dépendance à BR-35.
 - BR-30 était la story du lot 2 à ne pas bâcler, et elle a été à moitié entendue : le worker tourne,
   les mails de code partent, mais T5 est restée sur le carreau. Sans alerte sur file non consommée,
   un worker mort ne se signale pas — ni pour les mails d'aujourd'hui, ni pour les éliminations
