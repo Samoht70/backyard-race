@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Epic** | 7 — Déploiement |
-| **Statut** | 🚧 En cours |
+| **Statut** | ✅ Terminé |
 | **Estimation** | 5 pts |
 | **Dépend de** | BR-29 |
 
@@ -103,10 +103,10 @@ du site.
 - [x] **T2** — Configurer Horizon en production : files, tentatives, délais `1 pt`
 - [x] **T3** — Protéger l'interface Horizon par permission `1 pt`
 - [x] **T4** — Redémarrage des workers au déploiement `1 pt`
-- [ ] **T5** — Alerte sur file non consommée `2 pts` — sondage et battement livrés, deux inscriptions à faire
+- [x] **T5** — Alerte sur file non consommée `2 pts`
 - [x] **T6** — Vérifier de bout en bout qu'une élimination tombe sans navigateur ouvert `1 pt`
 
-## Ce qui reste au 2026-08-22
+## Où en est la story au 2026-08-22
 
 Le worker tourne en production et il travaille : un code d'accès est parti par mail sans qu'aucun
 navigateur soit resté ouvert. C'est ce que T6 demandait de constater — l'élimination nommée dans son
@@ -131,12 +131,11 @@ la couvre par renversement : le planificateur l'exécute chaque minute et elle n
 `HEALTHCHECKS_QUEUE_URL` que si la file est consommée. Plus de ping veut dire « le planificateur est
 mort » ou « le worker ne consomme plus » ; `up/queue` dit ensuite lequel des deux.
 
-**Ce qui reste à T5, deux inscriptions et rien de plus :**
+**Les deux inscriptions sont faites le 2026-08-22, et la story est close.** Un moniteur sur
+`up/queue` à côté de celui de `/up`, et un check de battement dont l'URL remplit
+`HEALTHCHECKS_QUEUE_URL`. Ce que le tuto de mise en ligne porte désormais à ses étapes 13 et 14, à la
+place de la voie qu'il proposait avant.
 
-1. Un moniteur sur `https://<domaine>/up/queue` dans la surveillance externe de BR-31 T3, deux échecs
-   consécutifs avant l'alerte — le redémarrage du worker au déploiement ne doit pas sonner.
-2. Un check de battement chez le service de ping déjà utilisé par les sauvegardes (BR-29), son URL
-   dans `HEALTHCHECKS_QUEUE_URL`, période et grâce réglées pour laisser passer un déploiement.
-
-Tant que ces deux entrées n'existent pas, le dépôt sait dire que la file décroche et personne ne
-l'écoute — la case reste donc ouverte.
+Reste, mais ailleurs : l'exercice à froid — couper le worker en production et constater que les deux
+alertes arrivent sur le téléphone. C'est le même geste que celui que BR-31 T5 réclame pour sa propre
+alerte, et il se fait une fois, avec les deux.
