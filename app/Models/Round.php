@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Casts\UtcDateTime;
+use Carbon\CarbonImmutable;
 use Database\Factories\RoundFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,6 +11,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id
+ * @property int $event_id
+ * @property int $number
+ * @property CarbonImmutable $starts_at
+ * @property CarbonImmutable $deadline_at
+ */
 #[Fillable(['event_id', 'number', 'starts_at', 'deadline_at'])]
 class Round extends Model
 {
