@@ -13,10 +13,7 @@ use Inertia\Response;
 
 class IndexController extends Controller
 {
-    public function __invoke(
-        ResolveCurrentRound $resolveCurrentRound,
-        ResolveNextRound $resolveNextRound,
-    ): Response {
+    public function __invoke(ResolveCurrentRound $resolveCurrentRound, ResolveNextRound $resolveNextRound): Response {
         $event = Event::currentOrNew();
         $round = $resolveCurrentRound($event);
         $next = $resolveNextRound($event);

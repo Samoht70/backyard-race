@@ -42,11 +42,6 @@ final class ChangeRoundDuration
         $event->unsetRelation('scheduleSegments');
     }
 
-    /**
-     * Reading `$resumed` after the first write resumes the change's own
-     * duration, and a replayed single-round change then pushes the exception
-     * one round further on every send.
-     */
     private function rewrite(Event $event, int $fromRoundNumber, int $lapDurationMinutes, ScheduleChange $change, int $resumed): void
     {
         $this->write($event, $fromRoundNumber, $lapDurationMinutes);

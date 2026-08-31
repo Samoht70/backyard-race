@@ -34,10 +34,6 @@ class RoundDurationRequest extends FormRequest
     }
 
     /**
-     * Without the catch-up, a round due but not yet materialised passes here
-     * and is refused by the action as a 409, which leaves the SPA for an
-     * untranslated error page.
-     *
      * @return array<int, callable>
      */
     public function after(): array
