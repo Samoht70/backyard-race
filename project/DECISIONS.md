@@ -3208,3 +3208,75 @@ repeupler une course vide, ce qu'aucun scénario de la nuit ne fait. Le coureur 
 prévenu, conformément à D-15 et au périmètre de la story. Et l'élimination n'a toujours pas d'écran :
 le tableau de BR-09 montre le statut, mais rien n'annonce au gérant que trois coureurs viennent de
 sortir — c'est le bandeau d'effectifs de BR-13.
+
+## D-78 — La correction est une boucle qu'on remonte ou qu'on retire, et l'écran n'offre que ce que le geste courant ne sait plus faire
+
+Arrêté le 2026-08-31 par BR-12. La story se décrivait elle-même comme « volontairement étroite », et
+c'est la seule porte du produit par laquelle une heure saisie à la main entre dans le système. Le
+travail a moins porté sur les deux gestes que sur ce qui les rend difficiles à confondre avec la
+validation courante.
+
+**L'unité de la correction est la boucle, pas le coureur.** Réintégrer prend une boucle et une heure ;
+annuler prend une boucle. Le choix se voit au rattrapage : après une coupure du planificateur, un
+coureur sort à la première limite qu'il a manquée (D-77) et traîne des boucles
+éliminées sur plusieurs tours. Une action portée sur le coureur devrait alors deviner *laquelle* de
+ses boucles on rattrape, et toute déduction implicite est fausse une fois sur trois. L'écran les
+montre toutes, le gérant désigne, et le cas limite que la story nomme — « correction sur un tour
+antérieur au tour courant : les tours suivants ne sont pas rejoués » — tombe sans code.
+
+**La réintégration accepte aussi une boucle encore en attente, et c'est le refus de BR-09 qui
+l'exige.** Une validation tentée trois secondes après l'heure limite est refusée par un message qui
+envoie ici (D-75), et à cet instant la boucle est `pending` : le planificateur ne
+l'a pas encore fermée. Exiger `eliminated` aurait fait attendre le gérant devant un écran vide
+pendant la minute où il a le plus besoin de la porte. Le geste refuse donc une seule chose, la boucle
+**déjà validée** — et le refus dit d'aller chercher l'annulation, parce que c'est le geste que le
+gérant voulait.
+
+**L'annulation réutilise la sortie de BR-10 au lieu de réinventer la sienne.** Tour encore ouvert, la
+boucle repart en attente et le coureur ne bouge pas ; heure limite passée, la boucle est perdue et
+`leaveRace(ExitReason::Timeout, deadline_at)` sort le coureur à l'heure de la ligne du tour, exactement
+comme l'élimination automatique. La garde `isRunning()` conserve le motif d'un coureur déjà sorti :
+annuler la boucle d'un coureur qui avait abandonné à 17:40 n'en fait pas un éliminé de 18:00.
+
+**Le retour en course écrit `null` dans deux colonnes, et D-76 l'avait prévu.**
+`returnToRace()` rejoint `leaveRace()` sur le concern qui porte déjà le concept. Rien ne remonte les
+boucles fermées par la sortie : la boucle corrigée est validée, les autres restent éliminées. Le motif
+d'abandon disparaît, ce que le cas limite de la story demande explicitement.
+
+**La durée se recalcule sans une ligne pour ça.** `LapPerformance` naît à la lecture depuis
+`validated_at`, `starts_at` et la distance de l'événement (D-73) : écrire l'heure
+fournie par le gérant suffit à ce que durée et vitesse suivent. C'est la conséquence que D-75 avait
+annoncée, vérifiée à l'usage — « BR-12 n'aura qu'un instant à réécrire ».
+
+**L'heure saisie se pose sur la date du tour, et un tour à cheval sur minuit garde un angle mort.**
+Le champ ne demande que `HH:MM`, parce qu'une date à saisir à 4 h du matin est une erreur de plus à
+faire. L'instant se construit donc sur la date de `starts_at`, et le refus « antérieure au départ du
+tour » est possible. Sur un tour qui traverse minuit, une heure antérieure au départ est interprétée
+au lendemain plutôt que refusée : c'est le seul cas où la borne basse ne garde plus rien, et il
+demande une saisie fautive sur le seul tour de la nuit qui change de jour.
+
+**Le marqueur est une colonne, pas un historique.** `corrected_at` dit qu'une boucle a été touchée à
+la main et quand ; il ne dit pas par qui ni ce qu'elle valait avant. La story exclut l'historique
+complet (D-15), et une seconde correction écrase la première — ce qui reste vrai est
+la seule chose dont la nuit a besoin : ce chiffre-là n'est pas sorti du chronomètre.
+
+**L'écran est distinct, et il ne liste pas la course entière.** Les boucles à rattraper sont celles
+que le geste courant ne peut plus valider : éliminées, ou en attente sur un tour échu. Les
+validations annulables sont celles des **deux derniers tours** — une erreur de saisie se voit dans
+les minutes qui suivent, et rendre 24 h de boucles validées ferait d'un écran de secours un écran de
+navigation. Le lien vers le poste n'apparaît que pendant la course, faute de quoi il mènerait au 403
+que la policy oppose hors `running`.
+
+**Une seule capacité autorise les deux gestes et l'écran.** `EventPolicy::correctLaps` porte la
+permission `manage-laps` et l'état de course ; `LapPolicy::correct` la relaie pour les deux routes.
+Les `FormRequest` reposent le gérant sur son écran avec une ligne d'explication, les exceptions des
+actions restent le filet du programmeur — même construction que BR-09 et BR-44, duplication
+comprise et testée des deux côtés.
+
+**Ce qui reste ouvert.** Le marqueur se lit sur le tableau du tour courant, dans la sous-ligne du
+coureur ; la fiche du coureur que la story désigne est BR-16 et n'existe pas. Un coureur sorti sans
+aucune boucle fermée — un abandon posé sur une boucle déjà validée, ce que l'écran de BR-10 n'offre
+pas mais que l'action sait faire — n'apparaît sur aucune des deux listes, et son retour en course
+passerait par une réintégration sur une autre de ses boucles. Rien ne signale au gérant qu'une
+correction a eu lieu ailleurs que sur la ligne concernée, et rien ne l'empêche d'en faire son geste
+courant : c'est un choix d'écran, pas une garde.
