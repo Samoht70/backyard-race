@@ -79,7 +79,7 @@ const errorBag = computed(() => `lap-${props.lap.lap_id}-reversion`);
 
                     <p class="font-mono text-data tabular-nums">
                         {{
-                            t('race.correction.reinstate_window', {
+                            t('race.correction.window', {
                                 start: lap.round_starts_at,
                                 deadline: lap.round_deadline_at,
                             })

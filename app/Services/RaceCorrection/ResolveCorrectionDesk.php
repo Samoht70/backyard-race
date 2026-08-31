@@ -31,15 +31,17 @@ final class ResolveCorrectionDesk
      */
     private function reinstatable(Event $event, CarbonImmutable $at): Collection
     {
-        return $this->withRunners(
-            $this->lapsOf($event)
-                ->where(fn (Builder $lap): Builder => $lap
-                    ->where('laps.status', LapStatus::Eliminated)
-                    ->orWhere(fn (Builder $overdue): Builder => $overdue
-                        ->where('laps.status', LapStatus::Pending)
-                        ->where('rounds.deadline_at', '<', $at->utc())))
-                ->get(),
-        );
+        $laps = $this->lapsOf($event)
+            ->where(fn (Builder $lap): Builder => $lap
+                ->where('laps.status', LapStatus::Eliminated)
+                ->orWhere(fn (Builder $overdue): Builder => $overdue
+                    ->where('laps.status', LapStatus::Pending)
+                    ->where('rounds.deadline_at', '<', $at->utc())))
+            ->orderBy('rounds.number')
+            ->orderBy('participants.bib_number')
+            ->get();
+
+        return $this->withRunners($laps->unique('participant_id')->values());
     }
 
     /**
@@ -53,6 +55,8 @@ final class ResolveCorrectionDesk
             $this->lapsOf($event)
                 ->where('laps.status', LapStatus::Validated)
                 ->where('rounds.number', '>', $lastNumber - self::REVERTABLE_ROUNDS)
+                ->orderByDesc('rounds.number')
+                ->orderBy('participants.bib_number')
                 ->get(),
         );
     }
@@ -67,8 +71,6 @@ final class ResolveCorrectionDesk
             ->join('participants', 'participants.id', '=', 'laps.participant_id')
             ->where('rounds.event_id', $event->getKey())
             ->with('round')
-            ->orderByDesc('rounds.number')
-            ->orderBy('participants.bib_number')
             ->select('laps.*');
     }
 

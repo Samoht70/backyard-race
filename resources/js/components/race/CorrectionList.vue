@@ -22,7 +22,10 @@ function readout(lap: CorrectableLap): string {
 
     parts.push(
         lap.validated_at === null
-            ? `${t('race.round.deadline')} ${lap.round_deadline_at}`
+            ? t('race.correction.round_window', {
+                  start: lap.round_starts_at,
+                  deadline: lap.round_deadline_at,
+              })
             : `${t('race.runner.arrived')} ${lap.validated_at}`,
     );
 

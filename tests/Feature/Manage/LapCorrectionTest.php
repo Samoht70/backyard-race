@@ -45,6 +45,27 @@ class LapCorrectionTest extends TestCase
     }
 
     #[Test]
+    public function it_offers_one_line_per_runner_on_the_first_deadline_they_missed(): void
+    {
+        $event = $this->racingEvent();
+        $runner = $this->runner($event);
+
+        foreach (range(1, 3) as $number) {
+            $this->roundOf($event, $number)->laps()->create(['participant_id' => $runner->id]);
+        }
+
+        $runner->leaveRace(ExitReason::Timeout, $this->at('2026-09-05 18:00'));
+        $this->travelTo($this->at('2026-09-05 20:05'));
+
+        $this->get(route('manage.corrections'))->assertInertia(fn (AssertableInertia $page) => $page
+            ->count('reinstatable', 1)
+            ->where('reinstatable.0.round_number', 1)
+            ->where('reinstatable.0.round_starts_at', '17:00')
+            ->where('reinstatable.0.round_deadline_at', '18:00')
+            ->etc());
+    }
+
+    #[Test]
     public function it_puts_the_runner_back_in_the_race_on_the_time_the_manager_typed(): void
     {
         $event = $this->racingEvent();
