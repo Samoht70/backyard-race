@@ -2,7 +2,9 @@
 
 namespace Tests\Feature\Race;
 
+use App\Enums\ExitReason;
 use App\Enums\RunnerStatus;
+use App\Models\Event;
 use App\Models\Lap;
 use App\Models\Participant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -17,7 +19,7 @@ class RunnerStatusTest extends TestCase
     use RunsARace;
 
     #[Test]
-    public function it_reports_a_confirmed_runner_without_an_eliminated_lap_as_running(): void
+    public function it_reports_a_confirmed_runner_who_has_not_left_as_running(): void
     {
         $event = $this->runningEvent();
         $runner = $this->runner($event);
@@ -28,14 +30,21 @@ class RunnerStatusTest extends TestCase
     }
 
     #[Test]
-    public function it_reports_a_runner_with_an_eliminated_lap_as_eliminated(): void
+    public function it_reports_a_runner_the_clock_caught_as_eliminated(): void
     {
-        $event = $this->runningEvent();
-        $runner = $this->runner($event);
-        Lap::factory()->eliminated()->for($this->roundOf($event))->for($runner)->create();
+        $runner = $this->outOfTheRace($this->runningEvent(), ExitReason::Timeout);
 
         $this->assertFalse($runner->isRunning());
         $this->assertSame(RunnerStatus::Eliminated, $runner->runnerStatus());
+    }
+
+    #[Test]
+    public function it_reports_a_runner_who_stopped_as_withdrawn(): void
+    {
+        $runner = $this->outOfTheRace($this->runningEvent(), ExitReason::Withdrawal);
+
+        $this->assertFalse($runner->isRunning());
+        $this->assertSame(RunnerStatus::Withdrawn, $runner->runnerStatus());
     }
 
     #[Test]
@@ -53,26 +62,19 @@ class RunnerStatusTest extends TestCase
     public function it_reads_the_status_of_a_whole_roster_without_a_query_per_runner(): void
     {
         $event = $this->runningEvent();
-        $round = $this->roundOf($event);
-        $running = $this->runner($event);
-        $eliminated = $this->runner($event);
-        Lap::factory()->validated()->for($round)->for($running)->create();
-        Lap::factory()->eliminated()->for($round)->for($eliminated)->create();
-
-        $batched = Participant::query()->withRaceStatus()->orderBy('id')->get();
-        $plain = Participant::query()->orderBy('id')->get();
+        $this->runner($event);
+        $this->outOfTheRace($event, ExitReason::Withdrawal);
+        $roster = Participant::query()->orderBy('id')->get();
 
         $queries = 0;
         DB::listen(function () use (&$queries): void {
             $queries++;
         });
 
-        $statuses = $batched->map(fn (Participant $runner): RunnerStatus => $runner->runnerStatus())->all();
-        $this->assertSame([RunnerStatus::Running, RunnerStatus::Eliminated], $statuses);
-        $this->assertSame(0, $queries);
+        $statuses = $roster->map(fn (Participant $runner): RunnerStatus => $runner->runnerStatus())->all();
 
-        $plain->each(fn (Participant $runner): RunnerStatus => $runner->runnerStatus());
-        $this->assertSame($plain->count(), $queries);
+        $this->assertSame([RunnerStatus::Running, RunnerStatus::Withdrawn], $statuses);
+        $this->assertSame(0, $queries);
     }
 
     #[Test]
@@ -90,15 +92,20 @@ class RunnerStatusTest extends TestCase
     }
 
     #[Test]
-    public function it_keeps_an_eliminated_runner_out_of_the_active_roster(): void
+    public function it_keeps_a_runner_who_left_out_of_the_active_roster(): void
     {
         $event = $this->runningEvent();
-        $round = $this->roundOf($event);
         $running = $this->runner($event);
-        $eliminated = $this->runner($event);
-        Lap::factory()->eliminated()->for($round)->for($eliminated)->create();
-        Lap::factory()->validated()->for($round)->for($running)->create();
+        $this->outOfTheRace($event, ExitReason::Timeout);
 
         $this->assertSame([$running->getKey()], Participant::query()->running()->pluck('id')->all());
+    }
+
+    private function outOfTheRace(Event $event, ExitReason $reason): Participant
+    {
+        return Participant::factory()
+            ->confirmed()
+            ->outOfTheRace($reason)
+            ->create(['event_id' => $event->getKey()]);
     }
 }

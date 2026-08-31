@@ -38,6 +38,18 @@ return [
         'no_schedule' => 'La grille horaire n’est pas configurée : il n’y a pas de durée à changer.',
         'deadline_passed' => 'L’heure limite du tour est passée : cette boucle relève de la correction exceptionnelle.',
         'runner_out' => 'Ce coureur est sorti de la course : sa boucle ne se valide plus.',
+        'runner_already_out' => 'Ce coureur est déjà sorti de la course : son abandon ne s’enregistre pas une seconde fois.',
+    ],
+    'withdrawal' => [
+        'open' => 'Abandon',
+        'aria_open' => 'Déclarer l’abandon de :name',
+        'confirm_title' => 'Déclarer l’abandon de :name ?',
+        'last_lap' => 'Dernière boucle validée : n° :number',
+        'no_lap' => 'Aucune boucle validée.',
+        'consequence' => 'Sa boucle en cours ne compte pas, ses boucles validées restent acquises, et plus aucune boucle ne s’ouvrira pour lui.',
+        'submit' => 'Enregistrer l’abandon',
+        'keep' => 'Le laisser en course',
+        'recorded' => 'Abandon de :name enregistré.',
     ],
     'runner' => [
         'bib' => 'Dossard',

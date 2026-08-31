@@ -2,11 +2,13 @@
 
 namespace Tests\Feature\Manage;
 
+use App\Enums\ExitReason;
 use App\Enums\LapStatus;
 use App\Enums\RunnerStatus;
 use App\Models\Event;
 use App\Models\Lap;
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
@@ -149,7 +151,7 @@ class LapValidationTest extends TestCase
     public function it_marks_a_runner_eliminated_on_this_round_as_out(): void
     {
         $lap = $this->pendingLap();
-        $lap->update(['status' => LapStatus::Eliminated]);
+        $lap->participant->leaveRace(ExitReason::Timeout, CarbonImmutable::now());
         $this->travelTo($this->at('2026-09-05 13:30'));
 
         $this->get(route('manage.index'))->assertInertia(fn (AssertableInertia $page) => $page

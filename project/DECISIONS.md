@@ -3083,3 +3083,74 @@ faute de motif de sortie (BR-10). Aucune boucle n'est semée, donc l'écran ne s
 fabriquant une course à la main. Et la perte de réseau au moment de l'appui n'a pas de traitement
 propre : le bouton reste en attente, le gérant réappuie, et l'idempotence fait le reste — un
 tampon hors ligne serait une autre story.
+
+## D-76 — La sortie de course est une colonne du coureur, et le motif décide de ce qu'il affiche
+
+Arrêté le 2026-08-31 par BR-10. La story tenait en une phrase — « le gérant enregistre qu'un coureur
+s'arrête » — et elle a déplacé la vérité que BR-08 avait posée deux stories plus tôt.
+
+**D-74 est révoqué sur un point : le coureur actif se lit maintenant avec une colonne.** BR-08
+déduisait « en course » de l'absence de boucle `eliminated`, et cette déduction était juste tant que
+la seule façon de sortir était de rater une heure limite. Le cas limite que BR-10 nomme la casse :
+« abandon déclaré alors que la boucle du coureur venait d'être validée ». Ce coureur-là n'a aucune
+boucle éliminée — sa dernière boucle est bonne et se conserve — donc la déduction le laisserait dans
+les effectifs actifs, et le tour suivant lui ouvrirait une boucle. `exited_at` et `exit_reason`
+deviennent la seule vérité, `running` les lit, et `withRaceStatus()` disparaît : la donnée est sur la
+ligne, il n'y a plus de `withExists` à charger. Le statut de course reste dérivé, comme D-26
+l'exige ; c'est le **fait** de la sortie qui est stocké, pas son affichage.
+
+**La boucle en cours passe quand même en `eliminated`, et ce n'est plus la même information.** Elle
+dit que cette boucle-là ne compte pas, pas que le coureur est dehors. Les deux écritures partent
+ensemble dans `leaveRace()`, sur le concern qui porte déjà le concept, parce que BR-11 fera le même
+geste avec l'autre motif — un point d'écriture, deux appelants, la règle énoncée une fois.
+
+**`withdrawn` contre `eliminated` : la story dit l'un, le produit affiche l'autre.** Ses règles
+métier écrivent « l'abandon fait passer le participant en `eliminated` », et son propre paragraphe
+« Impacts techniques » dit l'inverse deux sections plus bas : « distinguer les deux est ce qui permet
+de dire qui s'est arrêté et qui a été rattrapé par le chrono ». D-74 avait déjà réservé `withdrawn`
+au motif de cette story. Le coureur est donc sorti de la course, exactement comme demandé, et il
+s'affiche `withdrawn` — même statut de sortie, deux motifs, deux pictogrammes que la charte avait
+déjà dessinés.
+
+**Le double envoi est refusé, là où BR-09 rendait silencieusement le premier temps.** Les deux
+stories décrivent le même geste répété et demandent l'inverse l'une de l'autre : « la seconde
+tentative ne modifie rien **et** ne présente aucune erreur » pour une boucle, « un coureur déjà sorti
+ne peut pas abandonner une seconde fois » ici. Le refus est le bon comportement parce que le second
+appui n'est pas le même geste : sur une boucle il vient d'un doigt qui a rebondi, sur un abandon il
+vient d'un gérant qui croit que le premier n'est pas passé — et la réponse utile est de lui dire que
+si. Le motif initial est conservé, ce qui règle du même coup l'abandon d'un coureur que le chrono
+avait déjà sorti.
+
+**L'abandon ne se déclare que sur une boucle non validée, et seulement depuis le tableau.** La story
+voulait l'action « depuis la fiche du coureur et depuis le tableau de course » : la fiche est BR-16,
+elle n'existe pas, et l'action y viendra avec elle. Le gérant a ensuite retiré le bouton des coureurs
+déjà rentrés sur le tour — un coureur qui vient de valider n'abandonne pas la boucle qu'il a finie,
+il ne repart pas au tour suivant. L'action reste capable de le faire, elle est testée, et c'est
+l'écran qui ne l'offre pas.
+
+**Q-04 est fermée, dans le sens que personne n'attendait.** D-24 exigeait 72 px de haut pour la
+validation d'une boucle, la charte de D-46 l'avait ramenée à 50, et la question attendait un écran
+réel pour trancher. Il est arrivé : le gérant a jugé le bouton trop gros, puis a demandé que les
+gestes de course tiennent la taille des autres boutons du site. La variante spéciale disparaît donc
+au lieu de remonter — une seule taille, 44 px au doigt et 40 au grand format, plancher
+d'accessibilité tenu. Ce que Q-04 réclamait d'autre est fait : la valeur n'est plus une chaîne
+enfouie dans un composant mais `lib/actionButton.ts`, et un test la garde, comme `runnerStatus.ts`
+garde déjà la sienne.
+
+**Sur la carte du téléphone, les deux gestes tombent à leur icône.** Deux boutons libellés côte à
+côte sur une ligne qui porte déjà un dossard, un nom et un compteur ne tiennent pas, et c'est le nom
+du coureur qui se faisait tronquer. Le libellé revient à partir de `sm` ; en dessous, l'`aria-label`
+porte seul le sens, et il nomme le coureur là où le texte visible ne l'aurait pas fait. L'icône de
+l'abandon a été reprise deux fois avant de tenir : la flèche vers une ligne se lisait « télécharger »,
+le carré dans un cercle se lisait « enregistrement », et c'est une tête de mort qui les remplace —
+sur le bouton comme sur le pictogramme de statut. Lucide n'a pas de « porte plus bonhomme », qui
+était l'autre piste ; elle n'offre que la porte seule, voisine de la déconnexion. Le crâne dit le DNF
+dans le vocabulaire de la discipline, il ne ressemble à aucune commande de lecteur, et le
+propriétaire l'a choisi en connaissance du registre — c'est un mot d'un fichier à changer si le ton
+ne convient plus.
+
+**Ce qui reste ouvert.** `finished` attend BR-20, et c'est le dernier statut sans motif. BR-11 n'a
+plus qu'à appeler `leaveRace(ExitReason::Timeout, …)` sur les coureurs dont la boucle a expiré : le
+motif existe, il est sous test par cette story, et la grille d'élimination qu'elle encodera n'a plus
+à inventer sa sortie. L'annulation d'un abandon reste à BR-12, et elle devra écrire `null` dans deux
+colonnes plutôt que remonter une boucle.

@@ -50,6 +50,9 @@ Route::middleware('auth')
                 Route::post('laps/{lap}/validate', Manage\LapValidationController::class)
                     ->name('laps.validate');
 
+                Route::post('runners/{participant}/withdraw', Manage\RunnerWithdrawalController::class)
+                    ->name('runners.withdraw');
+
                 Route::middleware('can:'.Permission::ManageDocuments->value)
                     ->group(function () {
                         Route::singleton('briefing', Manage\BriefingController::class)

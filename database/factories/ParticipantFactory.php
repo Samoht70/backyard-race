@@ -3,10 +3,12 @@
 namespace Database\Factories;
 
 use App\Actions\NextBibNumber;
+use App\Enums\ExitReason;
 use App\Enums\RegistrationStatus;
 use App\Models\Event;
 use App\Models\Participant;
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -25,6 +27,8 @@ class ParticipantFactory extends Factory
             'status' => RegistrationStatus::Pending,
             'phone' => fake()->phoneNumber(),
             'birth_date' => fake()->dateTimeBetween('-60 years', '-18 years')->format('Y-m-d'),
+            'exit_reason' => null,
+            'exited_at' => null,
             'pps_number' => null,
             'emergency_contact_name' => fake()->name(),
             'emergency_contact_phone' => fake()->phoneNumber(),
@@ -44,6 +48,14 @@ class ParticipantFactory extends Factory
                     'bib_number' => app(NextBibNumber::class)($participant->event),
                 ])->save();
             });
+    }
+
+    public function outOfTheRace(ExitReason $reason): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'exit_reason' => $reason,
+            'exited_at' => CarbonImmutable::now(),
+        ]);
     }
 
     public function withBib(int $number): static

@@ -34,7 +34,6 @@ final class ResolveRoundBoard
                 'user',
                 'laps' => fn (Relation $laps): Relation => $laps->where('round_id', $round->id),
             ])
-            ->withRaceStatus()
             ->withValidatedLapsCount()
             ->orderBy('bib_number')
             ->get();

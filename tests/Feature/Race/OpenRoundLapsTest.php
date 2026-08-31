@@ -3,10 +3,12 @@
 namespace Tests\Feature\Race;
 
 use App\Actions\OpenRoundLaps;
+use App\Enums\ExitReason;
 use App\Enums\LapStatus;
 use App\Models\Lap;
 use App\Models\Participant;
 use App\Models\Round;
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\Concerns\RunsARace;
@@ -35,7 +37,8 @@ class OpenRoundLapsTest extends TestCase
     {
         $event = $this->runningEvent();
         $eliminated = $this->runner($event);
-        Lap::factory()->eliminated()->for($this->roundOf($event, 5))->for($eliminated)->create();
+        Lap::factory()->for($this->roundOf($event, 5))->for($eliminated)->create();
+        $eliminated->leaveRace(ExitReason::Timeout, CarbonImmutable::now());
 
         $this->open($this->roundOf($event, 6));
 
@@ -74,9 +77,8 @@ class OpenRoundLapsTest extends TestCase
     public function it_opens_nothing_when_every_runner_is_out(): void
     {
         $event = $this->runningEvent();
-        $previous = $this->roundOf($event, 5);
         $this->runners($event, 2)->each(
-            fn (Participant $runner) => Lap::factory()->eliminated()->for($previous)->for($runner)->create(),
+            fn (Participant $runner) => $runner->leaveRace(ExitReason::Timeout, CarbonImmutable::now()),
         );
 
         $opened = $this->open($this->roundOf($event, 6));

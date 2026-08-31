@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import type { LucideIcon } from '@lucide/vue';
-import { cva } from 'class-variance-authority';
 import { Primitive } from 'reka-ui';
 import type { Component } from 'vue';
 import { computed, useSlots } from 'vue';
 import Spinner from '@/components/Spinner.vue';
+import { actionButtonVariants } from '@/lib/actionButton';
 import { cn } from '@/lib/utils';
 
 type Props = {
-    size?: 'touch' | 'validate' | 'icon';
+    size?: 'touch' | 'icon';
     type?: 'button' | 'submit';
     tone?: 'primary' | 'danger' | 'quiet' | 'ghost';
     loading?: boolean;
@@ -32,30 +32,6 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const slots = useSlots();
-
-const actionButtonVariants = cva(
-    'inline-flex shrink-0 touch-manipulation items-center justify-center gap-2 rounded-sm border font-bold tracking-wider uppercase transition-colors outline-none select-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none aria-disabled:opacity-50',
-    {
-        variants: {
-            block: {
-                true: 'w-full',
-                false: 'w-full sm:w-auto',
-            },
-            size: {
-                touch: 'min-h-11 px-4 text-xs lg:min-h-10',
-                validate: 'min-h-[3.125rem] min-w-24 px-5 text-sm',
-                icon: 'size-11 shrink-0 lg:size-10',
-            },
-            tone: {
-                primary:
-                    'border-primary bg-primary text-primary-foreground hover:bg-primary/90',
-                danger: 'border-destructive bg-destructive text-destructive-foreground hover:bg-destructive/90',
-                quiet: 'border-foreground bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground',
-                ghost: 'border-transparent bg-transparent text-muted-foreground hover:bg-accent hover:text-accent-foreground',
-            },
-        },
-    },
-);
 
 const isButton = computed(() => !props.asChild && props.as === 'button');
 
