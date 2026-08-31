@@ -17,8 +17,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $round_id
  * @property LapStatus $status
  * @property CarbonImmutable|null $validated_at
+ * @property CarbonImmutable|null $corrected_at
  */
-#[Fillable(['participant_id', 'round_id', 'status', 'validated_at'])]
+#[Fillable(['participant_id', 'round_id', 'status', 'validated_at', 'corrected_at'])]
 class Lap extends Model
 {
     /** @use HasFactory<LapFactory> */
@@ -55,6 +56,7 @@ class Lap extends Model
             'round_id' => 'integer',
             'status' => LapStatus::class,
             'validated_at' => UtcDateTime::class,
+            'corrected_at' => UtcDateTime::class,
         ];
     }
 }

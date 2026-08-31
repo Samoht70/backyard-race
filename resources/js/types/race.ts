@@ -27,6 +27,7 @@ export type RoundRunner = {
     runner_id: number;
     lap_id: number;
     lap_status: LapStatus;
+    corrected: boolean;
     bib_label: string | null;
     first_name: string;
     last_name: string;
@@ -37,4 +38,20 @@ export type RoundRunner = {
     duration_seconds: number | null;
     distance_meters: number | null;
     speed_kmh: number | null;
+};
+
+export type CorrectableLap = {
+    lap_id: number;
+    lap_status: LapStatus;
+    corrected: boolean;
+    validated_at: string | null;
+    round_number: number;
+    round_starts_at: string;
+    round_deadline_at: string;
+    runner_id: number;
+    bib_label: string | null;
+    first_name: string;
+    last_name: string;
+    status: RunnerStatus;
+    validated_laps: number;
 };

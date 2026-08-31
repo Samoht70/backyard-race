@@ -24,24 +24,29 @@ const page = usePage();
 const refusal = computed(() => page.props.errors.lap);
 
 function readout(runner: RoundRunner): string | undefined {
-    if (runner.duration_seconds === null) {
-        return undefined;
+    const parts: string[] = [];
+
+    if (runner.duration_seconds !== null) {
+        parts.push(formatLapDuration(runner.duration_seconds));
+
+        const kilometers = formatKilometers(runner.distance_meters);
+
+        if (kilometers !== null) {
+            parts.push(`${kilometers} ${t('event.unit.kilometers')}`);
+        }
+
+        if (runner.speed_kmh !== null) {
+            parts.push(
+                `${formatSpeed(runner.speed_kmh)} ${t('race.lap.speed_unit')}`,
+            );
+        }
     }
 
-    const parts = [formatLapDuration(runner.duration_seconds)];
-    const kilometers = formatKilometers(runner.distance_meters);
-
-    if (kilometers !== null) {
-        parts.push(`${kilometers} ${t('event.unit.kilometers')}`);
+    if (runner.corrected) {
+        parts.push(t('race.correction.marker'));
     }
 
-    if (runner.speed_kmh !== null) {
-        parts.push(
-            `${formatSpeed(runner.speed_kmh)} ${t('race.lap.speed_unit')}`,
-        );
-    }
-
-    return parts.join(' · ');
+    return parts.length === 0 ? undefined : parts.join(' · ');
 }
 </script>
 
