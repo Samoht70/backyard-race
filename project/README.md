@@ -277,7 +277,7 @@ par BR-33. Elle reste avec les écrans de course, dont elle dépend.
 | [BR-35](stories/BR-35-compte-organisateur-en-commande.md) | Créer le compte organisateur en une commande | 3 | ✅ Terminé |
 | [BR-37](stories/BR-37-purge-des-inscriptions.md) | Purger les inscriptions et les comptes coureurs | 5 | ✅ Terminé |
 
-Les quatre stories `En cours` sont en production et il leur manque une ou deux tâches, nommées dans
+Les trois stories `En cours` sont en production et il leur manque une ou deux tâches, nommées dans
 leur fichier sous « Ce qui reste au 2026-08-22 » et récapitulées dans le lot 2. Leurs points ne
 comptent pas encore comme livrés : une story qui sert sans se signaler quand elle tombe n'est pas
 finie.
