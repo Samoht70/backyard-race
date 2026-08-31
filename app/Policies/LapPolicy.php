@@ -13,4 +13,9 @@ class LapPolicy
         return $user->can(Permission::ValidateLaps->value)
             && $lap->round->event->lifecycle()->isRacing();
     }
+
+    public function correct(User $user, Lap $lap): bool
+    {
+        return $user->can('correctLaps', $lap->round->event);
+    }
 }

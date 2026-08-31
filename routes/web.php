@@ -53,6 +53,15 @@ Route::middleware('auth')
                 Route::post('runners/{participant}/withdraw', Manage\RunnerWithdrawalController::class)
                     ->name('runners.withdraw');
 
+                Route::get('corrections', Manage\CorrectionController::class)
+                    ->name('corrections');
+
+                Route::post('laps/{lap}/reinstate', Manage\LapReinstatementController::class)
+                    ->name('laps.reinstate');
+
+                Route::post('laps/{lap}/revert', Manage\LapReversionController::class)
+                    ->name('laps.revert');
+
                 Route::middleware('can:'.Permission::ManageDocuments->value)
                     ->group(function () {
                         Route::singleton('briefing', Manage\BriefingController::class)

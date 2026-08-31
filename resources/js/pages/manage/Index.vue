@@ -5,6 +5,7 @@ import {
     Files,
     ScrollText,
     SlidersHorizontal,
+    Undo2,
 } from '@lucide/vue';
 import { computed } from 'vue';
 import BoardPage from '@/components/board/BoardPage.vue';
@@ -13,6 +14,7 @@ import RoundBoard from '@/components/race/RoundBoard.vue';
 import RoundHeader from '@/components/race/RoundHeader.vue';
 import { t } from '@/lib/i18n';
 import { can } from '@/lib/permissions';
+import { corrections } from '@/routes/manage';
 import { edit as editBriefing } from '@/routes/manage/briefing';
 import { index as documents } from '@/routes/manage/documents';
 import { edit as editEvent } from '@/routes/manage/event';
@@ -25,10 +27,17 @@ type Props = {
     roundRunners: RoundRunner[];
 };
 
-defineProps<Props>();
+const props = defineProps<Props>();
 
 const desks = computed(() =>
     [
+        {
+            key: 'corrections',
+            icon: Undo2,
+            label: t('ui.manage.corrections'),
+            href: corrections(),
+            shown: can('manage-laps') && props.currentRound !== null,
+        },
         {
             key: 'event',
             icon: SlidersHorizontal,
