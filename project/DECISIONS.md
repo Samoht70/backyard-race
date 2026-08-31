@@ -2904,3 +2904,56 @@ parce que c'est le seul moment où il a un appelant, et le stockage par numéro 
 l'étendre le jour où un autre apparaît. Aucune trace de qui a changé quoi et quand — la table dit
 l'état de la grille, pas son historique, et un événement d'une nuit avec un seul gérant ne réclame
 pas de journal. Aucune notification aux coureurs : D-15 tient, le changement s'annonce au corral.
+
+## D-73 — La boucle ne stocke que son statut et son heure de validation, tout le reste se lit ailleurs
+
+Arrêté le 2026-08-31 par BR-08 T1. La story listait les colonnes de la boucle : « participant, tour,
+numéro de tour, heure théorique de départ, heure limite, heure réelle de validation, durée, vitesse
+moyenne, statut ». La table livrée en porte quatre — `participant_id`, `round_id`, `status`,
+`validated_at` — et cette entrée dit pourquoi les cinq autres ont été refusées, chacune pour une
+raison différente.
+
+**La vitesse moyenne ne peut pas être une colonne : D-17 l'interdit en toutes lettres.** Elle y écrit
+la conséquence de la distance unique — « si le gérant corrige la distance en cours d'événement, les
+vitesses déjà affichées se recalculent, c'est le comportement attendu d'une valeur unique ». Une
+colonne `average_speed` remplie par BR-09 rendrait cette phrase fausse en silence : la correction de
+la distance laisserait derrière elle des vitesses calculées sur l'ancienne. La formule reste donc
+une lecture, jamais une écriture.
+
+**La durée n'en est pas une non plus, parce qu'elle vaut par construction `validated_at − départ du
+tour`.** Elle ne dérive pas d'un calcul qui pourrait un jour changer d'avis : c'est une soustraction
+entre deux instants dont l'un est sur la boucle et l'autre sur le tour. La stocker créerait un
+troisième endroit où la même vérité s'écrit, et BR-12 — qui rejoue une validation avec une heure
+saisie à la main — devrait penser à le mettre à jour. Avec la soustraction, BR-12 n'a qu'un instant à
+réécrire.
+
+**Le numéro, l'heure de départ et l'heure limite sont ceux du tour, et le tour est déjà l'objet qui
+les fige.** C'est la moitié de D-72 : un tour couru porte ses horaires dans sa ligne, matérialisée au
+moment où il devient dû, et c'est cette ligne que BR-11 lira pour éliminer. Recopier ces trois
+valeurs sur chaque boucle donnerait quarante copies par tour d'une donnée que BR-44 s'applique à
+n'écrire qu'une fois — et la protection du passé cesserait d'être une propriété du schéma pour
+devenir une discipline à tenir. La boucle porte `round_id` ; elle lit son horaire sur son tour.
+
+**La conséquence sur BR-09 est une reformulation, pas une amputation.** Son critère
+« la durée enregistrée est 47 minutes et 32 secondes / la vitesse moyenne enregistrée est 7,57 km/h »
+se lit désormais **restituée** au lieu d'enregistrée : le geste écrit `validated_at` et le statut, et
+l'écran reçoit la durée et la vitesse calculées au même instant. Aucun critère d'acceptation ne
+change de valeur, et le cas limite « distance non renseignée : la vitesse n'est pas calculée » reste
+exactement le même contrôle.
+
+**`validated_at` est en `UtcDateTime`, sans avoir à y réfléchir.** D-35 avait déjà nommé cette colonne
+comme l'un de ses appelants futurs. Un test la repasse par la base sur l'heure vécue deux fois du 25
+octobre — deux boucles validées à « 02:30 », une heure d'écart réelle — pour que le cast reste rouge
+s'il disparaît.
+
+**Deux absences volontaires en plus.** Pas d'`event_id` sur la boucle : le participant et le tour le
+portent chacun, et il n'y a qu'un événement (D-31). Pas de `label()` sur `LapStatus` : aucun
+consommateur PHP ne l'appelle — les écrans affichent le statut du **coureur**, dérivé, jamais celui
+d'une boucle — et D-26 a déjà tranché contre la déclaration morte sur `RunnerStatus`. Le jour où une
+boucle s'affiche par elle-même, `race.lap.*` est libre depuis D-34.
+
+**Ce qui reste ouvert.** Le marqueur de correction de BR-12 sera, lui, une vraie colonne : « une
+boucle corrigée est marquée comme telle » est un fait que rien d'autre ne porte. Et si un écran de
+course finit par trier des centaines de boucles par vitesse, le tri se fera en base sur
+`validated_at`, jamais sur une vitesse recalculée en PHP — l'ordre est le même, la distance étant
+constante.

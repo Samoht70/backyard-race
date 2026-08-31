@@ -222,7 +222,7 @@ par BR-33. Elle reste avec les écrans de course, dont elle dépend.
 
 | ID | Story | Pts | Statut |
 |----|-------|-----|--------|
-| [BR-08](stories/BR-08-tours-et-laps.md) | Tours de course et boucles des participants | 8 | À faire |
+| [BR-08](stories/BR-08-tours-et-laps.md) | Tours de course et boucles des participants | 8 | 🚧 En cours |
 | [BR-44](stories/BR-44-duree-du-prochain-tour.md) | Changer la durée du prochain tour avant qu'il parte | 5 | À faire |
 | [BR-09](stories/BR-09-validation-tour.md) | Validation d'une boucle par le gérant | 8 | À faire |
 | [BR-10](stories/BR-10-abandon.md) | Abandon volontaire déclaré par le gérant | 5 | À faire |
