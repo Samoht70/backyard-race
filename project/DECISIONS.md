@@ -2813,3 +2813,94 @@ règlent pas. Aucune trace en base de ce qui a été envoyé — un job qui éch
 dans Horizon et dans `failed_jobs`, pas dans la fiche du coureur. Et le va-et-vient d'un gérant qui
 annule puis remet en attente par erreur envoie bien deux mails contradictoires : c'est voulu, le
 coureur voit ce que le gérant a fait plutôt qu'un statut changé sans explication.
+
+## D-72 — La durée d'un tour se change par morceaux à partir d'un tour non parti, et les gages restent à l'oral
+
+Arrêté le 2026-08-31, avant d'ouvrir l'epic 2. Le propriétaire veut pouvoir changer la durée d'un
+tour qui n'a pas encore commencé — « avant que le tour 3 parte, je passe de 60 à 55 minutes » — et
+que le changement se répercute sur la suite. La demande venait avec une seconde idée, des gages
+portés par les tours, dont il demandait s'il valait la peine de les coder.
+
+**Le gel de `RunningEventState` n'est pas levé, il est remplacé par une règle plus fine.**
+`frozenAttributes()` interdit `first_start_at` et `lap_duration_minutes` en course, et son docblock
+dit exactement pourquoi : « changing either mid-race silently reschedules rounds already run ». La
+grille de BR-04 est une multiplication, `premier départ + (N - 1) × durée` — elle n'a pas de passé,
+donc modifier la durée globale à 3 h du matin ne déplace pas les tours à venir, ça réécrit aussi les
+tours déjà courus et les heures limites contre lesquelles BR-11 aura éliminé des coureurs. Le geste
+demandé n'est donc surtout pas le dégel de ce champ : c'est un objet qui, par construction, ne peut
+atteindre que le futur. Les deux champs restent gelés — la configuration décrit la grille avant le
+départ, le nouveau geste la corrige après.
+
+**Ce qui est stocké est un morceau de grille, pas la durée d'un tour.** L'enregistrement dit « à
+partir du tour N, la durée est de X », et la grille devient une fonction par morceaux. La forme
+naïve — une durée par tour — obligeait à écrire une ligne par tour à venir, sur une course qui n'a
+pas de nombre de tours prédéfini, donc à écrire l'infini. Le morceau donne les deux gestes utiles
+avec un seul stockage : « à partir de ce tour » écrit un morceau, « ce tour seulement » en écrit un
+second au tour d'après, qui rétablit la durée précédente. L'écran offre les deux, la première nuit
+posera la question.
+
+**Le morceau se compte en numéros de tour, jamais en horaires.** C'est ce qui le rend indépendant du
+premier départ : déplacer l'heure du départ avant la course fait glisser toute la grille, et les
+morceaux restent aux mêmes tours. Aucune invalidation à écrire, y compris sur le retour en brouillon
+de BR-41 — rien dans un demi-tour de l'événement ne rend faux « à partir du tour 3, 55 minutes ».
+
+**La garde se pose sur la ligne de tour, pas sur l'horloge.** « Seul un tour non parti se change »
+semblait se traduire par une comparaison à l'heure serveur ; elle laisse une fenêtre d'une minute.
+Les tours sont matérialisés paresseusement par `OpenDueRounds`, planifié chaque minute, donc un tour
+peut être parti sans avoir encore sa ligne — et un changement écrit dans cet intervalle déplace une
+heure limite sous les pieds de coureurs déjà lancés. Le geste rattrape donc la matérialisation
+d'abord, puis exige un numéro strictement supérieur au dernier tour ouvert. La garde devient un fait
+en base au lieu d'une lecture d'horloge, et elle réutilise une action déjà rejouable sans effet de
+bord. Accessoirement, c'est la même construction qui protège le passé : un tour couru porte ses
+horaires figés dans sa ligne, et c'est cette ligne que BR-11 lira.
+
+**La table ne peut pas être une colonne de `rounds`, et c'est la même paresse qui l'explique.** La
+ligne du tour 7 n'existe pas quand le gérant décide de sa durée. Une colonne sur `rounds` aurait
+donc exigé de matérialiser les tours à venir — c'est-à-dire de choisir un nombre de tours, ce que le
+format refuse. La table des morceaux porte l'intention, les lignes de `rounds` portent le fait.
+
+**`RoundSchedule` garde ses trois méthodes, et c'est là que tient le prix de la story.**
+`startOf`, `deadlineOf` et `numberAt` conservent leur signature ; seule leur implémentation passe de
+la multiplication au parcours cumulatif. `ResolveCurrentRound`, `OpenDueRounds`,
+`CurrentRoundResource` et l'écran ne bougent pas, et BR-11 s'écrira contre la même surface qu'elle
+aurait eue sans cette décision. La condition pour que ça reste vrai est une discipline à tenir dans
+tout l'epic 2 : **aucun calcul `premier départ + N × durée` hors de `RoundSchedule`**. C'est vrai
+aujourd'hui — une boucle de BR-08 qui recalculerait sa propre heure limite au lieu de la lire de son
+tour ferait doubler le prix de BR-44.
+
+**L'exclusion de BR-04 est révoquée, celle de D-17 ne l'est pas.** BR-04 excluait explicitement « une
+durée de boucle variable d'un tour à l'autre » ; c'est cette ligne que BR-44 rouvre, et elle la
+rouvre dans un seul sens, vers l'avant. **La distance, elle, reste unique pour l'événement.** C'est
+le piège naturel de cette story — une durée par morceau appelle une distance par morceau, et le
+raccourcissement de la boucle de nuit était précisément le cas que D-17 avait examiné et écarté.
+Rien dans la demande ne le ramène : le propriétaire veut serrer le temps, pas raccourcir le tour.
+
+**Les gages ne laissent rien dans le code, et l'argument qui voulait les y mettre a été défait par le
+propriétaire.** Le premier avis était de coder la version pauvre — une ligne de texte portée par le
+tour, affichée sur les écrans — au motif que personne ne se souvient à 3 h du matin de quel gage
+tombe au tour 11. Le propriétaire a précisé son intention : il ne planifie pas, il décide sur le
+moment et annonce à la voix cinq minutes avant le départ. Or dans une backyard, à ce moment-là, les
+coureurs encore en course sont **tous dans le corral** — l'audience concernée est réunie, physique,
+et le gage meurt à la fin du tour. La voix couvre la totalité du besoin, sans écran à lire ni page à
+rafraîchir, et un gage codé n'aurait ajouté qu'une surface à maintenir.
+
+**Le tri qui reste vrai après ça : un gage n'entre dans le code que s'il change une règle que
+l'application mesure.** Il en existe trois familles. Celle qui change le temps du tour — « ce
+tour-ci, vous n'avez que 55 minutes » — n'est pas une annonce mais une heure limite contre laquelle
+BR-11 élimine : c'est BR-44, et c'est le seul gage codé. Celle qui change la distance est fermée par
+D-17. Celle qui ajoute une contrainte physique — porter un poids, courir déguisé — n'est constatable
+par rien dans l'application, et n'a aucune raison d'y entrer. Autrement dit l'idée des gages n'a pas
+produit une story, elle a produit l'appelant réel de BR-44 : le geste utile n'est pas la correction
+d'un horaire mal configuré, c'est « je change la durée du prochain tour, cinq minutes avant qu'il
+parte ».
+
+**BR-44 se place avant BR-11, et après BR-08.** Elle ne touche pas aux boucles, donc BR-08 n'a pas à
+l'attendre. BR-11, en revanche, est le consommateur dont la justesse dépend de l'heure limite, et ses
+tests vont encoder une grille : autant qu'ils encodent la bonne du premier coup, plutôt que de
+retoucher un job d'élimination qui décide seul, sans qu'un humain appuie sur un bouton.
+
+**Ce qui reste ouvert.** Aucune grille prévisionnelle éditable : le geste porte sur le prochain tour,
+parce que c'est le seul moment où il a un appelant, et le stockage par numéro n'interdit pas de
+l'étendre le jour où un autre apparaît. Aucune trace de qui a changé quoi et quand — la table dit
+l'état de la grille, pas son historique, et un événement d'une nuit avec un seul gérant ne réclame
+pas de journal. Aucune notification aux coureurs : D-15 tient, le changement s'annonce au corral.
