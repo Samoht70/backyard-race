@@ -222,7 +222,8 @@ par BR-33. Elle reste avec les écrans de course, dont elle dépend.
 
 | ID | Story | Pts | Statut |
 |----|-------|-----|--------|
-| [BR-08](stories/BR-08-tours-et-laps.md) | Tours de course et boucles des participants | 8 | À faire |
+| [BR-08](stories/BR-08-tours-et-laps.md) | Tours de course et boucles des participants | 8 | ✅ Terminé |
+| [BR-44](stories/BR-44-duree-du-prochain-tour.md) | Changer la durée du prochain tour avant qu'il parte | 5 | À faire |
 | [BR-09](stories/BR-09-validation-tour.md) | Validation d'une boucle par le gérant | 8 | À faire |
 | [BR-10](stories/BR-10-abandon.md) | Abandon volontaire déclaré par le gérant | 5 | À faire |
 | [BR-11](stories/BR-11-elimination-automatique.md) | Élimination automatique à expiration du tour | 8 | À faire |
@@ -297,7 +298,7 @@ pas de fichier de story : c'est la décision qui les porte, et elles prennent un
 | R-06 | Charte de l’instrument, et primitives reka-ui à la place du starter kit | 5 | ✅ Livrée | [D-61](DECISIONS.md) |
 | R-07 | Adresse de l'organisateur en configuration, en plus du rôle `manager` | 2 | ✅ Livrée | [D-65](DECISIONS.md) |
 
-**Total : 38 stories actives + 7 reprises · 262 pts · 163 pts livrés (62 %)**
+**Total : 39 stories actives + 7 reprises · 267 pts · 171 pts livrés (64 %)**
 
 **Hors périmètre : 4 stories abandonnées, 32 pts non engagés** — voir [D-47](DECISIONS.md).
 
@@ -324,10 +325,10 @@ français, et le mode développement garde son écran de diagnostic.
 parce qu'une file qui cesse d'être consommée coûtait des coureurs dès aujourd'hui ; la version exposée
 et le garde-fou de gel, eux, ne coûtent que la nuit de course, et il reste du temps.
 
-**Ensuite, le moteur et les écrans de course** — BR-08 → BR-09 → BR-10 → BR-11 → BR-12 → BR-13 →
-BR-14 → BR-15 → BR-16 → BR-24 → BR-20 → BR-23
+**Ensuite, le moteur et les écrans de course** — BR-08 → BR-44 → BR-09 → BR-10 → BR-11 → BR-12 →
+BR-13 → BR-14 → BR-15 → BR-16 → BR-24 → BR-20 → BR-23
 
-Dix remarques sur cet ordre :
+Onze remarques sur cet ordre :
 
 - Les deux premiers lots livrent un produit **incomplet mais utile**, et il est en ligne : un coureur
   s'inscrit, lit le briefing, télécharge le règlement et déclare son numéro PPS. Rien de la nuit de
@@ -342,6 +343,11 @@ Dix remarques sur cet ordre :
 - BR-24 sort de la fin du backlog pour rejoindre les écrans de course : elle dépend de BR-08 et
   reprend l'accueil que BR-33 a livré.
 - BR-09 et BR-11 restent le cœur métier — c'est là que les tests comptent le plus.
+- BR-44 s'insère après BR-08 et avant BR-11, et cette place est le seul point de son ordre qui
+  compte. Elle ne touche pas aux boucles, donc BR-08 n'a pas à l'attendre ; mais BR-11 est le
+  consommateur dont la justesse dépend de l'heure limite, et ses tests vont encoder une grille.
+  Autant qu'ils encodent la bonne du premier coup, plutôt que de retoucher après coup le seul
+  mécanisme du produit qui décide sans qu'un humain appuie sur un bouton ([D-72](DECISIONS.md)).
 - BR-13 reste le porteur naturel de **Q-04**, l'écart de cible tactile relevé en D-46 : le bouton de
   validation a perdu un tiers de sa hauteur. **Q-02**, en revanche, ne l'attend plus : la page
   d'erreur est devenue publique le jour où l'adresse a circulé, et elle est sortie en story propre
