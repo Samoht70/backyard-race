@@ -226,7 +226,7 @@ par BR-33. Elle reste avec les écrans de course, dont elle dépend.
 | [BR-44](stories/BR-44-duree-du-prochain-tour.md) | Changer la durée du prochain tour avant qu'il parte | 5 | ✅ Terminé |
 | [BR-09](stories/BR-09-validation-tour.md) | Validation d'une boucle par le gérant | 8 | ✅ Terminé |
 | [BR-10](stories/BR-10-abandon.md) | Abandon volontaire déclaré par le gérant | 5 | ✅ Terminé |
-| [BR-11](stories/BR-11-elimination-automatique.md) | Élimination automatique à expiration du tour | 8 | À faire |
+| [BR-11](stories/BR-11-elimination-automatique.md) | Élimination automatique à expiration du tour | 8 | ✅ Terminé |
 | [BR-12](stories/BR-12-correction-tour.md) | Correction exceptionnelle d'une boucle | 5 | À faire |
 
 ### EPIC 3 — Interface de course
@@ -298,7 +298,7 @@ pas de fichier de story : c'est la décision qui les porte, et elles prennent un
 | R-06 | Charte de l’instrument, et primitives reka-ui à la place du starter kit | 5 | ✅ Livrée | [D-61](DECISIONS.md) |
 | R-07 | Adresse de l'organisateur en configuration, en plus du rôle `manager` | 2 | ✅ Livrée | [D-65](DECISIONS.md) |
 
-**Total : 39 stories actives + 7 reprises · 267 pts · 189 pts livrés (71 %)**
+**Total : 39 stories actives + 7 reprises · 267 pts · 197 pts livrés (74 %)**
 
 **Hors périmètre : 4 stories abandonnées, 32 pts non engagés** — voir [D-47](DECISIONS.md).
 

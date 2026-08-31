@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Epic** | 2 — Moteur de course |
-| **Statut** | À faire |
+| **Statut** | ✅ Terminé |
 | **Estimation** | 8 pts |
 | **Dépend de** | BR-09 |
 
@@ -87,10 +87,38 @@ C'est le seul mécanisme du produit qui décide seul, sans qu'un humain appuie s
 Une erreur de fuseau ou une queue arrêtée sans qu'on le voie fausserait le résultat de la
 course, sans message d'erreur visible. La supervision Horizon n'est donc pas décorative.
 
+## Ce que la livraison a changé
+
+**Il n'y a pas de job, et pas de file dédiée.** La story les demandait ; ses propres « Impacts
+techniques » les ont écartés. Faire porter l'élimination par une file, c'est exiger deux processus
+vivants — le planificateur qui déclenche et le worker qui exécute — pour le seul mécanisme du produit
+qui décide sans humain, et c'est exactement la panne muette que la story redoute. Le geste tient en
+trois requêtes par tour échu : il s'exécute dans le processus du planificateur, comme l'ouverture des
+tours depuis BR-08. Ce qui restait de T4, l'accès d'Horizon réservé au gérant, était livré sans test
+par BR-30 T3 ; il en a un désormais.
+
+**Une seule entrée planifiée.** `race:open-rounds` devient `race:advance` : elle élimine, puis elle
+ouvre. Deux commandes planifiées à la même minute n'auraient pas garanti l'ordre, et l'ordre se voit
+— éliminer d'abord n'ouvre le tour suivant que pour les coureurs qui y ont droit. [D-37](../DECISIONS.md)
+avait posé cette reprise d'avance.
+
+**Un coureur sort à la première limite qu'il a manquée.** Ce n'était pas dans l'énoncé et ça se voit
+au rattrapage : après une coupure de deux heures, un coureur traîne des boucles ouvertes sur trois
+tours. Les tours échus se traitent par numéro croissant, et la sortie ferme toutes ses boucles en
+attente — les tours suivants ne trouvent plus rien.
+
+**« Plus aucun tour n'est ouvert » a été formulé étroitement, exprès.** La garde évidente — aucun
+coureur actif, aucun tour — aurait cassé le cas de [D-74](../DECISIONS.md) : un événement en course
+sans inscrit confirmé matérialise quand même ses tours, et c'est ce qui fait entrer un retardataire
+au tour **suivant**. La règle dit donc que la course a *perdu* ses coureurs : au moins un est sorti,
+aucun ne reste.
+
+[D-77](../DECISIONS.md) porte le détail, dont l'angle mort assumé de cette garde.
+
 ## Tâches
 
-- [ ] **T1** — Job d'élimination des boucles échues, rejouable et sans effet de bord `3 pts`
-- [ ] **T2** — Planification récurrente du job et garde sur le statut de l'événement `2 pts`
-- [ ] **T3** — Enchaînement sur l'ouverture du tour suivant `1 pt`
-- [ ] **T4** — Configuration Horizon : file dédiée, accès réservé au gérant `2 pts`
-- [ ] **T5** — Tests : élimination, validation en limite, rejouabilité, retard d'exécution, événement clos `3 pts`
+- [x] **T1** — Action d'élimination des boucles échues, rejouable et sans effet de bord `3 pts`
+- [x] **T2** — Planification récurrente et garde sur le statut de l'événement `2 pts`
+- [x] **T3** — Enchaînement sur l'ouverture du tour suivant `1 pt`
+- [x] **T4** — Horizon : pas de file dédiée à créer, accès du gérant mis sous test `2 pts`
+- [x] **T5** — Tests : élimination, validation en limite, rejouabilité, retard d'exécution, événement clos `3 pts`
