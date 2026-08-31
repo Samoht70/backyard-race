@@ -8,6 +8,7 @@ import {
 } from '@lucide/vue';
 import { computed } from 'vue';
 import BoardPage from '@/components/board/BoardPage.vue';
+import NextRoundDuration from '@/components/race/NextRoundDuration.vue';
 import RoundHeader from '@/components/race/RoundHeader.vue';
 import { t } from '@/lib/i18n';
 import { can } from '@/lib/permissions';
@@ -15,10 +16,11 @@ import { edit as editBriefing } from '@/routes/manage/briefing';
 import { index as documents } from '@/routes/manage/documents';
 import { edit as editEvent } from '@/routes/manage/event';
 import { index as registrations } from '@/routes/manage/registrations';
-import type { CurrentRound } from '@/types/race';
+import type { CurrentRound, NextRound } from '@/types/race';
 
 type Props = {
     currentRound: CurrentRound | null;
+    nextRound: NextRound | null;
 };
 
 defineProps<Props>();
@@ -86,6 +88,8 @@ const desks = computed(() =>
                     <span class="text-sm font-medium">{{ desk.label }}</span>
                 </Link>
             </nav>
+
+            <NextRoundDuration v-if="nextRound" :round="nextRound" />
         </div>
     </BoardPage>
 </template>

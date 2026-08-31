@@ -12,3 +12,9 @@ export type CurrentRound = {
     starts_at: string;
     deadline_at: string;
 };
+
+export type NextRound = {
+    number: number;
+    starts_at: string;
+    lap_duration_minutes: number;
+};

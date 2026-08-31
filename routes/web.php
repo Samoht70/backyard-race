@@ -43,6 +43,8 @@ Route::middleware('auth')
 
                         Route::post('event/advance', Manage\AdvanceEventController::class)->name('event.advance');
                         Route::post('event/revert', Manage\RevertEventController::class)->name('event.revert');
+
+                        Route::post('rounds/duration', Manage\RoundDurationController::class)->name('rounds.duration');
                     });
 
                 Route::middleware('can:'.Permission::ManageDocuments->value)
