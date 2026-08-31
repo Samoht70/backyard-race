@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { Form, usePage } from '@inertiajs/vue3';
-import { Flag } from '@lucide/vue';
+import { Check, Flag } from '@lucide/vue';
 import { computed } from 'vue';
 import LapValidationController from '@/actions/App/Http/Controllers/Manage/LapValidationController';
 import ActionButton from '@/components/ActionButton.vue';
 import Notice from '@/components/Notice.vue';
 import RunnerSlat from '@/components/race/RunnerSlat.vue';
+import RunnerWithdrawalDialog from '@/components/race/RunnerWithdrawalDialog.vue';
 import SlatCell from '@/components/race/SlatCell.vue';
 import { formatKilometers } from '@/lib/distance';
 import { t } from '@/lib/i18n';
@@ -73,33 +74,48 @@ function readout(runner: RoundRunner): string | undefined {
                 :meta="readout(runner)"
             >
                 <template #cell>
-                    <SlatCell
-                        v-if="runner.validated_at"
-                        flip
-                        :value="runner.validated_at"
-                        :label="t('race.runner.arrived')"
-                    />
-                    <Form
-                        v-else-if="runner.lap_status === 'pending'"
-                        v-bind="LapValidationController.form(runner.lap_id)"
-                        :options="{ preserveScroll: true }"
-                        v-slot="{ processing }"
-                    >
-                        <ActionButton
-                            type="submit"
-                            size="validate"
-                            class="w-auto"
-                            :loading="processing"
+                    <div class="flex items-center gap-1.5">
+                        <RunnerWithdrawalDialog
+                            v-if="
+                                runner.status === 'running' &&
+                                runner.lap_status === 'pending'
+                            "
+                            :runner-id="runner.runner_id"
+                            :runner-name="`${runner.first_name} ${runner.last_name}`"
+                            :validated-laps="runner.validated_laps"
+                            :covered-meters="runner.covered_meters"
+                        />
+                        <SlatCell
+                            v-if="runner.validated_at"
+                            flip
+                            :value="runner.validated_at"
+                            :label="t('race.runner.arrived')"
+                        />
+                        <Form
+                            v-else-if="runner.lap_status === 'pending'"
+                            v-bind="LapValidationController.form(runner.lap_id)"
+                            :options="{ preserveScroll: true }"
+                            v-slot="{ processing }"
                         >
-                            {{ t('race.runner.validate') }}
-                        </ActionButton>
-                    </Form>
-                    <SlatCell
-                        v-else
-                        tone="quiet"
-                        value="—"
-                        :label="t('race.runner.out')"
-                    />
+                            <ActionButton
+                                type="submit"
+                                class="w-auto max-sm:gap-0"
+                                :icon="Check"
+                                :loading="processing"
+                                :aria-label="t('race.runner.validate')"
+                            >
+                                <span class="hidden sm:inline">
+                                    {{ t('race.runner.validate') }}
+                                </span>
+                            </ActionButton>
+                        </Form>
+                        <SlatCell
+                            v-else
+                            tone="quiet"
+                            value="—"
+                            :label="t('race.runner.out')"
+                        />
+                    </div>
                 </template>
             </RunnerSlat>
         </div>

@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Casts\UtcDateTime;
+use App\Enums\ExitReason;
 use App\Enums\RegistrationStatus;
 use App\Enums\RegistrationTransition;
 use App\Models\Concerns\HasRaceStatus;
@@ -20,6 +22,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $user_id
  * @property RegistrationStatus $status
  * @property int|null $bib_number
+ * @property ExitReason|null $exit_reason
+ * @property CarbonImmutable|null $exited_at
  * @property string $phone
  * @property CarbonImmutable $birth_date
  * @property string|null $pps_number
@@ -89,6 +93,8 @@ class Participant extends Model
         return [
             'status' => RegistrationStatus::class,
             'bib_number' => 'integer',
+            'exit_reason' => ExitReason::class,
+            'exited_at' => UtcDateTime::class,
             'birth_date' => 'immutable_date',
         ];
     }

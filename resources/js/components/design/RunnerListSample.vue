@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Check } from '@lucide/vue';
 import ActionButton from '@/components/ActionButton.vue';
 import RunnerSlat from '@/components/race/RunnerSlat.vue';
 import SlatCell from '@/components/race/SlatCell.vue';
@@ -52,10 +53,13 @@ const runners: Sample[] = names.map(([firstName, lastName], position) => ({
                 />
                 <ActionButton
                     v-else-if="runner.status === 'running'"
-                    size="validate"
-                    class="w-auto"
+                    class="w-auto max-sm:gap-0"
+                    :icon="Check"
+                    :aria-label="t('race.runner.validate')"
                 >
-                    {{ t('race.runner.validate') }}
+                    <span class="hidden sm:inline">
+                        {{ t('race.runner.validate') }}
+                    </span>
                 </ActionButton>
                 <SlatCell
                     v-else

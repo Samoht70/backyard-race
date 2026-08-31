@@ -24,6 +24,7 @@ export const LAP_STATUSES = ['pending', 'validated', 'eliminated'] as const;
 export type LapStatus = (typeof LAP_STATUSES)[number];
 
 export type RoundRunner = {
+    runner_id: number;
     lap_id: number;
     lap_status: LapStatus;
     bib_label: string | null;
@@ -31,6 +32,7 @@ export type RoundRunner = {
     last_name: string;
     status: RunnerStatus;
     validated_laps: number;
+    covered_meters: number | null;
     validated_at: string | null;
     duration_seconds: number | null;
     distance_meters: number | null;
