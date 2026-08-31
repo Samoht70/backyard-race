@@ -25,9 +25,19 @@ return [
         'onwards_saved' => 'À partir du tour :number, une boucle dure :minutes minutes.',
         'single_round_saved' => 'Le tour :number dure :minutes minutes, puis la grille reprend son cours.',
     ],
+    'board' => [
+        'title' => 'Tour en cours',
+        'empty' => 'Aucune boucle ouverte sur ce tour.',
+        'refused' => 'Validation refusée',
+    ],
+    'lap' => [
+        'speed_unit' => 'km/h',
+    ],
     'refusal' => [
         'round_started' => 'Ce tour est déjà parti : sa durée n’est plus modifiable.',
         'no_schedule' => 'La grille horaire n’est pas configurée : il n’y a pas de durée à changer.',
+        'deadline_passed' => 'L’heure limite du tour est passée : cette boucle relève de la correction exceptionnelle.',
+        'runner_out' => 'Ce coureur est sorti de la course : sa boucle ne se valide plus.',
     ],
     'runner' => [
         'bib' => 'Dossard',

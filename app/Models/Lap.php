@@ -4,12 +4,20 @@ namespace App\Models;
 
 use App\Casts\UtcDateTime;
 use App\Enums\LapStatus;
+use Carbon\CarbonImmutable;
 use Database\Factories\LapFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id
+ * @property int $participant_id
+ * @property int $round_id
+ * @property LapStatus $status
+ * @property CarbonImmutable|null $validated_at
+ */
 #[Fillable(['participant_id', 'round_id', 'status', 'validated_at'])]
 class Lap extends Model
 {

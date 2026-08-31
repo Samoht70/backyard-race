@@ -47,6 +47,9 @@ Route::middleware('auth')
                         Route::post('rounds/duration', Manage\RoundDurationController::class)->name('rounds.duration');
                     });
 
+                Route::post('laps/{lap}/validate', Manage\LapValidationController::class)
+                    ->name('laps.validate');
+
                 Route::middleware('can:'.Permission::ManageDocuments->value)
                     ->group(function () {
                         Route::singleton('briefing', Manage\BriefingController::class)
