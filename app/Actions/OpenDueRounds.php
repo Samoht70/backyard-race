@@ -35,11 +35,17 @@ final class OpenDueRounds
 
         $openedThrough = (int) $event->rounds()->max('number');
 
-        if ($openedThrough >= $current) {
+        if ($openedThrough >= $current || $this->hasLostEveryRunner($event)) {
             return [];
         }
 
         return DB::transaction(fn (): array => $this->materialise($event, $schedule, $openedThrough + 1, $current));
+    }
+
+    private function hasLostEveryRunner(Event $event): bool
+    {
+        return $event->participants()->outOfTheRace()->exists()
+            && ! $event->participants()->running()->exists();
     }
 
     /**
