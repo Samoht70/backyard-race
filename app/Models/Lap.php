@@ -51,6 +51,8 @@ class Lap extends Model
     protected function casts(): array
     {
         return [
+            'participant_id' => 'integer',
+            'round_id' => 'integer',
             'status' => LapStatus::class,
             'validated_at' => UtcDateTime::class,
         ];
