@@ -3154,3 +3154,57 @@ plus qu'à appeler `leaveRace(ExitReason::Timeout, …)` sur les coureurs dont l
 motif existe, il est sous test par cette story, et la grille d'élimination qu'elle encodera n'a plus
 à inventer sa sortie. L'annulation d'un abandon reste à BR-12, et elle devra écrire `null` dans deux
 colonnes plutôt que remonter une boucle.
+
+## D-77 — L'élimination sort de la file et rentre dans le planificateur, et le tour n'ouvre plus quand la course a perdu ses coureurs
+
+Arrêté le 2026-08-31 par BR-11. La story décrivait « une tâche récurrente », « un job », « une file
+dédiée » et « la supervision des files dans Horizon ». Elle est livrée sans job et sans file, et
+c'est son propre paragraphe « Impacts techniques » qui a tranché.
+
+**La règle refuse la file, parce que la file est exactement le risque que la story nomme.** Ses
+impacts techniques disent : « une queue arrêtée sans qu'on le voie fausserait le résultat de la
+course, sans message d'erreur visible ». Mettre l'élimination sur une file, c'est faire dépendre le
+seul mécanisme du produit qui décide sans humain de **deux** processus vivants — le planificateur qui
+déclenche, le worker qui exécute — au lieu d'un. Le travail à faire est de trois requêtes par tour
+échu, sur quarante coureurs au plus : rien n'y demande d'être différé. `EliminateOverdueRunners`
+s'exécute donc dans le processus du planificateur, comme `OpenDueRounds` depuis BR-08, et la panne
+que la story craint se réduit à celle que D-67 surveille déjà. La file dédiée de T4 n'existe pas
+parce que rien n'y serait déposé ; ce qui restait de la tâche — l'accès d'Horizon réservé au porteur
+de `manage-event` — était livré par BR-30 T3, sans test, et il en a un maintenant.
+
+**Une seule entrée planifiée, et D-37 l'avait écrit d'avance.** `race:open-rounds` disparaît au
+profit de `race:advance`, qui élimine puis ouvre. Deux commandes planifiées à la même minute
+n'auraient pas garanti l'ordre, et l'ordre porte une différence visible : éliminer d'abord, c'est
+n'ouvrir le tour suivant que pour les coureurs qui y ont droit ; ouvrir d'abord, c'est créer une
+boucle au coureur qu'on s'apprête à sortir, puis la retourner en `eliminated` dans la seconde. Les
+deux états finaux se valent, la trace non.
+
+**L'heure de sortie est celle de la ligne du tour, et les tours échus se traitent dans l'ordre des
+numéros.** La première moitié est la discipline de D-75 : la limite se lit sur `deadline_at`, jamais
+sur la grille, donc un traitement en retard de quatre minutes enregistre quand même 19:00. La seconde
+moitié n'était pas dans l'énoncé et se voit au rattrapage : un planificateur mort pendant deux heures
+laisse un coureur avec des boucles ouvertes sur trois tours, et il doit sortir à **la première**
+limite qu'il a manquée. `leaveRace()` éliminant toutes les boucles en attente du coureur, traiter les
+tours par numéro croissant suffit — les tours suivants ne trouvent plus rien à sortir.
+
+**La rejouabilité ne coûte pas de marqueur.** Le geste ne s'applique qu'aux boucles `pending`, et
+`leaveRace()` les ferme : relancer la tâche sur le même tour ne trouve plus de candidat. Le verrou
+`lockForUpdate` sur le coureur, avec la relecture de `isRunning()`, règle les deux exécutions
+concurrentes et conserve du même coup le motif d'un coureur déjà sorti — un abandon déclaré à 13:58
+reste un abandon quand la limite de 14:00 passe.
+
+**« Plus aucun tour n'est ouvert » ne veut pas dire « aucun coureur n'est en course ».** La
+formulation évidente — ne rien ouvrir tant qu'aucun coureur n'est actif — casse le cas que D-74
+tenait : au tout début, un événement en course sans inscrit confirmé matérialise quand même ses
+tours, et c'est ce qui fait entrer un coureur confirmé en cours de route **au tour suivant** plutôt
+qu'au premier. La garde dit donc ce que la règle dit vraiment : la course a **perdu** ses coureurs —
+au moins un est sorti, aucun ne reste. Un événement où personne n'est encore inscrit continue
+d'égrener ses tours.
+
+**Ce qui reste ouvert.** La garde a un angle mort assumé : si le gérant confirme une inscription
+après que le dernier coureur est sorti, les tours non matérialisés pendant la pause s'ouvrent tous
+d'un coup et le nouvel arrivant se fait éliminer sur la première limite déjà passée. Ça demande de
+repeupler une course vide, ce qu'aucun scénario de la nuit ne fait. Le coureur éliminé n'est pas
+prévenu, conformément à D-15 et au périmètre de la story. Et l'élimination n'a toujours pas d'écran :
+le tableau de BR-09 montre le statut, mais rien n'annonce au gérant que trois coureurs viennent de
+sortir — c'est le bandeau d'effectifs de BR-13.

@@ -74,6 +74,16 @@ trait HasRaceStatus
      * @return Builder<static>
      */
     #[Scope]
+    protected function outOfTheRace(Builder $query): Builder
+    {
+        return $query->whereNotNull('exited_at');
+    }
+
+    /**
+     * @param  Builder<static>  $query
+     * @return Builder<static>
+     */
+    #[Scope]
     protected function withValidatedLapsCount(Builder $query): Builder
     {
         return $query->withCount([
