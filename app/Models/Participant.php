@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\RegistrationStatus;
 use App\Enums\RegistrationTransition;
+use App\Models\Concerns\HasRaceStatus;
 use App\Services\RegistrationLifecycle\RegistrationLifecycleFactory;
 use App\Services\RegistrationLifecycle\RegistrationLifecycleState;
 use Carbon\CarbonImmutable;
@@ -40,6 +41,8 @@ class Participant extends Model
 {
     /** @use HasFactory<ParticipantFactory> */
     use HasFactory;
+
+    use HasRaceStatus;
 
     /**
      * @var array<string, mixed>

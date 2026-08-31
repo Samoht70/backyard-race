@@ -2813,3 +2813,192 @@ règlent pas. Aucune trace en base de ce qui a été envoyé — un job qui éch
 dans Horizon et dans `failed_jobs`, pas dans la fiche du coureur. Et le va-et-vient d'un gérant qui
 annule puis remet en attente par erreur envoie bien deux mails contradictoires : c'est voulu, le
 coureur voit ce que le gérant a fait plutôt qu'un statut changé sans explication.
+
+## D-72 — La durée d'un tour se change par morceaux à partir d'un tour non parti, et les gages restent à l'oral
+
+Arrêté le 2026-08-31, avant d'ouvrir l'epic 2. Le propriétaire veut pouvoir changer la durée d'un
+tour qui n'a pas encore commencé — « avant que le tour 3 parte, je passe de 60 à 55 minutes » — et
+que le changement se répercute sur la suite. La demande venait avec une seconde idée, des gages
+portés par les tours, dont il demandait s'il valait la peine de les coder.
+
+**Le gel de `RunningEventState` n'est pas levé, il est remplacé par une règle plus fine.**
+`frozenAttributes()` interdit `first_start_at` et `lap_duration_minutes` en course, et son docblock
+dit exactement pourquoi : « changing either mid-race silently reschedules rounds already run ». La
+grille de BR-04 est une multiplication, `premier départ + (N - 1) × durée` — elle n'a pas de passé,
+donc modifier la durée globale à 3 h du matin ne déplace pas les tours à venir, ça réécrit aussi les
+tours déjà courus et les heures limites contre lesquelles BR-11 aura éliminé des coureurs. Le geste
+demandé n'est donc surtout pas le dégel de ce champ : c'est un objet qui, par construction, ne peut
+atteindre que le futur. Les deux champs restent gelés — la configuration décrit la grille avant le
+départ, le nouveau geste la corrige après.
+
+**Ce qui est stocké est un morceau de grille, pas la durée d'un tour.** L'enregistrement dit « à
+partir du tour N, la durée est de X », et la grille devient une fonction par morceaux. La forme
+naïve — une durée par tour — obligeait à écrire une ligne par tour à venir, sur une course qui n'a
+pas de nombre de tours prédéfini, donc à écrire l'infini. Le morceau donne les deux gestes utiles
+avec un seul stockage : « à partir de ce tour » écrit un morceau, « ce tour seulement » en écrit un
+second au tour d'après, qui rétablit la durée précédente. L'écran offre les deux, la première nuit
+posera la question.
+
+**Le morceau se compte en numéros de tour, jamais en horaires.** C'est ce qui le rend indépendant du
+premier départ : déplacer l'heure du départ avant la course fait glisser toute la grille, et les
+morceaux restent aux mêmes tours. Aucune invalidation à écrire, y compris sur le retour en brouillon
+de BR-41 — rien dans un demi-tour de l'événement ne rend faux « à partir du tour 3, 55 minutes ».
+
+**La garde se pose sur la ligne de tour, pas sur l'horloge.** « Seul un tour non parti se change »
+semblait se traduire par une comparaison à l'heure serveur ; elle laisse une fenêtre d'une minute.
+Les tours sont matérialisés paresseusement par `OpenDueRounds`, planifié chaque minute, donc un tour
+peut être parti sans avoir encore sa ligne — et un changement écrit dans cet intervalle déplace une
+heure limite sous les pieds de coureurs déjà lancés. Le geste rattrape donc la matérialisation
+d'abord, puis exige un numéro strictement supérieur au dernier tour ouvert. La garde devient un fait
+en base au lieu d'une lecture d'horloge, et elle réutilise une action déjà rejouable sans effet de
+bord. Accessoirement, c'est la même construction qui protège le passé : un tour couru porte ses
+horaires figés dans sa ligne, et c'est cette ligne que BR-11 lira.
+
+**La table ne peut pas être une colonne de `rounds`, et c'est la même paresse qui l'explique.** La
+ligne du tour 7 n'existe pas quand le gérant décide de sa durée. Une colonne sur `rounds` aurait
+donc exigé de matérialiser les tours à venir — c'est-à-dire de choisir un nombre de tours, ce que le
+format refuse. La table des morceaux porte l'intention, les lignes de `rounds` portent le fait.
+
+**`RoundSchedule` garde ses trois méthodes, et c'est là que tient le prix de la story.**
+`startOf`, `deadlineOf` et `numberAt` conservent leur signature ; seule leur implémentation passe de
+la multiplication au parcours cumulatif. `ResolveCurrentRound`, `OpenDueRounds`,
+`CurrentRoundResource` et l'écran ne bougent pas, et BR-11 s'écrira contre la même surface qu'elle
+aurait eue sans cette décision. La condition pour que ça reste vrai est une discipline à tenir dans
+tout l'epic 2 : **aucun calcul `premier départ + N × durée` hors de `RoundSchedule`**. C'est vrai
+aujourd'hui — une boucle de BR-08 qui recalculerait sa propre heure limite au lieu de la lire de son
+tour ferait doubler le prix de BR-44.
+
+**L'exclusion de BR-04 est révoquée, celle de D-17 ne l'est pas.** BR-04 excluait explicitement « une
+durée de boucle variable d'un tour à l'autre » ; c'est cette ligne que BR-44 rouvre, et elle la
+rouvre dans un seul sens, vers l'avant. **La distance, elle, reste unique pour l'événement.** C'est
+le piège naturel de cette story — une durée par morceau appelle une distance par morceau, et le
+raccourcissement de la boucle de nuit était précisément le cas que D-17 avait examiné et écarté.
+Rien dans la demande ne le ramène : le propriétaire veut serrer le temps, pas raccourcir le tour.
+
+**Les gages ne laissent rien dans le code, et l'argument qui voulait les y mettre a été défait par le
+propriétaire.** Le premier avis était de coder la version pauvre — une ligne de texte portée par le
+tour, affichée sur les écrans — au motif que personne ne se souvient à 3 h du matin de quel gage
+tombe au tour 11. Le propriétaire a précisé son intention : il ne planifie pas, il décide sur le
+moment et annonce à la voix cinq minutes avant le départ. Or dans une backyard, à ce moment-là, les
+coureurs encore en course sont **tous dans le corral** — l'audience concernée est réunie, physique,
+et le gage meurt à la fin du tour. La voix couvre la totalité du besoin, sans écran à lire ni page à
+rafraîchir, et un gage codé n'aurait ajouté qu'une surface à maintenir.
+
+**Le tri qui reste vrai après ça : un gage n'entre dans le code que s'il change une règle que
+l'application mesure.** Il en existe trois familles. Celle qui change le temps du tour — « ce
+tour-ci, vous n'avez que 55 minutes » — n'est pas une annonce mais une heure limite contre laquelle
+BR-11 élimine : c'est BR-44, et c'est le seul gage codé. Celle qui change la distance est fermée par
+D-17. Celle qui ajoute une contrainte physique — porter un poids, courir déguisé — n'est constatable
+par rien dans l'application, et n'a aucune raison d'y entrer. Autrement dit l'idée des gages n'a pas
+produit une story, elle a produit l'appelant réel de BR-44 : le geste utile n'est pas la correction
+d'un horaire mal configuré, c'est « je change la durée du prochain tour, cinq minutes avant qu'il
+parte ».
+
+**BR-44 se place avant BR-11, et après BR-08.** Elle ne touche pas aux boucles, donc BR-08 n'a pas à
+l'attendre. BR-11, en revanche, est le consommateur dont la justesse dépend de l'heure limite, et ses
+tests vont encoder une grille : autant qu'ils encodent la bonne du premier coup, plutôt que de
+retoucher un job d'élimination qui décide seul, sans qu'un humain appuie sur un bouton.
+
+**Ce qui reste ouvert.** Aucune grille prévisionnelle éditable : le geste porte sur le prochain tour,
+parce que c'est le seul moment où il a un appelant, et le stockage par numéro n'interdit pas de
+l'étendre le jour où un autre apparaît. Aucune trace de qui a changé quoi et quand — la table dit
+l'état de la grille, pas son historique, et un événement d'une nuit avec un seul gérant ne réclame
+pas de journal. Aucune notification aux coureurs : D-15 tient, le changement s'annonce au corral.
+
+## D-73 — La boucle ne stocke que son statut et son heure de validation, tout le reste se lit ailleurs
+
+Arrêté le 2026-08-31 par BR-08 T1. La story listait les colonnes de la boucle : « participant, tour,
+numéro de tour, heure théorique de départ, heure limite, heure réelle de validation, durée, vitesse
+moyenne, statut ». La table livrée en porte quatre — `participant_id`, `round_id`, `status`,
+`validated_at` — et cette entrée dit pourquoi les cinq autres ont été refusées, chacune pour une
+raison différente.
+
+**La vitesse moyenne ne peut pas être une colonne : D-17 l'interdit en toutes lettres.** Elle y écrit
+la conséquence de la distance unique — « si le gérant corrige la distance en cours d'événement, les
+vitesses déjà affichées se recalculent, c'est le comportement attendu d'une valeur unique ». Une
+colonne `average_speed` remplie par BR-09 rendrait cette phrase fausse en silence : la correction de
+la distance laisserait derrière elle des vitesses calculées sur l'ancienne. La formule reste donc
+une lecture, jamais une écriture.
+
+**La durée n'en est pas une non plus, parce qu'elle vaut par construction `validated_at − départ du
+tour`.** Elle ne dérive pas d'un calcul qui pourrait un jour changer d'avis : c'est une soustraction
+entre deux instants dont l'un est sur la boucle et l'autre sur le tour. La stocker créerait un
+troisième endroit où la même vérité s'écrit, et BR-12 — qui rejoue une validation avec une heure
+saisie à la main — devrait penser à le mettre à jour. Avec la soustraction, BR-12 n'a qu'un instant à
+réécrire.
+
+**Le numéro, l'heure de départ et l'heure limite sont ceux du tour, et le tour est déjà l'objet qui
+les fige.** C'est la moitié de D-72 : un tour couru porte ses horaires dans sa ligne, matérialisée au
+moment où il devient dû, et c'est cette ligne que BR-11 lira pour éliminer. Recopier ces trois
+valeurs sur chaque boucle donnerait quarante copies par tour d'une donnée que BR-44 s'applique à
+n'écrire qu'une fois — et la protection du passé cesserait d'être une propriété du schéma pour
+devenir une discipline à tenir. La boucle porte `round_id` ; elle lit son horaire sur son tour.
+
+**La conséquence sur BR-09 est une reformulation, pas une amputation.** Son critère
+« la durée enregistrée est 47 minutes et 32 secondes / la vitesse moyenne enregistrée est 7,57 km/h »
+se lit désormais **restituée** au lieu d'enregistrée : le geste écrit `validated_at` et le statut, et
+l'écran reçoit la durée et la vitesse calculées au même instant. Aucun critère d'acceptation ne
+change de valeur, et le cas limite « distance non renseignée : la vitesse n'est pas calculée » reste
+exactement le même contrôle.
+
+**`validated_at` est en `UtcDateTime`, sans avoir à y réfléchir.** D-35 avait déjà nommé cette colonne
+comme l'un de ses appelants futurs. Un test la repasse par la base sur l'heure vécue deux fois du 25
+octobre — deux boucles validées à « 02:30 », une heure d'écart réelle — pour que le cast reste rouge
+s'il disparaît.
+
+**Deux absences volontaires en plus.** Pas d'`event_id` sur la boucle : le participant et le tour le
+portent chacun, et il n'y a qu'un événement (D-31). Pas de `label()` sur `LapStatus` : aucun
+consommateur PHP ne l'appelle — les écrans affichent le statut du **coureur**, dérivé, jamais celui
+d'une boucle — et D-26 a déjà tranché contre la déclaration morte sur `RunnerStatus`. Le jour où une
+boucle s'affiche par elle-même, `race.lap.*` est libre depuis D-34.
+
+**Ce qui reste ouvert.** Le marqueur de correction de BR-12 sera, lui, une vraie colonne : « une
+boucle corrigée est marquée comme telle » est un fait que rien d'autre ne porte. Et si un écran de
+course finit par trier des centaines de boucles par vitesse, le tri se fera en base sur
+`validated_at`, jamais sur une vitesse recalculée en PHP — l'ordre est le même, la distance étant
+constante.
+
+## D-74 — La boucle s'ouvre avec son tour, dans la même transaction, et le coureur actif se lit sans colonne
+
+Arrêté le 2026-08-31 par BR-08 T2 à T5. La story demandait « une boucle par participant actif et par
+tour de course » et un « statut du participant dans la course ». Quatre choix ont été faits en
+l'écrivant, dont trois n'étaient pas dans son énoncé.
+
+**L'ouverture des boucles est accrochée à la matérialisation du tour, pas à un appel séparé.**
+`OpenDueRounds` était déjà le seul endroit du produit où un tour naît — le planificateur l'appelle
+chaque minute (BR-04). Lui faire ouvrir les boucles dans la foulée donne gratuitement le cas limite
+que la story nomme : « participant confirmé en cours de course, il entre au tour suivant, pas au tour
+en cours ». Un coureur confirmé à 13 h 30 n'a pas de boucle sur le tour 1, parce que le tour 1 était
+matérialisé à 13 h 00 et que rien ne repasse dessus. Aucune garde n'a eu à être écrite pour ça.
+
+**Le couple tour + boucles est écrit dans une transaction, et c'est une correction de bug, pas une
+précaution.** `OpenDueRounds` sort tôt dès que `max(number) >= tour courant` : un tour matérialisé
+dont l'insertion des boucles aurait échoué ne serait jamais rattrapé, la minute suivante retournant
+un tableau vide. Le tour existerait sans coureurs, et BR-11 n'éliminerait personne. La transaction
+fait retomber les deux écritures ensemble, et le rejeu de la minute suivante les refait.
+
+**L'idempotence est une clause, pas un `firstOrCreate` par coureur.** Les coureurs à servir sont
+ceux qui n'ont pas déjà de boucle sur ce tour (`whereDoesntHave`), et l'écriture est un `insert` en
+masse : deux requêtes par tour au lieu de quarante, et le rejeu du même tour n'écrit rien. L'unicité
+`participant_id + round_id` de T1 reste le filet, elle n'est pas le mécanisme.
+
+**Le statut de course reste dérivé, et il vit dans un concern avec les boucles dont il se déduit.**
+D-26 avait déjà interdit de persister `RunnerStatus` ; ce qui manquait, c'est où loger la lecture.
+`HasRaceStatus` porte le concept entier — la relation `laps()`, le prédicat `isRunning()`, le statut
+d'affichage et le scope `running` — plutôt qu'un scope de plus sur un modèle `Participant` qui porte
+déjà son cycle d'inscription. Un coureur est actif s'il est confirmé et qu'aucune de ses boucles
+n'est `eliminated` : c'est la règle de la story, écrite une fois côté prédicat et une fois côté
+requête, comme tout couple scope/prédicat d'Eloquent.
+
+**Un critère de la story n'est pas testable, et c'est le schéma qui l'interdit.** « Aucune boucle
+pour un coureur d'un autre événement » a été écrit, puis retiré : la contrainte `events_singleton_unique`
+(D-31) refuse le second événement que le test aurait fallu créer. Le filtre `event_id` reste dans la
+requête d'ouverture — il est exact et ne coûte rien — mais il garde une porte que la base a déjà
+condamnée.
+
+**Ce qui reste ouvert.** `runnerStatus()` ne rend que `running` et `eliminated`, les deux états que
+BR-08 nomme ; `withdrawn` attend le motif de sortie de BR-10 T1, `finished` attend BR-20. Le
+prédicat interroge la base par coureur : les écrans de course de l'epic 3 liront cet état en lot,
+par `withExists`, et non en appelant `isRunning()` quarante fois. Aucune boucle n'est semée non
+plus — le jeu de développement s'arrête à un événement en inscriptions, et le semer en course
+demanderait de choisir un tour courant, ce qu'aucune story n'a encore tranché.
