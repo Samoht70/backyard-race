@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Epic** | 2 — Moteur de course |
-| **Statut** | À faire |
+| **Statut** | ✅ Terminé |
 | **Estimation** | 5 pts |
 | **Créée** | 2026-08-31 — demandée par le propriétaire avant d'ouvrir l'epic 2 |
 | **Dépend de** | BR-04 |
@@ -178,8 +178,8 @@ la lire de son tour ferait doubler le prix.
 
 ## Tâches
 
-- [ ] **T1** — Migration et modèle du changement de durée, unicité événement + tour d'effet `0,5 pt`
-- [ ] **T2** — `RoundSchedule` par morceaux : départ, heure limite et résolution du tour courant `1,5 pt`
-- [ ] **T3** — Action de changement : rattrapage de matérialisation, garde sur le tour parti, les deux gestes `1 pt`
-- [ ] **T4** — Route, requête et geste sur le prochain tour depuis l'écran de pilotage `1 pt`
-- [ ] **T5** — Tests : grille sans changement, deux gestes, refus sur tour ouvert, fenêtre du planificateur, remplacement, tour courant `1 pt`
+- [x] **T1** — Migration et modèle du changement de durée, unicité événement + tour d'effet `0,5 pt`
+- [x] **T2** — `RoundSchedule` par morceaux : départ, heure limite et résolution du tour courant `1,5 pt`
+- [x] **T3** — Action de changement : rattrapage de matérialisation, garde sur le tour parti, les deux gestes `1 pt`
+- [x] **T4** — Route, requête et geste sur le prochain tour depuis l'écran de pilotage `1 pt`
+- [x] **T5** — Tests : grille sans changement, deux gestes, refus sur tour ouvert, fenêtre du planificateur, remplacement, tour courant `1 pt`

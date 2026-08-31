@@ -80,6 +80,14 @@ class Event extends Model
     }
 
     /**
+     * @return HasMany<ScheduleSegment, $this>
+     */
+    public function scheduleSegments(): HasMany
+    {
+        return $this->hasMany(ScheduleSegment::class)->orderBy('from_round_number');
+    }
+
+    /**
      * @return HasMany<Document, $this>
      */
     public function documents(): HasMany
