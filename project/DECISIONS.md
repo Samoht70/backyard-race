@@ -3002,3 +3002,84 @@ prédicat interroge la base par coureur : les écrans de course de l'epic 3 liro
 par `withExists`, et non en appelant `isRunning()` quarante fois. Aucune boucle n'est semée non
 plus — le jeu de développement s'arrête à un événement en inscriptions, et le semer en course
 demanderait de choisir un tour courant, ce qu'aucune story n'a encore tranché.
+
+## D-75 — La validation est un appui sur une boucle, gardée par la ligne du tour et par un verrou
+
+Arrêté le 2026-08-31 par BR-09. Le geste le plus répété de la nuit est aussi le plus court à
+décrire : un bouton, une heure serveur, deux nombres calculés. Ce qui a demandé des choix, c'est ce
+qui l'entoure — où vit le calcul, quoi garde le refus, et ce qu'il faut afficher pour que le gérant
+sache que son appui est passé.
+
+**La durée et la vitesse naissent à la lecture, et D-73 tient sans retouche.** `LapPerformance` est
+un objet de valeur construit au moment où on l'affiche, depuis trois entrées : `validated_at` sur la
+boucle, `starts_at` sur le tour, `lap_distance_meters` sur l'événement. Rien n'est écrit d'autre que
+le statut et l'heure. La conséquence promise par D-73 s'est vérifiée à l'écriture : corriger la
+distance de l'événement recalcule toutes les vitesses déjà affichées, et BR-12 n'aura qu'un instant
+à réécrire pour que la durée suive.
+
+**L'heure limite se lit sur la ligne du tour, jamais sur la grille.** C'est la discipline que D-72
+nomme, et elle est maintenant sous test : un événement dont la durée de boucle est passée à 30
+minutes, avec un tour matérialisé à 60, accepte une validation à 17:45. Si le calcul repassait par
+`RoundSchedule`, ce test tomberait — c'est-à-dire qu'un changement de durée déplacerait l'heure
+limite d'un tour déjà lancé, exactement la panne que D-72 voulait rendre impossible.
+
+**La limite est inclusive, et le refus nomme la sortie.** La comparaison est `>` et pas `>=`, donc la
+validation à la seconde exacte de l'heure limite passe. Au-delà, le message envoie vers la correction
+exceptionnelle de BR-12 : c'est le seul refus du produit qui désigne une story pas encore écrite, et
+il vaut mieux qu'il le dise que de laisser le gérant croire à une panne.
+
+**Le double appui est gardé par un verrou, et l'idempotence s'appuie sur `validated_at`.** La règle
+demandée est particulière : la seconde tentative ne modifie rien **et** ne présente aucune erreur —
+elle rend le premier temps. La garde n'est donc pas un refus, c'est un retour. Deux raisons de la
+poser sur `validated_at` plutôt que sur le statut : c'est la colonne qui porte le fait, et elle
+restera juste quand BR-12 ajoutera son marqueur de correction. Le geste s'exécute dans une
+transaction avec `lockForUpdate`, parce que deux requêtes séparées par 200 ms peuvent lire toutes les
+deux une boucle vide et écrire deux heures différentes — et c'est la seule donnée de la nuit que
+personne ne pourra recontester après coup.
+
+**Le refus que voit le gérant est une erreur de formulaire ; l'exception est un filet de
+programmeur.** D-70 n'a pas mis 409 dans les statuts rendus dans le site, donc une
+`LapValidationRefusedException` qui remonterait jusqu'au navigateur donnerait la page brute de
+Symfony. La garde utile est celle du `FormRequest`, qui repose le gérant sur son tableau avec une
+ligne d'explication ; l'exception de l'action reste pour l'appelant qui n'est pas un écran. C'est la
+même construction que BR-44, duplication comprise, et elle s'assume : deux endroits énoncent la même
+règle, et les deux sont testés.
+
+**La policy porte la permission *et* l'état de course, sinon elle ne servirait à rien.**
+`validate-laps` en middleware de route aurait dit exactement ce qu'une policy réduite à `can()`
+dirait. `LapPolicy::validate` ajoute donc ce que le middleware ne sait pas voir : une boucle ne se
+valide que sur un événement en course. Un seul endroit autorise, et aucune route n'a de groupe de
+middleware pour elle seule.
+
+**Le tableau du tour courant naît ici, et il est volontairement pauvre.** Le bouton demandé par la
+story ne peut pas exister sans une liste où le poser, donc l'écran de pilotage reçoit les boucles du
+tour courant : dossard, nom, statut, boucles validées, et une cellule qui est soit le bouton, soit
+l'heure d'arrivée, soit un tiret. Les filtres et la pagination restent à BR-14, le compte des
+effectifs à BR-13. Les trois états de la cellule sont ceux que la charte avait déjà dessinés dans son
+échantillon de liste — la story n'a rien eu à inventer côté écran.
+
+**La restitution est la ligne elle-même, pas un toast.** « Durée, distance, vitesse » s'affichent
+dans la sous-ligne du coureur, et l'heure d'arrivée bascule dans la cellule avec l'animation de
+volet. Un toast aurait répété les mêmes trois nombres et obligé PHP à reformater en français ce que
+le front sait déjà faire — `formatKilometers` existait, `formatLapDuration` et `formatSpeed` le
+rejoignent, tous sous test. Le serveur n'envoie que des nombres.
+
+**Le statut de course se lit maintenant en lot, et le « reste ouvert » de D-74 est fermé.** D-74
+prévoyait `withExists` pour l'epic 3 ; le tableau l'a réclamé une story plus tôt. `withRaceStatus()`
+et `withValidatedLapsCount()` chargent les deux faits dérivés en une requête, et `isRunning()` comme
+`validatedLapsCount()` préfèrent l'attribut chargé quand il est là. La règle reste écrite une fois,
+et un test compare les deux coûts sur le même effectif : zéro requête chargé, une par coureur sinon.
+
+**L'écran ne rattrape pas la matérialisation des tours, exprès.** `RoundDurationRequest` appelle
+`OpenDueRounds` avant de décider, parce qu'un changement de durée dépend de ce qui est déjà parti.
+Le tableau, lui, est une lecture, et BR-15 va le sonder en boucle : y accrocher une écriture ferait
+tenter une insertion à chaque sondage. La conséquence assumée est une fenêtre de moins d'une minute
+au tout début d'un tour, où le bandeau annonce le tour et le tableau est encore vide — c'est-à-dire
+le moment de la nuit où personne ne rentre.
+
+**Ce qui reste ouvert.** Le tableau montre toutes les boucles du tour, sans filtre ni pagination :
+sur quarante coureurs c'est lisible, et BR-14 s'en occupe. `withdrawn` n'apparaît toujours pas,
+faute de motif de sortie (BR-10). Aucune boucle n'est semée, donc l'écran ne se regarde encore qu'en
+fabriquant une course à la main. Et la perte de réseau au moment de l'appui n'a pas de traitement
+propre : le bouton reste en attente, le gérant réappuie, et l'idempotence fait le reste — un
+tampon hors ligne serait une autre story.
