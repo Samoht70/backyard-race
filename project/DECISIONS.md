@@ -3280,3 +3280,59 @@ pas mais que l'action sait faire — n'apparaît sur aucune des deux listes, et 
 passerait par une réintégration sur une autre de ses boucles. Rien ne signale au gérant qu'une
 correction a eu lieu ailleurs que sur la ligne concernée, et rien ne l'empêche d'en faire son geste
 courant : c'est un choix d'écran, pas une garde.
+
+## D-79 — Le tableau du tour ne montre que ceux qui courent, et le compteur porte les sortis
+
+Arrêté le 2026-09-01 par BR-13. L'écran existait à moitié depuis D-75 — un tableau « volontairement
+pauvre », posé parce que le bouton de validation devait bien se poser quelque part. BR-13 en fait
+l'écran de la nuit, et deux de ses règles ont déplacé ce que BR-09 et BR-10 avaient livré.
+
+**Le coureur sorti quitte la liste, et deux tests de l'epic 2 ont été réécrits pour le dire.** BR-09
+affichait le coureur éliminé avec une cellule « sorti », BR-10 le coureur en abandon avec son statut,
+et les deux étaient sous test. La règle de BR-13 est explicite — « seuls les coureurs actifs
+apparaissent dans la liste de validation » — et son critère chiffré ne laisse pas d'ambiguïté : 24 en
+course, 13 sortis, 24 lignes. Ce n'est pas une amputation de l'information : elle passe dans le
+compteur, qui la donne en un chiffre au lieu de treize lignes à faire défiler. Le gérant qui veut la
+liste complète l'aura par BR-14 et ses filtres. Les deux tests réécrits affirment maintenant le
+mouvement lui-même : le coureur sort du tableau **et** apparaît dans le compteur des sortis.
+
+**Les compteurs sont un agrégat, pas un `count()` sur la liste rendue.** Une somme conditionnelle sur
+les inscriptions confirmées donne les deux chiffres en une requête. La conséquence assumée est une
+divergence possible d'un coureur entre le compteur et la liste : un inscrit confirmé en pleine course
+est « en course » avant que le tour suivant ne lui ouvre une boucle (D-74). C'est la lecture honnête
+de l'effectif ; l'inverse — dériver le compteur de la liste — ferait mentir le chiffre chaque fois
+qu'un coureur rejoint la course, et ferait payer au téléphone un parcours de la collection à chaque
+sondage de BR-15.
+
+**« Aucune boucle ouverte sur ce tour » est devenu faux le jour où la liste s'est réduite.** Un tour
+peut porter quarante boucles et n'afficher personne, si les quarante coureurs sont sortis. Le texte
+dit maintenant ce que le gérant peut faire — aucun coureur en course sur ce tour — et il couvre du
+même coup la minute que D-75 laisse ouverte au sommet d'un tour, où le tour existe et où ses boucles
+ne sont pas encore écrites.
+
+**L'écran s'ouvre sur `manage-laps`, pas sur `manage-event`.** Les deux capacités sont tenues par le
+même rôle aujourd'hui, donc rien ne change sur la machine. Ce qui change, c'est qu'elles cessent
+d'être lues comme une seule : le poste de configuration et le poste de chronométrage sont deux
+métiers, et le second peut être confié sans le premier. La conséquence est visible sur la ligne du
+coureur — le lien vers sa fiche ne s'affiche que pour qui porte `manage-participants`, faute de quoi
+l'écran offrirait une porte qui répond 403.
+
+**La panne réseau est traitée globalement, sur l'événement d'Inertia, pas sur le formulaire de
+validation.** D-75 laissait ce cas ouvert : « le bouton reste en attente, le gérant réappuie ». Il ne
+restait pas en attente, il retombait en silence, ce qui est pire — rien ne distinguait un appui parti
+d'un appui perdu. Le client émet `networkError` pour la requête qui ne part pas ; un toast s'y
+accroche, et il couvre tous les gestes de la nuit plutôt que celui-ci seul. L'exception n'est pas
+avalée, donc une vraie panne reste lisible en console.
+
+**Le lien vers la fiche est sur le nom, pas sur la latte.** `RunnerSlat` portait depuis la charte un
+`href` qui transformait la latte entière en lien, et que personne n'avait branché. Le brancher ici
+aurait imbriqué le bouton de validation et la boîte d'abandon dans une ancre — HTML invalide, et
+surtout un pouce qui rate le bouton de quelques pixels quitte l'écran en pleine course. Le lien tient
+donc sur le nom, avec sa cible tactile étendue aux lignes voisines.
+
+**Ce qui reste ouvert.** L'écran ne se rafraîchit pas seul : BR-15 en fait son affaire, et jusque-là
+le changement de tour se voit en rechargeant. La fiche du coureur est encore sa fiche d'inscription,
+que BR-16 remplacera par un dépliage sur place. Le compteur des sortis ne distingue pas l'abandon de
+l'élimination, alors que la donnée existe — la story ne demande que deux nombres, et le détail par
+motif appartient au classement de BR-20. Aucune boucle n'est semée, donc l'écran ne se regarde
+toujours qu'en fabriquant une course à la main.
