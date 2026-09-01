@@ -3,6 +3,7 @@ import { Head, Link } from '@inertiajs/vue3';
 import {
     ClipboardList,
     Files,
+    Hourglass,
     ScrollText,
     SlidersHorizontal,
     Undo2,
@@ -12,22 +13,48 @@ import BoardPage from '@/components/board/BoardPage.vue';
 import NextRoundDuration from '@/components/race/NextRoundDuration.vue';
 import RoundBoard from '@/components/race/RoundBoard.vue';
 import RoundHeader from '@/components/race/RoundHeader.vue';
+import RoundTally from '@/components/race/RoundTally.vue';
+import EmptyState from '@/components/state/EmptyState.vue';
 import { t } from '@/lib/i18n';
 import { can } from '@/lib/permissions';
+import {
+    raceStandby,
+    raceStandbyDescriptionKey,
+    raceStandbyTitleKey,
+} from '@/lib/raceStandby';
 import { corrections } from '@/routes/manage';
 import { edit as editBriefing } from '@/routes/manage/briefing';
 import { index as documents } from '@/routes/manage/documents';
 import { edit as editEvent } from '@/routes/manage/event';
 import { index as registrations } from '@/routes/manage/registrations';
-import type { CurrentRound, NextRound, RoundRunner } from '@/types/race';
+import type { EventStatus } from '@/types/event';
+import type {
+    CurrentRound,
+    NextRound,
+    RoundRunner,
+    RunnerTally,
+} from '@/types/race';
 
 type Props = {
+    eventStatus: EventStatus | null;
     currentRound: CurrentRound | null;
     nextRound: NextRound | null;
+    tally: RunnerTally | null;
     roundRunners: RoundRunner[];
 };
 
 const props = defineProps<Props>();
+
+const counts = computed(() =>
+    props.tally === null
+        ? []
+        : [
+              { label: t('race.round.runners_left'), value: props.tally.running },
+              { label: t('race.round.runners_out'), value: props.tally.out },
+          ],
+);
+
+const standby = computed(() => raceStandby(props.eventStatus));
 
 const desks = computed(() =>
     [
@@ -73,18 +100,32 @@ const desks = computed(() =>
 <template>
     <Head :title="t('ui.manage.title')" />
 
-    <RoundHeader
-        v-if="currentRound"
-        :round="currentRound.number"
-        :start-at="currentRound.starts_at"
-        :deadline-at="currentRound.deadline_at"
-    />
+    <div v-if="currentRound" class="sticky top-0 z-10 bg-background">
+        <RoundHeader
+            :round="currentRound.number"
+            :start-at="currentRound.starts_at"
+            :deadline-at="currentRound.deadline_at"
+        />
+        <RoundTally v-if="counts.length" :counts="counts" />
+    </div>
 
     <BoardPage>
         <div class="grid gap-6">
-            <h1 class="text-title">{{ t('ui.manage.title') }}</h1>
+            <h1 class="sr-only">{{ t('ui.manage.title') }}</h1>
 
-            <nav class="grid gap-1.5 sm:grid-cols-2 xl:grid-cols-4">
+            <RoundBoard v-if="currentRound" :runners="roundRunners" />
+
+            <EmptyState
+                v-else
+                :icon="Hourglass"
+                :title="t(raceStandbyTitleKey(standby))"
+                :description="t(raceStandbyDescriptionKey(standby))"
+            />
+
+            <nav
+                class="grid gap-1.5 sm:grid-cols-2 xl:grid-cols-4"
+                :aria-label="t('ui.manage.title')"
+            >
                 <Link
                     v-for="desk in desks"
                     :key="desk.key"
@@ -99,8 +140,6 @@ const desks = computed(() =>
                     <span class="text-sm font-medium">{{ desk.label }}</span>
                 </Link>
             </nav>
-
-            <RoundBoard v-if="currentRound" :runners="roundRunners" />
 
             <NextRoundDuration v-if="nextRound" :round="nextRound" />
         </div>

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Manage;
 
+use App\Enums\EventStatus;
 use App\Enums\ExitReason;
 use App\Enums\Permission;
 use App\Models\Event;
@@ -72,6 +73,30 @@ class RaceDashboardTest extends TestCase
         $this->linedUp($round, 27);
 
         $this->assertSame($threeRunners, $this->queriesOfTheBoard());
+    }
+
+    #[Test]
+    public function it_names_the_state_of_the_event_instead_of_an_empty_board(): void
+    {
+        Event::factory()->registration()->create([
+            'first_start_at' => $this->at('2026-09-05 13:00'),
+            'lap_duration_minutes' => 60,
+        ]);
+
+        $this->get(route('manage.index'))->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('eventStatus', EventStatus::Registration->value)
+            ->where('currentRound', null)
+            ->where('tally', null)
+            ->where('roundRunners', [])
+            ->etc());
+    }
+
+    #[Test]
+    public function it_carries_no_event_status_until_an_event_exists(): void
+    {
+        $this->get(route('manage.index'))->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('eventStatus', null)
+            ->etc());
     }
 
     #[Test]

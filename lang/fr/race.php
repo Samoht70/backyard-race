@@ -30,6 +30,28 @@ return [
         'empty' => 'Aucune boucle ouverte sur ce tour.',
         'refused' => 'Validation refusée',
     ],
+    'standby' => [
+        'no_event' => [
+            'title' => 'Aucun événement',
+            'description' => 'Rien n’est encore créé : la course commence par la configuration de l’événement.',
+        ],
+        'draft' => [
+            'title' => 'La course n’a pas commencé',
+            'description' => 'L’événement est en brouillon : les inscriptions ne sont pas encore ouvertes.',
+        ],
+        'registration' => [
+            'title' => 'La course n’a pas commencé',
+            'description' => 'Les inscriptions sont ouvertes. Le tableau s’ouvrira au départ du premier tour.',
+        ],
+        'between_rounds' => [
+            'title' => 'Aucun tour en cours',
+            'description' => 'Le premier tour n’est pas encore parti, ou la grille horaire est épuisée.',
+        ],
+        'finished' => [
+            'title' => 'La course est terminée',
+            'description' => 'Les tours sont clos : le classement se lit sur la page des résultats.',
+        ],
+    ],
     'lap' => [
         'speed_unit' => 'km/h',
     ],
