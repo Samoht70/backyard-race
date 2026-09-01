@@ -46,6 +46,11 @@ trait HasRaceStatus
         $this->laps()->where('status', LapStatus::Pending)->update(['status' => LapStatus::Eliminated]);
     }
 
+    public function returnToRace(): void
+    {
+        $this->forceFill(['exit_reason' => null, 'exited_at' => null])->save();
+    }
+
     public function validatedLapsCount(): int
     {
         $loaded = $this->getAttribute(self::VALIDATED_LAPS_COUNT);

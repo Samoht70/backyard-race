@@ -31,6 +31,12 @@ class EventPolicy
         return $user->can(Permission::ManageEvent->value);
     }
 
+    public function correctLaps(User $user, Event $event): bool
+    {
+        return $user->can(Permission::ManageLaps->value)
+            && $event->lifecycle()->isRacing();
+    }
+
     public function advance(User $user, Event $event): bool
     {
         $permission = $event->lifecycle()->advancePermission();

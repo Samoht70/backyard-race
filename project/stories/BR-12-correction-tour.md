@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Epic** | 2 — Moteur de course |
-| **Statut** | À faire |
+| **Statut** | ✅ Terminé |
 | **Estimation** | 5 pts |
 | **Dépend de** | BR-11 |
 
@@ -83,10 +83,47 @@ C'est la seule porte par laquelle une heure saisie à la main entre dans le syst
 rester visiblement exceptionnelle, sinon elle devient le geste courant et le calcul
 automatique perd son sens.
 
+## Ce que la livraison a changé
+
+**La correction porte sur une boucle, jamais sur un coureur.** Réintégrer demande une boucle et une
+heure ; annuler demande une boucle. Le gérant désigne, l'application ne devine pas : après une
+coupure du planificateur un coureur traîne des boucles éliminées sur plusieurs tours, et rattraper
+« sa » boucle n'aurait pas de sens. Le cas limite « correction sur un tour antérieur » tombe alors
+sans code, et les tours suivants restent tels quels.
+
+**La réintégration accepte aussi une boucle encore en attente.** Le refus de BR-09 passé l'heure
+limite envoie ici, et à cette seconde la boucle est encore `pending` : le planificateur ne l'a pas
+fermée. Exiger `eliminated` aurait laissé le gérant devant un écran vide pendant la minute où la
+porte lui sert. Le seul refus est la boucle déjà validée, et il renvoie vers l'annulation.
+
+**L'annulation réutilise la sortie de BR-10 plutôt que d'en écrire une autre.** Tour ouvert, la boucle
+repart en attente ; heure limite passée, elle est perdue et le coureur sort à l'heure de la ligne du
+tour, comme l'élimination automatique. Un coureur déjà sorti garde son motif : annuler la boucle d'un
+abandon de 17:40 n'en fait pas un éliminé de 18:00.
+
+**La durée n'a pas eu une ligne à elle.** Elle naît à la lecture depuis l'heure de validation et le
+départ du tour ([D-73](../DECISIONS.md)) : écrire l'heure fournie suffit à ce que durée et vitesse
+suivent. C'est ce que [D-75](../DECISIONS.md) avait annoncé.
+
+**Le champ ne demande que `HH:MM`.** L'instant se pose sur la date du tour, donc la borne basse
+— antérieure au départ — refuse bien. Sur le seul tour de la nuit qui traverse minuit, une heure
+antérieure au départ est lue au lendemain au lieu d'être refusée : angle mort assumé.
+
+**L'écran ne liste pas la course entière.** À rattraper : les boucles éliminées, et celles en attente
+sur un tour échu. À annuler : les validations des **deux derniers tours** — une erreur de saisie se
+voit dans les minutes qui suivent, et rendre 24 h de boucles ferait d'un écran de secours un écran de
+navigation. Le lien n'apparaît que pendant la course.
+
+**Le marqueur est une colonne, pas un historique.** `corrected_at` dit qu'une boucle a été touchée à
+la main et quand, rien de plus — l'historique complet reste exclu (D-15). Il se lit aujourd'hui sur
+le tableau du tour courant : la fiche du coureur est BR-16 et n'existe pas encore.
+
+[D-78](../DECISIONS.md) porte le détail, dont les trois points restés ouverts.
+
 ## Tâches
 
-- [ ] **T1** — Marqueur de correction sur la boucle `1 pt`
-- [ ] **T2** — Action de réintégration avec recalcul de durée et de vitesse `2 pts`
-- [ ] **T3** — Action d'annulation d'une validation, selon que le tour est ouvert ou échu `2 pts`
-- [ ] **T4** — Écran de correction, distinct du geste de validation courant `2 pts`
-- [ ] **T5** — Tests : réintégration, annulation dans les deux cas, bornes d'heure, refus hors course `2 pts`
+- [x] **T1** — Marqueur de correction sur la boucle `1 pt`
+- [x] **T2** — Action de réintégration avec recalcul de durée et de vitesse `2 pts`
+- [x] **T3** — Action d'annulation d'une validation, selon que le tour est ouvert ou échu `2 pts`
+- [x] **T4** — Écran de correction, distinct du geste de validation courant `2 pts`
+- [x] **T5** — Tests : réintégration, annulation dans les deux cas, bornes d'heure, refus hors course `2 pts`

@@ -26,6 +26,7 @@ class LapFactory extends Factory
                 ->state(['event_id' => Round::query()->whereKey($attributes['round_id'])->sole()->event_id]),
             'status' => LapStatus::Pending,
             'validated_at' => null,
+            'corrected_at' => null,
         ];
     }
 
@@ -34,6 +35,13 @@ class LapFactory extends Factory
         return $this->state(fn (array $attributes): array => [
             'status' => LapStatus::Validated,
             'validated_at' => $at ?? CarbonImmutable::now(),
+        ]);
+    }
+
+    public function corrected(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'corrected_at' => CarbonImmutable::now(),
         ]);
     }
 

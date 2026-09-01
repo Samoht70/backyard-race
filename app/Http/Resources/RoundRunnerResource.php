@@ -35,6 +35,7 @@ class RoundRunnerResource extends JsonResource
             'runner_id' => $this->id,
             'lap_id' => $lap->id,
             'lap_status' => $lap->status->value,
+            'corrected' => $lap->corrected_at !== null,
             'bib_label' => BibNumber::label($this->bib_number),
             'first_name' => $this->user->first_name,
             'last_name' => $this->user->last_name,
