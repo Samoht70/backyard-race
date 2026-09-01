@@ -13,6 +13,11 @@ export type CurrentRound = {
     deadline_at: string;
 };
 
+export type RunnerTally = {
+    running: number;
+    out: number;
+};
+
 export type NextRound = {
     number: number;
     starts_at: string;

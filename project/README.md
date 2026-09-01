@@ -233,7 +233,7 @@ par BR-33. Elle reste avec les écrans de course, dont elle dépend.
 
 | ID | Story | Pts | Statut |
 |----|-------|-----|--------|
-| [BR-13](stories/BR-13-dashboard-gerant.md) | Dashboard gérant mobile-first | 13 | À faire |
+| [BR-13](stories/BR-13-dashboard-gerant.md) | Dashboard gérant mobile-first | 13 | ✅ Terminé |
 | [BR-14](stories/BR-14-tableau-coureurs.md) | Tableau des coureurs et filtres | 8 | À faire |
 | [BR-15](stories/BR-15-polling.md) | Rafraîchissement léger de l'état de course | 2 | À faire |
 | [BR-16](stories/BR-16-detail-participant.md) | Détail d'un coureur, déplié dans le tableau | 2 | À faire |
@@ -298,7 +298,7 @@ pas de fichier de story : c'est la décision qui les porte, et elles prennent un
 | R-06 | Charte de l’instrument, et primitives reka-ui à la place du starter kit | 5 | ✅ Livrée | [D-61](DECISIONS.md) |
 | R-07 | Adresse de l'organisateur en configuration, en plus du rôle `manager` | 2 | ✅ Livrée | [D-65](DECISIONS.md) |
 
-**Total : 39 stories actives + 7 reprises · 267 pts · 202 pts livrés (76 %)**
+**Total : 39 stories actives + 7 reprises · 267 pts · 215 pts livrés (81 %)**
 
 **Hors périmètre : 4 stories abandonnées, 32 pts non engagés** — voir [D-47](DECISIONS.md).
 
@@ -328,11 +328,18 @@ et le garde-fou de gel, eux, ne coûtent que la nuit de course, et il reste du t
 **Ensuite, le moteur et les écrans de course** — BR-08 → BR-44 → BR-09 → BR-10 → BR-11 → BR-12 →
 BR-13 → BR-14 → BR-15 → BR-16 → BR-24 → BR-20 → BR-23
 
+**L'epic 3 est ouvert le 2026-09-01 par BR-13.** Le moteur décidait juste sans se regarder ; il se
+regarde maintenant sur l'écran que le gérant tiendra quinze heures — entête de tour et effectifs
+collés en haut, liste des seuls coureurs encore en course, et une phrase à la place du vide quand la
+course n'a pas commencé. Deux tests de l'epic 2 ont été réécrits en la prenant : le coureur sorti
+quitte le tableau et passe dans le compteur ([D-79](DECISIONS.md)). La suite est **BR-14**, dont les
+filtres rendront la liste complète que BR-13 vient de restreindre.
+
 **L'epic 2 est clos le 2026-08-31.** Les six entrées du moteur sont livrées dans cet ordre : les
 boucles s'ouvrent avec leur tour, la durée du prochain tour se change, le gérant valide d'un appui,
 déclare un abandon, le chronomètre élimine seul, et BR-12 rattrape ce que les cinq premières
-n'auraient pas su défaire. La suite commence à **BR-13** : le moteur décide juste, mais il ne se
-regarde encore que sur le tableau pauvre posé par BR-09.
+n'auraient pas su défaire. La suite a commencé à **BR-13**, qui a remplacé le tableau pauvre posé par
+BR-09 par l'écran que le gérant tient pendant la course.
 
 Onze remarques sur cet ordre :
 
@@ -354,10 +361,10 @@ Onze remarques sur cet ordre :
   consommateur dont la justesse dépend de l'heure limite, et ses tests vont encoder une grille.
   Autant qu'ils encodent la bonne du premier coup, plutôt que de retoucher après coup le seul
   mécanisme du produit qui décide sans qu'un humain appuie sur un bouton ([D-72](DECISIONS.md)).
-- BR-13 reste le porteur naturel de **Q-04**, l'écart de cible tactile relevé en D-46 : le bouton de
-  validation a perdu un tiers de sa hauteur. **Q-02**, en revanche, ne l'attend plus : la page
-  d'erreur est devenue publique le jour où l'adresse a circulé, et elle est sortie en story propre
-  dans le lot 4 ([D-66](DECISIONS.md)).
+- BR-13 devait porter **Q-04**, l'écart de cible tactile relevé en D-46, et ne l'a pas eue à porter :
+  D-76 avait déjà tranché en sens inverse, le gérant ayant jugé le bouton trop gros en situation.
+  **Q-02** ne l'attendait plus non plus : la page d'erreur est devenue publique le jour où l'adresse
+  a circulé, et elle est sortie en story propre dans le lot 4 ([D-66](DECISIONS.md)).
 - BR-35 a perdu son urgence sans rien perdre de sa valeur : le compte organisateur a été créé à la
   main le 2026-08-22, donc elle ne barre plus la porte d'entrée. Elle reprend la tête du lot 3 pour
   une autre raison — BR-37 supprime des comptes, et on lance mieux un balai quand on sait recoller

@@ -33,9 +33,7 @@ const isRunning = computed(() => props.status === 'running');
 </script>
 
 <template>
-    <component
-        :is="href ? Link : 'div'"
-        :href="href"
+    <div
         class="flex min-h-[4.25rem] min-w-0 items-center gap-2 overflow-hidden rounded-sm border border-border bg-card py-2.5 pr-3"
     >
         <span
@@ -47,7 +45,16 @@ const isRunning = computed(() => props.status === 'running');
             bib
         }}</span>
         <span class="flex min-w-0 flex-1 flex-col gap-px">
-            <span class="truncate font-semibold">{{ fullName }}</span>
+            <component
+                :is="href ? Link : 'span'"
+                :href="href"
+                class="-my-1.5 truncate py-1.5 font-semibold"
+                :class="
+                    href && 'underline decoration-border underline-offset-4'
+                "
+            >
+                {{ fullName }}
+            </component>
             <span
                 class="flex min-w-0 items-center gap-1.5 font-mono text-data text-muted-foreground"
             >
@@ -67,5 +74,5 @@ const isRunning = computed(() => props.status === 'running');
                 :tone="isRunning ? 'strong' : 'quiet'"
             />
         </slot>
-    </component>
+    </div>
 </template>

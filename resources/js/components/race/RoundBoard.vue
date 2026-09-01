@@ -11,7 +11,10 @@ import SlatCell from '@/components/race/SlatCell.vue';
 import { formatKilometers } from '@/lib/distance';
 import { t } from '@/lib/i18n';
 import { formatLapDuration, formatSpeed } from '@/lib/lapReadout';
+import { can } from '@/lib/permissions';
+import { edit as editRegistration } from '@/routes/manage/registrations';
 import type { RoundRunner } from '@/types/race';
+import type { RouteDefinition } from '@/wayfinder';
 
 type Props = {
     runners: RoundRunner[];
@@ -22,6 +25,14 @@ const props = defineProps<Props>();
 const page = usePage();
 
 const refusal = computed(() => page.props.errors.lap);
+
+const opensRunnerFiles = computed(() => can('manage-participants'));
+
+function fileOf(runner: RoundRunner): RouteDefinition<'get'> | undefined {
+    return opensRunnerFiles.value
+        ? editRegistration(runner.runner_id)
+        : undefined;
+}
 
 function readout(runner: RoundRunner): string | undefined {
     const parts: string[] = [];
@@ -77,6 +88,7 @@ function readout(runner: RoundRunner): string | undefined {
                 :status="runner.status"
                 :laps="runner.validated_laps"
                 :meta="readout(runner)"
+                :href="fileOf(runner)"
             >
                 <template #cell>
                     <div class="flex items-center gap-1.5">

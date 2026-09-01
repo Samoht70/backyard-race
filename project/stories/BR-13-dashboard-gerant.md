@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Epic** | 3 — Interface de course |
-| **Statut** | À faire |
+| **Statut** | ✅ Terminé |
 | **Estimation** | 13 pts |
 | **Dépend de** | BR-02, BR-09, BR-10 |
 
@@ -85,9 +85,9 @@ base et non recalculées coureur par coureur, sinon le téléphone rame au pire 
 
 ## Tâches
 
-- [ ] **T1** — Requête d'état de course : tour courant, compteurs, coureurs actifs, en une passe `3 pts`
-- [ ] **T2** — Contrôleur Inertia et types TypeScript partagés `2 pts`
-- [ ] **T3** — Écran mobile : entête de tour, compteurs, liste de validation `3 pts`
-- [ ] **T4** — Retour visuel après validation, y compris en cas d'échec `2 pts`
-- [ ] **T5** — Accès rapides : abandon, fiche coureur, autres vues `2 pts`
-- [ ] **T6** — Tests : accès, contenu, refus participant, événement hors course `2 pts`
+- [x] **T1** — Requête d'état de course : tour courant, compteurs, coureurs actifs, en une passe `3 pts`
+- [x] **T2** — Contrôleur Inertia et types TypeScript partagés `2 pts`
+- [x] **T3** — Écran mobile : entête de tour, compteurs, liste de validation `3 pts`
+- [x] **T4** — Retour visuel après validation, y compris en cas d'échec `2 pts`
+- [x] **T5** — Accès rapides : abandon, fiche coureur, autres vues `2 pts`
+- [x] **T6** — Tests : accès, contenu, refus participant, événement hors course `2 pts`

@@ -53,6 +53,7 @@ return [
         'error_description' => 'Réessaie dans un instant. Si le problème persiste, recharge la page.',
         'retry' => 'Réessayer',
         'validation_title' => 'Vérifie les informations saisies',
+        'unreachable' => 'Le geste n’est pas parti : vérifie le réseau et recommence.',
     ],
     'pagination' => [
         'previous' => 'Page précédente',
