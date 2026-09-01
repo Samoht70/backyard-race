@@ -33,7 +33,7 @@ describe('initializeRequestFailureToast', () => {
 
     it('tells the manager when a press never reached the server', () => {
         initializeRequestFailureToast();
-        handlers.exception();
+        handlers.networkError();
 
         expect(errors).toEqual(['Le geste n’est pas parti']);
     });

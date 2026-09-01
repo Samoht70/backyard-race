@@ -3,7 +3,7 @@ import { toast } from 'vue-sonner';
 import { t } from '@/lib/i18n';
 
 export function initializeRequestFailureToast(): void {
-    router.on('exception', () => {
+    router.on('networkError', () => {
         toast.error(t('ui.state.unreachable'));
     });
 }
