@@ -27,7 +27,7 @@ return [
     ],
     'board' => [
         'title' => 'Tour en cours',
-        'empty' => 'Aucune boucle ouverte sur ce tour.',
+        'empty' => 'Aucun coureur en course sur ce tour.',
         'refused' => 'Validation refusée',
     ],
     'standby' => [

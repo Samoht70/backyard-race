@@ -76,6 +76,21 @@ class RaceDashboardTest extends TestCase
     }
 
     #[Test]
+    public function it_holds_the_round_open_once_every_runner_of_it_is_out(): void
+    {
+        $event = $this->racingEvent();
+        $this->linedUp($this->roundOf($event), 2);
+        $this->roundOf($event, 2);
+        $this->travelTo($this->at('2026-09-05 14:30'));
+
+        $this->get(route('manage.index'))->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('currentRound.number', 2)
+            ->where('roundRunners', [])
+            ->where('tally.running', 2)
+            ->etc());
+    }
+
+    #[Test]
     public function it_names_the_state_of_the_event_instead_of_an_empty_board(): void
     {
         Event::factory()->registration()->create([
