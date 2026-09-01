@@ -84,7 +84,7 @@ class RunnerWithdrawalTest extends TestCase
     }
 
     #[Test]
-    public function it_marks_the_runner_as_withdrawn_on_the_board(): void
+    public function it_moves_the_withdrawn_runner_from_the_board_to_the_tally(): void
     {
         $event = $this->racingEvent();
         $runner = $this->runner($event);
@@ -94,8 +94,9 @@ class RunnerWithdrawalTest extends TestCase
         $this->travelTo($this->at('2026-09-05 13:50'));
 
         $this->get(route('manage.index'))->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('roundRunners.0.status', RunnerStatus::Withdrawn->value)
-            ->where('roundRunners.0.lap_status', LapStatus::Eliminated->value)
+            ->where('roundRunners', [])
+            ->where('tally.running', 0)
+            ->where('tally.out', 1)
             ->etc());
     }
 

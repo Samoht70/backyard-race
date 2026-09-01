@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\CurrentRoundResource;
 use App\Http\Resources\NextRoundResource;
 use App\Http\Resources\RoundRunnerResource;
+use App\Http\Resources\RunnerTallyResource;
 use App\Models\Event;
 use App\Models\Participant;
 use App\Services\RaceBoard\ResolveRoundBoard;
@@ -28,8 +29,10 @@ class IndexController extends Controller
         $board = $resolveRoundBoard($event, $round);
 
         return Inertia::render('manage/Index', [
+            'eventStatus' => $event->exists ? $event->status->value : null,
             'currentRound' => $round === null ? null : new CurrentRoundResource($round)->resolve(),
             'nextRound' => $next === null ? null : new NextRoundResource($next)->resolve(),
+            'tally' => $board === null ? null : new RunnerTallyResource($board->tally)->resolve(),
             'roundRunners' => $board === null ? [] : $this->runnersOf($board, $event->lap_distance_meters),
         ]);
     }

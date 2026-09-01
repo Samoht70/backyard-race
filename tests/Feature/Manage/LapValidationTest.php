@@ -4,7 +4,6 @@ namespace Tests\Feature\Manage;
 
 use App\Enums\ExitReason;
 use App\Enums\LapStatus;
-use App\Enums\RunnerStatus;
 use App\Models\Event;
 use App\Models\Lap;
 use App\Models\User;
@@ -148,16 +147,16 @@ class LapValidationTest extends TestCase
     }
 
     #[Test]
-    public function it_marks_a_runner_eliminated_on_this_round_as_out(): void
+    public function it_drops_a_runner_eliminated_on_this_round_from_the_board(): void
     {
         $lap = $this->pendingLap();
         $lap->participant->leaveRace(ExitReason::Timeout, CarbonImmutable::now());
         $this->travelTo($this->at('2026-09-05 13:30'));
 
         $this->get(route('manage.index'))->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('roundRunners.0.status', RunnerStatus::Eliminated->value)
-            ->where('roundRunners.0.lap_status', LapStatus::Eliminated->value)
-            ->where('roundRunners.0.validated_at', null)
+            ->where('roundRunners', [])
+            ->where('tally.running', 0)
+            ->where('tally.out', 1)
             ->etc());
     }
 

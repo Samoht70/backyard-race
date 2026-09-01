@@ -14,5 +14,6 @@ final class RoundBoard
     public function __construct(
         public Round $round,
         public Collection $runners,
+        public RunnerTally $tally,
     ) {}
 }

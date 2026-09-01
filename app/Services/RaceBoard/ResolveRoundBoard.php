@@ -2,6 +2,7 @@
 
 namespace App\Services\RaceBoard;
 
+use App\Enums\RegistrationStatus;
 use App\Models\Event;
 use App\Models\Participant;
 use App\Models\Round;
@@ -20,7 +21,9 @@ final class ResolveRoundBoard
 
         $round = $event->rounds()->where('number', $current->number)->first();
 
-        return $round === null ? null : new RoundBoard($round, $this->runnersOf($round));
+        return $round === null
+            ? null
+            : new RoundBoard($round, $this->runnersOf($round), $this->tallyOf($event));
     }
 
     /**
@@ -29,6 +32,7 @@ final class ResolveRoundBoard
     private function runnersOf(Round $round): Collection
     {
         return Participant::query()
+            ->running()
             ->whereHas('laps', fn (Builder $laps): Builder => $laps->where('round_id', $round->id))
             ->with([
                 'user',
@@ -37,5 +41,20 @@ final class ResolveRoundBoard
             ->withValidatedLapsCount()
             ->orderBy('bib_number')
             ->get();
+    }
+
+    private function tallyOf(Event $event): RunnerTally
+    {
+        $counts = (array) $event->participants()
+            ->where('status', RegistrationStatus::Confirmed)
+            ->toBase()
+            ->selectRaw('sum(case when exited_at is null then 1 else 0 end) as still_running')
+            ->selectRaw('sum(case when exited_at is null then 0 else 1 end) as gone')
+            ->first();
+
+        return new RunnerTally(
+            (int) ($counts['still_running'] ?? 0),
+            (int) ($counts['gone'] ?? 0),
+        );
     }
 }
