@@ -27,7 +27,9 @@ describe('initializeRequestFailureToast', () => {
     beforeEach(() => {
         errors.length = 0;
         page.props = {
-            translations: { 'ui.state.unreachable': 'Le geste n’est pas parti' },
+            translations: {
+                'ui.state.unreachable': 'Le geste n’est pas parti',
+            },
         };
     });
 

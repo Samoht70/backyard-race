@@ -49,7 +49,9 @@ const isRunning = computed(() => props.status === 'running');
                 :is="href ? Link : 'span'"
                 :href="href"
                 class="-my-1.5 truncate py-1.5 font-semibold"
-                :class="href && 'underline decoration-border underline-offset-4'"
+                :class="
+                    href && 'underline decoration-border underline-offset-4'
+                "
             >
                 {{ fullName }}
             </component>

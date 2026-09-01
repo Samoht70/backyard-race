@@ -49,7 +49,10 @@ const counts = computed(() =>
     props.tally === null
         ? []
         : [
-              { label: t('race.round.runners_left'), value: props.tally.running },
+              {
+                  label: t('race.round.runners_left'),
+                  value: props.tally.running,
+              },
               { label: t('race.round.runners_out'), value: props.tally.out },
           ],
 );
