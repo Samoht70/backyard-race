@@ -3,6 +3,7 @@
 namespace Tests\Feature\Manage;
 
 use App\Enums\ExitReason;
+use App\Enums\Permission;
 use App\Models\Event;
 use App\Models\Lap;
 use App\Models\Participant;
@@ -71,6 +72,26 @@ class RaceDashboardTest extends TestCase
         $this->linedUp($round, 27);
 
         $this->assertSame($threeRunners, $this->queriesOfTheBoard());
+    }
+
+    #[Test]
+    public function it_opens_the_screen_to_the_permission_that_validates_laps(): void
+    {
+        $this->racingEvent();
+        $lapKeeper = User::factory()->create();
+        $lapKeeper->givePermissionTo(Permission::ManageLaps->value);
+
+        $this->actingAs($lapKeeper)->get(route('manage.index'))->assertOk();
+    }
+
+    #[Test]
+    public function it_refuses_a_manager_of_everything_but_the_laps(): void
+    {
+        $this->racingEvent();
+        $organiser = User::factory()->create();
+        $organiser->givePermissionTo(Permission::ManageEvent->value);
+
+        $this->actingAs($organiser)->get(route('manage.index'))->assertForbidden();
     }
 
     private function queriesOfTheBoard(): int

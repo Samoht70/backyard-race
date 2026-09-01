@@ -34,10 +34,12 @@ Route::middleware('auth')
         Route::prefix('manage')
             ->name('manage.')
             ->group(function () {
+                Route::get('/', Manage\IndexController::class)
+                    ->middleware('can:'.Permission::ManageLaps->value)
+                    ->name('index');
+
                 Route::middleware('can:'.Permission::ManageEvent->value)
                     ->group(function () {
-                        Route::get('/', Manage\IndexController::class)->name('index');
-
                         Route::singleton('event', Manage\EventController::class)
                             ->only(['edit', 'update']);
 
