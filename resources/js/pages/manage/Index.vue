@@ -119,7 +119,9 @@ onUnmounted(stop);
     <BoardPage>
         <div class="grid gap-6">
             <h1 class="sr-only">{{ t('ui.manage.title') }}</h1>
-            
+
+            <RoundBoard v-if="currentRound" :runners="roundRunners" />
+
             <EmptyState
                 v-else
                 :icon="Hourglass"
