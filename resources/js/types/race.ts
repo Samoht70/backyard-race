@@ -67,6 +67,16 @@ export type RunnerSearchResult = {
     laps: RunnerLap[];
 };
 
+export type Standing = {
+    rank: number;
+    bib_label: string | null;
+    first_name: string;
+    last_name: string;
+    status: RunnerStatus;
+    validated_laps: number;
+    covered_meters: number | null;
+};
+
 export type CorrectableLap = {
     lap_id: number;
     lap_status: LapStatus;

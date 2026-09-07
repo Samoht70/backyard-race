@@ -71,6 +71,7 @@ class HandleInertiaRequests extends Middleware
             'documents' => $event !== null && $gate->allows('viewAny', [Document::class, $event]),
             'registration' => $user?->participant()->exists() === true,
             'register' => $user === null && $event !== null && $event->acceptsRegistrations(),
+            'standings' => $event !== null && $event->lifecycle()->publishesStandings(),
         ];
     }
 
