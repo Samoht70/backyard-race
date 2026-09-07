@@ -299,9 +299,9 @@ pas de fichier de story : c'est la décision qui les porte, et elles prennent un
 | R-07 | Adresse de l'organisateur en configuration, en plus du rôle `manager` | 2 | ✅ Livrée | [D-65](DECISIONS.md) |
 | R-08 | Recherche de coureur déplacée sur l'accueil, réservée au gérant ; le coureur y voit sa course | 3 | ✅ Livrée | [D-80](DECISIONS.md) |
 | R-09 | Gestion en barre de sous-menus, section Course à part, bandeaux du tour échangés avec l'accueil | 5 | ✅ Livrée | [D-84](DECISIONS.md) |
-| R-10 | Briefing et documents fondus en un seul onglet | 3 | À faire | — |
+| R-10 | Briefing et documents fondus en un seul onglet, ouvert aux invités | 3 | ✅ Livrée | [D-88](DECISIONS.md) |
 
-**Total : 39 stories actives + 10 reprises · 280 pts · 264 pts livrés (94 %)**
+**Total : 39 stories actives + 10 reprises · 280 pts · 267 pts livrés (95 %)**
 
 **Hors périmètre : 4 stories abandonnées, 32 pts non engagés** — voir [D-47](DECISIONS.md).
 
@@ -340,6 +340,14 @@ renvoi vers les résultats que D-85 avait laissé en attente arrive du même cou
 navigation « Événement » devient « Résultats ». **Le lien vers l'album photos sort du périmètre** — il
 demandait une colonne que le gel de D-86 aurait rendue inutilisable, les photos arrivant après la
 clôture.
+
+**R-10 fond le briefing et les documents le 2026-09-07.** Le briefing se terminait par deux lignes
+renvoyant à l'onglet Documents : les deux onglets n'en font plus qu'un, sur `/briefing`, le texte à
+gauche et les fichiers en section à droite au bureau ([D-88](DECISIONS.md)). **Le briefing s'ouvre
+aux invités**, ce que D-60 avait refusé sur une raison que son contenu contredit — principe, infos
+clés et esprit sont ce qui décide de venir. Les deux pages posaient déjà le même prédicat de
+visibilité : `/documents` quitte le routage avec son contrôleur, `DocumentPolicy::viewAny` avec ses
+deux appelants, et `access.documents` avec eux. Le côté gérant garde ses deux bureaux.
 
 **BR-24 ferme le côté coureur le 2026-09-07.** L'accueil que D-80 avait ouvert en attendant devient
 sa vue de course : il s'ouvre à la confirmation de l'inscription et non plus au départ du premier
@@ -382,7 +390,9 @@ Onze remarques sur cet ordre :
   dans une décision (D-50, mise en œuvre par D-54) et dans le tableau des reprises, comme R-01 à
   R-03. R-05 suit la même règle : elle rouvre la navigation de BR-33 et les documents de BR-18, et
   c'est D-60 qui la porte. R-06 aussi : elle révoque le parti monochrome de D-46 et retire la couche
-  `components/ui/`, portée par D-61.
+  `components/ui/`, portée par D-61. R-10 ferme la boucle sur R-05 : elle fond en un onglet le
+  briefing de BR-17 et les documents de BR-18, et ouvre aux invités la moitié que D-60 avait gardée
+  fermée (D-88).
 - BR-24 sort de la fin du backlog pour rejoindre les écrans de course : elle dépend de BR-08 et
   reprend l'accueil que BR-33 a livré.
 - BR-09 et BR-11 restent le cœur métier — c'est là que les tests comptent le plus.

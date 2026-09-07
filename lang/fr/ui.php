@@ -8,7 +8,6 @@ return [
         'registration' => 'Mon inscription',
         'register' => 'S’inscrire',
         'briefing' => 'Briefing',
-        'documents' => 'Documents',
         'standings' => 'Classement',
         'event' => 'Événement',
         'results' => 'Résultats',

@@ -3719,3 +3719,51 @@ emporté la galerie ; le lien la suit.
 `pending` et n'entre dans aucun chiffre. Elle est comptée comme partante au dernier tour, ni terminée
 ni sortie, et c'est exactement ce qui s'est passé : la ligne du dernier tour ne s'additionne donc pas,
 faute d'un statut de boucle qui dise « la course s'est arrêtée avant ».
+
+## D-88 — Le briefing et les documents ne font qu'un onglet, public, et `/documents` disparaît
+
+Reprise R-10, arbitrée le 2026-09-07 par le propriétaire du projet. Elle revient sur la moitié de
+D-60 restée fermée.
+
+**Le constat vient du texte lui-même.** Le briefing se terminait par deux lignes qui renvoyaient le
+coureur au **Guide du coureur** et l'accompagnant au **Guide du fêtard**, « dans l'onglet Documents
+du site ». Un texte qui doit expliquer à son lecteur où se trouve la moitié de ce qu'il annonce n'a
+pas deux onglets à occuper : il en a un. Le propriétaire a supprimé ces deux lignes le jour de la
+fusion, ce qui est exactement ce que devient une référence croisée quand les deux pages n'en font
+plus qu'une.
+
+**L'arbitrage de D-60 sur le briefing est renversé, par son auteur.** D-60 ouvrait les documents et
+gardait le briefing fermé, sur une raison énoncée en deux temps : « les documents s'ouvrent parce
+qu'ils décident, ils n'exploitent pas », et « le briefing reste fermé pour la raison inverse : il dit
+comment se déroule la nuit à quelqu'un qui y sera ». Le contenu dit autre chose. Le briefing initial
+est le principe d'un Backyard, les infos clés — lieu, heure d'arrivée conseillée, premier départ — et
+l'esprit de la soirée : c'est ce qui décide de venir, pas ce qui se lit une fois sur place. La raison
+que D-60 donnait aux documents s'applique donc au briefing telle quelle. Ce que D-60 avait jugé,
+c'était l'idée qu'elle se faisait du contenu, pas le contenu.
+
+**Les deux gardes étaient déjà la même expression.** `EventPolicy::view()` et
+`DocumentPolicy::viewAny()` posaient littéralement le même prédicat — visible aux participants, ou
+gérant de l'événement — et seul le middleware `auth` séparait les deux pages. La fusion ne desserre
+donc aucune policy : elle retire un middleware et fond deux prédicats identiques en un. `viewAny`
+part avec ses deux seuls appelants, et `access.documents` quitte le contrat partagé : un onglet, une
+clé, `access.event`. Le refus qu'un invité reçoit sur un brouillon est la page française du site
+depuis BR-40 (D-66), ce que D-60 avait laissé en exposition.
+
+**La page vit sur `/briefing`, pas sur `/documents`.** L'onglet est nommé par ce qu'on lit d'abord.
+`Route::resource('documents')`, `DocumentController` et `pages/Documents.vue` quittent donc le
+produit, et `BriefingController` rend les deux moitiés. Comme `/documents` avant elle, l'adresse
+répond 404 sur une base sans événement, par `Event::current()`.
+
+**Les documents sont une section à droite du briefing, et leurs fiches restent en colonne.** Sur
+téléphone, tout s'empile. Sur tablette, les sections restent empilées et les fiches passent à deux
+par ligne, faute de largeur pour deux colonnes de contenu. Au bureau, le briefing prend sept
+douzièmes et les documents cinq, dans l'idiome de `BoardColumns` mais sans lui — sa colonne étroite
+vient en premier, et ici c'est le texte qui a besoin de la large. Dans leur colonne, les fiches
+reviennent à une par ligne : la demande du propriétaire, et ce que la largeur d'un rail permet de
+lire. La largeur de lecture du briefing reste bornée à 68 caractères (D-59).
+
+**Le côté gérant garde ses deux bureaux.** Écrire un texte en Markdown et déposer des fichiers sont
+deux gestes et deux formulaires, même s'ils répondent à la même permission `manage-documents` ; la
+barre de sous-menus de R-09 ne bouge pas. C'est la lecture qui fusionne, pas l'édition — et `document.title` sert désormais
+d'intitulé de section plutôt que de titre de page, son sous-titre disparaissant faute de place sous
+un libellé de section.

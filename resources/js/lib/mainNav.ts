@@ -5,7 +5,6 @@ import { can } from '@/lib/permissions';
 import { dashboard, home, login } from '@/routes';
 import { create as createAccount } from '@/routes/account';
 import { show as briefing } from '@/routes/briefing';
-import { index as documents } from '@/routes/documents';
 import { index as manage } from '@/routes/manage';
 import { show as registration } from '@/routes/registration';
 import { index as standings } from '@/routes/standings';
@@ -25,8 +24,8 @@ function homeEntry(): NavItem {
 function guestNavItems(): NavItem[] {
     const entries: NavItem[] = [homeEntry()];
 
-    if (canReach('documents')) {
-        entries.push({ title: t('ui.nav.documents'), href: documents() });
+    if (canReach('event')) {
+        entries.push({ title: t('ui.nav.briefing'), href: briefing() });
     }
 
     if (canReach('standings')) {
@@ -55,10 +54,6 @@ function memberNavItems(): NavItem[] {
 
     if (canReach('event')) {
         entries.push({ title: t('ui.nav.briefing'), href: briefing() });
-    }
-
-    if (canReach('documents')) {
-        entries.push({ title: t('ui.nav.documents'), href: documents() });
     }
 
     if (canReach('standings')) {
