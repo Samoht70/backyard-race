@@ -3394,3 +3394,71 @@ minuteur ni écouteur derrière lui.
 la seule constante du fichier, et chaque page passe sa propre liste `only` — les mêmes clés que
 son rechargement partiel existant (BR-13, BR-14) — pour que le polling n'élargisse jamais la
 charge que ces stories avaient déjà bornée.
+
+## D-82 — Q-05 : la validation de boucle rejoint le panneau de recherche, sans retirer celle de BR-13
+
+Arbitré le 2026-09-07 avec le propriétaire du projet, en ouverture de BR-16.
+
+Q-05 demandait ce que devient le bouton de validation en liste de BR-13 une fois que la boucle se
+valide aussi depuis le panneau déplié de la recherche (BR-14). Réponse : **les deux coexistent**.
+Le tableau du gérant (`/manage`) garde son bouton par coureur actif, utile pour valider en rafale
+pendant qu'une dizaine de coureurs rentrent ensemble. La recherche (`/dashboard`) gagne le même
+geste pour l'usage qu'elle sert déjà : un coureur précis, retrouvé par nom ou dossard, sans faire
+défiler la liste des actifs.
+
+**Aucun nouveau contrôleur.** `Manage\LapValidationController` et sa Policy `LapPolicy::validate`
+étaient déjà corrects pour cet usage — la Policy ne connaît que le tour et l'événement, jamais
+l'écran d'où vient la requête. Le panneau appelle le même `LapValidationController.form(lapId)`
+que `RoundBoard`, avec le même composant `Form` d'Inertia.
+
+**Ce que ce second point d'entrée casse, et corrige :** `LapValidationController` et
+`RunnerWithdrawalController` redirigeaient tous deux vers `to_route('manage.index')` en dur — une
+boucle validée depuis `/dashboard` aurait renvoyé le gérant sur `/manage`, et sa recherche en
+cours (terme saisi, résultat déplié) aurait disparu. Les deux passent à
+`redirect()->back(fallback: route('manage.index'))` : la session Inertia connaît déjà la page
+précédente, donc chaque écran revient sur lui-même, et le repli sur `/manage` protège les tests
+existants qui postent sans navigation préalable.
+
+**`RunnerSearchResultResource` porte deux champs de plus** pour que le panneau sache quoi
+proposer : `pending_lap_id` (la boucle en attente du tour courant, ou `null` si le coureur est
+sorti) et `laps`, la liste de ses boucles du tour 1 au dernier tour couru — c'est le cœur de
+BR-16, la validation n'en est qu'un sous-produit. `App\Http\Resources\RunnerLapResource` calcule
+chaque ligne avec `LapPerformance`, déjà écrit pour `RoundRunnerResource` : aucun calcul de
+vitesse ou de durée n'est dupliqué.
+
+**Le gating reste au bouton, pas à l'écran.** `/dashboard` en mode recherche n'est déjà accessible
+qu'au porteur de `manage-event` (D-80), mais valider une boucle exige `validate-laps` et
+l'abandon exige `manage-laps` — deux permissions distinctes (D-28). Le panneau vérifie chacune
+avant d'afficher son bouton, comme `RoundBoard` le fait déjà pour le lien vers la fiche coureur.
+En pratique le rôle gérant porte les neuf, donc aucun gérant ne verra les boutons disparaître —
+mais l'écran ne présume pas de cette coïncidence.
+
+**Ce que Q-05 ne rouvre pas : la correction.** Le Contexte de BR-16 parlait d'un « abandon ou une
+correction » déclenchés depuis le panneau, mais son Périmètre exclut la modification d'une boucle
+depuis cet écran : elle reste sur le poste de correction de BR-12, qui liste tout l'effectif et
+n'a pas de filtre par coureur. Rien n'y change ici — le panneau ne gagne qu'un lien d'action de
+plus (Valider), pas un accès à `LapReversionController` ni `LapReinstatementController`.
+
+## D-83 — La durée du prochain tour (BR-44) déménage sur l'accueil, réservée à la course en cours
+
+Demandé le 2026-09-07 par le propriétaire, dans le prolongement de D-80 et D-82 : le même
+mouvement qui a sorti la recherche (BR-14) puis la validation (D-82) de `/manage` pour les poser
+sur `/dashboard` s'applique au geste de BR-44.
+
+**Le geste déménage, il ne se duplique pas.** `NextRoundDuration` quitte `manage/Index.vue` et
+rejoint le bas du panneau de recherche sur `/dashboard`, dans le même bloc que
+`RunnerSearchBoard`. `Manage\IndexController` perd sa dépendance à `ResolveNextRound` et son prop
+`nextRound` ; `DashboardController::renderSearch()` les porte désormais, à côté de la recherche.
+
+**« Seulement en course » resurgit une capacité que BR-44 avait déjà jugée sans intérêt.** Son
+cas limite « Événement pas encore en course » notait que le geste restait disponible avant le
+départ sans qu'aucune règle ne l'interdise — « il n'a pas d'intérêt, la configuration fait la
+même chose plus simplement ». Comme `manager_search` n'existe que pendant la course (D-80 : sinon
+c'est `manager_idle`), le déménagement retire mécaniquement cette disponibilité pré-course plutôt
+que de la recréer sur un écran qui n'y a pas de raison d'être ; aucune règle métier de BR-44 ne
+change, seule sa fenêtre d'affichage se resserre à ce qu'elle sert réellement.
+
+**Même correctif de redirection que D-82.** `RoundDurationController` redirigeait vers
+`to_route('manage.index')` en dur ; avec ce second point d'entrée il passe à
+`redirect()->back(fallback: route('manage.index'))`, pour la même raison — rester sur l'écran
+d'où le geste est parti.

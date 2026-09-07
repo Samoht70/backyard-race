@@ -131,8 +131,7 @@ function meta(runner: RunnerSearchResult): string | undefined {
 
                 <RunnerDetailPanel
                     v-if="expandedId === runner.runner_id"
-                    :covered-meters="runner.covered_meters"
-                    :last-validated-round="runner.last_validated_round"
+                    :runner="runner"
                 />
             </template>
         </div>

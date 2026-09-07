@@ -4,12 +4,10 @@ namespace Tests\Feature\Manage;
 
 use App\Actions\OpenDueRounds;
 use App\Enums\ScheduleChange;
-use App\Models\Event;
 use App\Models\Round;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Inertia\Testing\AssertableInertia;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\Concerns\RunsARace;
 use Tests\TestCase;
@@ -128,45 +126,19 @@ class RoundDurationTest extends TestCase
     }
 
     #[Test]
-    public function it_offers_the_next_round_on_the_manage_screen(): void
+    public function it_returns_to_the_dashboard_when_the_manager_changes_it_from_there(): void
     {
         $this->travelTo($this->at('2026-09-05 14:30'));
-        $event = $this->runningEvent();
-        app(OpenDueRounds::class)($event);
+        $this->runningEvent();
+        $this->get(route('dashboard'));
 
-        $response = $this->get(route('manage.index'));
-
-        $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('nextRound.number', 3)
-            ->where('nextRound.starts_at', '15:00')
-            ->where('nextRound.lap_duration_minutes', 60)
-            ->etc());
-    }
-
-    #[Test]
-    public function it_offers_the_first_round_before_the_race_starts(): void
-    {
-        Event::factory()->registration()->create([
-            'first_start_at' => $this->at('2026-09-05 13:00'),
-            'lap_duration_minutes' => 60,
+        $response = $this->post(route('manage.rounds.duration'), [
+            'from' => 3,
+            'lap_duration_minutes' => 55,
+            'change' => ScheduleChange::Onwards->value,
         ]);
 
-        $response = $this->get(route('manage.index'));
-
-        $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('nextRound.number', 1)
-            ->where('nextRound.starts_at', '13:00')
-            ->etc());
-    }
-
-    #[Test]
-    public function it_offers_nothing_when_the_event_has_no_grid(): void
-    {
-        Event::factory()->running()->incomplete()->create();
-
-        $response = $this->get(route('manage.index'));
-
-        $response->assertInertia(fn (AssertableInertia $page) => $page->where('nextRound', null)->etc());
+        $response->assertRedirect(route('dashboard'));
     }
 
     protected function setUp(): void

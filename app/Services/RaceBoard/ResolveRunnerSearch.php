@@ -38,7 +38,7 @@ final class ResolveRunnerSearch
                         ->orWhereLike('last_name', "%{$term}%"),
                 ),
             )
-            ->with('user')
+            ->with(['user', 'laps.round'])
             ->withValidatedLapsCount()
             ->withLastValidatedRound()
             ->orderBy('bib_number')

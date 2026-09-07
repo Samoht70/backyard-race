@@ -19,6 +19,6 @@ class RunnerWithdrawalController extends Controller
 
         $this->flashSuccess(__('race.withdrawal.recorded', ['name' => $participant->user->name]));
 
-        return to_route('manage.index');
+        return redirect()->back(fallback: route('manage.index'));
     }
 }

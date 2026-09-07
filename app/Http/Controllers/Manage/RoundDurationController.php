@@ -21,6 +21,6 @@ class RoundDurationController extends Controller
 
         $this->flashSuccess($scope->confirmation($from, $minutes));
 
-        return to_route('manage.index');
+        return redirect()->back(fallback: route('manage.index'));
     }
 }

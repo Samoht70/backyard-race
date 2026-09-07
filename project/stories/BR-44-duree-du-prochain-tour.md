@@ -6,6 +6,7 @@
 | **Statut** | ✅ Terminé |
 | **Estimation** | 5 pts |
 | **Créée** | 2026-08-31 — demandée par le propriétaire avant d'ouvrir l'epic 2 |
+| **Révisée** | 2026-09-07 — le geste déménage sur l'accueil, réservé à la course en cours (voir [D-83](../DECISIONS.md)) |
 | **Dépend de** | BR-04 |
 
 ## User story
@@ -41,7 +42,8 @@ et ne laissent rien dans le code ([D-72](../DECISIONS.md)).
 **Inclus**
 - Une durée de boucle qui prend effet **à partir d'un tour** et vaut pour tous les tours suivants.
 - Deux gestes sur ce même enregistrement : « à partir de ce tour » et « ce tour seulement ».
-- Le geste porte sur le **prochain tour**, depuis l'écran de pilotage du gérant.
+- Le geste porte sur le **prochain tour**, depuis la recherche de l'accueil (`/dashboard`), tant
+  que la course est en cours — voir [D-83](../DECISIONS.md).
 - Le refus d'un tour déjà parti, énoncé au gérant.
 - Les horaires affichés — tour courant, heure de départ, heure limite — qui suivent la nouvelle
   grille sans rien savoir d'elle.
@@ -149,9 +151,10 @@ Alors l'accès est refusé
   supprime.
 - **Aucune grille.** Premier départ ou durée de boucle absents de la configuration : il n'y a pas de
   grille à corriger, le geste n'est pas proposé.
-- **Événement pas encore en course.** Le geste reste disponible : aucun tour n'est parti, donc tous
-  sont atteignables. Il n'a pas d'intérêt — la configuration fait la même chose plus simplement —
-  et il n'a pas besoin d'une règle de plus pour l'interdire.
+- **Événement pas encore en course.** Depuis [D-83](../DECISIONS.md), le geste ne s'affiche plus du
+  tout avant le départ : il vit sur l'écran de recherche, qui n'existe que pendant la course
+  (D-80). Aucune règle ne l'interdisait pour autant côté serveur — la route reste ouverte, seul
+  l'écran qui l'exposait avant le départ a disparu.
 - **Une durée qui repousse un tour au-delà de la fin de la nuit.** Rien ne l'interdit : il n'existe
   pas de nombre de tours prédéfini, et c'est le gérant qui déclare la course terminée.
 

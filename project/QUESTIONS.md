@@ -5,15 +5,10 @@ Chaque question bloque ou oriente une story. On tranche, on note la réponse dan
 
 ---
 
-Q-05 (où le gérant valide une boucle, une fois la recherche posée sur l'accueil) — R-08 vient
-d'installer sur l'accueil une recherche de coureur réservée au gérant, dans le prolongement de la
-coquille que BR-14 avait prévue. BR-16 doit encore y greffer le panneau dépliable (historique des
-boucles, abandon, correction) dont son contexte parle déjà. Retour du 2026-09-07 : une fois la
-course lancée, le menu de gestion mélange trop d'informations sur l'écran de BR-13 (entête de tour,
-compteurs et liste complète des coureurs actifs), et il faudrait un endroit dédié où retrouver un
-coureur par nom ou dossard pour valider sa boucle, sans faire défiler cette liste. Reste à trancher
-avant BR-16 : est-ce que la validation (BR-09) rejoint ce panneau de recherche, et si oui, BR-13
-garde-t-il son bouton de validation en liste ou passe-t-il au second plan derrière la recherche.
+Q-05 (où le gérant valide une boucle, une fois la recherche posée sur l'accueil) est fermée par
+[D-82](DECISIONS.md) : la validation rejoint le panneau de recherche de BR-14/BR-16, et le bouton
+en liste de BR-13 reste à sa place — les deux coexistent, l'un pour valider en rafale, l'autre pour
+un coureur précis retrouvé par nom ou dossard.
 
 Q-04 (les 72 px du bouton de validation) est fermée par [D-76](DECISIONS.md), en sens inverse de
 D-24 : le gérant a vu le bouton en situation, l'a jugé trop gros, et les gestes de course prennent

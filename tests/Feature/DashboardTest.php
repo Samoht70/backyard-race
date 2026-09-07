@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Actions\OpenDueRounds;
 use App\Enums\ExitReason;
 use App\Models\Event;
 use App\Models\Lap;
@@ -146,7 +147,138 @@ class DashboardTest extends TestCase
                     ->where('runner.first_name', 'Léa')
                     ->where('runner.last_name', 'Dubois')
                     ->where('runner.status', 'running')
-                    ->where('runner.validated_laps', 1),
+                    ->where('runner.validated_laps', 1)
+                    ->has('runner.laps', 1)
+                    ->where('runner.laps.0.round_number', 1),
+            );
+    }
+
+    #[Test]
+    public function it_lists_a_runners_laps_from_round_one_to_the_current_one(): void
+    {
+        $event = $this->racingEvent();
+        $runner = $this->named($event, 'Marchand', 'Yves', 12);
+        Lap::factory()
+            ->validated($this->at('2026-09-05 13:47:32'))
+            ->for($this->roundOf($event, 1))
+            ->for($runner)
+            ->create();
+        $this->roundOf($event, 2)->laps()->create(['participant_id' => $runner->id]);
+
+        $this->actingAs(User::factory()->manager()->create())
+            ->get(route('dashboard', ['q' => 'mar']))
+            ->assertInertia(
+                fn (AssertableInertia $page) => $page
+                    ->has('runners.0.laps', 2)
+                    ->where('runners.0.laps.0.round_number', 1)
+                    ->where('runners.0.laps.0.duration_seconds', 2852)
+                    ->where('runners.0.laps.0.distance_meters', 6000)
+                    ->where('runners.0.laps.0.speed_kmh', 7.57)
+                    ->where('runners.0.laps.0.corrected', false)
+                    ->where('runners.0.laps.1.round_number', 2)
+                    ->where('runners.0.laps.1.duration_seconds', null)
+                    ->where('runners.0.laps.1.speed_kmh', null)
+                    ->etc(),
+            );
+    }
+
+    #[Test]
+    public function it_flags_a_corrected_lap_in_the_search_result(): void
+    {
+        $event = $this->racingEvent();
+        $runner = $this->named($event, 'Marchand', 'Yves', 12);
+        Lap::factory()
+            ->validated($this->at('2026-09-05 13:47:32'))
+            ->corrected()
+            ->for($this->roundOf($event, 1))
+            ->for($runner)
+            ->create();
+
+        $this->actingAs(User::factory()->manager()->create())
+            ->get(route('dashboard', ['q' => 'mar']))
+            ->assertInertia(
+                fn (AssertableInertia $page) => $page
+                    ->where('runners.0.laps.0.corrected', true)
+                    ->etc(),
+            );
+    }
+
+    #[Test]
+    public function it_exposes_the_current_pending_lap_for_a_runner_still_racing(): void
+    {
+        $event = $this->racingEvent();
+        $runner = $this->named($event, 'Marchand', 'Yves', 12);
+        $lap = $this->roundOf($event)->laps()->create(['participant_id' => $runner->id]);
+
+        $this->actingAs(User::factory()->manager()->create())
+            ->get(route('dashboard', ['q' => 'mar']))
+            ->assertInertia(
+                fn (AssertableInertia $page) => $page
+                    ->where('runners.0.pending_lap_id', $lap->id)
+                    ->etc(),
+            );
+    }
+
+    #[Test]
+    public function it_clears_the_pending_lap_once_a_runner_has_left_the_race(): void
+    {
+        $event = $this->racingEvent();
+        $runner = $this->named($event, 'Marchand', 'Yves', 12);
+        $this->roundOf($event)->laps()->create(['participant_id' => $runner->id]);
+        $runner->leaveRace(ExitReason::Withdrawal, $this->at('2026-09-05 13:10'));
+
+        $this->actingAs(User::factory()->manager()->create())
+            ->get(route('dashboard', ['q' => 'mar']))
+            ->assertInertia(
+                fn (AssertableInertia $page) => $page
+                    ->where('runners.0.pending_lap_id', null)
+                    ->etc(),
+            );
+    }
+
+    #[Test]
+    public function it_offers_the_next_round_on_the_manager_search_screen(): void
+    {
+        $this->travelTo($this->at('2026-09-05 14:30'));
+        $event = $this->racingEvent();
+        app(OpenDueRounds::class)($event);
+
+        $this->actingAs(User::factory()->manager()->create())
+            ->get(route('dashboard'))
+            ->assertInertia(
+                fn (AssertableInertia $page) => $page
+                    ->where('nextRound.number', 3)
+                    ->where('nextRound.starts_at', '15:00')
+                    ->where('nextRound.lap_duration_minutes', 60)
+                    ->etc(),
+            );
+    }
+
+    #[Test]
+    public function it_offers_no_next_round_before_the_race_starts(): void
+    {
+        Event::factory()->registration()->create([
+            'first_start_at' => $this->at('2026-09-05 13:00'),
+            'lap_duration_minutes' => 60,
+        ]);
+
+        $this->actingAs(User::factory()->manager()->create())
+            ->get(route('dashboard'))
+            ->assertInertia(fn (AssertableInertia $page) => $page->missing('nextRound'));
+    }
+
+    #[Test]
+    public function it_offers_no_next_round_when_the_event_has_no_grid(): void
+    {
+        Event::factory()->running()->incomplete()->create();
+
+        $this->actingAs(User::factory()->manager()->create())
+            ->get(route('dashboard'))
+            ->assertInertia(
+                fn (AssertableInertia $page) => $page
+                    ->where('mode', 'manager_search')
+                    ->where('nextRound', null)
+                    ->etc(),
             );
     }
 
@@ -181,6 +313,15 @@ class DashboardTest extends TestCase
                     ->missing('runner.phone')
                     ->missing('runner.pps_number'),
             );
+    }
+
+    private function racingEvent(): Event
+    {
+        return Event::factory()->running()->create([
+            'first_start_at' => $this->at('2026-09-05 13:00'),
+            'lap_duration_minutes' => 60,
+            'lap_distance_meters' => 6000,
+        ]);
     }
 
     private function named(Event $event, string $lastName, string $firstName, int $bib): Participant
