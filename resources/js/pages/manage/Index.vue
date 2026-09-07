@@ -10,7 +10,6 @@ import {
 } from '@lucide/vue';
 import { computed, onMounted, onUnmounted } from 'vue';
 import BoardPage from '@/components/board/BoardPage.vue';
-import NextRoundDuration from '@/components/race/NextRoundDuration.vue';
 import RoundBoard from '@/components/race/RoundBoard.vue';
 import RoundHeader from '@/components/race/RoundHeader.vue';
 import RoundTally from '@/components/race/RoundTally.vue';
@@ -29,17 +28,11 @@ import { index as documents } from '@/routes/manage/documents';
 import { edit as editEvent } from '@/routes/manage/event';
 import { index as registrations } from '@/routes/manage/registrations';
 import type { EventStatus } from '@/types/event';
-import type {
-    CurrentRound,
-    NextRound,
-    RoundRunner,
-    RunnerTally,
-} from '@/types/race';
+import type { CurrentRound, RoundRunner, RunnerTally } from '@/types/race';
 
 type Props = {
     eventStatus: EventStatus | null;
     currentRound: CurrentRound | null;
-    nextRound: NextRound | null;
     tally: RunnerTally | null;
     roundRunners: RoundRunner[];
 };
@@ -103,7 +96,6 @@ const desks = computed(() =>
 const { start, stop } = usePolling([
     'eventStatus',
     'currentRound',
-    'nextRound',
     'tally',
     'roundRunners',
 ]);
@@ -127,9 +119,7 @@ onUnmounted(stop);
     <BoardPage>
         <div class="grid gap-6">
             <h1 class="sr-only">{{ t('ui.manage.title') }}</h1>
-
-            <RoundBoard v-if="currentRound" :runners="roundRunners" />
-
+            
             <EmptyState
                 v-else
                 :icon="Hourglass"
@@ -155,8 +145,6 @@ onUnmounted(stop);
                     <span class="text-sm font-medium">{{ desk.label }}</span>
                 </Link>
             </nav>
-
-            <NextRoundDuration v-if="nextRound" :round="nextRound" />
         </div>
     </BoardPage>
 </template>

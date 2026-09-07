@@ -5,6 +5,7 @@ import { computed, onMounted, onUnmounted } from 'vue';
 import ActionButton from '@/components/ActionButton.vue';
 import BoardPage from '@/components/board/BoardPage.vue';
 import Heading from '@/components/Heading.vue';
+import NextRoundDuration from '@/components/race/NextRoundDuration.vue';
 import RunnerDetailPanel from '@/components/race/RunnerDetailPanel.vue';
 import RunnerSearchBoard from '@/components/race/RunnerSearchBoard.vue';
 import RunnerSlat from '@/components/race/RunnerSlat.vue';
@@ -16,7 +17,7 @@ import { runnerStatusLabelKey } from '@/lib/runnerStatus';
 import { dashboard, home } from '@/routes';
 import { index as showManage } from '@/routes/manage';
 import { show as showRegistration } from '@/routes/registration';
-import type { RunnerSearchResult, RunnerTally } from '@/types/race';
+import type { NextRound, RunnerSearchResult, RunnerTally } from '@/types/race';
 
 type Mode =
     | 'no_event'
@@ -33,6 +34,7 @@ type Props = {
     tally?: RunnerTally;
     runners?: RunnerSearchResult[];
     runner?: RunnerSearchResult;
+    nextRound?: NextRound | null;
 };
 
 const props = defineProps<Props>();
@@ -67,6 +69,7 @@ const { start, stop } = usePolling([
     'tally',
     'runners',
     'runner',
+    'nextRound',
 ]);
 
 onMounted(start);
@@ -141,18 +144,18 @@ onUnmounted(stop);
                 :meta="runnerMeta"
             />
 
-            <RunnerDetailPanel
-                :covered-meters="runner.covered_meters"
-                :last-validated-round="runner.last_validated_round"
-            />
+            <RunnerDetailPanel :runner="runner" />
         </div>
 
-        <RunnerSearchBoard
-            v-else-if="mode === 'manager_search' && tally"
-            :query="query ?? null"
-            :tally="tally"
-            :runners="runners ?? []"
-            @search="search"
-        />
+        <div v-else-if="mode === 'manager_search' && tally" class="grid gap-6">
+            <RunnerSearchBoard
+                :query="query ?? null"
+                :tally="tally"
+                :runners="runners ?? []"
+                @search="search"
+            />
+
+            <NextRoundDuration v-if="nextRound" :round="nextRound" />
+        </div>
     </BoardPage>
 </template>

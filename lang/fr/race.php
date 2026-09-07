@@ -121,4 +121,8 @@ return [
         'expand' => 'Déplier le détail de :name',
         'collapse' => 'Replier le détail de :name',
     ],
+    'detail' => [
+        'empty' => 'Aucune boucle validée pour l’instant.',
+        'pending' => 'En cours',
+    ],
 ];

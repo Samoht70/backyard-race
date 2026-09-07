@@ -14,6 +14,6 @@ class LapValidationController extends Controller
     {
         $validate($lap);
 
-        return to_route('manage.index');
+        return redirect()->back(fallback: route('manage.index'));
     }
 }

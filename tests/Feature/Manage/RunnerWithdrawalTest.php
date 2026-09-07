@@ -38,6 +38,19 @@ class RunnerWithdrawalTest extends TestCase
     }
 
     #[Test]
+    public function it_returns_to_the_dashboard_when_the_manager_withdraws_a_runner_from_there(): void
+    {
+        $event = $this->racingEvent();
+        $runner = $this->runner($event);
+        $this->roundOf($event)->laps()->create(['participant_id' => $runner->id]);
+        $this->get(route('dashboard'));
+
+        $response = $this->post(route('manage.runners.withdraw', $runner));
+
+        $response->assertRedirect(route('dashboard'));
+    }
+
+    #[Test]
     public function it_refuses_a_confirmation_sent_a_second_time(): void
     {
         $runner = $this->runner($this->racingEvent());

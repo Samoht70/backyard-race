@@ -34,6 +34,17 @@ class LapValidationTest extends TestCase
     }
 
     #[Test]
+    public function it_returns_to_the_dashboard_when_the_manager_validates_from_there(): void
+    {
+        $lap = $this->pendingLap();
+        $this->get(route('dashboard'));
+
+        $response = $this->post(route('manage.laps.validate', $lap));
+
+        $response->assertRedirect(route('dashboard'));
+    }
+
+    #[Test]
     public function it_ignores_a_validation_time_sent_by_the_client(): void
     {
         $lap = $this->pendingLap();
