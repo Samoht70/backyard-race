@@ -45,6 +45,8 @@ interface EventLifecycleState
 
     public function isRacing(): bool;
 
+    public function announcesNextRound(): bool;
+
     /**
      * @return list<string>
      */

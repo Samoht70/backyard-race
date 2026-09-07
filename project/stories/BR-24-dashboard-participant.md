@@ -3,8 +3,9 @@
 | | |
 |---|---|
 | **Epic** | 6 — Expérience participant |
-| **Statut** | À faire |
+| **Statut** | ✅ Terminé |
 | **Estimation** | 8 pts |
+| **Révisée** | 2026-09-07 — le détail boucle par boucle reste chez le coureur et les raccourcis ne sont pas livrés (voir [D-85](../DECISIONS.md)) |
 | **Dépend de** | BR-02, BR-08, BR-33 |
 
 ## User story
@@ -30,13 +31,13 @@ de bord.
 
 **Inclus**
 - Son prénom, son numéro de dossard, son statut de course.
-- Ses boucles réalisées, sa distance totale, la durée de sa dernière boucle.
+- Ses boucles réalisées, sa distance totale, la durée et la vitesse de sa dernière boucle.
 - Le prochain départ : numéro du tour et heure.
-- Les raccourcis vers le briefing et les documents.
+- Le détail boucle par boucle : temps, distance et vitesse de chacune ([D-85](../DECISIONS.md)).
 
 **Exclu**
 - Toute action sur la course : le coureur ne valide rien et n'abandonne pas lui-même.
-- Le détail boucle par boucle : il se déplie dans le tableau des coureurs (BR-14, BR-16).
+- Les raccourcis vers le briefing et les documents : la navigation les porte depuis BR-33 ([D-85](../DECISIONS.md)).
 - Tout compte à rebours (voir D-15).
 
 **Dépendances** — BR-02, BR-08.
@@ -45,7 +46,7 @@ de bord.
 
 - Le coureur ne voit que ses propres données de course.
 - L'écran affiche le statut réel : en course, éliminé, abandon.
-- Le prochain départ n'est affiché que si le coureur est encore en course.
+- Le prochain départ n'est affiché que si le coureur est encore en course, et seulement en l'absence du bandeau du tour, qui porte déjà l'échéance ([D-85](../DECISIONS.md)).
 - Un coureur sorti voit son résultat figé et le motif de sa sortie.
 - Un utilisateur connecté sans inscription confirmée est orienté vers son inscription plutôt
   que vers un écran vide.
@@ -79,7 +80,7 @@ Alors aucune action de validation ou d'abandon ne lui est proposée
 
 - Coureur confirmé avant le départ de la course : zéro boucle, et le premier départ annoncé comme prochain départ.
 - Aucune boucle validée alors que la course a commencé : la durée de dernière boucle est vide, pas à zéro.
-- Événement terminé : l'écran renvoie vers les résultats (BR-23).
+- Événement terminé : plus aucun prochain départ n'est annoncé, et le renvoi vers les résultats attend BR-23 ([D-85](../DECISIONS.md)).
 
 ## Impacts techniques
 
@@ -87,7 +88,7 @@ Aucun — l'écran lit les agrégats déjà produits pour le tableau des coureur
 
 ## Tâches
 
-- [ ] **T1** — Requête de la situation du coureur connecté `2 pts`
-- [ ] **T2** — Écran mobile : statut, chiffres, prochain départ, raccourcis `3 pts`
-- [ ] **T3** — Redirections selon l'état de l'inscription et de l'événement `1 pt`
-- [ ] **T4** — Tests : contenu, coureur sorti, inscription non confirmée, aucune action de gestion `2 pts`
+- [x] **T1** — Requête de la situation du coureur connecté `2 pts`
+- [x] **T2** — Écran mobile : statut, chiffres, prochain départ, tableau des boucles `3 pts`
+- [x] **T3** — Redirections selon l'état de l'inscription et de l'événement `1 pt`
+- [x] **T4** — Tests : contenu, coureur sorti, inscription non confirmée, aucune action de gestion `2 pts`

@@ -6,6 +6,7 @@ use App\Enums\Permission;
 use App\Enums\RegistrationStatus;
 use App\Http\Requests\RunnerSearchRequest;
 use App\Http\Resources\CurrentRoundResource;
+use App\Http\Resources\NextRoundResource;
 use App\Http\Resources\RunnerSearchResultResource;
 use App\Http\Resources\RunnerTallyResource;
 use App\Models\Event;
@@ -13,6 +14,7 @@ use App\Models\Participant;
 use App\Services\RaceBoard\ResolveRunnerSearch;
 use App\Services\RaceBoard\ResolveRunnerTally;
 use App\Services\RaceSchedule\ResolveCurrentRound;
+use App\Services\RaceSchedule\ResolveNextRound;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -25,6 +27,7 @@ class DashboardController extends Controller
         ResolveRunnerSearch $search,
         ResolveCurrentRound $resolveCurrentRound,
         ResolveRunnerTally $resolveRunnerTally,
+        ResolveNextRound $resolveNextRound,
     ): Response {
         $event = Event::currentOrNull();
 
@@ -33,10 +36,9 @@ class DashboardController extends Controller
         }
 
         $user = $request->user();
-        $isRacing = $event->lifecycle()->isRacing();
 
         if ($user->can(Permission::ManageEvent->value)) {
-            return $isRacing
+            return $event->lifecycle()->isRacing()
                 ? $this->renderSearch($event, $searchRequest, $search, $resolveCurrentRound)
                 : $this->renderMode('manager_idle', $event);
         }
@@ -47,16 +49,17 @@ class DashboardController extends Controller
             return $this->renderMode('no_registration', $event);
         }
 
-        if ($isRacing && $participant->status === RegistrationStatus::Confirmed) {
-            return $this->renderRunnerStatus(
-                $event,
-                $participant,
-                $resolveCurrentRound,
-                $resolveRunnerTally,
-            );
+        if ($participant->status !== RegistrationStatus::Confirmed) {
+            return $this->renderMode('runner_waiting', $event);
         }
 
-        return $this->renderMode('runner_waiting', $event);
+        return $this->renderRunnerStatus(
+            $event,
+            $participant,
+            $resolveCurrentRound,
+            $resolveRunnerTally,
+            $resolveNextRound,
+        );
     }
 
     private function renderSearch(
@@ -89,6 +92,7 @@ class DashboardController extends Controller
         Participant $participant,
         ResolveCurrentRound $resolveCurrentRound,
         ResolveRunnerTally $resolveRunnerTally,
+        ResolveNextRound $resolveNextRound,
     ): Response {
         $participant->loadMissing('laps.round');
 
@@ -96,9 +100,27 @@ class DashboardController extends Controller
             'mode' => 'runner_active',
             'event' => $this->eventSummary($event),
             'currentRound' => $this->currentRound($event, $resolveCurrentRound),
+            'nextRound' => $this->nextRound($event, $participant, $resolveNextRound),
             'tally' => new RunnerTallyResource($resolveRunnerTally($event))->resolve(),
             'runner' => new RunnerSearchResultResource($participant, $event->lap_distance_meters)->resolve(),
         ]);
+    }
+
+    /**
+     * @return array<array-key, mixed>|null
+     */
+    private function nextRound(
+        Event $event,
+        Participant $participant,
+        ResolveNextRound $resolveNextRound,
+    ): ?array {
+        if (! $participant->isRunning() || ! $event->lifecycle()->announcesNextRound()) {
+            return null;
+        }
+
+        $round = $resolveNextRound($event);
+
+        return $round === null ? null : new NextRoundResource($round)->resolve();
     }
 
     /**

@@ -96,15 +96,80 @@ class DashboardTest extends TestCase
     }
 
     #[Test]
-    public function it_points_a_registered_runner_to_the_registration_tab_before_the_race_starts(): void
+    public function it_opens_the_runner_board_before_the_race_on_the_first_start(): void
     {
-        $event = Event::factory()->registration()->create();
-        $runner = User::factory()->participant()->create();
-        Participant::factory()->confirmed()->for($runner)->create(['event_id' => $event->getKey()]);
+        $event = Event::factory()->registration()->create([
+            'first_start_at' => $this->at('2026-09-05 13:00'),
+            'lap_duration_minutes' => 60,
+        ]);
+        $runner = $this->named($event, 'Dubois', 'Léa', 5);
 
-        $this->actingAs($runner)
+        $this->actingAs($runner->user)
             ->get(route('dashboard'))
-            ->assertInertia(fn (AssertableInertia $page) => $page->where('mode', 'runner_waiting'));
+            ->assertInertia(
+                fn (AssertableInertia $page) => $page
+                    ->where('mode', 'runner_active')
+                    ->where('runner.validated_laps', 0)
+                    ->has('runner.laps', 0)
+                    ->where('nextRound.number', 1)
+                    ->where('nextRound.starts_at', '13:00')
+                    ->etc(),
+            );
+    }
+
+    #[Test]
+    public function it_announces_the_round_to_come_to_a_runner_still_in_the_race(): void
+    {
+        $event = $this->racingEvent();
+        $runner = $this->named($event, 'Dubois', 'Léa', 5);
+        $this->roundOf($event, 1);
+
+        $this->actingAs($runner->user)
+            ->get(route('dashboard'))
+            ->assertInertia(
+                fn (AssertableInertia $page) => $page
+                    ->where('nextRound.number', 2)
+                    ->where('nextRound.starts_at', '14:00')
+                    ->etc(),
+            );
+    }
+
+    #[Test]
+    public function it_announces_no_next_start_to_a_runner_who_has_left_the_race(): void
+    {
+        $event = $this->racingEvent();
+        $runner = $this->named($event, 'Dubois', 'Léa', 5);
+        $this->roundOf($event, 1);
+        $runner->leaveRace(ExitReason::Withdrawal, $this->at('2026-09-05 13:40'));
+
+        $this->actingAs($runner->user)
+            ->get(route('dashboard'))
+            ->assertInertia(
+                fn (AssertableInertia $page) => $page
+                    ->where('mode', 'runner_active')
+                    ->where('runner.status', 'withdrawn')
+                    ->where('nextRound', null)
+                    ->etc(),
+            );
+    }
+
+    #[Test]
+    public function it_announces_no_next_start_once_the_event_is_over(): void
+    {
+        $event = Event::factory()->finished()->create([
+            'first_start_at' => $this->at('2026-09-05 13:00'),
+            'lap_duration_minutes' => 60,
+        ]);
+        $runner = $this->named($event, 'Dubois', 'Léa', 5);
+
+        $this->actingAs($runner->user)
+            ->get(route('dashboard'))
+            ->assertInertia(
+                fn (AssertableInertia $page) => $page
+                    ->where('mode', 'runner_active')
+                    ->where('nextRound', null)
+                    ->etc(),
+            );
     }
 
     #[Test]

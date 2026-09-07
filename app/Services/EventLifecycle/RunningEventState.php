@@ -69,6 +69,11 @@ final class RunningEventState implements EventLifecycleState
         return true;
     }
 
+    public function announcesNextRound(): bool
+    {
+        return true;
+    }
+
     /**
      * Changing either mid-race silently reschedules rounds already run.
      */

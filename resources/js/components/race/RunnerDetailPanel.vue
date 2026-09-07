@@ -4,12 +4,12 @@ import { Check } from '@lucide/vue';
 import { computed } from 'vue';
 import LapValidationController from '@/actions/App/Http/Controllers/Manage/LapValidationController';
 import ActionButton from '@/components/ActionButton.vue';
+import RunnerLapList from '@/components/race/RunnerLapList.vue';
 import RunnerWithdrawalDialog from '@/components/race/RunnerWithdrawalDialog.vue';
 import { formatKilometers } from '@/lib/distance';
 import { t } from '@/lib/i18n';
-import { formatLapDuration, formatSpeed } from '@/lib/lapReadout';
 import { can } from '@/lib/permissions';
-import type { RunnerLap, RunnerSearchResult } from '@/types/race';
+import type { RunnerSearchResult } from '@/types/race';
 
 type Props = {
     runner: RunnerSearchResult;
@@ -36,34 +36,6 @@ const showsValidate = computed(
 const showsWithdrawal = computed(
     () => props.runner.status === 'running' && can('manage-laps'),
 );
-
-function readout(lap: RunnerLap): string {
-    const parts = [t('race.round.short', { number: lap.round_number })];
-
-    if (lap.duration_seconds === null) {
-        parts.push(t('race.detail.pending'));
-    } else {
-        parts.push(formatLapDuration(lap.duration_seconds));
-
-        const kilometers = formatKilometers(lap.distance_meters);
-
-        if (kilometers !== null) {
-            parts.push(`${kilometers} ${t('event.unit.kilometers')}`);
-        }
-
-        if (lap.speed_kmh !== null) {
-            parts.push(
-                `${formatSpeed(lap.speed_kmh)} ${t('race.lap.speed_unit')}`,
-            );
-        }
-    }
-
-    if (lap.corrected) {
-        parts.push(t('race.correction.marker'));
-    }
-
-    return parts.join(' · ');
-}
 </script>
 
 <template>
@@ -89,15 +61,7 @@ function readout(lap: RunnerLap): string {
             </div>
         </dl>
 
-        <p v-if="!runner.laps.length" class="text-sm text-muted-foreground">
-            {{ t('race.detail.empty') }}
-        </p>
-
-        <ul v-else class="grid gap-1 font-mono text-data">
-            <li v-for="lap in runner.laps" :key="lap.round_number">
-                {{ readout(lap) }}
-            </li>
-        </ul>
+        <RunnerLapList :laps="runner.laps" />
 
         <div
             v-if="showsValidate || showsWithdrawal"

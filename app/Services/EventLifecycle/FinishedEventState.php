@@ -69,6 +69,11 @@ final class FinishedEventState implements EventLifecycleState
         return false;
     }
 
+    public function announcesNextRound(): bool
+    {
+        return false;
+    }
+
     public function frozenAttributes(): array
     {
         return array_values(new Event()->getFillable());

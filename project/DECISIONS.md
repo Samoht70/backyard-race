@@ -3516,3 +3516,71 @@ le geste de validation hors de l'écran sur un téléphone. La compression à de
 masquant le libellé du champ et en collant l'échéance du tour à sa réserve, ce qui coûtait la
 lisibilité : la forme retenue garde une rangée pour chacune des trois choses que l'encart dit — ce
 qu'il règle et pour quel tour, le réglage lui-même avec ses deux portées, et ce qu'il ne touche pas.
+
+## D-85 — L'espace du coureur s'ouvre à la confirmation, et le prochain départ est une question posée au cycle de vie
+
+Arbitré le 2026-09-07 par BR-24, avec le propriétaire du projet.
+
+**L'accueil du coureur n'attend plus le départ.** D-80 ouvrait l'espace de course sur deux conditions
+— inscription confirmée **et** course lancée — et renvoyait sinon vers « Mon inscription ». BR-24
+révoque la seconde : une inscription confirmée ouvre l'écran quel que soit le statut de l'événement,
+avec zéro boucle et le premier départ annoncé. `runner_waiting` ne parle donc plus du départ, mais de
+la confirmation : il ne reste que pour une inscription en attente ou annulée, et son texte le dit.
+
+**Le prochain départ ne s'affiche que sans bandeau au-dessus.** Les tours s'enchaînent sans trou :
+l'heure du prochain départ est l'échéance du tour en cours, que `RoundHeader` affiche déjà depuis
+D-84. La ligne de l'encart la répétait donc pendant toute la course, et elle ne dit quelque chose que
+quand il n'y a pas de bandeau — avant le premier départ, ou entre deux tours si la grille est
+épuisée. `Dashboard.vue` la coupe en présence d'un tour courant ; le contrôleur, lui, continue de la
+porter, parce que c'est l'écran qui sait ce qui est déjà à l'écran, pas le serveur.
+
+**Le prochain départ se demande au cycle de vie, pas au statut.** Deux conditions le gardent : le
+coureur est encore en course, et l'état de l'événement annonce un tour. La seconde est
+`announcesNextRound()` sur `EventLifecycleState` — vraie en inscription et en course, fausse en
+brouillon et une fois la course finie — plutôt qu'une comparaison à `EventStatus::Finished` dans le
+contrôleur. Deux cas limites de la story tombent ensemble : l'événement terminé n'annonce rien, et un
+événement en brouillon non plus. Le calcul lui-même est celui du gérant : `ResolveNextRound`, déjà
+posé par BR-44, sert les deux écrans sans être dupliqué.
+
+**La durée de la dernière boucle n'est pas un champ de plus.** Les boucles portent déjà
+`duration_seconds`, donc `lastTimedLap()` retient dans le navigateur la dernière boucle chronométrée.
+Une boucle en cours ne compte pas, et un coureur sans boucle validée lit un tiret — vide, pas zéro,
+comme le cas limite l'exige. Aucune requête ni aucun champ ne sont ajoutés côté serveur.
+
+**Le détail boucle par boucle reste chez le coureur, contre l'exclusion de la story.** BR-24 le
+renvoyait au panneau du gérant ; le propriétaire le veut sur son écran — le temps de la boucle, la
+vitesse, ce qui sert pendant la nuit. La liste quitte donc `RunnerDetailPanel` pour `RunnerLapList`,
+que les deux panneaux partagent, et le panneau du coureur ajoute ce que BR-24 demandait : distance
+totale, durée et vitesse de la dernière boucle, prochain départ.
+
+**La vitesse moyenne est une distance sur un temps couru, pas une moyenne de vitesses.** L'encart des
+chiffres l'affiche à côté de la distance totale : somme des kilomètres validés divisée par la somme
+des durées de boucle. Le temps d'attente entre l'arrivée d'une boucle et le départ du tour suivant
+n'y entre pas — c'est du repos, pas de la course — et une boucle en cours non plus, faute de durée.
+Moyenner les vitesses boucle à boucle aurait donné un autre nombre dès que les durées diffèrent, et
+c'est justement quand elles diffèrent que le coureur regarde. Le calcul vit dans `lapReadout.ts`, sur
+les boucles déjà en props, et ses trois cas sont couverts.
+
+**Ces boucles sont un tableau, dans son propre encart.** La ligne de récapitulation héritée de
+BR-16 — `T1 · 48:32 · 6 km · 7,57 km/h` — se lit une fois et se compare mal : posée à nu sous les
+chiffres, elle flottait, et empilée quinze fois, elle demande à l'œil de recompter les points à
+chaque ligne. Le tableau donne quatre colonnes alignées, tour, temps, kilomètres et vitesse, les
+unités passant en entête pour que les cellules ne portent que des chiffres, et le tour et le temps
+gardant seuls le gras. La correction devient une astérisque sur le numéro de tour, avec sa légende
+sous le tableau et son texte pour les lecteurs d'écran, plutôt qu'un quatrième point en fin de ligne.
+Les deux blocs restent deux encarts titrés et non un seul : les chiffres répondent « où j'en suis »,
+le tableau « comment j'y suis arrivé », et les fondre revenait à mélanger un état et un historique.
+`RunnerLapList` étant partagé, le panneau du gérant (BR-16) prend la même forme : une seule lecture
+des boucles dans le produit, pas deux.
+
+**Les raccourcis vers le briefing et les documents ne sont pas livrés**, bien que le périmètre inclus
+de BR-24 les nomme. La navigation du membre porte les deux entrées depuis BR-33 : une seconde copie
+sur l'accueil serait exactement la duplication que D-80 avait retirée de cet écran.
+
+**Aucune action de gestion n'atteint l'écran du coureur, par construction.** `RunnerStandingPanel`
+n'en porte aucune, là où `RunnerDetailPanel` les masquait par permission. Le critère
+d'acceptation n'a donc pas de garde à vérifier : il n'y a rien à masquer.
+
+**Ce que BR-24 ne ferme pas** — le renvoi vers les résultats une fois la course terminée. BR-23
+n'existe pas encore : le coureur voit son résultat figé, son motif de sortie et aucun prochain
+départ, et le lien viendra avec la page qu'il devra ouvrir.
