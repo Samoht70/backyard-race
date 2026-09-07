@@ -3656,3 +3656,66 @@ Reste aussi la boucle que la clôture interrompt : elle demeure `pending` en bas
 cours » sur l'écran du coureur, indéfiniment. Elle ne fausse aucun classement — une boucle non
 validée ne compte pas — et plus personne ne peut la valider. Le geste qui la fermerait demande un
 statut de boucle qui dise « la course s'est arrêtée avant », et il n'a pas été pris ici.
+
+## D-87 — L'accueil public bascule sur les résultats, et les chiffres sont quatre agrégats en base
+
+Arbitré le 2026-09-07 par BR-23, avec le propriétaire du projet.
+
+**Il y avait deux accueils, et c'est le public qui bascule.** La story demande « la bascule
+automatique de l'accueil », mot que le produit porte deux fois : `/` — la page événement ouverte par
+D-60 — et `/dashboard`, devenu la vue de course du coureur par BR-24. Le propriétaire a tranché pour
+`/`. La raison est celle de D-60 : le lien qu'on partage doit montrer la course, et une fiche
+d'inscription fermée sur un événement terminé ne montre rien. Les résultats s'ouvrent donc aux
+invités comme `/standings`, sans compte, et l'écran du coureur garde son propre résultat figé.
+
+**La question est posée au cycle de vie, comme partout depuis D-85.** `EventController` interroge
+`isOver()`, la même méthode que la navigation et que la page du classement, et rend `Results` ou
+`Event`. Aucune comparaison à `EventStatus::Finished` n'entre dans le contrôleur, et un brouillon ne
+bascule pas : il est déjà traité comme une absence par la policy, avant même d'atteindre la question.
+
+**Le renvoi que BR-24 n'avait pas pu livrer arrive avec la page qu'il ouvre.** D-85 laissait le
+coureur sans lien vers les résultats faute de page à ouvrir ; son écran en porte un maintenant, et
+l'entrée de navigation « Événement » devient « Résultats » une fois la course close — une entrée qui
+mène aux résultats sous le nom de l'événement aurait été le seul mensonge de la barre. Les deux se
+branchent sur `access.results`, partagé à côté de `access.standings`. Les deux clés coïncident
+aujourd'hui, et elles ne disent pas la même chose : l'une dit qu'un classement existe, l'autre dit ce
+que l'accueil rend. Les fondre aurait couplé le nom d'une entrée de navigation à l'existence d'une
+autre page.
+
+**Les quatre chiffres sont quatre agrégats, un par indicateur.** Participants, boucles validées,
+kilomètres et durée ne se parcourent pas en PHP : le comptage des boucles est un `count` joint sur
+les tours de l'événement, la distance est ce comptage multiplié par la distance de boucle (D-17), et
+la durée est la soustraction de deux colonnes déjà en base — premier départ et heure de clôture, que
+BR-20 avait posée pour cet usage. Une distance de boucle absente rend `null` et non zéro : la page
+affiche un tiret, parce qu'un total inconnu n'est pas un total nul.
+
+Le compte des participants est celui des inscriptions confirmées, et l'écran le nomme ainsi. Il ne
+dit pas combien de coureurs se sont réellement présentés au premier départ : un confirmé absent le
+jour même y figure, et le seul écran qui le distinguerait est le tableau par tour, dont la première
+ligne compte les boucles effectivement ouvertes.
+
+**Le tableau par tour tient dans une seule requête, et il se lit sur les boucles.** Une passe groupée
+par tour rend les quatre colonnes ensemble : les partants sont le nombre de boucles ouvertes, les
+terminées sont celles validées, et les sorties sont les boucles `eliminated` ventilées par le motif du
+coureur. Ce rattachement n'est pas une reconstitution : `leaveRace` marque la boucle en cours du
+coureur au moment où il quitte la course, donc la boucle éliminée **est** le tour de la sortie, sans
+qu'on ait à comparer une heure de sortie à une fenêtre de tour. Un test compte les requêtes de la page
+et vérifie qu'un tour de plus n'en ajoute aucune.
+
+**Le vainqueur se lit sur le rang, jamais sur un maximum.** La page demande les lignes de rang 1 du
+classement figé — plusieurs quand il y a ex æquo, aucune quand la course s'est terminée sans une
+boucle validée, et alors la page le dit au lieu d'annoncer un podium vide. Rien n'est recalculé à
+l'affichage, comme D-06 l'exigeait et comme D-86 l'a construit ; le classement complet reste sur
+`/standings`, et la page n'en charge que la tête.
+
+**L'album photos sort du périmètre, et n'y reviendra pas.** La story voulait un lien vers un album
+partagé, ce qui demandait une colonne sur l'événement. Le gel de D-86 la rendait inutilisable :
+`FinishedEventState` fige tous les attributs, or les photos arrivent après la clôture — le gérant
+aurait dû coller l'adresse d'un album qui n'existe pas encore. La sortie du périmètre est celle que le
+propriétaire a choisie plutôt que d'ouvrir une exception dans le gel pour un lien. BR-22 avait déjà
+emporté la galerie ; le lien la suit.
+
+**Ce que BR-23 ne ferme pas** — la boucle interrompue par la clôture, relevée en fin de D-86, reste
+`pending` et n'entre dans aucun chiffre. Elle est comptée comme partante au dernier tour, ni terminée
+ni sortie, et c'est exactement ce qui s'est passé : la ligne du dernier tour ne s'additionne donc pas,
+faute d'un statut de boucle qui dise « la course s'est arrêtée avant ».

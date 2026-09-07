@@ -253,7 +253,7 @@ par BR-33. Elle reste avec les écrans de course, dont elle dépend.
 | [BR-20](stories/BR-20-fin-evenement-classement.md) | Fin de l'événement et classement final | 8 | ✅ Terminé |
 | [BR-21](stories/BR-21-statistiques.md) | ~~Statistiques de l'événement~~ | — | ⛔ Abandonné |
 | [BR-22](stories/BR-22-galerie-photos.md) | ~~Galerie photos~~ | — | ⛔ Abandonné |
-| [BR-23](stories/BR-23-page-resultats.md) | Page de résultats et chiffres de l'événement | 8 | À faire |
+| [BR-23](stories/BR-23-page-resultats.md) | Page de résultats et chiffres de l'événement | 8 | ✅ Terminé |
 
 ### EPIC 6 — Expérience participant
 
@@ -299,8 +299,9 @@ pas de fichier de story : c'est la décision qui les porte, et elles prennent un
 | R-07 | Adresse de l'organisateur en configuration, en plus du rôle `manager` | 2 | ✅ Livrée | [D-65](DECISIONS.md) |
 | R-08 | Recherche de coureur déplacée sur l'accueil, réservée au gérant ; le coureur y voit sa course | 3 | ✅ Livrée | [D-80](DECISIONS.md) |
 | R-09 | Gestion en barre de sous-menus, section Course à part, bandeaux du tour échangés avec l'accueil | 5 | ✅ Livrée | [D-84](DECISIONS.md) |
+| R-10 | Briefing et documents fondus en un seul onglet | 3 | À faire | — |
 
-**Total : 39 stories actives + 9 reprises · 277 pts · 256 pts livrés (92 %)**
+**Total : 39 stories actives + 10 reprises · 280 pts · 264 pts livrés (94 %)**
 
 **Hors périmètre : 4 stories abandonnées, 32 pts non engagés** — voir [D-47](DECISIONS.md).
 
@@ -330,22 +331,31 @@ et le garde-fou de gel, eux, ne coûtent que la nuit de course, et il reste du t
 **Ensuite, le moteur et les écrans de course** — BR-08 → BR-44 → BR-09 → BR-10 → BR-11 → BR-12 →
 BR-13 → BR-14 → BR-15 → BR-16 → BR-24 → BR-20 → BR-23
 
+**BR-23 ferme l'epic 5 et le backlog des écrans le 2026-09-07.** L'accueil public bascule sur les
+résultats dès que la course est close : le vainqueur — tous les vainqueurs en cas d'ex æquo —, les
+quatre chiffres de la soirée et le tableau tour par tour, chacun agrégé en base et jamais parcouru en
+PHP ([D-87](DECISIONS.md)). C'est `/` qui bascule et non l'écran du coureur, décision du propriétaire
+sur la logique de D-60 : le lien qu'on partage doit montrer la course, pas une inscription fermée. Le
+renvoi vers les résultats que D-85 avait laissé en attente arrive du même coup, et l'entrée de
+navigation « Événement » devient « Résultats ». **Le lien vers l'album photos sort du périmètre** — il
+demandait une colonne que le gel de D-86 aurait rendue inutilisable, les photos arrivant après la
+clôture.
+
 **BR-24 ferme le côté coureur le 2026-09-07.** L'accueil que D-80 avait ouvert en attendant devient
 sa vue de course : il s'ouvre à la confirmation de l'inscription et non plus au départ du premier
 tour, annonce le prochain départ tant que le coureur est en course, et pose ses boucles en tableau —
 tour, temps, kilomètres, vitesse — dans le même encart que ses chiffres ([D-85](DECISIONS.md)). Deux
 points de son périmètre ne sont pas livrés : les raccourcis vers le briefing et les documents, que la
-navigation porte depuis BR-33, et le renvoi vers les résultats d'un événement terminé, qui attend
-BR-23.
+navigation porte depuis BR-33, et le renvoi vers les résultats d'un événement terminé, que BR-23 a
+branché le même jour.
 
 **BR-20 clôt la course le 2026-09-07.** Le geste existait déjà : la barre de gestion faisait passer
 l'événement à l'étape suivante, et `finish-event` gardait la dernière. Ce que la story ajoute, c'est
 ce qui se produit à l'entrée dans l'état terminé — l'heure de clôture est enregistrée, et le
 classement est recopié dans sa propre table, rang, boucles, motif de sortie, nom et dossard compris,
 dans la transaction de la transition ([D-86](DECISIONS.md)). Il se lit sur `/standings`, ouvert à
-tous, annoncé dans la navigation dès que la course est close. **La suite est BR-23**, l'accueil
-d'après-course : le vainqueur, les chiffres de la soirée et le tableau par tour, qui s'appuient sur
-le classement que BR-20 vient de figer.
+tous, annoncé dans la navigation dès que la course est close. **BR-23 a suivi le même jour**, et
+lit la tête de ce classement figé pour annoncer le vainqueur.
 
 **L'epic 3 est ouvert le 2026-09-01 par BR-13.** Le moteur décidait juste sans se regarder ; il se
 regarde maintenant sur l'écran que le gérant tiendra quinze heures — entête de tour et effectifs

@@ -3,9 +3,10 @@
 | | |
 |---|---|
 | **Epic** | 5 — Après-course |
-| **Statut** | À faire |
+| **Statut** | ✅ Terminé |
 | **Estimation** | 8 pts |
 | **Révisée** | 2026-08-20 — passe de 5 à 8 pts, absorbe BR-21 (voir D-47) |
+| **Révisée** | 2026-09-07 — l'accueil public porte les résultats, le lien d'album sort du périmètre (voir [D-87](../DECISIONS.md)) |
 | **Dépend de** | BR-20 |
 
 ## User story
@@ -33,15 +34,15 @@ partie statistiques. Uniquement des chiffres, pas de graphique (voir D-16).
   totale parcourue, durée totale de l'événement.
 - Un tableau par tour : boucles terminées, coureurs restants, éliminations, en distinguant
   abandons et hors délai.
-- L'accès au classement figé, et un lien vers l'album photos partagé.
+- L'accès au classement figé.
 
 **Exclu**
 - Le détail du classement : il vit sur sa propre page (BR-20).
 - Tout graphique, courbe ou histogramme (voir D-16).
 - Les statistiques individuelles comparées entre coureurs.
 - L'export des données (voir D-15).
-- Une galerie de photos hébergée par l'application : abandonnée avec BR-22 ; le lien pointe sur
-  un album partagé.
+- Toute mention d'un album photos : la galerie était abandonnée avec BR-22, et le lien vers un
+  album partagé sort du périmètre à son tour ([D-87](../DECISIONS.md)).
 - Le partage sur les réseaux sociaux.
 
 **Dépendances** — BR-20 pour le classement figé et la notion de vainqueur.
@@ -100,8 +101,8 @@ Alors il reste lisible sans défilement horizontal de la page
 - Aucune boucle validée sur l'événement : la page le dit sans annoncer de vainqueur, et les
   indicateurs sont à zéro plutôt qu'un tableau vide.
 - Un seul tour couru : le tableau ne comporte qu'une ligne, ce qui reste correct.
-- Distance de boucle corrigée par le gérant : les totaux suivent la nouvelle valeur.
-- Lien d'album absent : l'accès correspondant n'est pas proposé, plutôt que de mener nulle part.
+- Distance de boucle non renseignée : les kilomètres se lisent en tiret, et les boucles restent
+  comptées.
 
 ## Impacts techniques
 
@@ -111,8 +112,8 @@ l'événement est terminé, les valeurs ne bougent plus — la mise en cache n'e
 
 ## Tâches
 
-- [ ] **T1** — Bascule de l'accueil selon le statut de l'événement `1 pt`
-- [ ] **T2** — Service d'agrégation des indicateurs, tout en base `2 pts`
-- [ ] **T3** — Comptages par tour : boucles terminées, coureurs restants, abandons, hors délai `2 pts`
-- [ ] **T4** — Page de résultats : vainqueur, indicateurs, tableau par tour, accès et états vides `2 pts`
-- [ ] **T5** — Tests : affichage selon statut, ex æquo, aucune boucle, comptages par tour `1 pt`
+- [x] **T1** — Bascule de l'accueil selon le statut de l'événement `1 pt`
+- [x] **T2** — Service d'agrégation des indicateurs, tout en base `2 pts`
+- [x] **T3** — Comptages par tour : boucles terminées, coureurs restants, abandons, hors délai `2 pts`
+- [x] **T4** — Page de résultats : vainqueur, indicateurs, tableau par tour, accès et états vides `2 pts`
+- [x] **T5** — Tests : affichage selon statut, ex æquo, aucune boucle, comptages par tour `1 pt`

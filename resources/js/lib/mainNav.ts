@@ -15,8 +15,15 @@ export function mainNavItems(): NavItem[] {
     return isAuthenticated() ? memberNavItems() : guestNavItems();
 }
 
+function homeEntry(): NavItem {
+    return {
+        title: canReach('results') ? t('ui.nav.results') : t('ui.nav.event'),
+        href: home(),
+    };
+}
+
 function guestNavItems(): NavItem[] {
-    const entries: NavItem[] = [{ title: t('ui.nav.event'), href: home() }];
+    const entries: NavItem[] = [homeEntry()];
 
     if (canReach('documents')) {
         entries.push({ title: t('ui.nav.documents'), href: documents() });
@@ -59,7 +66,7 @@ function memberNavItems(): NavItem[] {
     }
 
     if (canReach('event')) {
-        entries.push({ title: t('ui.nav.event'), href: home() });
+        entries.push(homeEntry());
     }
 
     return entries;

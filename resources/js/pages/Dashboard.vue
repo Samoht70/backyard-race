@@ -3,6 +3,7 @@ import { Head, Link, router } from '@inertiajs/vue3';
 import { CalendarOff, SlidersHorizontal, Ticket } from '@lucide/vue';
 import { computed, onMounted, onUnmounted } from 'vue';
 import ActionButton from '@/components/ActionButton.vue';
+import ActionBar from '@/components/board/ActionBar.vue';
 import BoardPage from '@/components/board/BoardPage.vue';
 import Heading from '@/components/Heading.vue';
 import RoundHeader from '@/components/race/RoundHeader.vue';
@@ -177,6 +178,14 @@ onUnmounted(stop);
                 :runner="runner"
                 :next-round="currentRound ? null : nextRound"
             />
+
+            <ActionBar v-if="canReach('results')">
+                <ActionButton as-child>
+                    <Link :href="home()">
+                        {{ t('race.results.call_to_action') }}
+                    </Link>
+                </ActionButton>
+            </ActionBar>
         </div>
 
         <div v-else-if="mode === 'manager_search' && tally" class="grid gap-6">
