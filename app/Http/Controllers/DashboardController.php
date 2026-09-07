@@ -2,31 +2,92 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Permission;
+use App\Enums\RegistrationStatus;
+use App\Http\Requests\RunnerSearchRequest;
+use App\Http\Resources\RunnerSearchResultResource;
+use App\Http\Resources\RunnerTallyResource;
 use App\Models\Event;
-use App\Support\BibNumber;
+use App\Models\Participant;
+use App\Services\RaceBoard\ResolveRunnerSearch;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class DashboardController extends Controller
 {
-    public function __invoke(Request $request): Response
+    public function __invoke(Request $request, RunnerSearchRequest $searchRequest, ResolveRunnerSearch $search): Response
     {
         $event = Event::currentOrNull();
-        $participant = $request->user()?->participant;
+
+        if ($event === null) {
+            return Inertia::render('Dashboard', ['mode' => 'no_event', 'event' => null]);
+        }
+
+        $user = $request->user();
+        $isRacing = $event->lifecycle()->isRacing();
+
+        if ($user->can(Permission::ManageEvent->value)) {
+            return $isRacing
+                ? $this->renderSearch($event, $searchRequest, $search)
+                : $this->renderMode('manager_idle', $event);
+        }
+
+        $participant = $user->participant;
+
+        if ($participant === null) {
+            return $this->renderMode('no_registration', $event);
+        }
+
+        if ($isRacing && $participant->status === RegistrationStatus::Confirmed) {
+            return $this->renderRunnerStatus($event, $participant);
+        }
+
+        return $this->renderMode('runner_waiting', $event);
+    }
+
+    private function renderSearch(Event $event, RunnerSearchRequest $request, ResolveRunnerSearch $search): Response
+    {
+        $term = $request->term();
+        $matches = $search($event, $term);
 
         return Inertia::render('Dashboard', [
-            'event' => $event === null ? null : [
-                'name' => $event->name,
-                'status' => $event->status->value,
-            ],
-            'registration' => $participant === null ? null : [
-                'status' => $participant->status->value,
-                'status_label' => $participant->status->label(),
-                'bib_label' => BibNumber::label($participant->bib_number),
-                'submitted_on' => $participant->created_at?->translatedFormat('d.m.Y'),
-                'editable' => $participant->lifecycle()->isEditableByRunner(),
-            ],
+            'mode' => 'manager_search',
+            'event' => $this->eventSummary($event),
+            'query' => $term,
+            'tally' => new RunnerTallyResource($matches->tally)->resolve(),
+            'runners' => $matches->runners
+                ->map(fn (Participant $runner): array => new RunnerSearchResultResource(
+                    $runner,
+                    $event->lap_distance_meters,
+                )->resolve())
+                ->values()
+                ->all(),
         ]);
+    }
+
+    private function renderRunnerStatus(Event $event, Participant $participant): Response
+    {
+        return Inertia::render('Dashboard', [
+            'mode' => 'runner_active',
+            'event' => $this->eventSummary($event),
+            'runner' => new RunnerSearchResultResource($participant, $event->lap_distance_meters)->resolve(),
+        ]);
+    }
+
+    private function renderMode(string $mode, Event $event): Response
+    {
+        return Inertia::render('Dashboard', [
+            'mode' => $mode,
+            'event' => $this->eventSummary($event),
+        ]);
+    }
+
+    /**
+     * @return array{name: string|null, status: string}
+     */
+    private function eventSummary(Event $event): array
+    {
+        return ['name' => $event->name, 'status' => $event->status->value];
     }
 }

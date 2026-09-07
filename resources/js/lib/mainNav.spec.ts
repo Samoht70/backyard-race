@@ -98,7 +98,6 @@ describe('mainNavItems', () => {
             'ui.nav.registration',
             'ui.nav.briefing',
             'ui.nav.documents',
-            'ui.nav.runners',
             'ui.nav.event',
         ]);
     });
@@ -116,7 +115,6 @@ describe('mainNavItems', () => {
             'ui.nav.home',
             'ui.nav.briefing',
             'ui.nav.documents',
-            'ui.nav.runners',
             'ui.nav.event',
         ]);
     });
@@ -129,7 +127,6 @@ describe('mainNavItems', () => {
             'ui.nav.manage',
             'ui.nav.briefing',
             'ui.nav.documents',
-            'ui.nav.runners',
             'ui.nav.event',
         ]);
     });
@@ -145,7 +142,6 @@ describe('mainNavItems', () => {
             'ui.nav.registration',
             'ui.nav.briefing',
             'ui.nav.documents',
-            'ui.nav.runners',
             'ui.nav.event',
         ]);
     });
@@ -167,7 +163,6 @@ describe('mainNavItems', () => {
             '/registration',
             '/briefing',
             '/documents',
-            '/runners',
             '/',
         ]);
     });

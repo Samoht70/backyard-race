@@ -2,7 +2,7 @@ import { canReach } from '@/lib/access';
 import { isAuthenticated } from '@/lib/auth';
 import { t } from '@/lib/i18n';
 import { can } from '@/lib/permissions';
-import { dashboard, home, login, runners } from '@/routes';
+import { dashboard, home, login } from '@/routes';
 import { create as createAccount } from '@/routes/account';
 import { show as briefing } from '@/routes/briefing';
 import { index as documents } from '@/routes/documents';
@@ -47,10 +47,6 @@ function memberNavItems(): NavItem[] {
 
     if (canReach('documents')) {
         entries.push({ title: t('ui.nav.documents'), href: documents() });
-    }
-
-    if (canReach('event')) {
-        entries.push({ title: t('ui.nav.runners'), href: runners() });
     }
 
     if (canReach('event')) {
