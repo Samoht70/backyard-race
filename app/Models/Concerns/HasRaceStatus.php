@@ -127,6 +127,28 @@ trait HasRaceStatus
      * @return Builder<static>
      */
     #[Scope]
+    protected function withAValidatedLap(Builder $query): Builder
+    {
+        return $query->whereHas('laps', fn (Builder $laps): Builder => $laps->where('status', LapStatus::Validated));
+    }
+
+    /**
+     * @param  Builder<static>  $query
+     * @return Builder<static>
+     */
+    #[Scope]
+    protected function bestFirst(Builder $query): Builder
+    {
+        return $query
+            ->orderByDesc(self::VALIDATED_LAPS_COUNT)
+            ->orderBy('bib_number');
+    }
+
+    /**
+     * @param  Builder<static>  $query
+     * @return Builder<static>
+     */
+    #[Scope]
     protected function withLastValidatedRound(Builder $query): Builder
     {
         return $query->addSelect([
