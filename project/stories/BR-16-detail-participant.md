@@ -16,13 +16,16 @@ Afin de **suivre sa progression tour par tour et comparer ses temps**.
 
 ## Contexte
 
-Le tableau des coureurs donne l'état, le détail donne l'histoire : la liste des boucles avec
+La recherche donne l'état d'un coureur, le détail donne son histoire : la liste des boucles avec
 leur temps et leur vitesse. C'est aussi de là que le gérant déclenche un abandon ou une
 correction.
 
-Le détail **se déplie dans le tableau de BR-14**, il n'a pas d'écran à lui. Une main occupée à
-4 h du matin n'a pas à quitter la liste, ni à y revenir en cherchant sa place — c'est ce qui fait
-tomber la story de cinq points à deux.
+Le détail **se déplie dans le résultat de recherche de BR-14**, il n'a pas d'écran à lui. Une main
+occupée à 4 h du matin n'a pas à quitter le coureur qu'elle vient de trouver, ni à le rechercher
+une seconde fois — c'est ce qui fait tomber la story de cinq points à deux.
+
+BR-14 livre la coquille du panneau, portant déjà la distance totale et la dernière boucle validée.
+BR-16 la remplit : les boucles une par une, leurs durées, leurs vitesses, et les actions gérant.
 
 ## Périmètre fonctionnel
 
@@ -35,7 +38,8 @@ tomber la story de cinq points à deux.
 **Exclu**
 - Les données personnelles du coureur, sauf pour le gérant et pour l'intéressé.
 - La modification des boucles depuis cet écran : elle passe par BR-12.
-- Un écran dédié et sa route : le détail est un panneau dépliable du tableau de BR-14.
+- Un écran dédié et sa route : le détail est un panneau dépliable des résultats de BR-14.
+- L'entête, la distance totale et la dernière boucle validée : BR-14 les livre déjà.
 
 **Dépendances** — BR-14.
 
@@ -87,5 +91,5 @@ Aucun — l'écran lit des données déjà produites par le moteur de course.
 
 ## Tâches
 
-- [ ] **T1** — Boucles du coureur chargées avec le tableau, panneau dépliable dans BR-14 `1 pt`
+- [ ] **T1** — Boucles du coureur chargées avec son résultat, panneau de BR-14 rempli `1 pt`
 - [ ] **T2** — Cloisonnement des données personnelles et des actions gérant, avec ses tests `1 pt`

@@ -234,9 +234,9 @@ par BR-33. Elle reste avec les écrans de course, dont elle dépend.
 | ID | Story | Pts | Statut |
 |----|-------|-----|--------|
 | [BR-13](stories/BR-13-dashboard-gerant.md) | Dashboard gérant mobile-first | 13 | ✅ Terminé |
-| [BR-14](stories/BR-14-tableau-coureurs.md) | Tableau des coureurs et filtres | 8 | À faire |
+| [BR-14](stories/BR-14-tableau-coureurs.md) | Recherche d'un coureur | 6 | À faire |
 | [BR-15](stories/BR-15-polling.md) | Rafraîchissement léger de l'état de course | 2 | À faire |
-| [BR-16](stories/BR-16-detail-participant.md) | Détail d'un coureur, déplié dans le tableau | 2 | À faire |
+| [BR-16](stories/BR-16-detail-participant.md) | Détail d'un coureur, déplié dans ses résultats | 2 | À faire |
 
 ### EPIC 4 — Informations événement
 
@@ -332,8 +332,9 @@ BR-13 → BR-14 → BR-15 → BR-16 → BR-24 → BR-20 → BR-23
 regarde maintenant sur l'écran que le gérant tiendra quinze heures — entête de tour et effectifs
 collés en haut, liste des seuls coureurs encore en course, et une phrase à la place du vide quand la
 course n'a pas commencé. Deux tests de l'epic 2 ont été réécrits en la prenant : le coureur sorti
-quitte le tableau et passe dans le compteur ([D-79](DECISIONS.md)). La suite est **BR-14**, dont les
-filtres rendront la liste complète que BR-13 vient de restreindre.
+quitte le tableau et passe dans le compteur ([D-79](DECISIONS.md)). La suite est **BR-14**, qui ne
+rendra pas la liste complète que BR-13 vient de restreindre : elle répond « où en est Untel » par une
+recherche sur le nom et le dossard, et l'effectif reste un compteur.
 
 **L'epic 2 est clos le 2026-08-31.** Les six entrées du moteur sont livrées dans cet ordre : les
 boucles s'ouvrent avec leur tour, la durée du prochain tour se change, le gérant valide d'un appui,
