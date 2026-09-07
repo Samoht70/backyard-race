@@ -3584,3 +3584,56 @@ d'acceptation n'a donc pas de garde à vérifier : il n'y a rien à masquer.
 **Ce que BR-24 ne ferme pas** — le renvoi vers les résultats une fois la course terminée. BR-23
 n'existe pas encore : le coureur voit son résultat figé, son motif de sortie et aucun prochain
 départ, et le lien viendra avec la page qu'il devra ouvrir.
+
+## D-86 — La clôture est une entrée d'état, et le classement figé est une table à part
+
+Arbitré le 2026-09-07 par BR-20.
+
+**La clôture n'a pas eu de geste à elle.** La story demandait une action « Terminer l'événement »
+avec confirmation ; la barre de gestion la portait déjà, sous la forme générique du passage à
+l'étape suivante — `manage.event.advance`, réservé à la permission `finish-event` par
+`RunningEventState::advancePermission()`, avec la boîte de confirmation qui distingue déjà une
+transition réversible d'une transition qui ne l'est pas. Écrire un second chemin pour le même
+mouvement aurait donné deux façons de finir la course, dont une seule serait testée. La lecture
+seule ne s'est pas écrite non plus : validation, abandon et correction interrogent toutes
+`isRacing()`, faux dès que l'état est `finished`.
+
+**Le gel s'accroche à l'entrée dans l'état, pas à un `if` sur le statut.** `AdvanceEventStatus` est
+générique, et le lui apprendre à reconnaître `finished` aurait remis dans une action la
+correspondance sur l'enum que `EventStatus` déclare vivre une seule fois, dans le cycle de vie.
+L'interface gagne donc `enter(Event $event): void`, vide dans trois états sur quatre :
+`FinishedEventState` y pose l'heure de clôture et appelle `FreezeStandings`. La transition et le gel
+tiennent dans une transaction — un classement à moitié écrit sur un événement déjà terminé ne se
+rattrape pas, puisque la clôture ne se défait pas.
+
+**Le classement est une table, pas une lecture.** D-06 le disait dès le premier jour : « figé par
+une action serveur, pas recalculé à l'affichage ». `standings` porte le rang, le nombre de boucles,
+le motif de sortie, et **recopie le nom et le dossard** du coureur. La recopie n'est pas de la
+redondance : un coureur qui change son nom dans son profil après la course ne doit pas changer
+l'annonce du podium. Ce qui reste dérivé, c'est la distance — boucles validées × distance de boucle,
+comme partout ailleurs (D-17), et la distance de boucle est gelée avec le reste de la configuration.
+
+**Le rang est le rang de compétition, et il saute.** Deux coureurs à 12 boucles sont tous les deux
+premiers, le suivant est troisième. Aucun critère ne les départage : ni la vitesse, ni le temps
+cumulé, ni l'heure de la dernière boucle. L'ordre d'affichage entre ex æquo est celui des dossards,
+pour que deux lectures de la même page donnent la même liste.
+
+**Un coureur sans boucle validée n'est pas classé.** Le classement récompense des boucles ; sans
+boucle, il n'y a rien à classer. C'est ce qui rend possible le cas limite de la story — une course
+close sans qu'une seule boucle soit validée produit un classement vide, et la page le dit au lieu
+d'aligner des zéros.
+
+**Le coureur encore en course à la clôture est « terminé ».** `RunnerStatus::Finished` existait
+depuis BR-08 sans être utilisé : c'est ici qu'il sert. Le classement lit le statut du motif de
+sortie, et son absence signifie que le coureur était encore debout quand le gérant a arrêté la
+course. Sa boucle en cours, elle, ne compte pas — elle n'a jamais été validée.
+
+**Le classement a sa page publique, `/standings`, et non l'accueil.** BR-23 prendra l'accueil
+d'après-course, le vainqueur et les chiffres de la soirée ; BR-20 ne livre que la liste, ouverte aux
+invités comme aux inscrits, et l'entrée de navigation n'apparaît qu'une fois la course close
+(`publishesStandings()`, quatrième question posée au cycle de vie après D-85). Avant la clôture,
+l'adresse répond 404 dans le site, par BR-40.
+
+**Ce que BR-20 ne ferme pas** — l'heure de clôture est enregistrée mais ne sert encore qu'à dater le
+classement. C'est BR-23 qui en fera la durée totale de l'événement, du premier départ à la clôture ;
+la colonne existe dès maintenant parce qu'une heure de clôture ne se rattrape pas après coup.
