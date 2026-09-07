@@ -65,6 +65,13 @@ trait HasRaceStatus
         return $this->laps()->where('status', LapStatus::Validated)->count();
     }
 
+    public function coveredMeters(?int $lapDistanceMeters): ?int
+    {
+        return $lapDistanceMeters === null
+            ? null
+            : $this->validatedLapsCount() * $lapDistanceMeters;
+    }
+
     public function lastValidatedRoundNumber(): ?int
     {
         $loaded = $this->getAttribute(self::LAST_VALIDATED_ROUND);

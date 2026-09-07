@@ -9,6 +9,7 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\Manage;
 use App\Http\Controllers\MissingPageController;
 use App\Http\Controllers\RegistrationController;
+use App\Http\Controllers\RunnersController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', EventController::class)
@@ -30,6 +31,9 @@ Route::middleware('auth')
 
         Route::singleton('registration', RegistrationController::class)
             ->only(['show', 'edit', 'update']);
+
+        Route::get('runners', RunnersController::class)
+            ->name('runners');
 
         Route::prefix('manage')
             ->name('manage.')
