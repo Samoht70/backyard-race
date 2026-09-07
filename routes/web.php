@@ -4,7 +4,6 @@ use App\Enums\Permission;
 use App\Http\Controllers\BriefingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DesignSystemController;
-use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\Manage;
 use App\Http\Controllers\MissingPageController;
@@ -18,8 +17,8 @@ Route::get('/', EventController::class)
 Route::get('design-system', DesignSystemController::class)
     ->name('design-system');
 
-Route::resource('documents', DocumentController::class)
-    ->only(['index']);
+Route::singleton('briefing', BriefingController::class)
+    ->only(['show']);
 
 Route::resource('standings', StandingController::class)
     ->only(['index']);
@@ -28,9 +27,6 @@ Route::middleware('auth')
     ->group(function () {
         Route::get('dashboard', DashboardController::class)
             ->name('dashboard');
-
-        Route::singleton('briefing', BriefingController::class)
-            ->only(['show']);
 
         Route::singleton('registration', RegistrationController::class)
             ->only(['show', 'edit', 'update']);

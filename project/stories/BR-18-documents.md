@@ -6,6 +6,7 @@
 | **Statut** | ✅ Terminé |
 | **Estimation** | 4 pts |
 | **Révisée** | 2026-08-20 — réduite de 8 à 4 pts, absorbe le GPX de BR-19 (voir D-47) |
+| **Révisée** | 2026-09-07 — `/documents` disparaît, la liste devient une section de `/briefing` (voir [D-88](../DECISIONS.md)) |
 | **Dépend de** | BR-03 |
 
 ## User story

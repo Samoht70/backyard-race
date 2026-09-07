@@ -9,12 +9,6 @@ use App\Models\User;
 
 class DocumentPolicy
 {
-    public function viewAny(?User $user, Event $event): bool
-    {
-        return $event->lifecycle()->isVisibleToParticipants()
-            || $user?->can(Permission::ManageEvent->value) === true;
-    }
-
     public function create(User $user, Event $event): bool
     {
         return $user->can(Permission::ManageDocuments->value)

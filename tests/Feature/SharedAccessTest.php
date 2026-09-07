@@ -26,7 +26,7 @@ class SharedAccessTest extends TestCase
     }
 
     #[Test]
-    public function it_opens_the_event_and_the_documents_to_a_guest(): void
+    public function it_opens_the_event_to_a_guest(): void
     {
         $this->openEvent();
 
@@ -35,7 +35,6 @@ class SharedAccessTest extends TestCase
                 fn (AssertableInertia $page) => $page
                     ->where('access', [
                         'event' => true,
-                        'documents' => true,
                         'registration' => false,
                         'register' => true,
                         'standings' => false,
@@ -54,7 +53,6 @@ class SharedAccessTest extends TestCase
                 fn (AssertableInertia $page) => $page
                     ->where('access', [
                         'event' => false,
-                        'documents' => false,
                         'registration' => false,
                         'register' => false,
                         'standings' => false,
@@ -90,31 +88,23 @@ class SharedAccessTest extends TestCase
     }
 
     #[Test]
-    public function it_hides_the_briefing_and_the_documents_from_a_participant_while_the_event_is_a_draft(): void
+    public function it_hides_the_briefing_from_a_participant_while_the_event_is_a_draft(): void
     {
         Event::factory()->create();
 
         $this->actingAs(User::factory()->participant()->create())
             ->get(route('dashboard'))
-            ->assertInertia(
-                fn (AssertableInertia $page) => $page
-                    ->where('access.event', false)
-                    ->where('access.documents', false),
-            );
+            ->assertInertia(fn (AssertableInertia $page) => $page->where('access.event', false));
     }
 
     #[Test]
-    public function it_opens_the_briefing_and_the_documents_once_the_event_takes_registrations(): void
+    public function it_opens_the_briefing_once_the_event_takes_registrations(): void
     {
         $this->openEvent();
 
         $this->actingAs(User::factory()->participant()->create())
             ->get(route('dashboard'))
-            ->assertInertia(
-                fn (AssertableInertia $page) => $page
-                    ->where('access.event', true)
-                    ->where('access.documents', true),
-            );
+            ->assertInertia(fn (AssertableInertia $page) => $page->where('access.event', true));
     }
 
     #[Test]
@@ -124,11 +114,7 @@ class SharedAccessTest extends TestCase
 
         $this->actingAs(User::factory()->manager()->create())
             ->get(route('dashboard'))
-            ->assertInertia(
-                fn (AssertableInertia $page) => $page
-                    ->where('access.event', true)
-                    ->where('access.documents', true),
-            );
+            ->assertInertia(fn (AssertableInertia $page) => $page->where('access.event', true));
     }
 
     #[Test]
@@ -140,11 +126,7 @@ class SharedAccessTest extends TestCase
 
         $this->actingAs($editor)
             ->get(route('dashboard'))
-            ->assertInertia(
-                fn (AssertableInertia $page) => $page
-                    ->where('access.event', false)
-                    ->where('access.documents', false),
-            );
+            ->assertInertia(fn (AssertableInertia $page) => $page->where('access.event', false));
     }
 
     #[Test]
@@ -179,7 +161,7 @@ class SharedAccessTest extends TestCase
     }
 
     #[Test]
-    public function it_opens_both_sets_to_a_manager_who_also_holds_a_registration(): void
+    public function it_opens_every_area_to_a_manager_who_also_holds_a_registration(): void
     {
         $event = $this->openEvent();
         $manager = User::factory()->manager()->create();
@@ -194,7 +176,6 @@ class SharedAccessTest extends TestCase
                 fn (AssertableInertia $page) => $page
                     ->where('access', [
                         'event' => true,
-                        'documents' => true,
                         'registration' => true,
                         'register' => false,
                         'standings' => false,
@@ -214,7 +195,6 @@ class SharedAccessTest extends TestCase
             ->assertInertia(
                 fn (AssertableInertia $page) => $page
                     ->where('access.event', false)
-                    ->where('access.documents', false)
                     ->where('access.registration', false),
             );
     }

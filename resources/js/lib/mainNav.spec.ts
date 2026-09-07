@@ -13,7 +13,6 @@ const { toUrl } = await import('@/lib/utils');
 
 type Areas = {
     event?: boolean;
-    documents?: boolean;
     registration?: boolean;
     register?: boolean;
     standings?: boolean;
@@ -34,7 +33,6 @@ function share(
         },
         access: {
             event: areas.event === true,
-            documents: areas.documents === true,
             registration: areas.registration === true,
             register: areas.register === true,
             standings: areas.standings === true,
@@ -60,81 +58,69 @@ describe('mainNavItems', () => {
         page.props = {};
     });
 
-    it('offers a guest the race, the documents, a way in and a way to register', () => {
-        visitAsGuest({ event: true, documents: true, register: true });
+    it('offers a guest the race, the briefing, a way in and a way to register', () => {
+        visitAsGuest({ event: true, register: true });
 
         expect(titles()).toEqual([
             'ui.nav.event',
-            'ui.nav.documents',
+            'ui.nav.briefing',
             'ui.nav.registration',
             'ui.nav.register',
         ]);
     });
 
     it('offers a guest the standings once the race is closed', () => {
-        visitAsGuest({ event: true, documents: true, standings: true });
+        visitAsGuest({ event: true, standings: true });
 
         expect(titles()).toEqual([
             'ui.nav.event',
-            'ui.nav.documents',
+            'ui.nav.briefing',
             'ui.nav.standings',
             'ui.nav.registration',
         ]);
     });
 
     it('offers a signed-in runner the standings once the race is closed', () => {
-        signIn({ event: true, documents: true, standings: true });
+        signIn({ event: true, standings: true });
 
         expect(titles()).toEqual([
             'ui.nav.home',
             'ui.nav.briefing',
-            'ui.nav.documents',
             'ui.nav.standings',
             'ui.nav.event',
         ]);
     });
 
     it('renames the home entry once the home page carries the results', () => {
-        visitAsGuest({
-            event: true,
-            documents: true,
-            standings: true,
-            results: true,
-        });
+        visitAsGuest({ event: true, standings: true, results: true });
 
         expect(titles()).toEqual([
             'ui.nav.results',
-            'ui.nav.documents',
+            'ui.nav.briefing',
             'ui.nav.standings',
             'ui.nav.registration',
         ]);
     });
 
     it('renames the home entry for a signed-in runner too', () => {
-        signIn({
-            event: true,
-            documents: true,
-            standings: true,
-            results: true,
-        });
+        signIn({ event: true, standings: true, results: true });
 
         expect(titles()).toEqual([
             'ui.nav.home',
             'ui.nav.briefing',
-            'ui.nav.documents',
             'ui.nav.standings',
             'ui.nav.results',
         ]);
     });
 
     it('withholds the standings while the race is still running', () => {
-        visitAsGuest({ event: true, documents: true });
+        visitAsGuest({ event: true });
 
         expect(titles()).not.toContain('ui.nav.standings');
     });
 
     it('withholds the account creation from a guest once the window is shut', () => {
-        visitAsGuest({ event: true, documents: true });
+        visitAsGuest({ event: true });
 
         expect(titles()).not.toContain('ui.nav.register');
     });
@@ -145,90 +131,81 @@ describe('mainNavItems', () => {
         expect(titles()).toEqual(['ui.nav.event', 'ui.nav.registration']);
     });
 
-    it('points a guest at the public race page and the login screen', () => {
-        visitAsGuest({ event: true, documents: true, register: true });
+    it('points a guest at the public race page, the briefing and the login screen', () => {
+        visitAsGuest({ event: true, register: true });
 
         expect(mainNavItems().map((item) => toUrl(item.href))).toEqual([
             '/',
-            '/documents',
+            '/briefing',
             '/login',
             '/account/create',
         ]);
     });
 
-    it('offers a registered runner their registration, the briefing and the documents', () => {
-        signIn({ event: true, documents: true, registration: true });
+    it('offers a registered runner their registration and the briefing', () => {
+        signIn({ event: true, registration: true });
 
         expect(titles()).toEqual([
             'ui.nav.home',
             'ui.nav.registration',
             'ui.nav.briefing',
-            'ui.nav.documents',
             'ui.nav.event',
         ]);
     });
 
-    it('withholds the briefing and the documents while the event is a draft', () => {
+    it('withholds the briefing while the event is a draft', () => {
         signIn({ registration: true });
 
         expect(titles()).toEqual(['ui.nav.home', 'ui.nav.registration']);
     });
 
     it('withholds the registration entry from an account without one', () => {
-        signIn({ event: true, documents: true });
+        signIn({ event: true });
 
         expect(titles()).toEqual([
             'ui.nav.home',
             'ui.nav.briefing',
-            'ui.nav.documents',
             'ui.nav.event',
         ]);
     });
 
     it('opens a manager rail on the management hub', () => {
-        signIn({ event: true, documents: true }, ['manage-event']);
+        signIn({ event: true }, ['manage-event']);
 
         expect(titles()).toEqual([
             'ui.nav.home',
             'ui.nav.manage',
             'ui.nav.briefing',
-            'ui.nav.documents',
             'ui.nav.event',
         ]);
     });
 
     it('keeps the management hub ahead of a manager own registration', () => {
-        signIn({ event: true, documents: true, registration: true }, [
-            'manage-event',
-        ]);
+        signIn({ event: true, registration: true }, ['manage-event']);
 
         expect(titles()).toEqual([
             'ui.nav.home',
             'ui.nav.manage',
             'ui.nav.registration',
             'ui.nav.briefing',
-            'ui.nav.documents',
             'ui.nav.event',
         ]);
     });
 
     it('withholds the management hub from a runner', () => {
-        signIn({ event: true, documents: true, registration: true });
+        signIn({ event: true, registration: true });
 
         expect(titles()).not.toContain('ui.nav.manage');
     });
 
     it('points every entry at its own screen', () => {
-        signIn({ event: true, documents: true, registration: true }, [
-            'manage-event',
-        ]);
+        signIn({ event: true, registration: true }, ['manage-event']);
 
         expect(mainNavItems().map((item) => toUrl(item.href))).toEqual([
             '/dashboard',
             '/manage',
             '/registration',
             '/briefing',
-            '/documents',
             '/',
         ]);
     });
