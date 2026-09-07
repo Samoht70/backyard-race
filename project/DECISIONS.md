@@ -3503,3 +3503,14 @@ que le geste reste indisponible avant le départ.
 **Le compteur suit son bandeau.** `manage.index` ne porte plus `tally` ; `DashboardController` le
 porte dans ses deux modes de course, calculé par `ResolveRunnerTally` côté coureur et déjà présent
 dans la recherche côté gérant.
+
+**La recherche du tableau du tour filtre dans le navigateur, celle de l'accueil interroge le
+serveur.** Les deux répondent à la même question et n'ont pas le même corpus : les coureurs du tour
+sont déjà tous en props, donc le filtre est immédiat, ne coûte aucune requête et survit au
+rafraîchissement périodique ; la recherche de l'accueil (BR-14) porte sur tout l'événement et reste
+serveur, avec son seuil et son délai. Le champ lui-même est le même composant
+(`form/SearchField.vue`), extrait au deuxième usage.
+
+**L'encart de durée tient sur deux rangées.** Il en occupait six au-dessus du tableau et repoussait
+le geste de validation hors de l'écran sur un téléphone : l'échéance du tour et sa réserve
+rejoignent la ligne de titre, le champ, son unité et les deux boutons tiennent sur la suivante.

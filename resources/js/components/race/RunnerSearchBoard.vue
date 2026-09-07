@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Search, Users } from '@lucide/vue';
 import { computed, ref, watch } from 'vue';
-import TextField from '@/components/form/TextField.vue';
+import SearchField from '@/components/form/SearchField.vue';
 import RoundTally from '@/components/race/RoundTally.vue';
 import RunnerDetailPanel from '@/components/race/RunnerDetailPanel.vue';
 import RunnerSlat from '@/components/race/RunnerSlat.vue';
@@ -71,25 +71,12 @@ function meta(runner: RunnerSearchResult): string | undefined {
     <div class="grid gap-6">
         <RoundTally :counts="counts" />
 
-        <div class="grid gap-1.5">
-            <label for="runner-search" class="sr-only">
-                {{ t('race.search.label') }}
-            </label>
-            <div class="relative">
-                <Search
-                    class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
-                    aria-hidden="true"
-                />
-                <TextField
-                    id="runner-search"
-                    v-model="term"
-                    type="search"
-                    autocomplete="off"
-                    :placeholder="t('race.search.placeholder')"
-                    class="pl-9"
-                />
-            </div>
-        </div>
+        <SearchField
+            id="runner-search"
+            v-model="term"
+            :label="t('race.search.label')"
+            :placeholder="t('race.search.placeholder')"
+        />
 
         <EmptyState
             v-if="state === 'invitation'"
