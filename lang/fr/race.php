@@ -54,6 +54,7 @@ return [
     ],
     'lap' => [
         'speed_unit' => 'km/h',
+        'time' => 'Temps',
     ],
     'refusal' => [
         'round_started' => 'Ce tour est déjà parti : sa durée n’est plus modifiable.',
@@ -106,6 +107,10 @@ return [
     'runner' => [
         'bib' => 'Dossard',
         'laps_completed' => 'boucles',
+        'last_lap' => 'Dernière boucle',
+        'last_speed' => 'Vitesse',
+        'average_speed' => 'Vitesse moyenne',
+        'next_start' => 'Prochain départ',
         'arrived' => 'rentré',
         'out' => 'sorti',
         'validate' => 'Valider',
@@ -122,6 +127,7 @@ return [
         'collapse' => 'Replier le détail de :name',
     ],
     'detail' => [
+        'title' => 'Boucles',
         'empty' => 'Aucune boucle validée pour l’instant.',
         'pending' => 'En cours',
     ],

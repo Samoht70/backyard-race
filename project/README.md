@@ -235,8 +235,8 @@ par BR-33. Elle reste avec les écrans de course, dont elle dépend.
 |----|-------|-----|--------|
 | [BR-13](stories/BR-13-dashboard-gerant.md) | Dashboard gérant mobile-first | 13 | ✅ Terminé |
 | [BR-14](stories/BR-14-tableau-coureurs.md) | Recherche d'un coureur | 6 | ✅ Terminé |
-| [BR-15](stories/BR-15-polling.md) | Rafraîchissement léger de l'état de course | 2 | À faire |
-| [BR-16](stories/BR-16-detail-participant.md) | Détail d'un coureur, déplié dans ses résultats | 2 | À faire |
+| [BR-15](stories/BR-15-polling.md) | Rafraîchissement léger de l'état de course | 2 | ✅ Terminé |
+| [BR-16](stories/BR-16-detail-participant.md) | Détail d'un coureur, déplié dans ses résultats | 3 | ✅ Terminé |
 
 ### EPIC 4 — Informations événement
 
@@ -260,7 +260,7 @@ par BR-33. Elle reste avec les écrans de course, dont elle dépend.
 | ID | Story | Pts | Statut |
 |----|-------|-----|--------|
 | [BR-33](stories/BR-33-acces-parcours-coureur.md) | Accès du coureur à son inscription | 5 | ✅ Terminé |
-| [BR-24](stories/BR-24-dashboard-participant.md) | Dashboard participant | 8 | À faire |
+| [BR-24](stories/BR-24-dashboard-participant.md) | Dashboard participant | 8 | ✅ Terminé |
 | [BR-36](stories/BR-36-gabarit-de-mail.md) | Habiller les mails aux couleurs de la course | 3 | ✅ Terminé |
 | [BR-25](stories/BR-25-mon-dossard.md) | ~~Dossard imprimable~~ | — | ⛔ Abandonné |
 
@@ -300,7 +300,7 @@ pas de fichier de story : c'est la décision qui les porte, et elles prennent un
 | R-08 | Recherche de coureur déplacée sur l'accueil, réservée au gérant ; le coureur y voit sa course | 3 | ✅ Livrée | [D-80](DECISIONS.md) |
 | R-09 | Gestion en barre de sous-menus, section Course à part, bandeaux du tour échangés avec l'accueil | 5 | ✅ Livrée | [D-84](DECISIONS.md) |
 
-**Total : 39 stories actives + 9 reprises · 275 pts · 229 pts livrés (83 %)**
+**Total : 39 stories actives + 9 reprises · 277 pts · 248 pts livrés (90 %)**
 
 **Hors périmètre : 4 stories abandonnées, 32 pts non engagés** — voir [D-47](DECISIONS.md).
 
@@ -329,6 +329,14 @@ et le garde-fou de gel, eux, ne coûtent que la nuit de course, et il reste du t
 
 **Ensuite, le moteur et les écrans de course** — BR-08 → BR-44 → BR-09 → BR-10 → BR-11 → BR-12 →
 BR-13 → BR-14 → BR-15 → BR-16 → BR-24 → BR-20 → BR-23
+
+**BR-24 ferme le côté coureur le 2026-09-07.** L'accueil que D-80 avait ouvert en attendant devient
+sa vue de course : il s'ouvre à la confirmation de l'inscription et non plus au départ du premier
+tour, annonce le prochain départ tant que le coureur est en course, et pose ses boucles en tableau —
+tour, temps, kilomètres, vitesse — dans le même encart que ses chiffres ([D-85](DECISIONS.md)). Deux
+points de son périmètre ne sont pas livrés : les raccourcis vers le briefing et les documents, que la
+navigation porte depuis BR-33, et le renvoi vers les résultats d'un événement terminé, qui attend
+BR-23. **La suite est BR-20**, la clôture de l'événement et le classement figé, puis BR-23.
 
 **L'epic 3 est ouvert le 2026-09-01 par BR-13.** Le moteur décidait juste sans se regarder ; il se
 regarde maintenant sur l'écran que le gérant tiendra quinze heures — entête de tour et effectifs

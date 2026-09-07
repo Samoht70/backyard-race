@@ -69,6 +69,11 @@ final class DraftEventState implements EventLifecycleState
         return false;
     }
 
+    public function announcesNextRound(): bool
+    {
+        return false;
+    }
+
     public function frozenAttributes(): array
     {
         return [];

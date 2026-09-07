@@ -7,9 +7,9 @@ import BoardPage from '@/components/board/BoardPage.vue';
 import Heading from '@/components/Heading.vue';
 import RoundHeader from '@/components/race/RoundHeader.vue';
 import RoundTally from '@/components/race/RoundTally.vue';
-import RunnerDetailPanel from '@/components/race/RunnerDetailPanel.vue';
 import RunnerSearchBoard from '@/components/race/RunnerSearchBoard.vue';
 import RunnerSlat from '@/components/race/RunnerSlat.vue';
+import RunnerStandingPanel from '@/components/race/RunnerStandingPanel.vue';
 import EmptyState from '@/components/state/EmptyState.vue';
 import { usePolling } from '@/composables/usePolling';
 import { canReach } from '@/lib/access';
@@ -20,6 +20,7 @@ import { index as showManage } from '@/routes/manage';
 import { show as showRegistration } from '@/routes/registration';
 import type {
     CurrentRound,
+    NextRound,
     RunnerSearchResult,
     RunnerTally,
 } from '@/types/race';
@@ -37,6 +38,7 @@ type Props = {
     event: { name: string | null; status: string } | null;
     query?: string | null;
     currentRound?: CurrentRound | null;
+    nextRound?: NextRound | null;
     tally?: RunnerTally;
     runners?: RunnerSearchResult[];
     runner?: RunnerSearchResult;
@@ -84,6 +86,7 @@ const { start, stop } = usePolling([
     'event',
     'query',
     'currentRound',
+    'nextRound',
     'tally',
     'runners',
     'runner',
@@ -170,7 +173,10 @@ onUnmounted(stop);
                 :meta="runnerMeta"
             />
 
-            <RunnerDetailPanel :runner="runner" />
+            <RunnerStandingPanel
+                :runner="runner"
+                :next-round="currentRound ? null : nextRound"
+            />
         </div>
 
         <div v-else-if="mode === 'manager_search' && tally" class="grid gap-6">

@@ -97,6 +97,11 @@ final class RegistrationEventState implements EventLifecycleState
         return false;
     }
 
+    public function announcesNextRound(): bool
+    {
+        return true;
+    }
+
     public function frozenAttributes(): array
     {
         return [];
