@@ -3369,3 +3369,28 @@ recherche, aucune inscription, coureur en attente, coureur en course).
 **Ce que la reprise retire à BR-14 telle que livrée** : la recherche pour un participant. BR-14 la
 voulait ouverte aux deux rôles ; un coureur ne peut plus chercher un autre coureur depuis
 l'application, la capacité n'existant plus que côté gérant.
+
+## D-81 — Le rafraîchissement périodique tient dans un composable sans dépendance au cycle de vie du composant
+
+Arbitré le 2026-09-07 par BR-15.
+
+`usePolling()` n'appelle ni `onMounted` ni `onUnmounted` : il rend `start()` et `stop()`, que
+`manage/Index.vue` et `Dashboard.vue` branchent eux-mêmes sur leur cycle de vie. La suite de tests
+du composable n'a donc besoin de monter aucun composant Vue — inexistant dans l'outillage du
+projet, ni `@vue/test-utils` ni `jsdom` n'étant installés — et reste alignée sur le seul style de
+test déjà en usage : une fonction pure, `document` et `@inertiajs/vue3` simulés par
+`vi.stubGlobal()` et `vi.mock()`.
+
+**La session expirée ne demande aucun code.** `router.reload()` embarque déjà
+`preserveScroll: true` et `preserveState: true` — le second critère d'acceptation est acquis sans
+rien écrire. Une session tombée pendant la nuit fait répondre le serveur hors du protocole
+Inertia ; le client Inertia détecte l'écart et bascule en navigation pleine page vers la
+connexion, ce qui démonte le composant et donc appelle `stop()` : aucun minuteur ne continue de
+cogner sur un écran qui n'existe plus. Le test qui couvre ce cas n'exerce donc pas une redirection
+— déjà à la charge d'Inertia — mais l'invariant qui la rend sûre : `stop()` ne laisse aucun
+minuteur ni écouteur derrière lui.
+
+**Un seul point d'ajustement pour la fréquence et la liste des props.** `POLLING_INTERVAL_MS` est
+la seule constante du fichier, et chaque page passe sa propre liste `only` — les mêmes clés que
+son rechargement partiel existant (BR-13, BR-14) — pour que le polling n'élargisse jamais la
+charge que ces stories avaient déjà bornée.

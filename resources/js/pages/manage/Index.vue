@@ -8,13 +8,14 @@ import {
     SlidersHorizontal,
     Undo2,
 } from '@lucide/vue';
-import { computed } from 'vue';
+import { computed, onMounted, onUnmounted } from 'vue';
 import BoardPage from '@/components/board/BoardPage.vue';
 import NextRoundDuration from '@/components/race/NextRoundDuration.vue';
 import RoundBoard from '@/components/race/RoundBoard.vue';
 import RoundHeader from '@/components/race/RoundHeader.vue';
 import RoundTally from '@/components/race/RoundTally.vue';
 import EmptyState from '@/components/state/EmptyState.vue';
+import { usePolling } from '@/composables/usePolling';
 import { t } from '@/lib/i18n';
 import { can } from '@/lib/permissions';
 import {
@@ -98,6 +99,17 @@ const desks = computed(() =>
         },
     ].filter((desk) => desk.shown),
 );
+
+const { start, stop } = usePolling([
+    'eventStatus',
+    'currentRound',
+    'nextRound',
+    'tally',
+    'roundRunners',
+]);
+
+onMounted(start);
+onUnmounted(stop);
 </script>
 
 <template>
