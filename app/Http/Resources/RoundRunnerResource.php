@@ -41,19 +41,12 @@ class RoundRunnerResource extends JsonResource
             'last_name' => $this->user->last_name,
             'status' => $this->runnerStatus()->value,
             'validated_laps' => $this->validatedLapsCount(),
-            'covered_meters' => $this->coveredMeters(),
+            'covered_meters' => $this->coveredMeters($this->lapDistanceMeters),
             'validated_at' => $performance?->validatedAt->format('H:i:s'),
             'duration_seconds' => $performance?->durationSeconds,
             'distance_meters' => $performance?->distanceMeters,
             'speed_kmh' => $performance?->speedKmh,
         ];
-    }
-
-    private function coveredMeters(): ?int
-    {
-        return $this->lapDistanceMeters === null
-            ? null
-            : $this->validatedLapsCount() * $this->lapDistanceMeters;
     }
 
     private function lap(): Lap

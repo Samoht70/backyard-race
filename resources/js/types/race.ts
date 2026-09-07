@@ -45,6 +45,18 @@ export type RoundRunner = {
     speed_kmh: number | null;
 };
 
+export type RunnerSearchResult = {
+    runner_id: number;
+    bib_label: string | null;
+    first_name: string;
+    last_name: string;
+    status: RunnerStatus;
+    validated_laps: number;
+    covered_meters: number | null;
+    last_validated_round: number | null;
+    exited_at: string | null;
+};
+
 export type CorrectableLap = {
     lap_id: number;
     lap_status: LapStatus;

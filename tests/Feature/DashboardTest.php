@@ -2,19 +2,22 @@
 
 namespace Tests\Feature;
 
+use App\Enums\ExitReason;
 use App\Models\Event;
+use App\Models\Lap;
 use App\Models\Participant;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
 use PHPUnit\Framework\Attributes\Test;
-use Tests\Concerns\RegistersRunners;
+use Tests\Concerns\RunsARace;
 use Tests\TestCase;
 
 class DashboardTest extends TestCase
 {
-    use RefreshDatabase, RegistersRunners;
+    use RefreshDatabase;
+    use RunsARace;
 
     protected function setUp(): void
     {
@@ -26,141 +29,166 @@ class DashboardTest extends TestCase
     #[Test]
     public function it_sends_a_guest_to_the_login_page(): void
     {
-        $this->get(route('dashboard'))
-            ->assertRedirect(route('login'));
-    }
-
-    #[Test]
-    public function it_announces_a_registration_still_waiting_for_confirmation(): void
-    {
-        $runner = $this->runnerOf($this->openEvent());
-
-        $this->actingAs($runner)
-            ->get(route('dashboard'))
-            ->assertOk()
-            ->assertInertia(
-                fn (AssertableInertia $page) => $page
-                    ->component('Dashboard')
-                    ->where('registration.status', 'pending')
-                    ->where('registration.bib_label', null),
-            );
-    }
-
-    #[Test]
-    public function it_shows_the_bib_number_once_the_registration_is_confirmed(): void
-    {
-        $event = $this->openEvent();
-        $runner = User::factory()->participant()->create();
-        Participant::factory()->confirmed()->withBib(7)->create([
-            'event_id' => $event->id,
-            'user_id' => $runner->id,
-        ]);
-
-        $this->actingAs($runner)
-            ->get(route('dashboard'))
-            ->assertOk()
-            ->assertInertia(
-                fn (AssertableInertia $page) => $page
-                    ->where('registration.status', 'confirmed')
-                    ->where('registration.bib_label', '007'),
-            );
-    }
-
-    #[Test]
-    public function it_keeps_a_cancelled_registration_on_the_home_screen(): void
-    {
-        $event = $this->openEvent();
-        $runner = User::factory()->participant()->create();
-        Participant::factory()->cancelled()->create([
-            'event_id' => $event->id,
-            'user_id' => $runner->id,
-        ]);
-
-        $this->actingAs($runner)
-            ->get(route('dashboard'))
-            ->assertOk()
-            ->assertInertia(
-                fn (AssertableInertia $page) => $page
-                    ->where('registration.status', 'cancelled')
-                    ->where('registration.status_label', 'Annulée'),
-            );
-    }
-
-    #[Test]
-    public function it_carries_no_registration_for_an_account_without_one(): void
-    {
-        $this->openEvent();
-
-        $this->actingAs(User::factory()->participant()->create())
-            ->get(route('dashboard'))
-            ->assertOk()
-            ->assertInertia(
-                fn (AssertableInertia $page) => $page
-                    ->where('registration', null)
-                    ->where('event.status', 'registration'),
-            );
+        $this->get(route('dashboard'))->assertRedirect(route('login'));
     }
 
     #[Test]
     public function it_still_answers_when_no_event_exists(): void
     {
-        $this->assertDatabaseCount('events', 0);
-
         $this->actingAs(User::factory()->participant()->create())
             ->get(route('dashboard'))
             ->assertOk()
             ->assertInertia(
                 fn (AssertableInertia $page) => $page
                     ->component('Dashboard')
-                    ->where('event', null)
-                    ->where('registration', null),
+                    ->where('mode', 'no_event')
+                    ->where('event', null),
             );
     }
 
     #[Test]
-    public function it_serves_a_manager_who_also_holds_a_registration(): void
+    public function it_prompts_the_manager_toward_the_console_before_the_race_starts(): void
     {
-        $event = Event::factory()->create();
-        $manager = User::factory()->manager()->create();
-        Participant::factory()->create([
-            'event_id' => $event->id,
-            'user_id' => $manager->id,
-        ]);
-
-        $this->actingAs($manager)
-            ->get(route('dashboard'))
-            ->assertOk()
-            ->assertInertia(
-                fn (AssertableInertia $page) => $page
-                    ->where('event.status', 'draft')
-                    ->where('registration.status', 'pending'),
-            );
-    }
-
-    #[Test]
-    public function it_flags_a_manager_who_holds_no_registration(): void
-    {
-        Event::factory()->create();
+        Event::factory()->registration()->create();
 
         $this->actingAs(User::factory()->manager()->create())
             ->get(route('dashboard'))
-            ->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page->where('mode', 'manager_idle'));
+    }
+
+    #[Test]
+    public function it_offers_the_manager_a_search_once_the_race_is_running(): void
+    {
+        $event = $this->runningEvent();
+        $this->named($event, 'Marchand', 'Yves', 12);
+
+        $this->actingAs(User::factory()->manager()->create())
+            ->get(route('dashboard', ['q' => 'mar']))
             ->assertInertia(
                 fn (AssertableInertia $page) => $page
-                    ->where('registration', null)
-                    ->where('auth.permissions.manage-event', true),
+                    ->where('mode', 'manager_search')
+                    ->where('query', 'mar')
+                    ->has('runners', 1)
+                    ->where('runners.0.last_name', 'Marchand'),
             );
     }
 
-    private function runnerOf(Event $event): User
+    #[Test]
+    public function it_gives_the_manager_search_precedence_over_their_own_registration(): void
     {
+        $event = $this->runningEvent();
+        $manager = User::factory()->manager()->create();
+        Participant::factory()->confirmed()->for($manager)->create(['event_id' => $event->getKey()]);
+
+        $this->actingAs($manager)
+            ->get(route('dashboard'))
+            ->assertInertia(fn (AssertableInertia $page) => $page->where('mode', 'manager_search'));
+    }
+
+    #[Test]
+    public function it_prompts_an_unregistered_account_to_register(): void
+    {
+        Event::factory()->registration()->create();
+
+        $this->actingAs(User::factory()->participant()->create())
+            ->get(route('dashboard'))
+            ->assertInertia(fn (AssertableInertia $page) => $page->where('mode', 'no_registration'));
+    }
+
+    #[Test]
+    public function it_points_a_registered_runner_to_the_registration_tab_before_the_race_starts(): void
+    {
+        $event = Event::factory()->registration()->create();
         $runner = User::factory()->participant()->create();
+        Participant::factory()->confirmed()->for($runner)->create(['event_id' => $event->getKey()]);
 
-        Participant::factory()->create([
-            'event_id' => $event->id,
-            'user_id' => $runner->id,
-        ]);
+        $this->actingAs($runner)
+            ->get(route('dashboard'))
+            ->assertInertia(fn (AssertableInertia $page) => $page->where('mode', 'runner_waiting'));
+    }
 
-        return $runner;
+    #[Test]
+    public function it_keeps_a_pending_registration_off_the_race_view_even_while_running(): void
+    {
+        $event = $this->runningEvent();
+        $runner = User::factory()->participant()->create();
+        Participant::factory()->for($runner)->create(['event_id' => $event->getKey()]);
+
+        $this->actingAs($runner)
+            ->get(route('dashboard'))
+            ->assertInertia(fn (AssertableInertia $page) => $page->where('mode', 'runner_waiting'));
+    }
+
+    #[Test]
+    public function it_keeps_a_cancelled_registration_off_the_race_view_even_while_running(): void
+    {
+        $event = $this->runningEvent();
+        $runner = User::factory()->participant()->create();
+        Participant::factory()->cancelled()->for($runner)->create(['event_id' => $event->getKey()]);
+
+        $this->actingAs($runner)
+            ->get(route('dashboard'))
+            ->assertInertia(fn (AssertableInertia $page) => $page->where('mode', 'runner_waiting'));
+    }
+
+    #[Test]
+    public function it_shows_a_confirmed_runners_own_race_status_once_the_race_is_running(): void
+    {
+        $event = $this->runningEvent('2026-09-05 13:00', 60);
+        $runner = $this->named($event, 'Dubois', 'Léa', 5);
+        Lap::factory()->validated()->for($this->roundOf($event, 1))->for($runner)->create();
+
+        $this->actingAs($runner->user)
+            ->get(route('dashboard'))
+            ->assertInertia(
+                fn (AssertableInertia $page) => $page
+                    ->where('mode', 'runner_active')
+                    ->where('runner.first_name', 'Léa')
+                    ->where('runner.last_name', 'Dubois')
+                    ->where('runner.status', 'running')
+                    ->where('runner.validated_laps', 1),
+            );
+    }
+
+    #[Test]
+    public function it_reports_an_eliminated_runners_own_status_and_exit_time(): void
+    {
+        $event = $this->runningEvent('2026-09-05 13:00', 60);
+        $runner = $this->named($event, 'Dubois', 'Léa', 5);
+        $runner->leaveRace(ExitReason::Timeout, $this->at('2026-09-05 15:12'));
+
+        $this->actingAs($runner->user)
+            ->get(route('dashboard'))
+            ->assertInertia(
+                fn (AssertableInertia $page) => $page
+                    ->where('mode', 'runner_active')
+                    ->where('runner.status', 'eliminated')
+                    ->where('runner.exited_at', '15:12'),
+            );
+    }
+
+    #[Test]
+    public function it_no_longer_carries_registration_lifecycle_details_on_the_home_screen(): void
+    {
+        $event = $this->runningEvent();
+        $runner = $this->named($event, 'Dubois', 'Léa', 5);
+
+        $this->actingAs($runner->user)
+            ->get(route('dashboard'))
+            ->assertInertia(
+                fn (AssertableInertia $page) => $page
+                    ->missing('registration')
+                    ->missing('runner.phone')
+                    ->missing('runner.pps_number'),
+            );
+    }
+
+    private function named(Event $event, string $lastName, string $firstName, int $bib): Participant
+    {
+        return Participant::factory()
+            ->confirmed()
+            ->withBib($bib)
+            ->for(User::factory()->state(['first_name' => $firstName, 'last_name' => $lastName]))
+            ->create(['event_id' => $event->getKey()]);
     }
 }

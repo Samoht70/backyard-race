@@ -3336,3 +3336,36 @@ que BR-16 remplacera par un dépliage sur place. Le compteur des sortis ne disti
 l'élimination, alors que la donnée existe — la story ne demande que deux nombres, et le détail par
 motif appartient au classement de BR-20. Aucune boucle n'est semée, donc l'écran ne se regarde
 toujours qu'en fabriquant une course à la main.
+
+## D-80 — La recherche de BR-14 déménage sur l'accueil, réservée au gérant ; le coureur y voit sa propre course
+
+Demandé le 2026-09-07 par le propriétaire, en reprise de BR-14 livrée la même session.
+
+BR-14 ouvrait la recherche par nom ou dossard aux deux rôles, sur sa propre page `/runners`. Le
+propriétaire a resserré ce périmètre : la recherche n'a plus de page ni d'entrée de navigation
+dédiées, elle vit sur l'accueil (`/dashboard`), et seulement pour qui porte `manage-event` — c'est
+le gérant qui cherche un coureur, jamais un participant vis-à-vis d'un autre.
+
+**L'accueil du coureur perd les informations de son inscription.** Statut, date de dépôt et
+« modifiable jusqu'à confirmation » sortent de `Dashboard.vue` : `RegistrationController` les porte
+déjà sur l'onglet « Mon inscription », et les répéter sur l'accueil était la duplication que la
+reprise visait. Une fois la course lancée et l'inscription confirmée, l'accueil affiche à la place
+l'espace du coureur — son propre statut de course, son dossard, ses boucles validées, sa distance et,
+s'il est sorti, l'heure de sortie — bâti avec le même `RunnerSearchResultResource` que la recherche
+du gérant, appliqué à un seul coureur : lui-même. Avant le départ, ou tant que l'inscription n'est
+pas confirmée, l'accueil renvoie simplement vers « Mon inscription ».
+
+**Le gérant garde la priorité sur son propre accueil.** Un gérant qui détient aussi une inscription
+voit la recherche, jamais son espace coureur : la bascule dépend du rôle porté, pas de l'existence
+d'une inscription, pour ne pas réintroduire la distinction que D-79 avait déjà tranchée en sens
+inverse pour le tableau de bord de BR-13.
+
+**Composants réutilisés, rien reconstruit.** `RunnerSlat` et `RunnerDetailPanel`, construits pour
+BR-14, servent tels quels aux deux usages ; la boîte de recherche est extraite en
+`RunnerSearchBoard.vue`, qui émet l'événement de recherche plutôt que de naviguer elle-même, pour que
+`Dashboard.vue` reste lisible malgré ses six états (aucun événement, gérant au repos, gérant en
+recherche, aucune inscription, coureur en attente, coureur en course).
+
+**Ce que la reprise retire à BR-14 telle que livrée** : la recherche pour un participant. BR-14 la
+voulait ouverte aux deux rôles ; un coureur ne peut plus chercher un autre coureur depuis
+l'application, la capacité n'existant plus que côté gérant.

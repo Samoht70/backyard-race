@@ -110,4 +110,15 @@ return [
         'out' => 'sorti',
         'validate' => 'Valider',
     ],
+    'search' => [
+        'title' => 'Coureurs',
+        'label' => 'Chercher un coureur',
+        'placeholder' => 'Nom ou dossard',
+        'invitation' => 'Cherche un coureur par son nom ou son dossard.',
+        'empty' => 'Aucun coureur ne correspond à cette recherche.',
+        'total_distance' => 'Distance totale',
+        'last_round' => 'Dernière boucle validée',
+        'expand' => 'Déplier le détail de :name',
+        'collapse' => 'Replier le détail de :name',
+    ],
 ];

@@ -234,7 +234,7 @@ par BR-33. Elle reste avec les écrans de course, dont elle dépend.
 | ID | Story | Pts | Statut |
 |----|-------|-----|--------|
 | [BR-13](stories/BR-13-dashboard-gerant.md) | Dashboard gérant mobile-first | 13 | ✅ Terminé |
-| [BR-14](stories/BR-14-tableau-coureurs.md) | Recherche d'un coureur | 6 | À faire |
+| [BR-14](stories/BR-14-tableau-coureurs.md) | Recherche d'un coureur | 6 | ✅ Terminé |
 | [BR-15](stories/BR-15-polling.md) | Rafraîchissement léger de l'état de course | 2 | À faire |
 | [BR-16](stories/BR-16-detail-participant.md) | Détail d'un coureur, déplié dans ses résultats | 2 | À faire |
 
@@ -297,8 +297,9 @@ pas de fichier de story : c'est la décision qui les porte, et elles prennent un
 | R-05 | Course publique : l'accueil porte l'événement, les documents s'ouvrent aux invités | 5 | ✅ Livrée | [D-60](DECISIONS.md) |
 | R-06 | Charte de l’instrument, et primitives reka-ui à la place du starter kit | 5 | ✅ Livrée | [D-61](DECISIONS.md) |
 | R-07 | Adresse de l'organisateur en configuration, en plus du rôle `manager` | 2 | ✅ Livrée | [D-65](DECISIONS.md) |
+| R-08 | Recherche de coureur déplacée sur l'accueil, réservée au gérant ; le coureur y voit sa course | 3 | ✅ Livrée | [D-80](DECISIONS.md) |
 
-**Total : 39 stories actives + 7 reprises · 267 pts · 215 pts livrés (81 %)**
+**Total : 39 stories actives + 8 reprises · 270 pts · 224 pts livrés (83 %)**
 
 **Hors périmètre : 4 stories abandonnées, 32 pts non engagés** — voir [D-47](DECISIONS.md).
 

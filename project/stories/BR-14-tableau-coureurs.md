@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Epic** | 3 — Interface de course |
-| **Statut** | À faire |
+| **Statut** | ✅ Terminé |
 | **Estimation** | 6 pts |
 | **Révisée** | 2026-09-04 — de 8 à 6 pts, et l'écran passe du tableau à quatre vues à une recherche : les vues, leurs filtres et la pagination quittent le périmètre, un champ de recherche et une coquille de dépliage arrivent |
 | **Dépend de** | BR-13 |
@@ -138,11 +138,11 @@ composant existant, sans variante nouvelle.
 
 ## Tâches
 
-- [ ] **T1** — Requête de recherche et agrégats par coureur en une passe : boucles validées,
+- [x] **T1** — Requête de recherche et agrégats par coureur en une passe : boucles validées,
       dernière boucle validée `2 pts`
-- [ ] **T2** — Route, contrôleur Inertia, Form Request du seuil de saisie, entrée de
+- [x] **T2** — Route, contrôleur Inertia, Form Request du seuil de saisie, entrée de
       navigation `1 pt`
-- [ ] **T3** — Écran : compteurs, champ de recherche débouncé, lattes de résultats, coquille du
+- [x] **T3** — Écran : compteurs, champ de recherche débouncé, lattes de résultats, coquille du
       panneau dépliable `2 pts`
-- [ ] **T4** — Tests : 404 et 403, seuil de saisie, recherche par nom et par dossard, agrégats
+- [x] **T4** — Tests : 404 et 403, seuil de saisie, recherche par nom et par dossard, agrégats
       justes, aucune donnée personnelle exposée `1 pt`
