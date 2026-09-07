@@ -3511,6 +3511,8 @@ rafraîchissement périodique ; la recherche de l'accueil (BR-14) porte sur tout
 serveur, avec son seuil et son délai. Le champ lui-même est le même composant
 (`form/SearchField.vue`), extrait au deuxième usage.
 
-**L'encart de durée tient sur deux rangées.** Il en occupait six au-dessus du tableau et repoussait
-le geste de validation hors de l'écran sur un téléphone : l'échéance du tour et sa réserve
-rejoignent la ligne de titre, le champ, son unité et les deux boutons tiennent sur la suivante.
+**L'encart de durée tient sur trois rangées.** Il en occupait six au-dessus du tableau et repoussait
+le geste de validation hors de l'écran sur un téléphone. La compression à deux rangées y arrivait en
+masquant le libellé du champ et en collant l'échéance du tour à sa réserve, ce qui coûtait la
+lisibilité : la forme retenue garde une rangée pour chacune des trois choses que l'encart dit — ce
+qu'il règle et pour quel tour, le réglage lui-même avec ses deux portées, et ce qu'il ne touche pas.
