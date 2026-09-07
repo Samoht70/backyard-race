@@ -14,7 +14,7 @@ class StandingController extends Controller
     {
         $event = Event::currentOrNull();
 
-        abort_if($event === null || ! $event->lifecycle()->publishesStandings(), 404);
+        abort_if($event === null || ! $event->lifecycle()->isOver(), 404);
 
         return Inertia::render('Standings', [
             'event' => [
@@ -22,10 +22,7 @@ class StandingController extends Controller
                 'finished_at' => $event->finished_at?->format('d/m/Y H:i'),
             ],
             'standings' => $event->standings
-                ->map(fn (Standing $standing): array => new StandingResource(
-                    $standing,
-                    $event->lap_distance_meters,
-                )->resolve())
+                ->map(fn (Standing $standing): array => new StandingResource($standing, $event)->resolve())
                 ->values()
                 ->all(),
         ]);

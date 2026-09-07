@@ -99,7 +99,7 @@ final class RegistrationEventState implements EventLifecycleState
         return false;
     }
 
-    public function publishesStandings(): bool
+    public function isOver(): bool
     {
         return false;
     }

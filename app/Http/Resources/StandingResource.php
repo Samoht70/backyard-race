@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Event;
 use App\Models\Standing;
 use App\Support\BibNumber;
 use Illuminate\Http\Request;
@@ -14,7 +15,7 @@ class StandingResource extends JsonResource
 {
     public function __construct(
         Standing $standing,
-        private readonly ?int $lapDistanceMeters,
+        private readonly Event $race,
     ) {
         parent::__construct($standing);
     }
@@ -31,7 +32,7 @@ class StandingResource extends JsonResource
             'last_name' => $this->last_name,
             'status' => $this->runnerStatus()->value,
             'validated_laps' => $this->validated_laps,
-            'covered_meters' => $this->coveredMeters($this->lapDistanceMeters),
+            'covered_meters' => $this->coveredMeters($this->race->lap_distance_meters),
         ];
     }
 }

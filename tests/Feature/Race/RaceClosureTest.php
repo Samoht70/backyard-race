@@ -14,6 +14,7 @@ use App\Models\User;
 use Carbon\CarbonImmutable;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Inertia\Testing\AssertableInertia;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\Concerns\RunsARace;
 use Tests\TestCase;
@@ -122,6 +123,21 @@ class RaceClosureTest extends TestCase
             'Sorti' => RunnerStatus::Eliminated,
             'Parti' => RunnerStatus::Withdrawn,
         ], $statuses);
+    }
+
+    #[Test]
+    public function it_reads_a_runner_the_closure_caught_still_going_as_finished_on_his_own_screen(): void
+    {
+        $event = $this->runningEvent();
+        $runner = $this->runnerNamed($event, 'Camille', 3);
+
+        $this->close($event);
+
+        $this->actingAs($runner->user)
+            ->get(route('dashboard'))
+            ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+                ->where('runner.status', RunnerStatus::Finished->value)
+            );
     }
 
     #[Test]

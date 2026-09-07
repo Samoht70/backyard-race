@@ -71,7 +71,7 @@ final class RunningEventState implements EventLifecycleState
         return true;
     }
 
-    public function publishesStandings(): bool
+    public function isOver(): bool
     {
         return false;
     }

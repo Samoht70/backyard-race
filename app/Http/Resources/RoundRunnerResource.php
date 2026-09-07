@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Event;
 use App\Models\Lap;
 use App\Models\Participant;
 use App\Models\Round;
@@ -18,7 +19,7 @@ class RoundRunnerResource extends JsonResource
     public function __construct(
         Participant $runner,
         private readonly Round $round,
-        private readonly ?int $lapDistanceMeters,
+        private readonly Event $race,
     ) {
         parent::__construct($runner);
     }
@@ -39,9 +40,9 @@ class RoundRunnerResource extends JsonResource
             'bib_label' => BibNumber::label($this->bib_number),
             'first_name' => $this->user->first_name,
             'last_name' => $this->user->last_name,
-            'status' => $this->runnerStatus()->value,
+            'status' => $this->runnerStatus($this->race->lifecycle())->value,
             'validated_laps' => $this->validatedLapsCount(),
-            'covered_meters' => $this->coveredMeters($this->lapDistanceMeters),
+            'covered_meters' => $this->coveredMeters($this->race->lap_distance_meters),
             'validated_at' => $performance?->validatedAt->format('H:i:s'),
             'duration_seconds' => $performance?->durationSeconds,
             'distance_meters' => $performance?->distanceMeters,
@@ -60,6 +61,6 @@ class RoundRunnerResource extends JsonResource
 
         return $validatedAt === null
             ? null
-            : LapPerformance::of($this->round, $validatedAt, $this->lapDistanceMeters);
+            : LapPerformance::of($this->round, $validatedAt, $this->race->lap_distance_meters);
     }
 }

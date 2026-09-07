@@ -34,7 +34,7 @@ class WithdrawRunnerTest extends TestCase
         $runner->refresh();
         $this->assertSame(ExitReason::Withdrawal, $runner->exit_reason);
         $this->assertSame('13:42:10', $runner->exited_at?->format('H:i:s'));
-        $this->assertSame(RunnerStatus::Withdrawn, $runner->runnerStatus());
+        $this->assertSame(RunnerStatus::Withdrawn, $runner->runnerStatus($event->lifecycle()));
         $this->assertSame(LapStatus::Eliminated, $lap->refresh()->status);
     }
 
@@ -107,15 +107,16 @@ class WithdrawRunnerTest extends TestCase
     #[Test]
     public function it_keeps_the_reason_of_a_runner_the_clock_already_caught(): void
     {
+        $event = $this->runningEvent();
         $runner = Participant::factory()
             ->confirmed()
             ->outOfTheRace(ExitReason::Timeout)
-            ->create(['event_id' => $this->runningEvent()->getKey()]);
+            ->create(['event_id' => $event->getKey()]);
 
         rescue(fn () => app(WithdrawRunner::class)($runner), report: false);
 
         $this->assertSame(ExitReason::Timeout, $runner->refresh()->exit_reason);
-        $this->assertSame(RunnerStatus::Eliminated, $runner->runnerStatus());
+        $this->assertSame(RunnerStatus::Eliminated, $runner->runnerStatus($event->lifecycle()));
     }
 
     private function lapsValidated(Event $event, Participant $runner, int $count): void

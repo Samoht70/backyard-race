@@ -3631,9 +3631,28 @@ course. Sa boucle en cours, elle, ne compte pas — elle n'a jamais été valid�
 **Le classement a sa page publique, `/standings`, et non l'accueil.** BR-23 prendra l'accueil
 d'après-course, le vainqueur et les chiffres de la soirée ; BR-20 ne livre que la liste, ouverte aux
 invités comme aux inscrits, et l'entrée de navigation n'apparaît qu'une fois la course close
-(`publishesStandings()`, quatrième question posée au cycle de vie après D-85). Avant la clôture,
+(`isOver()`, quatrième question posée au cycle de vie après D-85). Avant la clôture,
 l'adresse répond 404 dans le site, par BR-40.
+
+**Le statut d'un coureur se lit contre l'état de la course, pas seulement contre sa propre sortie.**
+Relevé en prenant la story : `runnerStatus()` ne regardait que `exited_at`, donc un coureur que la
+clôture attrape debout lisait « Terminé » au classement et « En course » sur son propre écran — deux
+réponses pour le même coureur, le lendemain matin. La méthode prend désormais l'état du cycle de vie
+en argument : sorti, elle rend le motif ; encore debout, elle rend « Terminé » si la course est
+close et « En course » sinon. L'argument est passé, jamais lu depuis la relation `event` : le tableau
+du tour appelle cette méthode une fois par coureur, et un test compte les requêtes justement pour
+qu'aucune n'y apparaisse. Les trois vues qui l'appellent reçoivent donc l'événement entier plutôt que
+sa seule distance de boucle, ce qui leur retire un paramètre au lieu de leur en ajouter un.
+
+Un coureur confirmé avant le départ reste « En course » : la question posée est `isOver()`, vraie du
+seul état terminé, et non `isRacing()`, qui aurait fait passer tout le monde pour arrivé pendant les
+inscriptions.
 
 **Ce que BR-20 ne ferme pas** — l'heure de clôture est enregistrée mais ne sert encore qu'à dater le
 classement. C'est BR-23 qui en fera la durée totale de l'événement, du premier départ à la clôture ;
 la colonne existe dès maintenant parce qu'une heure de clôture ne se rattrape pas après coup.
+
+Reste aussi la boucle que la clôture interrompt : elle demeure `pending` en base et s'affiche « En
+cours » sur l'écran du coureur, indéfiniment. Elle ne fausse aucun classement — une boucle non
+validée ne compte pas — et plus personne ne peut la valider. Le geste qui la fermerait demande un
+statut de boucle qui dise « la course s'est arrêtée avant », et il n'a pas été pris ici.

@@ -47,7 +47,7 @@ interface EventLifecycleState
 
     public function isRacing(): bool;
 
-    public function publishesStandings(): bool;
+    public function isOver(): bool;
 
     public function announcesNextRound(): bool;
 

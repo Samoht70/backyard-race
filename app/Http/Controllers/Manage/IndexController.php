@@ -31,20 +31,20 @@ class IndexController extends Controller
             'eventStatus' => $event->exists ? $event->status->value : null,
             'currentRound' => $round === null ? null : new CurrentRoundResource($round)->resolve(),
             'nextRound' => $next === null ? null : new NextRoundResource($next)->resolve(),
-            'roundRunners' => $board === null ? [] : $this->runnersOf($board, $event->lap_distance_meters),
+            'roundRunners' => $board === null ? [] : $this->runnersOf($board, $event),
         ]);
     }
 
     /**
      * @return array<int, array<array-key, mixed>>
      */
-    private function runnersOf(RoundBoard $board, ?int $lapDistanceMeters): array
+    private function runnersOf(RoundBoard $board, Event $event): array
     {
         return $board->runners
             ->map(fn (Participant $runner): array => new RoundRunnerResource(
                 $runner,
                 $board->round,
-                $lapDistanceMeters,
+                $event,
             )->resolve())
             ->values()
             ->all();
