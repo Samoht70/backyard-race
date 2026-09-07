@@ -2,12 +2,12 @@
 import { Form, Head } from '@inertiajs/vue3';
 import EventController from '@/actions/App/Http/Controllers/Manage/EventController';
 import ActionButton from '@/components/ActionButton.vue';
-import BoardPage from '@/components/board/BoardPage.vue';
 import EventDetailsFields from '@/components/event/EventDetailsFields.vue';
 import EventRaceFields from '@/components/event/EventRaceFields.vue';
 import EventStatusPanel from '@/components/event/EventStatusPanel.vue';
 import EventSummary from '@/components/event/EventSummary.vue';
 import Heading from '@/components/Heading.vue';
+import ManagePage from '@/components/manage/ManagePage.vue';
 import Notice from '@/components/Notice.vue';
 import { t } from '@/lib/i18n';
 import type {
@@ -29,7 +29,7 @@ defineProps<Props>();
 <template>
     <Head :title="t('event.manage.title')" />
 
-    <BoardPage>
+    <ManagePage>
         <div class="grid max-w-4xl gap-6">
             <Heading
                 :title="t('event.manage.title')"
@@ -70,5 +70,5 @@ defineProps<Props>();
                 </div>
             </Form>
         </div>
-    </BoardPage>
+    </ManagePage>
 </template>

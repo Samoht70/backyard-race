@@ -2,12 +2,12 @@
 import { Form, Head } from '@inertiajs/vue3';
 import BriefingController from '@/actions/App/Http/Controllers/Manage/BriefingController';
 import ActionButton from '@/components/ActionButton.vue';
-import BoardPage from '@/components/board/BoardPage.vue';
 import BriefingContent from '@/components/briefing/BriefingContent.vue';
 import FormField from '@/components/form/FormField.vue';
 import FormFieldset from '@/components/form/FormFieldset.vue';
 import TextAreaField from '@/components/form/TextAreaField.vue';
 import Heading from '@/components/Heading.vue';
+import ManagePage from '@/components/manage/ManagePage.vue';
 import Notice from '@/components/Notice.vue';
 import { t } from '@/lib/i18n';
 
@@ -23,7 +23,7 @@ defineProps<Props>();
 <template>
     <Head :title="t('event.briefing.manage_title')" />
 
-    <BoardPage>
+    <ManagePage>
         <div class="grid max-w-4xl gap-6">
             <Heading
                 :title="t('event.briefing.manage_title')"
@@ -71,5 +71,5 @@ defineProps<Props>();
                 </div>
             </Form>
         </div>
-    </BoardPage>
+    </ManagePage>
 </template>
