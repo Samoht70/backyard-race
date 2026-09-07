@@ -17,6 +17,7 @@ type Areas = {
     registration?: boolean;
     register?: boolean;
     standings?: boolean;
+    results?: boolean;
 };
 
 function share(
@@ -37,6 +38,7 @@ function share(
             registration: areas.registration === true,
             register: areas.register === true,
             standings: areas.standings === true,
+            results: areas.results === true,
         },
     };
 }
@@ -89,6 +91,39 @@ describe('mainNavItems', () => {
             'ui.nav.documents',
             'ui.nav.standings',
             'ui.nav.event',
+        ]);
+    });
+
+    it('renames the home entry once the home page carries the results', () => {
+        visitAsGuest({
+            event: true,
+            documents: true,
+            standings: true,
+            results: true,
+        });
+
+        expect(titles()).toEqual([
+            'ui.nav.results',
+            'ui.nav.documents',
+            'ui.nav.standings',
+            'ui.nav.registration',
+        ]);
+    });
+
+    it('renames the home entry for a signed-in runner too', () => {
+        signIn({
+            event: true,
+            documents: true,
+            standings: true,
+            results: true,
+        });
+
+        expect(titles()).toEqual([
+            'ui.nav.home',
+            'ui.nav.briefing',
+            'ui.nav.documents',
+            'ui.nav.standings',
+            'ui.nav.results',
         ]);
     });
 

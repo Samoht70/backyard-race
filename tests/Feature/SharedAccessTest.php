@@ -39,6 +39,7 @@ class SharedAccessTest extends TestCase
                         'registration' => false,
                         'register' => true,
                         'standings' => false,
+                        'results' => false,
                     ]),
             );
     }
@@ -57,6 +58,7 @@ class SharedAccessTest extends TestCase
                         'registration' => false,
                         'register' => false,
                         'standings' => false,
+                        'results' => false,
                     ]),
             );
     }
@@ -196,6 +198,7 @@ class SharedAccessTest extends TestCase
                         'registration' => true,
                         'register' => false,
                         'standings' => false,
+                        'results' => false,
                     ])
                     ->where('auth.permissions.'.Permission::ManageEvent->value, true),
             );

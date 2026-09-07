@@ -77,6 +77,21 @@ export type Standing = {
     covered_meters: number | null;
 };
 
+export type EventTotals = {
+    participants: number;
+    validated_laps: number;
+    covered_meters: number | null;
+    duration_seconds: number | null;
+};
+
+export type RoundOutcome = {
+    number: number;
+    runners: number;
+    completed_laps: number;
+    withdrawals: number;
+    timeouts: number;
+};
+
 export type CorrectableLap = {
     lap_id: number;
     lap_status: LapStatus;

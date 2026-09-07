@@ -11,6 +11,7 @@ return [
         'documents' => 'Documents',
         'standings' => 'Classement',
         'event' => 'Événement',
+        'results' => 'Résultats',
         'manage' => 'Gestion',
         'menu' => 'Menu',
         'main' => 'Navigation principale',

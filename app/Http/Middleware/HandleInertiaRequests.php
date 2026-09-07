@@ -65,13 +65,16 @@ class HandleInertiaRequests extends Middleware
     {
         $event = $this->event();
         $gate = Gate::forUser($user);
+        $isEventVisible = $event !== null && $gate->allows('view', $event);
+        $isRaceOver = $event !== null && $event->lifecycle()->isOver();
 
         return [
-            'event' => $event !== null && $gate->allows('view', $event),
+            'event' => $isEventVisible,
             'documents' => $event !== null && $gate->allows('viewAny', [Document::class, $event]),
             'registration' => $user?->participant()->exists() === true,
             'register' => $user === null && $event !== null && $event->acceptsRegistrations(),
-            'standings' => $event !== null && $event->lifecycle()->isOver(),
+            'standings' => $isRaceOver,
+            'results' => $isEventVisible && $isRaceOver,
         ];
     }
 
