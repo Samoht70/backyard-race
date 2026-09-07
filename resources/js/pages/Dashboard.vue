@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Head, Link, router } from '@inertiajs/vue3';
 import { CalendarOff, SlidersHorizontal, Ticket } from '@lucide/vue';
-import { computed } from 'vue';
+import { computed, onMounted, onUnmounted } from 'vue';
 import ActionButton from '@/components/ActionButton.vue';
 import BoardPage from '@/components/board/BoardPage.vue';
 import Heading from '@/components/Heading.vue';
@@ -9,6 +9,7 @@ import RunnerDetailPanel from '@/components/race/RunnerDetailPanel.vue';
 import RunnerSearchBoard from '@/components/race/RunnerSearchBoard.vue';
 import RunnerSlat from '@/components/race/RunnerSlat.vue';
 import EmptyState from '@/components/state/EmptyState.vue';
+import { usePolling } from '@/composables/usePolling';
 import { canReach } from '@/lib/access';
 import { t } from '@/lib/i18n';
 import { runnerStatusLabelKey } from '@/lib/runnerStatus';
@@ -58,6 +59,18 @@ function search(term: string): void {
         },
     );
 }
+
+const { start, stop } = usePolling([
+    'mode',
+    'event',
+    'query',
+    'tally',
+    'runners',
+    'runner',
+]);
+
+onMounted(start);
+onUnmounted(stop);
 </script>
 
 <template>
