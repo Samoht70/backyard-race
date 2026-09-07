@@ -3,8 +3,9 @@
 | | |
 |---|---|
 | **Epic** | 5 — Après-course |
-| **Statut** | À faire |
+| **Statut** | ✅ Terminé |
 | **Estimation** | 8 pts |
+| **Révisée** | 2026-09-07 — la clôture réutilise la transition de statut existante, et le classement figé prend sa propre page (voir [D-86](../DECISIONS.md)) |
 | **Dépend de** | BR-11 |
 
 ## User story
@@ -88,7 +89,7 @@ qu'on ne peut pas défaire depuis l'application, d'où la confirmation obligatoi
 
 ## Tâches
 
-- [ ] **T1** — Action de clôture : transition de statut et verrouillage en lecture seule `2 pts`
-- [ ] **T2** — Génération et persistance du classement au moment de la clôture `3 pts`
-- [ ] **T3** — Écran de confirmation et page de classement `2 pts`
-- [ ] **T4** — Tests : ordre par boucles, ex æquo, vitesse ignorée, lecture seule après clôture `3 pts`
+- [x] **T1** — Action de clôture : transition de statut et verrouillage en lecture seule `2 pts`
+- [x] **T2** — Génération et persistance du classement au moment de la clôture `3 pts`
+- [x] **T3** — Écran de confirmation et page de classement `2 pts`
+- [x] **T4** — Tests : ordre par boucles, ex æquo, vitesse ignorée, lecture seule après clôture `3 pts`

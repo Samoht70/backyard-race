@@ -16,6 +16,7 @@ type Areas = {
     documents?: boolean;
     registration?: boolean;
     register?: boolean;
+    standings?: boolean;
 };
 
 function share(
@@ -35,6 +36,7 @@ function share(
             documents: areas.documents === true,
             registration: areas.registration === true,
             register: areas.register === true,
+            standings: areas.standings === true,
         },
     };
 }
@@ -65,6 +67,35 @@ describe('mainNavItems', () => {
             'ui.nav.registration',
             'ui.nav.register',
         ]);
+    });
+
+    it('offers a guest the standings once the race is closed', () => {
+        visitAsGuest({ event: true, documents: true, standings: true });
+
+        expect(titles()).toEqual([
+            'ui.nav.event',
+            'ui.nav.documents',
+            'ui.nav.standings',
+            'ui.nav.registration',
+        ]);
+    });
+
+    it('offers a signed-in runner the standings once the race is closed', () => {
+        signIn({ event: true, documents: true, standings: true });
+
+        expect(titles()).toEqual([
+            'ui.nav.home',
+            'ui.nav.briefing',
+            'ui.nav.documents',
+            'ui.nav.standings',
+            'ui.nav.event',
+        ]);
+    });
+
+    it('withholds the standings while the race is still running', () => {
+        visitAsGuest({ event: true, documents: true });
+
+        expect(titles()).not.toContain('ui.nav.standings');
     });
 
     it('withholds the account creation from a guest once the window is shut', () => {

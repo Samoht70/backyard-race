@@ -9,6 +9,7 @@ return [
         'register' => 'S’inscrire',
         'briefing' => 'Briefing',
         'documents' => 'Documents',
+        'standings' => 'Classement',
         'event' => 'Événement',
         'manage' => 'Gestion',
         'menu' => 'Menu',

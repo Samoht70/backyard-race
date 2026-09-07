@@ -49,6 +49,8 @@ final class RunningEventState implements EventLifecycleState
         throw EventTransitionRefusedException::illegal();
     }
 
+    public function enter(Event $event): void {}
+
     public function allowsRegistration(): bool
     {
         return false;
@@ -67,6 +69,11 @@ final class RunningEventState implements EventLifecycleState
     public function isRacing(): bool
     {
         return true;
+    }
+
+    public function isOver(): bool
+    {
+        return false;
     }
 
     public function announcesNextRound(): bool

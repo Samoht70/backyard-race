@@ -78,10 +78,7 @@ class DashboardController extends Controller
             'currentRound' => $this->currentRound($event, $resolveCurrentRound),
             'tally' => new RunnerTallyResource($matches->tally)->resolve(),
             'runners' => $matches->runners
-                ->map(fn (Participant $runner): array => new RunnerSearchResultResource(
-                    $runner,
-                    $event->lap_distance_meters,
-                )->resolve())
+                ->map(fn (Participant $runner): array => new RunnerSearchResultResource($runner, $event)->resolve())
                 ->values()
                 ->all(),
         ]);
@@ -102,7 +99,7 @@ class DashboardController extends Controller
             'currentRound' => $this->currentRound($event, $resolveCurrentRound),
             'nextRound' => $this->nextRound($event, $participant, $resolveNextRound),
             'tally' => new RunnerTallyResource($resolveRunnerTally($event))->resolve(),
-            'runner' => new RunnerSearchResultResource($participant, $event->lap_distance_meters)->resolve(),
+            'runner' => new RunnerSearchResultResource($participant, $event)->resolve(),
         ]);
     }
 

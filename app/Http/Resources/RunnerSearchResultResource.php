@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Enums\LapStatus;
+use App\Models\Event;
 use App\Models\Lap;
 use App\Models\Participant;
 use App\Support\BibNumber;
@@ -17,7 +18,7 @@ class RunnerSearchResultResource extends JsonResource
 {
     public function __construct(
         Participant $runner,
-        private readonly ?int $lapDistanceMeters,
+        private readonly Event $race,
     ) {
         parent::__construct($runner);
     }
@@ -32,14 +33,14 @@ class RunnerSearchResultResource extends JsonResource
             'bib_label' => BibNumber::label($this->bib_number),
             'first_name' => $this->user->first_name,
             'last_name' => $this->user->last_name,
-            'status' => $this->runnerStatus()->value,
+            'status' => $this->runnerStatus($this->race->lifecycle())->value,
             'validated_laps' => $this->validatedLapsCount(),
-            'covered_meters' => $this->coveredMeters($this->lapDistanceMeters),
+            'covered_meters' => $this->coveredMeters($this->race->lap_distance_meters),
             'last_validated_round' => $this->lastValidatedRoundNumber(),
             'exited_at' => $this->exited_at?->format('H:i'),
             'pending_lap_id' => $this->pendingLap()?->id,
             'laps' => $this->orderedLaps()
-                ->map(fn (Lap $lap): array => new RunnerLapResource($lap, $this->lapDistanceMeters)->resolve())
+                ->map(fn (Lap $lap): array => new RunnerLapResource($lap, $this->race->lap_distance_meters)->resolve())
                 ->values()
                 ->all(),
         ];

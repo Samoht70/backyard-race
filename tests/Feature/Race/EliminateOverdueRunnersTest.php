@@ -34,7 +34,7 @@ class EliminateOverdueRunnersTest extends TestCase
         $runner->refresh();
         $this->assertSame(LapStatus::Eliminated, $lap->refresh()->status);
         $this->assertSame(ExitReason::Timeout, $runner->exit_reason);
-        $this->assertSame(RunnerStatus::Eliminated, $runner->runnerStatus());
+        $this->assertSame(RunnerStatus::Eliminated, $runner->runnerStatus($event->lifecycle()));
         $this->assertSame('14:00:00', $runner->exited_at?->format('H:i:s'));
     }
 

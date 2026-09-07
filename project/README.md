@@ -250,7 +250,7 @@ par BR-33. Elle reste avec les écrans de course, dont elle dépend.
 
 | ID | Story | Pts | Statut |
 |----|-------|-----|--------|
-| [BR-20](stories/BR-20-fin-evenement-classement.md) | Fin de l'événement et classement final | 8 | À faire |
+| [BR-20](stories/BR-20-fin-evenement-classement.md) | Fin de l'événement et classement final | 8 | ✅ Terminé |
 | [BR-21](stories/BR-21-statistiques.md) | ~~Statistiques de l'événement~~ | — | ⛔ Abandonné |
 | [BR-22](stories/BR-22-galerie-photos.md) | ~~Galerie photos~~ | — | ⛔ Abandonné |
 | [BR-23](stories/BR-23-page-resultats.md) | Page de résultats et chiffres de l'événement | 8 | À faire |
@@ -300,7 +300,7 @@ pas de fichier de story : c'est la décision qui les porte, et elles prennent un
 | R-08 | Recherche de coureur déplacée sur l'accueil, réservée au gérant ; le coureur y voit sa course | 3 | ✅ Livrée | [D-80](DECISIONS.md) |
 | R-09 | Gestion en barre de sous-menus, section Course à part, bandeaux du tour échangés avec l'accueil | 5 | ✅ Livrée | [D-84](DECISIONS.md) |
 
-**Total : 39 stories actives + 9 reprises · 277 pts · 248 pts livrés (90 %)**
+**Total : 39 stories actives + 9 reprises · 277 pts · 256 pts livrés (92 %)**
 
 **Hors périmètre : 4 stories abandonnées, 32 pts non engagés** — voir [D-47](DECISIONS.md).
 
@@ -336,7 +336,16 @@ tour, annonce le prochain départ tant que le coureur est en course, et pose ses
 tour, temps, kilomètres, vitesse — dans le même encart que ses chiffres ([D-85](DECISIONS.md)). Deux
 points de son périmètre ne sont pas livrés : les raccourcis vers le briefing et les documents, que la
 navigation porte depuis BR-33, et le renvoi vers les résultats d'un événement terminé, qui attend
-BR-23. **La suite est BR-20**, la clôture de l'événement et le classement figé, puis BR-23.
+BR-23.
+
+**BR-20 clôt la course le 2026-09-07.** Le geste existait déjà : la barre de gestion faisait passer
+l'événement à l'étape suivante, et `finish-event` gardait la dernière. Ce que la story ajoute, c'est
+ce qui se produit à l'entrée dans l'état terminé — l'heure de clôture est enregistrée, et le
+classement est recopié dans sa propre table, rang, boucles, motif de sortie, nom et dossard compris,
+dans la transaction de la transition ([D-86](DECISIONS.md)). Il se lit sur `/standings`, ouvert à
+tous, annoncé dans la navigation dès que la course est close. **La suite est BR-23**, l'accueil
+d'après-course : le vainqueur, les chiffres de la soirée et le tableau par tour, qui s'appuient sur
+le classement que BR-20 vient de figer.
 
 **L'epic 3 est ouvert le 2026-09-01 par BR-13.** Le moteur décidait juste sans se regarder ; il se
 regarde maintenant sur l'écran que le gérant tiendra quinze heures — entête de tour et effectifs

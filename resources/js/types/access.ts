@@ -3,4 +3,5 @@ export type Access = {
     documents: boolean;
     registration: boolean;
     register: boolean;
+    standings: boolean;
 };

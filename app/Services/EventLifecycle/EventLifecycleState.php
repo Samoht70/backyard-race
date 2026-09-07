@@ -37,6 +37,8 @@ interface EventLifecycleState
      */
     public function revert(Event $event): EventLifecycleState;
 
+    public function enter(Event $event): void;
+
     public function allowsRegistration(): bool;
 
     public function isVisibleToParticipants(): bool;
@@ -44,6 +46,8 @@ interface EventLifecycleState
     public function isEditable(): bool;
 
     public function isRacing(): bool;
+
+    public function isOver(): bool;
 
     public function announcesNextRound(): bool;
 

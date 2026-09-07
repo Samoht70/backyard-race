@@ -33,7 +33,7 @@ class ReinstateRunnerTest extends TestCase
         $this->assertSame(6.21, $performance->speedKmh);
         $this->assertSame(LapStatus::Validated, $lap->refresh()->status);
         $this->assertSame('17:58:00', $lap->validated_at?->format('H:i:s'));
-        $this->assertSame(RunnerStatus::Running, $lap->participant->refresh()->runnerStatus());
+        $this->assertSame(RunnerStatus::Running, $lap->participant->refresh()->runnerStatus($lap->round->event->lifecycle()));
     }
 
     #[Test]

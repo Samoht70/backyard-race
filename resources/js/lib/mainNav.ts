@@ -8,6 +8,7 @@ import { show as briefing } from '@/routes/briefing';
 import { index as documents } from '@/routes/documents';
 import { index as manage } from '@/routes/manage';
 import { show as registration } from '@/routes/registration';
+import { index as standings } from '@/routes/standings';
 import type { NavItem } from '@/types';
 
 export function mainNavItems(): NavItem[] {
@@ -19,6 +20,10 @@ function guestNavItems(): NavItem[] {
 
     if (canReach('documents')) {
         entries.push({ title: t('ui.nav.documents'), href: documents() });
+    }
+
+    if (canReach('standings')) {
+        entries.push({ title: t('ui.nav.standings'), href: standings() });
     }
 
     entries.push({ title: t('ui.nav.registration'), href: login() });
@@ -47,6 +52,10 @@ function memberNavItems(): NavItem[] {
 
     if (canReach('documents')) {
         entries.push({ title: t('ui.nav.documents'), href: documents() });
+    }
+
+    if (canReach('standings')) {
+        entries.push({ title: t('ui.nav.standings'), href: standings() });
     }
 
     if (canReach('event')) {

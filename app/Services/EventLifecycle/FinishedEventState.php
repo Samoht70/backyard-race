@@ -2,10 +2,12 @@
 
 namespace App\Services\EventLifecycle;
 
+use App\Actions\FreezeStandings;
 use App\Enums\EventStatus;
 use App\Enums\Permission;
 use App\Exceptions\EventTransitionRefusedException;
 use App\Models\Event;
+use Carbon\CarbonImmutable;
 
 final class FinishedEventState implements EventLifecycleState
 {
@@ -49,6 +51,13 @@ final class FinishedEventState implements EventLifecycleState
         throw EventTransitionRefusedException::terminal();
     }
 
+    public function enter(Event $event): void
+    {
+        $event->forceFill(['finished_at' => CarbonImmutable::now()])->save();
+
+        app(FreezeStandings::class)($event);
+    }
+
     public function allowsRegistration(): bool
     {
         return false;
@@ -67,6 +76,11 @@ final class FinishedEventState implements EventLifecycleState
     public function isRacing(): bool
     {
         return false;
+    }
+
+    public function isOver(): bool
+    {
+        return true;
     }
 
     public function announcesNextRound(): bool

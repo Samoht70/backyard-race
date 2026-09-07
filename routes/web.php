@@ -9,6 +9,7 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\Manage;
 use App\Http\Controllers\MissingPageController;
 use App\Http\Controllers\RegistrationController;
+use App\Http\Controllers\StandingController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', EventController::class)
@@ -18,6 +19,9 @@ Route::get('design-system', DesignSystemController::class)
     ->name('design-system');
 
 Route::resource('documents', DocumentController::class)
+    ->only(['index']);
+
+Route::resource('standings', StandingController::class)
     ->only(['index']);
 
 Route::middleware('auth')

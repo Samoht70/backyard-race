@@ -58,7 +58,7 @@ class RevertLapValidationTest extends TestCase
         $runner = $lap->participant->refresh();
         $this->assertSame(ExitReason::Timeout, $runner->exit_reason);
         $this->assertSame('18:00:00', $runner->exited_at?->format('H:i:s'));
-        $this->assertSame(RunnerStatus::Eliminated, $runner->runnerStatus());
+        $this->assertSame(RunnerStatus::Eliminated, $runner->runnerStatus($lap->round->event->lifecycle()));
     }
 
     #[Test]

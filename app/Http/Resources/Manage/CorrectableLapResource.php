@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Manage;
 
+use App\Models\Event;
 use App\Models\Lap;
 use App\Support\BibNumber;
 use Illuminate\Http\Request;
@@ -12,6 +13,13 @@ use Illuminate\Http\Resources\Json\JsonResource;
  */
 class CorrectableLapResource extends JsonResource
 {
+    public function __construct(
+        Lap $lap,
+        private readonly Event $race,
+    ) {
+        parent::__construct($lap);
+    }
+
     /**
      * @return array<string, mixed>
      */
@@ -32,7 +40,7 @@ class CorrectableLapResource extends JsonResource
             'bib_label' => BibNumber::label($runner->bib_number),
             'first_name' => $runner->user->first_name,
             'last_name' => $runner->user->last_name,
-            'status' => $runner->runnerStatus()->value,
+            'status' => $runner->runnerStatus($this->race->lifecycle())->value,
             'validated_laps' => $runner->validatedLapsCount(),
         ];
     }

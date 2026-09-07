@@ -26,25 +26,46 @@ class RunnerStatusTest extends TestCase
         Lap::factory()->validated()->for($this->roundOf($event))->for($runner)->create();
 
         $this->assertTrue($runner->isRunning());
-        $this->assertSame(RunnerStatus::Running, $runner->runnerStatus());
+        $this->assertSame(RunnerStatus::Running, $runner->runnerStatus($event->lifecycle()));
+    }
+
+    #[Test]
+    public function it_reports_a_runner_the_closure_caught_still_going_as_finished(): void
+    {
+        $event = Event::factory()->finished()->create();
+        $runner = $this->runner($event);
+
+        $this->assertTrue($runner->isRunning());
+        $this->assertSame(RunnerStatus::Finished, $runner->runnerStatus($event->lifecycle()));
+    }
+
+    #[Test]
+    public function it_keeps_the_exit_reason_of_a_runner_who_left_before_the_closure(): void
+    {
+        $event = Event::factory()->finished()->create();
+        $runner = $this->outOfTheRace($event, ExitReason::Withdrawal);
+
+        $this->assertSame(RunnerStatus::Withdrawn, $runner->runnerStatus($event->lifecycle()));
     }
 
     #[Test]
     public function it_reports_a_runner_the_clock_caught_as_eliminated(): void
     {
-        $runner = $this->outOfTheRace($this->runningEvent(), ExitReason::Timeout);
+        $event = $this->runningEvent();
+        $runner = $this->outOfTheRace($event, ExitReason::Timeout);
 
         $this->assertFalse($runner->isRunning());
-        $this->assertSame(RunnerStatus::Eliminated, $runner->runnerStatus());
+        $this->assertSame(RunnerStatus::Eliminated, $runner->runnerStatus($event->lifecycle()));
     }
 
     #[Test]
     public function it_reports_a_runner_who_stopped_as_withdrawn(): void
     {
-        $runner = $this->outOfTheRace($this->runningEvent(), ExitReason::Withdrawal);
+        $event = $this->runningEvent();
+        $runner = $this->outOfTheRace($event, ExitReason::Withdrawal);
 
         $this->assertFalse($runner->isRunning());
-        $this->assertSame(RunnerStatus::Withdrawn, $runner->runnerStatus());
+        $this->assertSame(RunnerStatus::Withdrawn, $runner->runnerStatus($event->lifecycle()));
     }
 
     #[Test]
@@ -71,7 +92,8 @@ class RunnerStatusTest extends TestCase
             $queries++;
         });
 
-        $statuses = $roster->map(fn (Participant $runner): RunnerStatus => $runner->runnerStatus())->all();
+        $race = $event->lifecycle();
+        $statuses = $roster->map(fn (Participant $runner): RunnerStatus => $runner->runnerStatus($race))->all();
 
         $this->assertSame([RunnerStatus::Running, RunnerStatus::Withdrawn], $statuses);
         $this->assertSame(0, $queries);

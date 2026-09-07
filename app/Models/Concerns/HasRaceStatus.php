@@ -8,6 +8,7 @@ use App\Enums\RegistrationStatus;
 use App\Enums\RunnerStatus;
 use App\Models\Lap;
 use App\Models\Round;
+use App\Services\EventLifecycle\EventLifecycleState;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
@@ -33,13 +34,13 @@ trait HasRaceStatus
             && $this->exited_at === null;
     }
 
-    public function runnerStatus(): RunnerStatus
+    public function runnerStatus(EventLifecycleState $race): RunnerStatus
     {
-        if ($this->isRunning()) {
-            return RunnerStatus::Running;
+        if (! $this->isRunning()) {
+            return $this->exit_reason?->runnerStatus() ?? RunnerStatus::Eliminated;
         }
 
-        return $this->exit_reason?->runnerStatus() ?? RunnerStatus::Eliminated;
+        return $race->isOver() ? RunnerStatus::Finished : RunnerStatus::Running;
     }
 
     public function leaveRace(ExitReason $reason, CarbonImmutable $at): void
@@ -120,6 +121,28 @@ trait HasRaceStatus
         return $query->withCount([
             'laps as '.self::VALIDATED_LAPS_COUNT => fn (Builder $laps): Builder => $laps->where('status', LapStatus::Validated),
         ]);
+    }
+
+    /**
+     * @param  Builder<static>  $query
+     * @return Builder<static>
+     */
+    #[Scope]
+    protected function withAValidatedLap(Builder $query): Builder
+    {
+        return $query->whereHas('laps', fn (Builder $laps): Builder => $laps->where('status', LapStatus::Validated));
+    }
+
+    /**
+     * @param  Builder<static>  $query
+     * @return Builder<static>
+     */
+    #[Scope]
+    protected function bestFirst(Builder $query): Builder
+    {
+        return $query
+            ->orderByDesc(self::VALIDATED_LAPS_COUNT)
+            ->orderBy('bib_number');
     }
 
     /**
