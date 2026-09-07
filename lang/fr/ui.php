@@ -82,10 +82,11 @@ return [
     ],
     'manage' => [
         'title' => 'Gestion de la course',
-        'corrections' => 'Corriger une boucle',
-        'event' => 'Configurer l’événement',
-        'registrations' => 'Gérer les inscriptions',
-        'briefing' => 'Rédiger le briefing',
-        'documents' => 'Déposer les documents',
+        'race' => 'Course',
+        'corrections' => 'Corrections',
+        'event' => 'Événement',
+        'registrations' => 'Inscriptions',
+        'briefing' => 'Briefing',
+        'documents' => 'Documents',
     ],
 ];

@@ -5,7 +5,8 @@ import { computed, onMounted, onUnmounted } from 'vue';
 import ActionButton from '@/components/ActionButton.vue';
 import BoardPage from '@/components/board/BoardPage.vue';
 import Heading from '@/components/Heading.vue';
-import NextRoundDuration from '@/components/race/NextRoundDuration.vue';
+import RoundHeader from '@/components/race/RoundHeader.vue';
+import RoundTally from '@/components/race/RoundTally.vue';
 import RunnerDetailPanel from '@/components/race/RunnerDetailPanel.vue';
 import RunnerSearchBoard from '@/components/race/RunnerSearchBoard.vue';
 import RunnerSlat from '@/components/race/RunnerSlat.vue';
@@ -17,7 +18,11 @@ import { runnerStatusLabelKey } from '@/lib/runnerStatus';
 import { dashboard, home } from '@/routes';
 import { index as showManage } from '@/routes/manage';
 import { show as showRegistration } from '@/routes/registration';
-import type { NextRound, RunnerSearchResult, RunnerTally } from '@/types/race';
+import type {
+    CurrentRound,
+    RunnerSearchResult,
+    RunnerTally,
+} from '@/types/race';
 
 type Mode =
     | 'no_event'
@@ -31,15 +36,27 @@ type Props = {
     mode: Mode;
     event: { name: string | null; status: string } | null;
     query?: string | null;
+    currentRound?: CurrentRound | null;
     tally?: RunnerTally;
     runners?: RunnerSearchResult[];
     runner?: RunnerSearchResult;
-    nextRound?: NextRound | null;
 };
 
 const props = defineProps<Props>();
 
 const title = computed(() => props.event?.name ?? t('ui.dashboard.title'));
+
+const counts = computed(() =>
+    props.tally === undefined
+        ? []
+        : [
+              {
+                  label: t('race.round.runners_left'),
+                  value: props.tally.running,
+              },
+              { label: t('race.round.runners_out'), value: props.tally.out },
+          ],
+);
 
 const runnerMeta = computed(() => {
     if (!props.runner || props.runner.exited_at === null) {
@@ -66,10 +83,10 @@ const { start, stop } = usePolling([
     'mode',
     'event',
     'query',
+    'currentRound',
     'tally',
     'runners',
     'runner',
-    'nextRound',
 ]);
 
 onMounted(start);
@@ -78,6 +95,15 @@ onUnmounted(stop);
 
 <template>
     <Head :title="title" />
+
+    <div v-if="currentRound" class="sticky top-0 z-10 bg-background">
+        <RoundHeader
+            :round="currentRound.number"
+            :start-at="currentRound.starts_at"
+            :deadline-at="currentRound.deadline_at"
+        />
+        <RoundTally v-if="counts.length" :counts="counts" />
+    </div>
 
     <BoardPage>
         <EmptyState
@@ -154,8 +180,6 @@ onUnmounted(stop);
                 :runners="runners ?? []"
                 @search="search"
             />
-
-            <NextRoundDuration v-if="nextRound" :round="nextRound" />
         </div>
     </BoardPage>
 </template>

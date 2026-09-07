@@ -108,6 +108,9 @@ class RunnerWithdrawalTest extends TestCase
 
         $this->get(route('manage.index'))->assertInertia(fn (AssertableInertia $page) => $page
             ->where('roundRunners', [])
+            ->etc());
+
+        $this->get(route('dashboard'))->assertInertia(fn (AssertableInertia $page) => $page
             ->where('tally.running', 0)
             ->where('tally.out', 1)
             ->etc());

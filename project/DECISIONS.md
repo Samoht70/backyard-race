@@ -3462,3 +3462,57 @@ change, seule sa fenêtre d'affichage se resserre à ce qu'elle sert réellement
 `to_route('manage.index')` en dur ; avec ce second point d'entrée il passe à
 `redirect()->back(fallback: route('manage.index'))`, pour la même raison — rester sur l'écran
 d'où le geste est parti.
+
+**Révoquée le 2026-09-07 par D-84**, le jour même : le geste repart de l'accueil vers la gestion,
+en haut de la section Course. Ce qui lui survit est la réserve « seulement en course », désormais
+tenue par `Manage\IndexController`, et le correctif de redirection, qui vaut pour les deux écrans.
+
+## D-84 — La gestion est une barre de sous-menus sur six écrans, et les deux bandeaux de course échangent leur place
+
+Demandé le 2026-09-07 par le propriétaire, le même jour que D-83 et contre une partie de celle-ci :
+`/manage` mélangeait trois choses sur un seul écran — le bandeau du tour, le tableau des coureurs en
+course, et la grille de liens vers les écrans d'administration. Chaque lien quittait la page ; le
+tableau de course « polluait » l'accès à l'administration.
+
+**Une barre de sous-menus partagée, pas une page unique à onglets.** `ManageDesks` liste les six
+sections et marque celle qu'on regarde ; `ManagePage` l'empile au-dessus du contenu et remplace
+`BoardPage` sur les six écrans de gestion. Les routes ne changent pas : Inertia ne remplace que le
+bloc du dessous, la barre ne bouge pas, et chaque section reste partageable en URL avec son
+contrôleur et sa permission. Fusionner les six contrôleurs derrière un résolveur de section aurait
+donné le même ressenti pour un démontage sans contrepartie.
+
+**Le format suit l'appareil** — colonne sur téléphone, grille de trois sur tablette, une seule ligne
+sur PC. Les entrées perdent leurs phrases d'action (« Corriger une boucle ») pour des noms courts
+(« Corrections ») : une ligne de six ne tient pas autrement.
+
+**`/manage` devient la section « Course », et rien d'autre.** Le tableau des coureurs cesse de
+cohabiter avec les liens d'administration : il occupe sa propre section, ouverte par défaut en
+entrant dans la gestion — donc l'écran de course pendant la course, et l'état d'attente que BR-13
+affichait déjà le reste du temps. `Corrections` n'apparaît dans la barre que pendant la course,
+comme avant, mais sur le statut de l'événement (`board.status`) plutôt que sur l'existence d'un tour
+courant, parce que la barre est partagée par des écrans qui n'ont pas le tour en props.
+
+**Les deux bandeaux échangent leur écran.** Le bandeau du tour en cours (`RoundHeader` +
+`RoundTally`) quitte `/manage` pour l'accueil, gérant **et** coureur : c'est l'écran qu'on laisse
+ouvert pendant la course, et le coureur y gagne l'échéance de son tour. En sens inverse, la durée du
+prochain tour (`NextRoundDuration`) revient de l'accueil vers le haut de la section Course — ce qui
+révoque le déménagement de D-83, arrêté le matin même. La réserve de D-83 lui survit : c'est
+maintenant `Manage\IndexController` qui ne résout `nextRound` que sur un événement en course, pour
+que le geste reste indisponible avant le départ.
+
+**Le compteur suit son bandeau.** `manage.index` ne porte plus `tally` ; `DashboardController` le
+porte dans ses deux modes de course, calculé par `ResolveRunnerTally` côté coureur et déjà présent
+dans la recherche côté gérant.
+
+**La recherche du tableau du tour filtre dans le navigateur, celle de l'accueil interroge le
+serveur.** Les deux répondent à la même question et n'ont pas le même corpus : les coureurs du tour
+sont déjà tous en props, donc le filtre est immédiat, ne coûte aucune requête et survit au
+rafraîchissement périodique ; la recherche de l'accueil (BR-14) porte sur tout l'événement et reste
+serveur, avec son seuil et son délai. Le champ lui-même est le même composant
+(`form/SearchField.vue`), extrait au deuxième usage.
+
+**L'encart de durée tient sur trois rangées.** Il en occupait six au-dessus du tableau et repoussait
+le geste de validation hors de l'écran sur un téléphone. La compression à deux rangées y arrivait en
+masquant le libellé du champ et en collant l'échéance du tour à sa réserve, ce qui coûtait la
+lisibilité : la forme retenue garde une rangée pour chacune des trois choses que l'encart dit — ce
+qu'il règle et pour quel tour, le réglage lui-même avec ses deux portées, et ce qu'il ne touche pas.

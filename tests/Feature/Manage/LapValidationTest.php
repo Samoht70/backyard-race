@@ -166,8 +166,6 @@ class LapValidationTest extends TestCase
 
         $this->get(route('manage.index'))->assertInertia(fn (AssertableInertia $page) => $page
             ->where('roundRunners', [])
-            ->where('tally.running', 0)
-            ->where('tally.out', 1)
             ->etc());
     }
 

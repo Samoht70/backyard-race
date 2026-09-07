@@ -12,8 +12,8 @@ import {
 } from 'reka-ui';
 import { computed, ref } from 'vue';
 import AlertError from '@/components/AlertError.vue';
-import BoardPage from '@/components/board/BoardPage.vue';
 import Heading from '@/components/Heading.vue';
+import ManagePage from '@/components/manage/ManagePage.vue';
 import BoardFilter from '@/components/race/BoardFilter.vue';
 import BoardPagination from '@/components/race/BoardPagination.vue';
 import RegistrationDossier from '@/components/registration/RegistrationDossier.vue';
@@ -98,7 +98,7 @@ const dossierTitle = computed(() =>
 <template>
     <Head :title="t('registration.manage.title')" />
 
-    <BoardPage>
+    <ManagePage>
         <div class="grid gap-6">
             <Heading
                 :title="t('registration.manage.title')"
@@ -217,5 +217,5 @@ const dossierTitle = computed(() =>
                 </DialogContent>
             </DialogPortal>
         </DialogRoot>
-    </BoardPage>
+    </ManagePage>
 </template>

@@ -2,6 +2,7 @@
 
 namespace Tests\Concerns;
 
+use App\Enums\ExitReason;
 use App\Models\Event;
 use App\Models\Participant;
 use App\Models\Round;
@@ -46,5 +47,12 @@ trait RunsARace
     protected function runners(Event $event, int $count): Collection
     {
         return Participant::factory()->count($count)->confirmed()->create(['event_id' => $event->getKey()]);
+    }
+
+    protected function outOfTheRace(Event $event, int $count): void
+    {
+        $this->runners($event, $count)->each(
+            fn (Participant $runner) => $runner->leaveRace(ExitReason::Timeout, $this->at('2026-09-05 17:00')),
+        );
     }
 }

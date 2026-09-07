@@ -3,7 +3,6 @@ import { Form, Head } from '@inertiajs/vue3';
 import { FolderOpen } from '@lucide/vue';
 import DocumentController from '@/actions/App/Http/Controllers/Manage/DocumentController';
 import ActionButton from '@/components/ActionButton.vue';
-import BoardPage from '@/components/board/BoardPage.vue';
 import DocumentDeleteForm from '@/components/document/DocumentDeleteForm.vue';
 import DocumentRow from '@/components/document/DocumentRow.vue';
 import FileField from '@/components/form/FileField.vue';
@@ -12,6 +11,7 @@ import FormFieldset from '@/components/form/FormFieldset.vue';
 import TextAreaField from '@/components/form/TextAreaField.vue';
 import TextField from '@/components/form/TextField.vue';
 import Heading from '@/components/Heading.vue';
+import ManagePage from '@/components/manage/ManagePage.vue';
 import Notice from '@/components/Notice.vue';
 import EmptyState from '@/components/state/EmptyState.vue';
 import { t } from '@/lib/i18n';
@@ -29,7 +29,7 @@ defineProps<Props>();
 <template>
     <Head :title="t('document.manage.title')" />
 
-    <BoardPage>
+    <ManagePage>
         <div class="grid max-w-4xl gap-6">
             <Heading
                 :title="t('document.manage.title')"
@@ -120,5 +120,5 @@ defineProps<Props>();
                 </div>
             </Form>
         </div>
-    </BoardPage>
+    </ManagePage>
 </template>

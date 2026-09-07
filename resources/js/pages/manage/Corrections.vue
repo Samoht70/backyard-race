@@ -2,7 +2,7 @@
 import { Head, usePage } from '@inertiajs/vue3';
 import { CircleSlash, Undo2 } from '@lucide/vue';
 import { computed } from 'vue';
-import BoardPage from '@/components/board/BoardPage.vue';
+import ManagePage from '@/components/manage/ManagePage.vue';
 import Notice from '@/components/Notice.vue';
 import CorrectionList from '@/components/race/CorrectionList.vue';
 import LapReinstatementDialog from '@/components/race/LapReinstatementDialog.vue';
@@ -25,7 +25,7 @@ const refusal = computed(() => page.props.errors.lap);
 <template>
     <Head :title="t('race.correction.title')" />
 
-    <BoardPage>
+    <ManagePage>
         <div class="grid gap-6">
             <div class="grid gap-2">
                 <h1 class="text-title">{{ t('race.correction.title') }}</h1>
@@ -64,5 +64,5 @@ const refusal = computed(() => page.props.errors.lap);
                 </template>
             </CorrectionList>
         </div>
-    </BoardPage>
+    </ManagePage>
 </template>

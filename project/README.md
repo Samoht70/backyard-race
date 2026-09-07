@@ -298,8 +298,9 @@ pas de fichier de story : c'est la décision qui les porte, et elles prennent un
 | R-06 | Charte de l’instrument, et primitives reka-ui à la place du starter kit | 5 | ✅ Livrée | [D-61](DECISIONS.md) |
 | R-07 | Adresse de l'organisateur en configuration, en plus du rôle `manager` | 2 | ✅ Livrée | [D-65](DECISIONS.md) |
 | R-08 | Recherche de coureur déplacée sur l'accueil, réservée au gérant ; le coureur y voit sa course | 3 | ✅ Livrée | [D-80](DECISIONS.md) |
+| R-09 | Gestion en barre de sous-menus, section Course à part, bandeaux du tour échangés avec l'accueil | 5 | ✅ Livrée | [D-84](DECISIONS.md) |
 
-**Total : 39 stories actives + 8 reprises · 270 pts · 224 pts livrés (83 %)**
+**Total : 39 stories actives + 9 reprises · 275 pts · 229 pts livrés (83 %)**
 
 **Hors périmètre : 4 stories abandonnées, 32 pts non engagés** — voir [D-47](DECISIONS.md).
 

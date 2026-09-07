@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Actions\OpenDueRounds;
 use App\Enums\ExitReason;
 use App\Models\Event;
 use App\Models\Lap;
@@ -237,25 +236,50 @@ class DashboardTest extends TestCase
     }
 
     #[Test]
-    public function it_offers_the_next_round_on_the_manager_search_screen(): void
+    public function it_carries_the_running_round_and_the_head_count_for_the_manager(): void
     {
-        $this->travelTo($this->at('2026-09-05 14:30'));
         $event = $this->racingEvent();
-        app(OpenDueRounds::class)($event);
+        $this->roundOf($event, 6);
+        $this->runners($event, 4);
+        $this->outOfTheRace($event, 3);
+        $this->travelTo($this->at('2026-09-05 18:30'));
 
         $this->actingAs(User::factory()->manager()->create())
             ->get(route('dashboard'))
             ->assertInertia(
                 fn (AssertableInertia $page) => $page
-                    ->where('nextRound.number', 3)
-                    ->where('nextRound.starts_at', '15:00')
-                    ->where('nextRound.lap_duration_minutes', 60)
+                    ->where('currentRound.number', 6)
+                    ->where('currentRound.starts_at', '18:00')
+                    ->where('currentRound.deadline_at', '19:00')
+                    ->where('tally.running', 4)
+                    ->where('tally.out', 3)
                     ->etc(),
             );
     }
 
     #[Test]
-    public function it_offers_no_next_round_before_the_race_starts(): void
+    public function it_carries_the_running_round_and_the_head_count_for_a_runner(): void
+    {
+        $event = $this->runningEvent('2026-09-05 13:00', 60);
+        $runner = $this->named($event, 'Dubois', 'Léa', 5);
+        $this->roundOf($event, 2);
+        $this->outOfTheRace($event, 2);
+        $this->travelTo($this->at('2026-09-05 14:30'));
+
+        $this->actingAs($runner->user)
+            ->get(route('dashboard'))
+            ->assertInertia(
+                fn (AssertableInertia $page) => $page
+                    ->where('mode', 'runner_active')
+                    ->where('currentRound.number', 2)
+                    ->where('tally.running', 1)
+                    ->where('tally.out', 2)
+                    ->etc(),
+            );
+    }
+
+    #[Test]
+    public function it_carries_no_round_before_the_race_starts(): void
     {
         Event::factory()->registration()->create([
             'first_start_at' => $this->at('2026-09-05 13:00'),
@@ -264,11 +288,11 @@ class DashboardTest extends TestCase
 
         $this->actingAs(User::factory()->manager()->create())
             ->get(route('dashboard'))
-            ->assertInertia(fn (AssertableInertia $page) => $page->missing('nextRound'));
+            ->assertInertia(fn (AssertableInertia $page) => $page->missing('currentRound'));
     }
 
     #[Test]
-    public function it_offers_no_next_round_when_the_event_has_no_grid(): void
+    public function it_carries_no_round_when_the_event_has_no_grid(): void
     {
         Event::factory()->running()->incomplete()->create();
 
@@ -277,7 +301,7 @@ class DashboardTest extends TestCase
             ->assertInertia(
                 fn (AssertableInertia $page) => $page
                     ->where('mode', 'manager_search')
-                    ->where('nextRound', null)
+                    ->where('currentRound', null)
                     ->etc(),
             );
     }

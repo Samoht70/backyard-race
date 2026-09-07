@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { Form, usePage } from '@inertiajs/vue3';
 import { Check, Flag } from '@lucide/vue';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import LapValidationController from '@/actions/App/Http/Controllers/Manage/LapValidationController';
 import ActionButton from '@/components/ActionButton.vue';
+import SearchField from '@/components/form/SearchField.vue';
 import Notice from '@/components/Notice.vue';
 import RunnerSlat from '@/components/race/RunnerSlat.vue';
 import RunnerWithdrawalDialog from '@/components/race/RunnerWithdrawalDialog.vue';
@@ -24,9 +25,26 @@ const props = defineProps<Props>();
 
 const page = usePage();
 
+const term = ref('');
+
 const refusal = computed(() => page.props.errors.lap);
 
 const opensRunnerFiles = computed(() => can('manage-participants'));
+
+const matches = computed(() => {
+    const needle = term.value.trim().toLowerCase();
+
+    if (needle === '') {
+        return props.runners;
+    }
+
+    return props.runners.filter(
+        (runner) =>
+            `${runner.first_name} ${runner.last_name}`
+                .toLowerCase()
+                .includes(needle) || (runner.bib_label ?? '').includes(needle),
+    );
+});
 
 function fileOf(runner: RoundRunner): RouteDefinition<'get'> | undefined {
     return opensRunnerFiles.value
@@ -74,13 +92,25 @@ function readout(runner: RoundRunner): string | undefined {
             {{ refusal }}
         </Notice>
 
+        <SearchField
+            v-if="props.runners.length"
+            id="round-board-search"
+            v-model="term"
+            :label="t('race.search.label')"
+            :placeholder="t('race.search.placeholder')"
+        />
+
         <p v-if="!props.runners.length" class="text-sm text-muted-foreground">
             {{ t('race.board.empty') }}
         </p>
 
+        <p v-else-if="!matches.length" class="text-sm text-muted-foreground">
+            {{ t('race.search.empty') }}
+        </p>
+
         <div v-else class="grid gap-1.5">
             <RunnerSlat
-                v-for="runner in props.runners"
+                v-for="runner in matches"
                 :key="runner.lap_id"
                 :bib="runner.bib_label ?? '—'"
                 :first-name="runner.first_name"

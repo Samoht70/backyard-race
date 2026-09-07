@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\Manage;
 
+use App\Actions\OpenDueRounds;
 use App\Enums\EventStatus;
-use App\Enums\ExitReason;
 use App\Enums\Permission;
 use App\Models\Event;
 use App\Models\Lap;
@@ -25,7 +25,7 @@ class RaceDashboardTest extends TestCase
     use RunsARace;
 
     #[Test]
-    public function it_shows_the_round_its_window_and_the_head_count(): void
+    public function it_shows_the_round_its_window_and_the_runners_on_it(): void
     {
         $event = $this->racingEvent();
         $this->linedUp($this->roundOf($event, 6), 24);
@@ -36,14 +36,12 @@ class RaceDashboardTest extends TestCase
             ->where('currentRound.number', 6)
             ->where('currentRound.starts_at', '18:00')
             ->where('currentRound.deadline_at', '19:00')
-            ->where('tally.running', 24)
-            ->where('tally.out', 13)
             ->has('roundRunners', 24)
             ->etc());
     }
 
     #[Test]
-    public function it_keeps_the_head_count_when_a_lap_is_validated(): void
+    public function it_marks_the_arrival_on_the_board_when_a_lap_is_validated(): void
     {
         $event = $this->racingEvent();
         $laps = $this->linedUp($this->roundOf($event), 3);
@@ -52,10 +50,32 @@ class RaceDashboardTest extends TestCase
         $this->post(route('manage.laps.validate', $laps->first()));
 
         $this->get(route('manage.index'))->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('tally.running', 3)
-            ->where('tally.out', 0)
             ->has('roundRunners', 3)
             ->where('roundRunners.0.validated_at', '13:40:00')
+            ->etc());
+    }
+
+    #[Test]
+    public function it_offers_the_duration_of_the_next_round(): void
+    {
+        $this->travelTo($this->at('2026-09-05 14:30'));
+        $event = $this->racingEvent();
+        app(OpenDueRounds::class)($event);
+
+        $this->get(route('manage.index'))->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('nextRound.number', 3)
+            ->where('nextRound.starts_at', '15:00')
+            ->where('nextRound.lap_duration_minutes', 60)
+            ->etc());
+    }
+
+    #[Test]
+    public function it_offers_no_next_round_when_the_event_has_no_grid(): void
+    {
+        Event::factory()->running()->incomplete()->create();
+
+        $this->get(route('manage.index'))->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('nextRound', null)
             ->etc());
     }
 
@@ -86,7 +106,6 @@ class RaceDashboardTest extends TestCase
         $this->get(route('manage.index'))->assertInertia(fn (AssertableInertia $page) => $page
             ->where('currentRound.number', 2)
             ->where('roundRunners', [])
-            ->where('tally.running', 2)
             ->etc());
     }
 
@@ -101,7 +120,7 @@ class RaceDashboardTest extends TestCase
         $this->get(route('manage.index'))->assertInertia(fn (AssertableInertia $page) => $page
             ->where('eventStatus', EventStatus::Registration->value)
             ->where('currentRound', null)
-            ->where('tally', null)
+            ->where('nextRound', null)
             ->where('roundRunners', [])
             ->etc());
     }
@@ -156,13 +175,6 @@ class RaceDashboardTest extends TestCase
             $this->runners($round->event, $count)
                 ->map(fn (Participant $runner): array => ['participant_id' => $runner->id])
                 ->all(),
-        );
-    }
-
-    private function outOfTheRace(Event $event, int $count): void
-    {
-        $this->runners($event, $count)->each(
-            fn (Participant $runner) => $runner->leaveRace(ExitReason::Timeout, $this->at('2026-09-05 17:00')),
         );
     }
 
