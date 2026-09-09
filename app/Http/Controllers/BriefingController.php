@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\DocumentResource;
 use App\Models\Event;
 use App\Support\Briefing;
 use Illuminate\Support\Facades\Gate;
@@ -18,6 +19,7 @@ class BriefingController extends Controller
 
         return Inertia::render('Briefing', [
             'html' => Briefing::toHtml(Briefing::orDefault($event->briefing)),
+            'documents' => DocumentResource::collection($event->documents()->with('media')->get())->resolve(),
         ]);
     }
 }

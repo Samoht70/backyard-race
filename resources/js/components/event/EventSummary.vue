@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import StatCounter from '@/components/race/StatCounter.vue';
+import { formatKilometers } from '@/lib/distance';
 import { t } from '@/lib/i18n';
 import type { EventDetails } from '@/types/event';
 
@@ -9,6 +10,10 @@ type Props = {
 };
 
 const props = defineProps<Props>();
+
+const lapDistance = computed(() =>
+    formatKilometers(props.event.lap_distance_meters),
+);
 
 const coordinates = computed(() => {
     if (props.event.latitude === null || props.event.longitude === null) {
@@ -42,9 +47,9 @@ const facts = computed(() => [
     <div class="flex flex-col gap-6">
         <div class="flex flex-wrap items-end gap-6">
             <StatCounter
-                :value="event.lap_distance_meters"
+                :value="lapDistance"
                 :label="t('event.field.lap_distance_meters')"
-                :unit="t('event.unit.meters')"
+                :unit="t('event.unit.kilometers')"
             />
             <StatCounter
                 :value="event.lap_duration_minutes"

@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Epic** | 2 — Moteur de course |
-| **Statut** | À faire |
+| **Statut** | ✅ Terminé |
 | **Estimation** | 8 pts |
 | **Dépend de** | BR-04, BR-06 |
 
@@ -23,9 +23,10 @@ l'élimination viennent ensuite s'appuyer dessus.
 
 **Inclus**
 - Une boucle par participant actif et par tour de course.
-- La boucle porte : participant, tour, numéro de tour, heure théorique de départ, heure
-  limite, heure réelle de validation, durée, vitesse moyenne, statut. La distance n'y figure
-  pas : elle est celle de l'événement (voir D-17).
+- La boucle porte le participant, son tour, son statut et son heure réelle de validation. Le
+  numéro, l'heure théorique de départ et l'heure limite sont ceux du tour ; la durée et la vitesse
+  moyenne se calculent à la lecture, la distance est celle de l'événement — voir D-17 et
+  [D-73](../DECISIONS.md).
 - Le statut du participant dans la course : en course, éliminé.
 
 **Exclu**
@@ -81,8 +82,8 @@ boucle — les requêtes de comptage doivent être agrégées en base, jamais en
 
 ## Tâches
 
-- [ ] **T1** — Migration et modèle `Lap`, énumération de statut, unicité participant + tour `2 pts`
-- [ ] **T2** — Statut de course du participant et notion de coureur actif `2 pts`
-- [ ] **T3** — Service d'ouverture des boucles d'un tour, rejouable sans effet de bord `2 pts`
-- [ ] **T4** — Factory des boucles pour les tests et le développement `1 pt`
-- [ ] **T5** — Tests : ouverture, exclusion des éliminés, unicité, idempotence `2 pts`
+- [x] **T1** — Migration et modèle `Lap`, énumération de statut, unicité participant + tour `2 pts`
+- [x] **T2** — Statut de course du participant et notion de coureur actif `2 pts`
+- [x] **T3** — Service d'ouverture des boucles d'un tour, rejouable sans effet de bord `2 pts`
+- [x] **T4** — Factory des boucles pour les tests et le développement `1 pt`
+- [x] **T5** — Tests : ouverture, exclusion des éliminés, unicité, idempotence `2 pts`

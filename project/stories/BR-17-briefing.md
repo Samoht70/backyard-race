@@ -6,6 +6,7 @@
 | **Statut** | ✅ Terminé |
 | **Estimation** | 2 pts |
 | **Révisée** | 2026-08-20 — réduite de 5 à 2 pts (voir D-47) |
+| **Révisée** | 2026-09-07 — la lecture fusionne avec les documents sur un `/briefing` public (voir [D-88](../DECISIONS.md)) |
 | **Dépend de** | BR-03 |
 
 ## User story

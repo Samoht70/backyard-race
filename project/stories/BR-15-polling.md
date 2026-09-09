@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Epic** | 3 — Interface de course |
-| **Statut** | À faire |
+| **Statut** | ✅ Terminé |
 | **Estimation** | 2 pts |
 | **Révisée** | 2026-08-20 — réduite de 5 à 2 pts (voir D-47) |
 | **Dépend de** | BR-13, BR-14 |
@@ -81,7 +81,7 @@ renvoie aux choix faits en BR-13 et BR-14.
 
 ## Tâches
 
-- [ ] **T1** — Composable de rafraîchissement : `router.reload()` périodique, fréquence unique,
+- [x] **T1** — Composable de rafraîchissement : `router.reload()` périodique, fréquence unique,
   suspension sur onglet masqué `1 pt`
-- [ ] **T2** — Branchement sur le dashboard gérant et le tableau des coureurs, avec les tests
+- [x] **T2** — Branchement sur le dashboard gérant et le tableau des coureurs, avec les tests
   d'onglet masqué et de session expirée `1 pt`

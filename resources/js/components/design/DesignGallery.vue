@@ -132,10 +132,10 @@ const counts = [
 
             <DesignSection
                 title="Boutons d’action"
-                note="44 px minimum, 50 px de haut et 96 px de large pour valider une boucle."
+                note="44 px de haut au doigt, 40 px au grand format — une seule taille, gestes de course compris."
             >
                 <div class="flex flex-col gap-1.5">
-                    <ActionButton size="validate">
+                    <ActionButton>
                         {{ t('race.runner.validate') }}
                     </ActionButton>
                     <ActionButton>Action courante</ActionButton>

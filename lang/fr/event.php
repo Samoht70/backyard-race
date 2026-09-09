@@ -68,6 +68,7 @@ return [
     ],
     'unit' => [
         'meters' => 'm',
+        'kilometers' => 'km',
         'minutes' => 'min',
     ],
     'locked' => [

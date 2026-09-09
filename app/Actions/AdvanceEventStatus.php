@@ -5,6 +5,7 @@ namespace App\Actions;
 use App\Enums\EventStatus;
 use App\Exceptions\EventTransitionRefusedException;
 use App\Models\Event;
+use Illuminate\Support\Facades\DB;
 
 final class AdvanceEventStatus
 {
@@ -25,15 +26,20 @@ final class AdvanceEventStatus
             throw EventTransitionRefusedException::illegal();
         }
 
-        $moved = Event::query()
-            ->whereKey($event->getKey())
-            ->where('status', $from->value)
-            ->update(['status' => $to->value]);
+        return DB::transaction(function () use ($event, $from, $to): Event {
+            $moved = Event::query()
+                ->whereKey($event->getKey())
+                ->where('status', $from->value)
+                ->update(['status' => $to->value]);
 
-        if ($moved === 0) {
-            throw EventTransitionRefusedException::illegal();
-        }
+            if ($moved === 0) {
+                throw EventTransitionRefusedException::illegal();
+            }
 
-        return $event->refresh();
+            $event->refresh();
+            $event->lifecycle()->enter($event);
+
+            return $event->refresh();
+        });
     }
 }

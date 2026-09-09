@@ -3,7 +3,9 @@
 namespace Tests\Feature\Race;
 
 use App\Actions\OpenDueRounds;
+use App\Enums\LapStatus;
 use App\Models\Event;
+use App\Models\Lap;
 use App\Models\Round;
 use App\Services\RaceSchedule\RoundSchedule;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -161,6 +163,34 @@ class OpenDueRoundsTest extends TestCase
         $this->assertSame('02:00', $this->round(14)->starts_at->format('H:i'));
         $this->assertSame('02:00', $this->round(15)->starts_at->format('H:i'));
         $this->assertSame(3600, $this->round(15)->starts_at->getTimestamp() - $this->round(14)->starts_at->getTimestamp());
+    }
+
+    #[Test]
+    public function it_opens_a_lap_for_every_runner_of_every_round_it_opens(): void
+    {
+        $this->travelTo($this->at('2026-09-05 15:30'));
+        $event = $this->runningEvent();
+        $this->runners($event, 3);
+
+        $this->open($event);
+
+        $this->assertDatabaseCount('laps', 9);
+        $this->assertSame(3, $this->round(3)->laps()->where('status', LapStatus::Pending)->count());
+    }
+
+    #[Test]
+    public function it_lets_a_runner_confirmed_mid_round_in_at_the_next_round(): void
+    {
+        $this->travelTo($this->at('2026-09-05 13:30'));
+        $event = $this->runningEvent();
+        $this->open($event);
+
+        $latecomer = $this->runner($event);
+        $this->travelTo($this->at('2026-09-05 14:30'));
+        $this->open($event);
+
+        $this->assertSame(0, $this->round(1)->laps()->count());
+        $this->assertSame([2], $latecomer->laps()->get()->map(fn (Lap $lap): int => $lap->round->number)->all());
     }
 
     /**

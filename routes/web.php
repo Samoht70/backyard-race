@@ -4,11 +4,11 @@ use App\Enums\Permission;
 use App\Http\Controllers\BriefingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DesignSystemController;
-use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\Manage;
 use App\Http\Controllers\MissingPageController;
 use App\Http\Controllers\RegistrationController;
+use App\Http\Controllers\StandingController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', EventController::class)
@@ -17,7 +17,10 @@ Route::get('/', EventController::class)
 Route::get('design-system', DesignSystemController::class)
     ->name('design-system');
 
-Route::resource('documents', DocumentController::class)
+Route::singleton('briefing', BriefingController::class)
+    ->only(['show']);
+
+Route::resource('standings', StandingController::class)
     ->only(['index']);
 
 Route::middleware('auth')
@@ -25,25 +28,41 @@ Route::middleware('auth')
         Route::get('dashboard', DashboardController::class)
             ->name('dashboard');
 
-        Route::singleton('briefing', BriefingController::class)
-            ->only(['show']);
-
         Route::singleton('registration', RegistrationController::class)
             ->only(['show', 'edit', 'update']);
 
         Route::prefix('manage')
             ->name('manage.')
             ->group(function () {
+                Route::get('/', Manage\IndexController::class)
+                    ->middleware('can:'.Permission::ManageLaps->value)
+                    ->name('index');
+
                 Route::middleware('can:'.Permission::ManageEvent->value)
                     ->group(function () {
-                        Route::get('/', Manage\IndexController::class)->name('index');
-
                         Route::singleton('event', Manage\EventController::class)
                             ->only(['edit', 'update']);
 
                         Route::post('event/advance', Manage\AdvanceEventController::class)->name('event.advance');
                         Route::post('event/revert', Manage\RevertEventController::class)->name('event.revert');
+
+                        Route::post('rounds/duration', Manage\RoundDurationController::class)->name('rounds.duration');
                     });
+
+                Route::post('laps/{lap}/validate', Manage\LapValidationController::class)
+                    ->name('laps.validate');
+
+                Route::post('runners/{participant}/withdraw', Manage\RunnerWithdrawalController::class)
+                    ->name('runners.withdraw');
+
+                Route::get('corrections', Manage\CorrectionController::class)
+                    ->name('corrections');
+
+                Route::post('laps/{lap}/reinstate', Manage\LapReinstatementController::class)
+                    ->name('laps.reinstate');
+
+                Route::post('laps/{lap}/revert', Manage\LapReversionController::class)
+                    ->name('laps.revert');
 
                 Route::middleware('can:'.Permission::ManageDocuments->value)
                     ->group(function () {

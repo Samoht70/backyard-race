@@ -3,6 +3,7 @@ import { initializeTheme } from '@/composables/useAppearance';
 import AppLayout from '@/layouts/AppLayout.vue';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import { initializeFlashToast } from '@/lib/flashToast';
+import { initializeRequestFailureToast } from '@/lib/requestFailure';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -38,3 +39,4 @@ createInertiaApp({
 
 initializeTheme();
 initializeFlashToast();
+initializeRequestFailureToast();

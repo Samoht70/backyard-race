@@ -2,7 +2,6 @@
 
 return [
     'title' => 'Documents',
-    'description' => 'Le règlement, les consignes et la trace de la boucle.',
     'empty_title' => 'Aucun document',
     'empty_description' => 'Le gérant n’a encore rien déposé. Reviens un peu plus tard.',
     'download' => 'Télécharger',

@@ -31,8 +31,5 @@ return [
         ### L'esprit
 
         On ne vient pas battre un record du monde. On vient courir, rigoler, s'encourager, et repousser un peu son propre curseur du ridicule — avant de fêter ça comme il se doit.
-
-        - 👉 Coureurs : retrouvez le **Guide du coureur** dans l'onglet **Documents** du site (parcours, équipement, ravito).
-        - 👉 Accompagnants : retrouvez le **Guide du fêtard** dans l'onglet **Documents** du site (programme, hébergement, repas).
         MARKDOWN,
 ];

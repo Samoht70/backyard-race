@@ -23,4 +23,10 @@ class ParticipantPolicy
     {
         return $user->can(Permission::ManageParticipants->value);
     }
+
+    public function withdraw(User $user, Participant $participant): bool
+    {
+        return $user->can(Permission::ManageLaps->value)
+            && $participant->event->lifecycle()->isRacing();
+    }
 }

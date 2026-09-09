@@ -2813,3 +2813,957 @@ règlent pas. Aucune trace en base de ce qui a été envoyé — un job qui éch
 dans Horizon et dans `failed_jobs`, pas dans la fiche du coureur. Et le va-et-vient d'un gérant qui
 annule puis remet en attente par erreur envoie bien deux mails contradictoires : c'est voulu, le
 coureur voit ce que le gérant a fait plutôt qu'un statut changé sans explication.
+
+## D-72 — La durée d'un tour se change par morceaux à partir d'un tour non parti, et les gages restent à l'oral
+
+Arrêté le 2026-08-31, avant d'ouvrir l'epic 2. Le propriétaire veut pouvoir changer la durée d'un
+tour qui n'a pas encore commencé — « avant que le tour 3 parte, je passe de 60 à 55 minutes » — et
+que le changement se répercute sur la suite. La demande venait avec une seconde idée, des gages
+portés par les tours, dont il demandait s'il valait la peine de les coder.
+
+**Le gel de `RunningEventState` n'est pas levé, il est remplacé par une règle plus fine.**
+`frozenAttributes()` interdit `first_start_at` et `lap_duration_minutes` en course, et son docblock
+dit exactement pourquoi : « changing either mid-race silently reschedules rounds already run ». La
+grille de BR-04 est une multiplication, `premier départ + (N - 1) × durée` — elle n'a pas de passé,
+donc modifier la durée globale à 3 h du matin ne déplace pas les tours à venir, ça réécrit aussi les
+tours déjà courus et les heures limites contre lesquelles BR-11 aura éliminé des coureurs. Le geste
+demandé n'est donc surtout pas le dégel de ce champ : c'est un objet qui, par construction, ne peut
+atteindre que le futur. Les deux champs restent gelés — la configuration décrit la grille avant le
+départ, le nouveau geste la corrige après.
+
+**Ce qui est stocké est un morceau de grille, pas la durée d'un tour.** L'enregistrement dit « à
+partir du tour N, la durée est de X », et la grille devient une fonction par morceaux. La forme
+naïve — une durée par tour — obligeait à écrire une ligne par tour à venir, sur une course qui n'a
+pas de nombre de tours prédéfini, donc à écrire l'infini. Le morceau donne les deux gestes utiles
+avec un seul stockage : « à partir de ce tour » écrit un morceau, « ce tour seulement » en écrit un
+second au tour d'après, qui rétablit la durée précédente. L'écran offre les deux, la première nuit
+posera la question.
+
+**Le morceau se compte en numéros de tour, jamais en horaires.** C'est ce qui le rend indépendant du
+premier départ : déplacer l'heure du départ avant la course fait glisser toute la grille, et les
+morceaux restent aux mêmes tours. Aucune invalidation à écrire, y compris sur le retour en brouillon
+de BR-41 — rien dans un demi-tour de l'événement ne rend faux « à partir du tour 3, 55 minutes ».
+
+**La garde se pose sur la ligne de tour, pas sur l'horloge.** « Seul un tour non parti se change »
+semblait se traduire par une comparaison à l'heure serveur ; elle laisse une fenêtre d'une minute.
+Les tours sont matérialisés paresseusement par `OpenDueRounds`, planifié chaque minute, donc un tour
+peut être parti sans avoir encore sa ligne — et un changement écrit dans cet intervalle déplace une
+heure limite sous les pieds de coureurs déjà lancés. Le geste rattrape donc la matérialisation
+d'abord, puis exige un numéro strictement supérieur au dernier tour ouvert. La garde devient un fait
+en base au lieu d'une lecture d'horloge, et elle réutilise une action déjà rejouable sans effet de
+bord. Accessoirement, c'est la même construction qui protège le passé : un tour couru porte ses
+horaires figés dans sa ligne, et c'est cette ligne que BR-11 lira.
+
+**La table ne peut pas être une colonne de `rounds`, et c'est la même paresse qui l'explique.** La
+ligne du tour 7 n'existe pas quand le gérant décide de sa durée. Une colonne sur `rounds` aurait
+donc exigé de matérialiser les tours à venir — c'est-à-dire de choisir un nombre de tours, ce que le
+format refuse. La table des morceaux porte l'intention, les lignes de `rounds` portent le fait.
+
+**`RoundSchedule` garde ses trois méthodes, et c'est là que tient le prix de la story.**
+`startOf`, `deadlineOf` et `numberAt` conservent leur signature ; seule leur implémentation passe de
+la multiplication au parcours cumulatif. `ResolveCurrentRound`, `OpenDueRounds`,
+`CurrentRoundResource` et l'écran ne bougent pas, et BR-11 s'écrira contre la même surface qu'elle
+aurait eue sans cette décision. La condition pour que ça reste vrai est une discipline à tenir dans
+tout l'epic 2 : **aucun calcul `premier départ + N × durée` hors de `RoundSchedule`**. C'est vrai
+aujourd'hui — une boucle de BR-08 qui recalculerait sa propre heure limite au lieu de la lire de son
+tour ferait doubler le prix de BR-44.
+
+**L'exclusion de BR-04 est révoquée, celle de D-17 ne l'est pas.** BR-04 excluait explicitement « une
+durée de boucle variable d'un tour à l'autre » ; c'est cette ligne que BR-44 rouvre, et elle la
+rouvre dans un seul sens, vers l'avant. **La distance, elle, reste unique pour l'événement.** C'est
+le piège naturel de cette story — une durée par morceau appelle une distance par morceau, et le
+raccourcissement de la boucle de nuit était précisément le cas que D-17 avait examiné et écarté.
+Rien dans la demande ne le ramène : le propriétaire veut serrer le temps, pas raccourcir le tour.
+
+**Les gages ne laissent rien dans le code, et l'argument qui voulait les y mettre a été défait par le
+propriétaire.** Le premier avis était de coder la version pauvre — une ligne de texte portée par le
+tour, affichée sur les écrans — au motif que personne ne se souvient à 3 h du matin de quel gage
+tombe au tour 11. Le propriétaire a précisé son intention : il ne planifie pas, il décide sur le
+moment et annonce à la voix cinq minutes avant le départ. Or dans une backyard, à ce moment-là, les
+coureurs encore en course sont **tous dans le corral** — l'audience concernée est réunie, physique,
+et le gage meurt à la fin du tour. La voix couvre la totalité du besoin, sans écran à lire ni page à
+rafraîchir, et un gage codé n'aurait ajouté qu'une surface à maintenir.
+
+**Le tri qui reste vrai après ça : un gage n'entre dans le code que s'il change une règle que
+l'application mesure.** Il en existe trois familles. Celle qui change le temps du tour — « ce
+tour-ci, vous n'avez que 55 minutes » — n'est pas une annonce mais une heure limite contre laquelle
+BR-11 élimine : c'est BR-44, et c'est le seul gage codé. Celle qui change la distance est fermée par
+D-17. Celle qui ajoute une contrainte physique — porter un poids, courir déguisé — n'est constatable
+par rien dans l'application, et n'a aucune raison d'y entrer. Autrement dit l'idée des gages n'a pas
+produit une story, elle a produit l'appelant réel de BR-44 : le geste utile n'est pas la correction
+d'un horaire mal configuré, c'est « je change la durée du prochain tour, cinq minutes avant qu'il
+parte ».
+
+**BR-44 se place avant BR-11, et après BR-08.** Elle ne touche pas aux boucles, donc BR-08 n'a pas à
+l'attendre. BR-11, en revanche, est le consommateur dont la justesse dépend de l'heure limite, et ses
+tests vont encoder une grille : autant qu'ils encodent la bonne du premier coup, plutôt que de
+retoucher un job d'élimination qui décide seul, sans qu'un humain appuie sur un bouton.
+
+**Ce qui reste ouvert.** Aucune grille prévisionnelle éditable : le geste porte sur le prochain tour,
+parce que c'est le seul moment où il a un appelant, et le stockage par numéro n'interdit pas de
+l'étendre le jour où un autre apparaît. Aucune trace de qui a changé quoi et quand — la table dit
+l'état de la grille, pas son historique, et un événement d'une nuit avec un seul gérant ne réclame
+pas de journal. Aucune notification aux coureurs : D-15 tient, le changement s'annonce au corral.
+
+## D-73 — La boucle ne stocke que son statut et son heure de validation, tout le reste se lit ailleurs
+
+Arrêté le 2026-08-31 par BR-08 T1. La story listait les colonnes de la boucle : « participant, tour,
+numéro de tour, heure théorique de départ, heure limite, heure réelle de validation, durée, vitesse
+moyenne, statut ». La table livrée en porte quatre — `participant_id`, `round_id`, `status`,
+`validated_at` — et cette entrée dit pourquoi les cinq autres ont été refusées, chacune pour une
+raison différente.
+
+**La vitesse moyenne ne peut pas être une colonne : D-17 l'interdit en toutes lettres.** Elle y écrit
+la conséquence de la distance unique — « si le gérant corrige la distance en cours d'événement, les
+vitesses déjà affichées se recalculent, c'est le comportement attendu d'une valeur unique ». Une
+colonne `average_speed` remplie par BR-09 rendrait cette phrase fausse en silence : la correction de
+la distance laisserait derrière elle des vitesses calculées sur l'ancienne. La formule reste donc
+une lecture, jamais une écriture.
+
+**La durée n'en est pas une non plus, parce qu'elle vaut par construction `validated_at − départ du
+tour`.** Elle ne dérive pas d'un calcul qui pourrait un jour changer d'avis : c'est une soustraction
+entre deux instants dont l'un est sur la boucle et l'autre sur le tour. La stocker créerait un
+troisième endroit où la même vérité s'écrit, et BR-12 — qui rejoue une validation avec une heure
+saisie à la main — devrait penser à le mettre à jour. Avec la soustraction, BR-12 n'a qu'un instant à
+réécrire.
+
+**Le numéro, l'heure de départ et l'heure limite sont ceux du tour, et le tour est déjà l'objet qui
+les fige.** C'est la moitié de D-72 : un tour couru porte ses horaires dans sa ligne, matérialisée au
+moment où il devient dû, et c'est cette ligne que BR-11 lira pour éliminer. Recopier ces trois
+valeurs sur chaque boucle donnerait quarante copies par tour d'une donnée que BR-44 s'applique à
+n'écrire qu'une fois — et la protection du passé cesserait d'être une propriété du schéma pour
+devenir une discipline à tenir. La boucle porte `round_id` ; elle lit son horaire sur son tour.
+
+**La conséquence sur BR-09 est une reformulation, pas une amputation.** Son critère
+« la durée enregistrée est 47 minutes et 32 secondes / la vitesse moyenne enregistrée est 7,57 km/h »
+se lit désormais **restituée** au lieu d'enregistrée : le geste écrit `validated_at` et le statut, et
+l'écran reçoit la durée et la vitesse calculées au même instant. Aucun critère d'acceptation ne
+change de valeur, et le cas limite « distance non renseignée : la vitesse n'est pas calculée » reste
+exactement le même contrôle.
+
+**`validated_at` est en `UtcDateTime`, sans avoir à y réfléchir.** D-35 avait déjà nommé cette colonne
+comme l'un de ses appelants futurs. Un test la repasse par la base sur l'heure vécue deux fois du 25
+octobre — deux boucles validées à « 02:30 », une heure d'écart réelle — pour que le cast reste rouge
+s'il disparaît.
+
+**Deux absences volontaires en plus.** Pas d'`event_id` sur la boucle : le participant et le tour le
+portent chacun, et il n'y a qu'un événement (D-31). Pas de `label()` sur `LapStatus` : aucun
+consommateur PHP ne l'appelle — les écrans affichent le statut du **coureur**, dérivé, jamais celui
+d'une boucle — et D-26 a déjà tranché contre la déclaration morte sur `RunnerStatus`. Le jour où une
+boucle s'affiche par elle-même, `race.lap.*` est libre depuis D-34.
+
+**Ce qui reste ouvert.** Le marqueur de correction de BR-12 sera, lui, une vraie colonne : « une
+boucle corrigée est marquée comme telle » est un fait que rien d'autre ne porte. Et si un écran de
+course finit par trier des centaines de boucles par vitesse, le tri se fera en base sur
+`validated_at`, jamais sur une vitesse recalculée en PHP — l'ordre est le même, la distance étant
+constante.
+
+## D-74 — La boucle s'ouvre avec son tour, dans la même transaction, et le coureur actif se lit sans colonne
+
+Arrêté le 2026-08-31 par BR-08 T2 à T5. La story demandait « une boucle par participant actif et par
+tour de course » et un « statut du participant dans la course ». Quatre choix ont été faits en
+l'écrivant, dont trois n'étaient pas dans son énoncé.
+
+**L'ouverture des boucles est accrochée à la matérialisation du tour, pas à un appel séparé.**
+`OpenDueRounds` était déjà le seul endroit du produit où un tour naît — le planificateur l'appelle
+chaque minute (BR-04). Lui faire ouvrir les boucles dans la foulée donne gratuitement le cas limite
+que la story nomme : « participant confirmé en cours de course, il entre au tour suivant, pas au tour
+en cours ». Un coureur confirmé à 13 h 30 n'a pas de boucle sur le tour 1, parce que le tour 1 était
+matérialisé à 13 h 00 et que rien ne repasse dessus. Aucune garde n'a eu à être écrite pour ça.
+
+**Le couple tour + boucles est écrit dans une transaction, et c'est une correction de bug, pas une
+précaution.** `OpenDueRounds` sort tôt dès que `max(number) >= tour courant` : un tour matérialisé
+dont l'insertion des boucles aurait échoué ne serait jamais rattrapé, la minute suivante retournant
+un tableau vide. Le tour existerait sans coureurs, et BR-11 n'éliminerait personne. La transaction
+fait retomber les deux écritures ensemble, et le rejeu de la minute suivante les refait.
+
+**L'idempotence est une clause, pas un `firstOrCreate` par coureur.** Les coureurs à servir sont
+ceux qui n'ont pas déjà de boucle sur ce tour (`whereDoesntHave`), et l'écriture est un `insert` en
+masse : deux requêtes par tour au lieu de quarante, et le rejeu du même tour n'écrit rien. L'unicité
+`participant_id + round_id` de T1 reste le filet, elle n'est pas le mécanisme.
+
+**Le statut de course reste dérivé, et il vit dans un concern avec les boucles dont il se déduit.**
+D-26 avait déjà interdit de persister `RunnerStatus` ; ce qui manquait, c'est où loger la lecture.
+`HasRaceStatus` porte le concept entier — la relation `laps()`, le prédicat `isRunning()`, le statut
+d'affichage et le scope `running` — plutôt qu'un scope de plus sur un modèle `Participant` qui porte
+déjà son cycle d'inscription. Un coureur est actif s'il est confirmé et qu'aucune de ses boucles
+n'est `eliminated` : c'est la règle de la story, écrite une fois côté prédicat et une fois côté
+requête, comme tout couple scope/prédicat d'Eloquent.
+
+**Un critère de la story n'est pas testable, et c'est le schéma qui l'interdit.** « Aucune boucle
+pour un coureur d'un autre événement » a été écrit, puis retiré : la contrainte `events_singleton_unique`
+(D-31) refuse le second événement que le test aurait fallu créer. Le filtre `event_id` reste dans la
+requête d'ouverture — il est exact et ne coûte rien — mais il garde une porte que la base a déjà
+condamnée.
+
+**Ce qui reste ouvert.** `runnerStatus()` ne rend que `running` et `eliminated`, les deux états que
+BR-08 nomme ; `withdrawn` attend le motif de sortie de BR-10 T1, `finished` attend BR-20. Le
+prédicat interroge la base par coureur : les écrans de course de l'epic 3 liront cet état en lot,
+par `withExists`, et non en appelant `isRunning()` quarante fois. Aucune boucle n'est semée non
+plus — le jeu de développement s'arrête à un événement en inscriptions, et le semer en course
+demanderait de choisir un tour courant, ce qu'aucune story n'a encore tranché.
+
+## D-75 — La validation est un appui sur une boucle, gardée par la ligne du tour et par un verrou
+
+Arrêté le 2026-08-31 par BR-09. Le geste le plus répété de la nuit est aussi le plus court à
+décrire : un bouton, une heure serveur, deux nombres calculés. Ce qui a demandé des choix, c'est ce
+qui l'entoure — où vit le calcul, quoi garde le refus, et ce qu'il faut afficher pour que le gérant
+sache que son appui est passé.
+
+**La durée et la vitesse naissent à la lecture, et D-73 tient sans retouche.** `LapPerformance` est
+un objet de valeur construit au moment où on l'affiche, depuis trois entrées : `validated_at` sur la
+boucle, `starts_at` sur le tour, `lap_distance_meters` sur l'événement. Rien n'est écrit d'autre que
+le statut et l'heure. La conséquence promise par D-73 s'est vérifiée à l'écriture : corriger la
+distance de l'événement recalcule toutes les vitesses déjà affichées, et BR-12 n'aura qu'un instant
+à réécrire pour que la durée suive.
+
+**L'heure limite se lit sur la ligne du tour, jamais sur la grille.** C'est la discipline que D-72
+nomme, et elle est maintenant sous test : un événement dont la durée de boucle est passée à 30
+minutes, avec un tour matérialisé à 60, accepte une validation à 17:45. Si le calcul repassait par
+`RoundSchedule`, ce test tomberait — c'est-à-dire qu'un changement de durée déplacerait l'heure
+limite d'un tour déjà lancé, exactement la panne que D-72 voulait rendre impossible.
+
+**La limite est inclusive, et le refus nomme la sortie.** La comparaison est `>` et pas `>=`, donc la
+validation à la seconde exacte de l'heure limite passe. Au-delà, le message envoie vers la correction
+exceptionnelle de BR-12 : c'est le seul refus du produit qui désigne une story pas encore écrite, et
+il vaut mieux qu'il le dise que de laisser le gérant croire à une panne.
+
+**Le double appui est gardé par un verrou, et l'idempotence s'appuie sur `validated_at`.** La règle
+demandée est particulière : la seconde tentative ne modifie rien **et** ne présente aucune erreur —
+elle rend le premier temps. La garde n'est donc pas un refus, c'est un retour. Deux raisons de la
+poser sur `validated_at` plutôt que sur le statut : c'est la colonne qui porte le fait, et elle
+restera juste quand BR-12 ajoutera son marqueur de correction. Le geste s'exécute dans une
+transaction avec `lockForUpdate`, parce que deux requêtes séparées par 200 ms peuvent lire toutes les
+deux une boucle vide et écrire deux heures différentes — et c'est la seule donnée de la nuit que
+personne ne pourra recontester après coup.
+
+**Le refus que voit le gérant est une erreur de formulaire ; l'exception est un filet de
+programmeur.** D-70 n'a pas mis 409 dans les statuts rendus dans le site, donc une
+`LapValidationRefusedException` qui remonterait jusqu'au navigateur donnerait la page brute de
+Symfony. La garde utile est celle du `FormRequest`, qui repose le gérant sur son tableau avec une
+ligne d'explication ; l'exception de l'action reste pour l'appelant qui n'est pas un écran. C'est la
+même construction que BR-44, duplication comprise, et elle s'assume : deux endroits énoncent la même
+règle, et les deux sont testés.
+
+**La policy porte la permission *et* l'état de course, sinon elle ne servirait à rien.**
+`validate-laps` en middleware de route aurait dit exactement ce qu'une policy réduite à `can()`
+dirait. `LapPolicy::validate` ajoute donc ce que le middleware ne sait pas voir : une boucle ne se
+valide que sur un événement en course. Un seul endroit autorise, et aucune route n'a de groupe de
+middleware pour elle seule.
+
+**Le tableau du tour courant naît ici, et il est volontairement pauvre.** Le bouton demandé par la
+story ne peut pas exister sans une liste où le poser, donc l'écran de pilotage reçoit les boucles du
+tour courant : dossard, nom, statut, boucles validées, et une cellule qui est soit le bouton, soit
+l'heure d'arrivée, soit un tiret. Les filtres et la pagination restent à BR-14, le compte des
+effectifs à BR-13. Les trois états de la cellule sont ceux que la charte avait déjà dessinés dans son
+échantillon de liste — la story n'a rien eu à inventer côté écran.
+
+**La restitution est la ligne elle-même, pas un toast.** « Durée, distance, vitesse » s'affichent
+dans la sous-ligne du coureur, et l'heure d'arrivée bascule dans la cellule avec l'animation de
+volet. Un toast aurait répété les mêmes trois nombres et obligé PHP à reformater en français ce que
+le front sait déjà faire — `formatKilometers` existait, `formatLapDuration` et `formatSpeed` le
+rejoignent, tous sous test. Le serveur n'envoie que des nombres.
+
+**Le statut de course se lit maintenant en lot, et le « reste ouvert » de D-74 est fermé.** D-74
+prévoyait `withExists` pour l'epic 3 ; le tableau l'a réclamé une story plus tôt. `withRaceStatus()`
+et `withValidatedLapsCount()` chargent les deux faits dérivés en une requête, et `isRunning()` comme
+`validatedLapsCount()` préfèrent l'attribut chargé quand il est là. La règle reste écrite une fois,
+et un test compare les deux coûts sur le même effectif : zéro requête chargé, une par coureur sinon.
+
+**L'écran ne rattrape pas la matérialisation des tours, exprès.** `RoundDurationRequest` appelle
+`OpenDueRounds` avant de décider, parce qu'un changement de durée dépend de ce qui est déjà parti.
+Le tableau, lui, est une lecture, et BR-15 va le sonder en boucle : y accrocher une écriture ferait
+tenter une insertion à chaque sondage. La conséquence assumée est une fenêtre de moins d'une minute
+au tout début d'un tour, où le bandeau annonce le tour et le tableau est encore vide — c'est-à-dire
+le moment de la nuit où personne ne rentre.
+
+**Ce qui reste ouvert.** Le tableau montre toutes les boucles du tour, sans filtre ni pagination :
+sur quarante coureurs c'est lisible, et BR-14 s'en occupe. `withdrawn` n'apparaît toujours pas,
+faute de motif de sortie (BR-10). Aucune boucle n'est semée, donc l'écran ne se regarde encore qu'en
+fabriquant une course à la main. Et la perte de réseau au moment de l'appui n'a pas de traitement
+propre : le bouton reste en attente, le gérant réappuie, et l'idempotence fait le reste — un
+tampon hors ligne serait une autre story.
+
+## D-76 — La sortie de course est une colonne du coureur, et le motif décide de ce qu'il affiche
+
+Arrêté le 2026-08-31 par BR-10. La story tenait en une phrase — « le gérant enregistre qu'un coureur
+s'arrête » — et elle a déplacé la vérité que BR-08 avait posée deux stories plus tôt.
+
+**D-74 est révoqué sur un point : le coureur actif se lit maintenant avec une colonne.** BR-08
+déduisait « en course » de l'absence de boucle `eliminated`, et cette déduction était juste tant que
+la seule façon de sortir était de rater une heure limite. Le cas limite que BR-10 nomme la casse :
+« abandon déclaré alors que la boucle du coureur venait d'être validée ». Ce coureur-là n'a aucune
+boucle éliminée — sa dernière boucle est bonne et se conserve — donc la déduction le laisserait dans
+les effectifs actifs, et le tour suivant lui ouvrirait une boucle. `exited_at` et `exit_reason`
+deviennent la seule vérité, `running` les lit, et `withRaceStatus()` disparaît : la donnée est sur la
+ligne, il n'y a plus de `withExists` à charger. Le statut de course reste dérivé, comme D-26
+l'exige ; c'est le **fait** de la sortie qui est stocké, pas son affichage.
+
+**La boucle en cours passe quand même en `eliminated`, et ce n'est plus la même information.** Elle
+dit que cette boucle-là ne compte pas, pas que le coureur est dehors. Les deux écritures partent
+ensemble dans `leaveRace()`, sur le concern qui porte déjà le concept, parce que BR-11 fera le même
+geste avec l'autre motif — un point d'écriture, deux appelants, la règle énoncée une fois.
+
+**`withdrawn` contre `eliminated` : la story dit l'un, le produit affiche l'autre.** Ses règles
+métier écrivent « l'abandon fait passer le participant en `eliminated` », et son propre paragraphe
+« Impacts techniques » dit l'inverse deux sections plus bas : « distinguer les deux est ce qui permet
+de dire qui s'est arrêté et qui a été rattrapé par le chrono ». D-74 avait déjà réservé `withdrawn`
+au motif de cette story. Le coureur est donc sorti de la course, exactement comme demandé, et il
+s'affiche `withdrawn` — même statut de sortie, deux motifs, deux pictogrammes que la charte avait
+déjà dessinés.
+
+**Le double envoi est refusé, là où BR-09 rendait silencieusement le premier temps.** Les deux
+stories décrivent le même geste répété et demandent l'inverse l'une de l'autre : « la seconde
+tentative ne modifie rien **et** ne présente aucune erreur » pour une boucle, « un coureur déjà sorti
+ne peut pas abandonner une seconde fois » ici. Le refus est le bon comportement parce que le second
+appui n'est pas le même geste : sur une boucle il vient d'un doigt qui a rebondi, sur un abandon il
+vient d'un gérant qui croit que le premier n'est pas passé — et la réponse utile est de lui dire que
+si. Le motif initial est conservé, ce qui règle du même coup l'abandon d'un coureur que le chrono
+avait déjà sorti.
+
+**L'abandon ne se déclare que sur une boucle non validée, et seulement depuis le tableau.** La story
+voulait l'action « depuis la fiche du coureur et depuis le tableau de course » : la fiche est BR-16,
+elle n'existe pas, et l'action y viendra avec elle. Le gérant a ensuite retiré le bouton des coureurs
+déjà rentrés sur le tour — un coureur qui vient de valider n'abandonne pas la boucle qu'il a finie,
+il ne repart pas au tour suivant. L'action reste capable de le faire, elle est testée, et c'est
+l'écran qui ne l'offre pas.
+
+**Q-04 est fermée, dans le sens que personne n'attendait.** D-24 exigeait 72 px de haut pour la
+validation d'une boucle, la charte de D-46 l'avait ramenée à 50, et la question attendait un écran
+réel pour trancher. Il est arrivé : le gérant a jugé le bouton trop gros, puis a demandé que les
+gestes de course tiennent la taille des autres boutons du site. La variante spéciale disparaît donc
+au lieu de remonter — une seule taille, 44 px au doigt et 40 au grand format, plancher
+d'accessibilité tenu. Ce que Q-04 réclamait d'autre est fait : la valeur n'est plus une chaîne
+enfouie dans un composant mais `lib/actionButton.ts`, et un test la garde, comme `runnerStatus.ts`
+garde déjà la sienne.
+
+**Sur la carte du téléphone, les deux gestes tombent à leur icône.** Deux boutons libellés côte à
+côte sur une ligne qui porte déjà un dossard, un nom et un compteur ne tiennent pas, et c'est le nom
+du coureur qui se faisait tronquer. Le libellé revient à partir de `sm` ; en dessous, l'`aria-label`
+porte seul le sens, et il nomme le coureur là où le texte visible ne l'aurait pas fait. L'icône de
+l'abandon a été reprise deux fois avant de tenir : la flèche vers une ligne se lisait « télécharger »,
+le carré dans un cercle se lisait « enregistrement », et c'est une tête de mort qui les remplace —
+sur le bouton comme sur le pictogramme de statut. Lucide n'a pas de « porte plus bonhomme », qui
+était l'autre piste ; elle n'offre que la porte seule, voisine de la déconnexion. Le crâne dit le DNF
+dans le vocabulaire de la discipline, il ne ressemble à aucune commande de lecteur, et le
+propriétaire l'a choisi en connaissance du registre — c'est un mot d'un fichier à changer si le ton
+ne convient plus.
+
+**Ce qui reste ouvert.** `finished` attend BR-20, et c'est le dernier statut sans motif. BR-11 n'a
+plus qu'à appeler `leaveRace(ExitReason::Timeout, …)` sur les coureurs dont la boucle a expiré : le
+motif existe, il est sous test par cette story, et la grille d'élimination qu'elle encodera n'a plus
+à inventer sa sortie. L'annulation d'un abandon reste à BR-12, et elle devra écrire `null` dans deux
+colonnes plutôt que remonter une boucle.
+
+## D-77 — L'élimination sort de la file et rentre dans le planificateur, et le tour n'ouvre plus quand la course a perdu ses coureurs
+
+Arrêté le 2026-08-31 par BR-11. La story décrivait « une tâche récurrente », « un job », « une file
+dédiée » et « la supervision des files dans Horizon ». Elle est livrée sans job et sans file, et
+c'est son propre paragraphe « Impacts techniques » qui a tranché.
+
+**La règle refuse la file, parce que la file est exactement le risque que la story nomme.** Ses
+impacts techniques disent : « une queue arrêtée sans qu'on le voie fausserait le résultat de la
+course, sans message d'erreur visible ». Mettre l'élimination sur une file, c'est faire dépendre le
+seul mécanisme du produit qui décide sans humain de **deux** processus vivants — le planificateur qui
+déclenche, le worker qui exécute — au lieu d'un. Le travail à faire est de trois requêtes par tour
+échu, sur quarante coureurs au plus : rien n'y demande d'être différé. `EliminateOverdueRunners`
+s'exécute donc dans le processus du planificateur, comme `OpenDueRounds` depuis BR-08, et la panne
+que la story craint se réduit à celle que D-67 surveille déjà. La file dédiée de T4 n'existe pas
+parce que rien n'y serait déposé ; ce qui restait de la tâche — l'accès d'Horizon réservé au porteur
+de `manage-event` — était livré par BR-30 T3, sans test, et il en a un maintenant.
+
+**Une seule entrée planifiée, et D-37 l'avait écrit d'avance.** `race:open-rounds` disparaît au
+profit de `race:advance`, qui élimine puis ouvre. Deux commandes planifiées à la même minute
+n'auraient pas garanti l'ordre, et l'ordre porte une différence visible : éliminer d'abord, c'est
+n'ouvrir le tour suivant que pour les coureurs qui y ont droit ; ouvrir d'abord, c'est créer une
+boucle au coureur qu'on s'apprête à sortir, puis la retourner en `eliminated` dans la seconde. Les
+deux états finaux se valent, la trace non.
+
+**L'heure de sortie est celle de la ligne du tour, et les tours échus se traitent dans l'ordre des
+numéros.** La première moitié est la discipline de D-75 : la limite se lit sur `deadline_at`, jamais
+sur la grille, donc un traitement en retard de quatre minutes enregistre quand même 19:00. La seconde
+moitié n'était pas dans l'énoncé et se voit au rattrapage : un planificateur mort pendant deux heures
+laisse un coureur avec des boucles ouvertes sur trois tours, et il doit sortir à **la première**
+limite qu'il a manquée. `leaveRace()` éliminant toutes les boucles en attente du coureur, traiter les
+tours par numéro croissant suffit — les tours suivants ne trouvent plus rien à sortir.
+
+**La rejouabilité ne coûte pas de marqueur.** Le geste ne s'applique qu'aux boucles `pending`, et
+`leaveRace()` les ferme : relancer la tâche sur le même tour ne trouve plus de candidat. Le verrou
+`lockForUpdate` sur le coureur, avec la relecture de `isRunning()`, règle les deux exécutions
+concurrentes et conserve du même coup le motif d'un coureur déjà sorti — un abandon déclaré à 13:58
+reste un abandon quand la limite de 14:00 passe.
+
+**« Plus aucun tour n'est ouvert » ne veut pas dire « aucun coureur n'est en course ».** La
+formulation évidente — ne rien ouvrir tant qu'aucun coureur n'est actif — casse le cas que D-74
+tenait : au tout début, un événement en course sans inscrit confirmé matérialise quand même ses
+tours, et c'est ce qui fait entrer un coureur confirmé en cours de route **au tour suivant** plutôt
+qu'au premier. La garde dit donc ce que la règle dit vraiment : la course a **perdu** ses coureurs —
+au moins un est sorti, aucun ne reste. Un événement où personne n'est encore inscrit continue
+d'égrener ses tours.
+
+**Ce qui reste ouvert.** La garde a un angle mort assumé : si le gérant confirme une inscription
+après que le dernier coureur est sorti, les tours non matérialisés pendant la pause s'ouvrent tous
+d'un coup et le nouvel arrivant se fait éliminer sur la première limite déjà passée. Ça demande de
+repeupler une course vide, ce qu'aucun scénario de la nuit ne fait. Le coureur éliminé n'est pas
+prévenu, conformément à D-15 et au périmètre de la story. Et l'élimination n'a toujours pas d'écran :
+le tableau de BR-09 montre le statut, mais rien n'annonce au gérant que trois coureurs viennent de
+sortir — c'est le bandeau d'effectifs de BR-13.
+
+## D-78 — La correction est une boucle qu'on remonte ou qu'on retire, et l'écran n'offre que ce que le geste courant ne sait plus faire
+
+Arrêté le 2026-08-31 par BR-12. La story se décrivait elle-même comme « volontairement étroite », et
+c'est la seule porte du produit par laquelle une heure saisie à la main entre dans le système. Le
+travail a moins porté sur les deux gestes que sur ce qui les rend difficiles à confondre avec la
+validation courante.
+
+**L'unité de la correction est la boucle, pas le coureur.** Réintégrer prend une boucle et une heure ;
+annuler prend une boucle. Le choix se voit au rattrapage : après une coupure du planificateur, un
+coureur sort à la première limite qu'il a manquée (D-77) et traîne des boucles
+éliminées sur plusieurs tours. Une action portée sur le coureur devrait alors deviner *laquelle* de
+ses boucles on rattrape, et toute déduction implicite est fausse une fois sur trois. L'écran les
+montre toutes, le gérant désigne, et le cas limite que la story nomme — « correction sur un tour
+antérieur au tour courant : les tours suivants ne sont pas rejoués » — tombe sans code.
+
+**La réintégration accepte aussi une boucle encore en attente, et c'est le refus de BR-09 qui
+l'exige.** Une validation tentée trois secondes après l'heure limite est refusée par un message qui
+envoie ici (D-75), et à cet instant la boucle est `pending` : le planificateur ne
+l'a pas encore fermée. Exiger `eliminated` aurait fait attendre le gérant devant un écran vide
+pendant la minute où il a le plus besoin de la porte. Le geste refuse donc une seule chose, la boucle
+**déjà validée** — et le refus dit d'aller chercher l'annulation, parce que c'est le geste que le
+gérant voulait.
+
+**L'annulation réutilise la sortie de BR-10 au lieu de réinventer la sienne.** Tour encore ouvert, la
+boucle repart en attente et le coureur ne bouge pas ; heure limite passée, la boucle est perdue et
+`leaveRace(ExitReason::Timeout, deadline_at)` sort le coureur à l'heure de la ligne du tour, exactement
+comme l'élimination automatique. La garde `isRunning()` conserve le motif d'un coureur déjà sorti :
+annuler la boucle d'un coureur qui avait abandonné à 17:40 n'en fait pas un éliminé de 18:00.
+
+**Le retour en course écrit `null` dans deux colonnes, et D-76 l'avait prévu.**
+`returnToRace()` rejoint `leaveRace()` sur le concern qui porte déjà le concept. Rien ne remonte les
+boucles fermées par la sortie : la boucle corrigée est validée, les autres restent éliminées. Le motif
+d'abandon disparaît, ce que le cas limite de la story demande explicitement.
+
+**La durée se recalcule sans une ligne pour ça.** `LapPerformance` naît à la lecture depuis
+`validated_at`, `starts_at` et la distance de l'événement (D-73) : écrire l'heure
+fournie par le gérant suffit à ce que durée et vitesse suivent. C'est la conséquence que D-75 avait
+annoncée, vérifiée à l'usage — « BR-12 n'aura qu'un instant à réécrire ».
+
+**L'heure saisie se pose sur la date du tour, et un tour à cheval sur minuit garde un angle mort.**
+Le champ ne demande que `HH:MM`, parce qu'une date à saisir à 4 h du matin est une erreur de plus à
+faire. L'instant se construit donc sur la date de `starts_at`, et le refus « antérieure au départ du
+tour » est possible. Sur un tour qui traverse minuit, une heure antérieure au départ est interprétée
+au lendemain plutôt que refusée : c'est le seul cas où la borne basse ne garde plus rien, et il
+demande une saisie fautive sur le seul tour de la nuit qui change de jour.
+
+**Le marqueur est une colonne, pas un historique.** `corrected_at` dit qu'une boucle a été touchée à
+la main et quand ; il ne dit pas par qui ni ce qu'elle valait avant. La story exclut l'historique
+complet (D-15), et une seconde correction écrase la première — ce qui reste vrai est
+la seule chose dont la nuit a besoin : ce chiffre-là n'est pas sorti du chronomètre.
+
+**L'écran est distinct, et il ne liste pas la course entière.** Les boucles à rattraper sont celles
+que le geste courant ne peut plus valider : éliminées, ou en attente sur un tour échu. Les
+validations annulables sont celles des **deux derniers tours** — une erreur de saisie se voit dans
+les minutes qui suivent, et rendre 24 h de boucles validées ferait d'un écran de secours un écran de
+navigation. Le lien vers le poste n'apparaît que pendant la course, faute de quoi il mènerait au 403
+que la policy oppose hors `running`.
+
+**Une seule capacité autorise les deux gestes et l'écran.** `EventPolicy::correctLaps` porte la
+permission `manage-laps` et l'état de course ; `LapPolicy::correct` la relaie pour les deux routes.
+Les `FormRequest` reposent le gérant sur son écran avec une ligne d'explication, les exceptions des
+actions restent le filet du programmeur — même construction que BR-09 et BR-44, duplication
+comprise et testée des deux côtés.
+
+**Ce qui reste ouvert.** Le marqueur se lit sur le tableau du tour courant, dans la sous-ligne du
+coureur ; la fiche du coureur que la story désigne est BR-16 et n'existe pas. Un coureur sorti sans
+aucune boucle fermée — un abandon posé sur une boucle déjà validée, ce que l'écran de BR-10 n'offre
+pas mais que l'action sait faire — n'apparaît sur aucune des deux listes, et son retour en course
+passerait par une réintégration sur une autre de ses boucles. Rien ne signale au gérant qu'une
+correction a eu lieu ailleurs que sur la ligne concernée, et rien ne l'empêche d'en faire son geste
+courant : c'est un choix d'écran, pas une garde.
+
+## D-79 — Le tableau du tour ne montre que ceux qui courent, et le compteur porte les sortis
+
+Arrêté le 2026-09-01 par BR-13. L'écran existait à moitié depuis D-75 — un tableau « volontairement
+pauvre », posé parce que le bouton de validation devait bien se poser quelque part. BR-13 en fait
+l'écran de la nuit, et deux de ses règles ont déplacé ce que BR-09 et BR-10 avaient livré.
+
+**Le coureur sorti quitte la liste, et deux tests de l'epic 2 ont été réécrits pour le dire.** BR-09
+affichait le coureur éliminé avec une cellule « sorti », BR-10 le coureur en abandon avec son statut,
+et les deux étaient sous test. La règle de BR-13 est explicite — « seuls les coureurs actifs
+apparaissent dans la liste de validation » — et son critère chiffré ne laisse pas d'ambiguïté : 24 en
+course, 13 sortis, 24 lignes. Ce n'est pas une amputation de l'information : elle passe dans le
+compteur, qui la donne en un chiffre au lieu de treize lignes à faire défiler. Le gérant qui veut la
+liste complète l'aura par BR-14 et ses filtres. Les deux tests réécrits affirment maintenant le
+mouvement lui-même : le coureur sort du tableau **et** apparaît dans le compteur des sortis.
+
+**Les compteurs sont un agrégat, pas un `count()` sur la liste rendue.** Une somme conditionnelle sur
+les inscriptions confirmées donne les deux chiffres en une requête. La conséquence assumée est une
+divergence possible d'un coureur entre le compteur et la liste : un inscrit confirmé en pleine course
+est « en course » avant que le tour suivant ne lui ouvre une boucle (D-74). C'est la lecture honnête
+de l'effectif ; l'inverse — dériver le compteur de la liste — ferait mentir le chiffre chaque fois
+qu'un coureur rejoint la course, et ferait payer au téléphone un parcours de la collection à chaque
+sondage de BR-15.
+
+**« Aucune boucle ouverte sur ce tour » est devenu faux le jour où la liste s'est réduite.** Un tour
+peut porter quarante boucles et n'afficher personne, si les quarante coureurs sont sortis. Le texte
+dit maintenant ce que le gérant peut faire — aucun coureur en course sur ce tour — et il couvre du
+même coup la minute que D-75 laisse ouverte au sommet d'un tour, où le tour existe et où ses boucles
+ne sont pas encore écrites.
+
+**L'écran s'ouvre sur `manage-laps`, pas sur `manage-event`.** Les deux capacités sont tenues par le
+même rôle aujourd'hui, donc rien ne change sur la machine. Ce qui change, c'est qu'elles cessent
+d'être lues comme une seule : le poste de configuration et le poste de chronométrage sont deux
+métiers, et le second peut être confié sans le premier. La conséquence est visible sur la ligne du
+coureur — le lien vers sa fiche ne s'affiche que pour qui porte `manage-participants`, faute de quoi
+l'écran offrirait une porte qui répond 403.
+
+**La panne réseau est traitée globalement, sur l'événement d'Inertia, pas sur le formulaire de
+validation.** D-75 laissait ce cas ouvert : « le bouton reste en attente, le gérant réappuie ». Il ne
+restait pas en attente, il retombait en silence, ce qui est pire — rien ne distinguait un appui parti
+d'un appui perdu. Le client émet `networkError` pour la requête qui ne part pas ; un toast s'y
+accroche, et il couvre tous les gestes de la nuit plutôt que celui-ci seul. L'exception n'est pas
+avalée, donc une vraie panne reste lisible en console.
+
+**Le lien vers la fiche est sur le nom, pas sur la latte.** `RunnerSlat` portait depuis la charte un
+`href` qui transformait la latte entière en lien, et que personne n'avait branché. Le brancher ici
+aurait imbriqué le bouton de validation et la boîte d'abandon dans une ancre — HTML invalide, et
+surtout un pouce qui rate le bouton de quelques pixels quitte l'écran en pleine course. Le lien tient
+donc sur le nom, avec sa cible tactile étendue aux lignes voisines.
+
+**Ce qui reste ouvert.** L'écran ne se rafraîchit pas seul : BR-15 en fait son affaire, et jusque-là
+le changement de tour se voit en rechargeant. La fiche du coureur est encore sa fiche d'inscription,
+que BR-16 remplacera par un dépliage sur place. Le compteur des sortis ne distingue pas l'abandon de
+l'élimination, alors que la donnée existe — la story ne demande que deux nombres, et le détail par
+motif appartient au classement de BR-20. Aucune boucle n'est semée, donc l'écran ne se regarde
+toujours qu'en fabriquant une course à la main.
+
+## D-80 — La recherche de BR-14 déménage sur l'accueil, réservée au gérant ; le coureur y voit sa propre course
+
+Demandé le 2026-09-07 par le propriétaire, en reprise de BR-14 livrée la même session.
+
+BR-14 ouvrait la recherche par nom ou dossard aux deux rôles, sur sa propre page `/runners`. Le
+propriétaire a resserré ce périmètre : la recherche n'a plus de page ni d'entrée de navigation
+dédiées, elle vit sur l'accueil (`/dashboard`), et seulement pour qui porte `manage-event` — c'est
+le gérant qui cherche un coureur, jamais un participant vis-à-vis d'un autre.
+
+**L'accueil du coureur perd les informations de son inscription.** Statut, date de dépôt et
+« modifiable jusqu'à confirmation » sortent de `Dashboard.vue` : `RegistrationController` les porte
+déjà sur l'onglet « Mon inscription », et les répéter sur l'accueil était la duplication que la
+reprise visait. Une fois la course lancée et l'inscription confirmée, l'accueil affiche à la place
+l'espace du coureur — son propre statut de course, son dossard, ses boucles validées, sa distance et,
+s'il est sorti, l'heure de sortie — bâti avec le même `RunnerSearchResultResource` que la recherche
+du gérant, appliqué à un seul coureur : lui-même. Avant le départ, ou tant que l'inscription n'est
+pas confirmée, l'accueil renvoie simplement vers « Mon inscription ».
+
+**Le gérant garde la priorité sur son propre accueil.** Un gérant qui détient aussi une inscription
+voit la recherche, jamais son espace coureur : la bascule dépend du rôle porté, pas de l'existence
+d'une inscription, pour ne pas réintroduire la distinction que D-79 avait déjà tranchée en sens
+inverse pour le tableau de bord de BR-13.
+
+**Composants réutilisés, rien reconstruit.** `RunnerSlat` et `RunnerDetailPanel`, construits pour
+BR-14, servent tels quels aux deux usages ; la boîte de recherche est extraite en
+`RunnerSearchBoard.vue`, qui émet l'événement de recherche plutôt que de naviguer elle-même, pour que
+`Dashboard.vue` reste lisible malgré ses six états (aucun événement, gérant au repos, gérant en
+recherche, aucune inscription, coureur en attente, coureur en course).
+
+**Ce que la reprise retire à BR-14 telle que livrée** : la recherche pour un participant. BR-14 la
+voulait ouverte aux deux rôles ; un coureur ne peut plus chercher un autre coureur depuis
+l'application, la capacité n'existant plus que côté gérant.
+
+## D-81 — Le rafraîchissement périodique tient dans un composable sans dépendance au cycle de vie du composant
+
+Arbitré le 2026-09-07 par BR-15.
+
+`usePolling()` n'appelle ni `onMounted` ni `onUnmounted` : il rend `start()` et `stop()`, que
+`manage/Index.vue` et `Dashboard.vue` branchent eux-mêmes sur leur cycle de vie. La suite de tests
+du composable n'a donc besoin de monter aucun composant Vue — inexistant dans l'outillage du
+projet, ni `@vue/test-utils` ni `jsdom` n'étant installés — et reste alignée sur le seul style de
+test déjà en usage : une fonction pure, `document` et `@inertiajs/vue3` simulés par
+`vi.stubGlobal()` et `vi.mock()`.
+
+**La session expirée ne demande aucun code.** `router.reload()` embarque déjà
+`preserveScroll: true` et `preserveState: true` — le second critère d'acceptation est acquis sans
+rien écrire. Une session tombée pendant la nuit fait répondre le serveur hors du protocole
+Inertia ; le client Inertia détecte l'écart et bascule en navigation pleine page vers la
+connexion, ce qui démonte le composant et donc appelle `stop()` : aucun minuteur ne continue de
+cogner sur un écran qui n'existe plus. Le test qui couvre ce cas n'exerce donc pas une redirection
+— déjà à la charge d'Inertia — mais l'invariant qui la rend sûre : `stop()` ne laisse aucun
+minuteur ni écouteur derrière lui.
+
+**Un seul point d'ajustement pour la fréquence et la liste des props.** `POLLING_INTERVAL_MS` est
+la seule constante du fichier, et chaque page passe sa propre liste `only` — les mêmes clés que
+son rechargement partiel existant (BR-13, BR-14) — pour que le polling n'élargisse jamais la
+charge que ces stories avaient déjà bornée.
+
+## D-82 — Q-05 : la validation de boucle rejoint le panneau de recherche, sans retirer celle de BR-13
+
+Arbitré le 2026-09-07 avec le propriétaire du projet, en ouverture de BR-16.
+
+Q-05 demandait ce que devient le bouton de validation en liste de BR-13 une fois que la boucle se
+valide aussi depuis le panneau déplié de la recherche (BR-14). Réponse : **les deux coexistent**.
+Le tableau du gérant (`/manage`) garde son bouton par coureur actif, utile pour valider en rafale
+pendant qu'une dizaine de coureurs rentrent ensemble. La recherche (`/dashboard`) gagne le même
+geste pour l'usage qu'elle sert déjà : un coureur précis, retrouvé par nom ou dossard, sans faire
+défiler la liste des actifs.
+
+**Aucun nouveau contrôleur.** `Manage\LapValidationController` et sa Policy `LapPolicy::validate`
+étaient déjà corrects pour cet usage — la Policy ne connaît que le tour et l'événement, jamais
+l'écran d'où vient la requête. Le panneau appelle le même `LapValidationController.form(lapId)`
+que `RoundBoard`, avec le même composant `Form` d'Inertia.
+
+**Ce que ce second point d'entrée casse, et corrige :** `LapValidationController` et
+`RunnerWithdrawalController` redirigeaient tous deux vers `to_route('manage.index')` en dur — une
+boucle validée depuis `/dashboard` aurait renvoyé le gérant sur `/manage`, et sa recherche en
+cours (terme saisi, résultat déplié) aurait disparu. Les deux passent à
+`redirect()->back(fallback: route('manage.index'))` : la session Inertia connaît déjà la page
+précédente, donc chaque écran revient sur lui-même, et le repli sur `/manage` protège les tests
+existants qui postent sans navigation préalable.
+
+**`RunnerSearchResultResource` porte deux champs de plus** pour que le panneau sache quoi
+proposer : `pending_lap_id` (la boucle en attente du tour courant, ou `null` si le coureur est
+sorti) et `laps`, la liste de ses boucles du tour 1 au dernier tour couru — c'est le cœur de
+BR-16, la validation n'en est qu'un sous-produit. `App\Http\Resources\RunnerLapResource` calcule
+chaque ligne avec `LapPerformance`, déjà écrit pour `RoundRunnerResource` : aucun calcul de
+vitesse ou de durée n'est dupliqué.
+
+**Le gating reste au bouton, pas à l'écran.** `/dashboard` en mode recherche n'est déjà accessible
+qu'au porteur de `manage-event` (D-80), mais valider une boucle exige `validate-laps` et
+l'abandon exige `manage-laps` — deux permissions distinctes (D-28). Le panneau vérifie chacune
+avant d'afficher son bouton, comme `RoundBoard` le fait déjà pour le lien vers la fiche coureur.
+En pratique le rôle gérant porte les neuf, donc aucun gérant ne verra les boutons disparaître —
+mais l'écran ne présume pas de cette coïncidence.
+
+**Ce que Q-05 ne rouvre pas : la correction.** Le Contexte de BR-16 parlait d'un « abandon ou une
+correction » déclenchés depuis le panneau, mais son Périmètre exclut la modification d'une boucle
+depuis cet écran : elle reste sur le poste de correction de BR-12, qui liste tout l'effectif et
+n'a pas de filtre par coureur. Rien n'y change ici — le panneau ne gagne qu'un lien d'action de
+plus (Valider), pas un accès à `LapReversionController` ni `LapReinstatementController`.
+
+## D-83 — La durée du prochain tour (BR-44) déménage sur l'accueil, réservée à la course en cours
+
+Demandé le 2026-09-07 par le propriétaire, dans le prolongement de D-80 et D-82 : le même
+mouvement qui a sorti la recherche (BR-14) puis la validation (D-82) de `/manage` pour les poser
+sur `/dashboard` s'applique au geste de BR-44.
+
+**Le geste déménage, il ne se duplique pas.** `NextRoundDuration` quitte `manage/Index.vue` et
+rejoint le bas du panneau de recherche sur `/dashboard`, dans le même bloc que
+`RunnerSearchBoard`. `Manage\IndexController` perd sa dépendance à `ResolveNextRound` et son prop
+`nextRound` ; `DashboardController::renderSearch()` les porte désormais, à côté de la recherche.
+
+**« Seulement en course » resurgit une capacité que BR-44 avait déjà jugée sans intérêt.** Son
+cas limite « Événement pas encore en course » notait que le geste restait disponible avant le
+départ sans qu'aucune règle ne l'interdise — « il n'a pas d'intérêt, la configuration fait la
+même chose plus simplement ». Comme `manager_search` n'existe que pendant la course (D-80 : sinon
+c'est `manager_idle`), le déménagement retire mécaniquement cette disponibilité pré-course plutôt
+que de la recréer sur un écran qui n'y a pas de raison d'être ; aucune règle métier de BR-44 ne
+change, seule sa fenêtre d'affichage se resserre à ce qu'elle sert réellement.
+
+**Même correctif de redirection que D-82.** `RoundDurationController` redirigeait vers
+`to_route('manage.index')` en dur ; avec ce second point d'entrée il passe à
+`redirect()->back(fallback: route('manage.index'))`, pour la même raison — rester sur l'écran
+d'où le geste est parti.
+
+**Révoquée le 2026-09-07 par D-84**, le jour même : le geste repart de l'accueil vers la gestion,
+en haut de la section Course. Ce qui lui survit est la réserve « seulement en course », désormais
+tenue par `Manage\IndexController`, et le correctif de redirection, qui vaut pour les deux écrans.
+
+## D-84 — La gestion est une barre de sous-menus sur six écrans, et les deux bandeaux de course échangent leur place
+
+Demandé le 2026-09-07 par le propriétaire, le même jour que D-83 et contre une partie de celle-ci :
+`/manage` mélangeait trois choses sur un seul écran — le bandeau du tour, le tableau des coureurs en
+course, et la grille de liens vers les écrans d'administration. Chaque lien quittait la page ; le
+tableau de course « polluait » l'accès à l'administration.
+
+**Une barre de sous-menus partagée, pas une page unique à onglets.** `ManageDesks` liste les six
+sections et marque celle qu'on regarde ; `ManagePage` l'empile au-dessus du contenu et remplace
+`BoardPage` sur les six écrans de gestion. Les routes ne changent pas : Inertia ne remplace que le
+bloc du dessous, la barre ne bouge pas, et chaque section reste partageable en URL avec son
+contrôleur et sa permission. Fusionner les six contrôleurs derrière un résolveur de section aurait
+donné le même ressenti pour un démontage sans contrepartie.
+
+**Le format suit l'appareil** — colonne sur téléphone, grille de trois sur tablette, une seule ligne
+sur PC. Les entrées perdent leurs phrases d'action (« Corriger une boucle ») pour des noms courts
+(« Corrections ») : une ligne de six ne tient pas autrement.
+
+**`/manage` devient la section « Course », et rien d'autre.** Le tableau des coureurs cesse de
+cohabiter avec les liens d'administration : il occupe sa propre section, ouverte par défaut en
+entrant dans la gestion — donc l'écran de course pendant la course, et l'état d'attente que BR-13
+affichait déjà le reste du temps. `Corrections` n'apparaît dans la barre que pendant la course,
+comme avant, mais sur le statut de l'événement (`board.status`) plutôt que sur l'existence d'un tour
+courant, parce que la barre est partagée par des écrans qui n'ont pas le tour en props.
+
+**Les deux bandeaux échangent leur écran.** Le bandeau du tour en cours (`RoundHeader` +
+`RoundTally`) quitte `/manage` pour l'accueil, gérant **et** coureur : c'est l'écran qu'on laisse
+ouvert pendant la course, et le coureur y gagne l'échéance de son tour. En sens inverse, la durée du
+prochain tour (`NextRoundDuration`) revient de l'accueil vers le haut de la section Course — ce qui
+révoque le déménagement de D-83, arrêté le matin même. La réserve de D-83 lui survit : c'est
+maintenant `Manage\IndexController` qui ne résout `nextRound` que sur un événement en course, pour
+que le geste reste indisponible avant le départ.
+
+**Le compteur suit son bandeau.** `manage.index` ne porte plus `tally` ; `DashboardController` le
+porte dans ses deux modes de course, calculé par `ResolveRunnerTally` côté coureur et déjà présent
+dans la recherche côté gérant.
+
+**La recherche du tableau du tour filtre dans le navigateur, celle de l'accueil interroge le
+serveur.** Les deux répondent à la même question et n'ont pas le même corpus : les coureurs du tour
+sont déjà tous en props, donc le filtre est immédiat, ne coûte aucune requête et survit au
+rafraîchissement périodique ; la recherche de l'accueil (BR-14) porte sur tout l'événement et reste
+serveur, avec son seuil et son délai. Le champ lui-même est le même composant
+(`form/SearchField.vue`), extrait au deuxième usage.
+
+**L'encart de durée tient sur trois rangées.** Il en occupait six au-dessus du tableau et repoussait
+le geste de validation hors de l'écran sur un téléphone. La compression à deux rangées y arrivait en
+masquant le libellé du champ et en collant l'échéance du tour à sa réserve, ce qui coûtait la
+lisibilité : la forme retenue garde une rangée pour chacune des trois choses que l'encart dit — ce
+qu'il règle et pour quel tour, le réglage lui-même avec ses deux portées, et ce qu'il ne touche pas.
+
+## D-85 — L'espace du coureur s'ouvre à la confirmation, et le prochain départ est une question posée au cycle de vie
+
+Arbitré le 2026-09-07 par BR-24, avec le propriétaire du projet.
+
+**L'accueil du coureur n'attend plus le départ.** D-80 ouvrait l'espace de course sur deux conditions
+— inscription confirmée **et** course lancée — et renvoyait sinon vers « Mon inscription ». BR-24
+révoque la seconde : une inscription confirmée ouvre l'écran quel que soit le statut de l'événement,
+avec zéro boucle et le premier départ annoncé. `runner_waiting` ne parle donc plus du départ, mais de
+la confirmation : il ne reste que pour une inscription en attente ou annulée, et son texte le dit.
+
+**Le prochain départ ne s'affiche que sans bandeau au-dessus.** Les tours s'enchaînent sans trou :
+l'heure du prochain départ est l'échéance du tour en cours, que `RoundHeader` affiche déjà depuis
+D-84. La ligne de l'encart la répétait donc pendant toute la course, et elle ne dit quelque chose que
+quand il n'y a pas de bandeau — avant le premier départ, ou entre deux tours si la grille est
+épuisée. `Dashboard.vue` la coupe en présence d'un tour courant ; le contrôleur, lui, continue de la
+porter, parce que c'est l'écran qui sait ce qui est déjà à l'écran, pas le serveur.
+
+**Le prochain départ se demande au cycle de vie, pas au statut.** Deux conditions le gardent : le
+coureur est encore en course, et l'état de l'événement annonce un tour. La seconde est
+`announcesNextRound()` sur `EventLifecycleState` — vraie en inscription et en course, fausse en
+brouillon et une fois la course finie — plutôt qu'une comparaison à `EventStatus::Finished` dans le
+contrôleur. Deux cas limites de la story tombent ensemble : l'événement terminé n'annonce rien, et un
+événement en brouillon non plus. Le calcul lui-même est celui du gérant : `ResolveNextRound`, déjà
+posé par BR-44, sert les deux écrans sans être dupliqué.
+
+**La durée de la dernière boucle n'est pas un champ de plus.** Les boucles portent déjà
+`duration_seconds`, donc `lastTimedLap()` retient dans le navigateur la dernière boucle chronométrée.
+Une boucle en cours ne compte pas, et un coureur sans boucle validée lit un tiret — vide, pas zéro,
+comme le cas limite l'exige. Aucune requête ni aucun champ ne sont ajoutés côté serveur.
+
+**Le détail boucle par boucle reste chez le coureur, contre l'exclusion de la story.** BR-24 le
+renvoyait au panneau du gérant ; le propriétaire le veut sur son écran — le temps de la boucle, la
+vitesse, ce qui sert pendant la nuit. La liste quitte donc `RunnerDetailPanel` pour `RunnerLapList`,
+que les deux panneaux partagent, et le panneau du coureur ajoute ce que BR-24 demandait : distance
+totale, durée et vitesse de la dernière boucle, prochain départ.
+
+**La vitesse moyenne est une distance sur un temps couru, pas une moyenne de vitesses.** L'encart des
+chiffres l'affiche à côté de la distance totale : somme des kilomètres validés divisée par la somme
+des durées de boucle. Le temps d'attente entre l'arrivée d'une boucle et le départ du tour suivant
+n'y entre pas — c'est du repos, pas de la course — et une boucle en cours non plus, faute de durée.
+Moyenner les vitesses boucle à boucle aurait donné un autre nombre dès que les durées diffèrent, et
+c'est justement quand elles diffèrent que le coureur regarde. Le calcul vit dans `lapReadout.ts`, sur
+les boucles déjà en props, et ses trois cas sont couverts.
+
+**Ces boucles sont un tableau, dans son propre encart.** La ligne de récapitulation héritée de
+BR-16 — `T1 · 48:32 · 6 km · 7,57 km/h` — se lit une fois et se compare mal : posée à nu sous les
+chiffres, elle flottait, et empilée quinze fois, elle demande à l'œil de recompter les points à
+chaque ligne. Le tableau donne quatre colonnes alignées, tour, temps, kilomètres et vitesse, les
+unités passant en entête pour que les cellules ne portent que des chiffres, et le tour et le temps
+gardant seuls le gras. La correction devient une astérisque sur le numéro de tour, avec sa légende
+sous le tableau et son texte pour les lecteurs d'écran, plutôt qu'un quatrième point en fin de ligne.
+Les deux blocs restent deux encarts titrés et non un seul : les chiffres répondent « où j'en suis »,
+le tableau « comment j'y suis arrivé », et les fondre revenait à mélanger un état et un historique.
+`RunnerLapList` étant partagé, le panneau du gérant (BR-16) prend la même forme : une seule lecture
+des boucles dans le produit, pas deux.
+
+**Les raccourcis vers le briefing et les documents ne sont pas livrés**, bien que le périmètre inclus
+de BR-24 les nomme. La navigation du membre porte les deux entrées depuis BR-33 : une seconde copie
+sur l'accueil serait exactement la duplication que D-80 avait retirée de cet écran.
+
+**Aucune action de gestion n'atteint l'écran du coureur, par construction.** `RunnerStandingPanel`
+n'en porte aucune, là où `RunnerDetailPanel` les masquait par permission. Le critère
+d'acceptation n'a donc pas de garde à vérifier : il n'y a rien à masquer.
+
+**Ce que BR-24 ne ferme pas** — le renvoi vers les résultats une fois la course terminée. BR-23
+n'existe pas encore : le coureur voit son résultat figé, son motif de sortie et aucun prochain
+départ, et le lien viendra avec la page qu'il devra ouvrir.
+
+## D-86 — La clôture est une entrée d'état, et le classement figé est une table à part
+
+Arbitré le 2026-09-07 par BR-20.
+
+**La clôture n'a pas eu de geste à elle.** La story demandait une action « Terminer l'événement »
+avec confirmation ; la barre de gestion la portait déjà, sous la forme générique du passage à
+l'étape suivante — `manage.event.advance`, réservé à la permission `finish-event` par
+`RunningEventState::advancePermission()`, avec la boîte de confirmation qui distingue déjà une
+transition réversible d'une transition qui ne l'est pas. Écrire un second chemin pour le même
+mouvement aurait donné deux façons de finir la course, dont une seule serait testée. La lecture
+seule ne s'est pas écrite non plus : validation, abandon et correction interrogent toutes
+`isRacing()`, faux dès que l'état est `finished`.
+
+**Le gel s'accroche à l'entrée dans l'état, pas à un `if` sur le statut.** `AdvanceEventStatus` est
+générique, et le lui apprendre à reconnaître `finished` aurait remis dans une action la
+correspondance sur l'enum que `EventStatus` déclare vivre une seule fois, dans le cycle de vie.
+L'interface gagne donc `enter(Event $event): void`, vide dans trois états sur quatre :
+`FinishedEventState` y pose l'heure de clôture et appelle `FreezeStandings`. La transition et le gel
+tiennent dans une transaction — un classement à moitié écrit sur un événement déjà terminé ne se
+rattrape pas, puisque la clôture ne se défait pas.
+
+**Le classement est une table, pas une lecture.** D-06 le disait dès le premier jour : « figé par
+une action serveur, pas recalculé à l'affichage ». `standings` porte le rang, le nombre de boucles,
+le motif de sortie, et **recopie le nom et le dossard** du coureur. La recopie n'est pas de la
+redondance : un coureur qui change son nom dans son profil après la course ne doit pas changer
+l'annonce du podium. Ce qui reste dérivé, c'est la distance — boucles validées × distance de boucle,
+comme partout ailleurs (D-17), et la distance de boucle est gelée avec le reste de la configuration.
+
+**Le rang est le rang de compétition, et il saute.** Deux coureurs à 12 boucles sont tous les deux
+premiers, le suivant est troisième. Aucun critère ne les départage : ni la vitesse, ni le temps
+cumulé, ni l'heure de la dernière boucle. L'ordre d'affichage entre ex æquo est celui des dossards,
+pour que deux lectures de la même page donnent la même liste.
+
+**Un coureur sans boucle validée n'est pas classé.** Le classement récompense des boucles ; sans
+boucle, il n'y a rien à classer. C'est ce qui rend possible le cas limite de la story — une course
+close sans qu'une seule boucle soit validée produit un classement vide, et la page le dit au lieu
+d'aligner des zéros.
+
+**Le coureur encore en course à la clôture est « terminé ».** `RunnerStatus::Finished` existait
+depuis BR-08 sans être utilisé : c'est ici qu'il sert. Le classement lit le statut du motif de
+sortie, et son absence signifie que le coureur était encore debout quand le gérant a arrêté la
+course. Sa boucle en cours, elle, ne compte pas — elle n'a jamais été validée.
+
+**Le classement a sa page publique, `/standings`, et non l'accueil.** BR-23 prendra l'accueil
+d'après-course, le vainqueur et les chiffres de la soirée ; BR-20 ne livre que la liste, ouverte aux
+invités comme aux inscrits, et l'entrée de navigation n'apparaît qu'une fois la course close
+(`isOver()`, quatrième question posée au cycle de vie après D-85). Avant la clôture,
+l'adresse répond 404 dans le site, par BR-40.
+
+**Le statut d'un coureur se lit contre l'état de la course, pas seulement contre sa propre sortie.**
+Relevé en prenant la story : `runnerStatus()` ne regardait que `exited_at`, donc un coureur que la
+clôture attrape debout lisait « Terminé » au classement et « En course » sur son propre écran — deux
+réponses pour le même coureur, le lendemain matin. La méthode prend désormais l'état du cycle de vie
+en argument : sorti, elle rend le motif ; encore debout, elle rend « Terminé » si la course est
+close et « En course » sinon. L'argument est passé, jamais lu depuis la relation `event` : le tableau
+du tour appelle cette méthode une fois par coureur, et un test compte les requêtes justement pour
+qu'aucune n'y apparaisse. Les trois vues qui l'appellent reçoivent donc l'événement entier plutôt que
+sa seule distance de boucle, ce qui leur retire un paramètre au lieu de leur en ajouter un.
+
+Un coureur confirmé avant le départ reste « En course » : la question posée est `isOver()`, vraie du
+seul état terminé, et non `isRacing()`, qui aurait fait passer tout le monde pour arrivé pendant les
+inscriptions.
+
+**Ce que BR-20 ne ferme pas** — l'heure de clôture est enregistrée mais ne sert encore qu'à dater le
+classement. C'est BR-23 qui en fera la durée totale de l'événement, du premier départ à la clôture ;
+la colonne existe dès maintenant parce qu'une heure de clôture ne se rattrape pas après coup.
+
+Reste aussi la boucle que la clôture interrompt : elle demeure `pending` en base et s'affiche « En
+cours » sur l'écran du coureur, indéfiniment. Elle ne fausse aucun classement — une boucle non
+validée ne compte pas — et plus personne ne peut la valider. Le geste qui la fermerait demande un
+statut de boucle qui dise « la course s'est arrêtée avant », et il n'a pas été pris ici.
+
+## D-87 — L'accueil public bascule sur les résultats, et les chiffres sont quatre agrégats en base
+
+Arbitré le 2026-09-07 par BR-23, avec le propriétaire du projet.
+
+**Il y avait deux accueils, et c'est le public qui bascule.** La story demande « la bascule
+automatique de l'accueil », mot que le produit porte deux fois : `/` — la page événement ouverte par
+D-60 — et `/dashboard`, devenu la vue de course du coureur par BR-24. Le propriétaire a tranché pour
+`/`. La raison est celle de D-60 : le lien qu'on partage doit montrer la course, et une fiche
+d'inscription fermée sur un événement terminé ne montre rien. Les résultats s'ouvrent donc aux
+invités comme `/standings`, sans compte, et l'écran du coureur garde son propre résultat figé.
+
+**La question est posée au cycle de vie, comme partout depuis D-85.** `EventController` interroge
+`isOver()`, la même méthode que la navigation et que la page du classement, et rend `Results` ou
+`Event`. Aucune comparaison à `EventStatus::Finished` n'entre dans le contrôleur, et un brouillon ne
+bascule pas : il est déjà traité comme une absence par la policy, avant même d'atteindre la question.
+
+**Le renvoi que BR-24 n'avait pas pu livrer arrive avec la page qu'il ouvre.** D-85 laissait le
+coureur sans lien vers les résultats faute de page à ouvrir ; son écran en porte un maintenant, et
+l'entrée de navigation « Événement » devient « Résultats » une fois la course close — une entrée qui
+mène aux résultats sous le nom de l'événement aurait été le seul mensonge de la barre. Les deux se
+branchent sur `access.results`, partagé à côté de `access.standings`. Les deux clés coïncident
+aujourd'hui, et elles ne disent pas la même chose : l'une dit qu'un classement existe, l'autre dit ce
+que l'accueil rend. Les fondre aurait couplé le nom d'une entrée de navigation à l'existence d'une
+autre page.
+
+**Les quatre chiffres sont quatre agrégats, un par indicateur.** Participants, boucles validées,
+kilomètres et durée ne se parcourent pas en PHP : le comptage des boucles est un `count` joint sur
+les tours de l'événement, la distance est ce comptage multiplié par la distance de boucle (D-17), et
+la durée est la soustraction de deux colonnes déjà en base — premier départ et heure de clôture, que
+BR-20 avait posée pour cet usage. Une distance de boucle absente rend `null` et non zéro : la page
+affiche un tiret, parce qu'un total inconnu n'est pas un total nul.
+
+Le compte des participants est celui des inscriptions confirmées, et l'écran le nomme ainsi. Il ne
+dit pas combien de coureurs se sont réellement présentés au premier départ : un confirmé absent le
+jour même y figure, et le seul écran qui le distinguerait est le tableau par tour, dont la première
+ligne compte les boucles effectivement ouvertes.
+
+**Le tableau par tour tient dans une seule requête, et il se lit sur les boucles.** Une passe groupée
+par tour rend les quatre colonnes ensemble : les partants sont le nombre de boucles ouvertes, les
+terminées sont celles validées, et les sorties sont les boucles `eliminated` ventilées par le motif du
+coureur. Ce rattachement n'est pas une reconstitution : `leaveRace` marque la boucle en cours du
+coureur au moment où il quitte la course, donc la boucle éliminée **est** le tour de la sortie, sans
+qu'on ait à comparer une heure de sortie à une fenêtre de tour. Un test compte les requêtes de la page
+et vérifie qu'un tour de plus n'en ajoute aucune.
+
+**Le vainqueur se lit sur le rang, jamais sur un maximum.** La page demande les lignes de rang 1 du
+classement figé — plusieurs quand il y a ex æquo, aucune quand la course s'est terminée sans une
+boucle validée, et alors la page le dit au lieu d'annoncer un podium vide. Rien n'est recalculé à
+l'affichage, comme D-06 l'exigeait et comme D-86 l'a construit ; le classement complet reste sur
+`/standings`, et la page n'en charge que la tête.
+
+**L'album photos sort du périmètre, et n'y reviendra pas.** La story voulait un lien vers un album
+partagé, ce qui demandait une colonne sur l'événement. Le gel de D-86 la rendait inutilisable :
+`FinishedEventState` fige tous les attributs, or les photos arrivent après la clôture — le gérant
+aurait dû coller l'adresse d'un album qui n'existe pas encore. La sortie du périmètre est celle que le
+propriétaire a choisie plutôt que d'ouvrir une exception dans le gel pour un lien. BR-22 avait déjà
+emporté la galerie ; le lien la suit.
+
+**Ce que BR-23 ne ferme pas** — la boucle interrompue par la clôture, relevée en fin de D-86, reste
+`pending` et n'entre dans aucun chiffre. Elle est comptée comme partante au dernier tour, ni terminée
+ni sortie, et c'est exactement ce qui s'est passé : la ligne du dernier tour ne s'additionne donc pas,
+faute d'un statut de boucle qui dise « la course s'est arrêtée avant ».
+
+## D-88 — Le briefing et les documents ne font qu'un onglet, public, et `/documents` disparaît
+
+Reprise R-10, arbitrée le 2026-09-07 par le propriétaire du projet. Elle revient sur la moitié de
+D-60 restée fermée.
+
+**Le constat vient du texte lui-même.** Le briefing se terminait par deux lignes qui renvoyaient le
+coureur au **Guide du coureur** et l'accompagnant au **Guide du fêtard**, « dans l'onglet Documents
+du site ». Un texte qui doit expliquer à son lecteur où se trouve la moitié de ce qu'il annonce n'a
+pas deux onglets à occuper : il en a un. Le propriétaire a supprimé ces deux lignes le jour de la
+fusion, ce qui est exactement ce que devient une référence croisée quand les deux pages n'en font
+plus qu'une.
+
+**L'arbitrage de D-60 sur le briefing est renversé, par son auteur.** D-60 ouvrait les documents et
+gardait le briefing fermé, sur une raison énoncée en deux temps : « les documents s'ouvrent parce
+qu'ils décident, ils n'exploitent pas », et « le briefing reste fermé pour la raison inverse : il dit
+comment se déroule la nuit à quelqu'un qui y sera ». Le contenu dit autre chose. Le briefing initial
+est le principe d'un Backyard, les infos clés — lieu, heure d'arrivée conseillée, premier départ — et
+l'esprit de la soirée : c'est ce qui décide de venir, pas ce qui se lit une fois sur place. La raison
+que D-60 donnait aux documents s'applique donc au briefing telle quelle. Ce que D-60 avait jugé,
+c'était l'idée qu'elle se faisait du contenu, pas le contenu.
+
+**Les deux gardes étaient déjà la même expression.** `EventPolicy::view()` et
+`DocumentPolicy::viewAny()` posaient littéralement le même prédicat — visible aux participants, ou
+gérant de l'événement — et seul le middleware `auth` séparait les deux pages. La fusion ne desserre
+donc aucune policy : elle retire un middleware et fond deux prédicats identiques en un. `viewAny`
+part avec ses deux seuls appelants, et `access.documents` quitte le contrat partagé : un onglet, une
+clé, `access.event`. Le refus qu'un invité reçoit sur un brouillon est la page française du site
+depuis BR-40 (D-66), ce que D-60 avait laissé en exposition.
+
+**La page vit sur `/briefing`, pas sur `/documents`.** L'onglet est nommé par ce qu'on lit d'abord.
+`Route::resource('documents')`, `DocumentController` et `pages/Documents.vue` quittent donc le
+produit, et `BriefingController` rend les deux moitiés. Comme `/documents` avant elle, l'adresse
+répond 404 sur une base sans événement, par `Event::current()`.
+
+**Les documents sont une section à droite du briefing, et leurs fiches restent en colonne.** Sur
+téléphone, tout s'empile. Sur tablette, les sections restent empilées et les fiches passent à deux
+par ligne, faute de largeur pour deux colonnes de contenu. Au bureau, le briefing prend sept
+douzièmes et les documents cinq, dans l'idiome de `BoardColumns` mais sans lui — sa colonne étroite
+vient en premier, et ici c'est le texte qui a besoin de la large. Dans leur colonne, les fiches
+reviennent à une par ligne : la demande du propriétaire, et ce que la largeur d'un rail permet de
+lire. La largeur de lecture du briefing reste bornée à 68 caractères (D-59).
+
+**Le côté gérant garde ses deux bureaux.** Écrire un texte en Markdown et déposer des fichiers sont
+deux gestes et deux formulaires, même s'ils répondent à la même permission `manage-documents` ; la
+barre de sous-menus de R-09 ne bouge pas. C'est la lecture qui fusionne, pas l'édition — et `document.title` sert désormais
+d'intitulé de section plutôt que de titre de page, son sous-titre disparaissant faute de place sous
+un libellé de section.

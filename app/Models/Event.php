@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property CarbonImmutable|null $first_start_at
  * @property int|null $lap_distance_meters
  * @property int|null $lap_duration_minutes
+ * @property CarbonImmutable|null $finished_at
  * @property string|null $address
  * @property float|null $latitude
  * @property float|null $longitude
@@ -80,6 +81,14 @@ class Event extends Model
     }
 
     /**
+     * @return HasMany<ScheduleSegment, $this>
+     */
+    public function scheduleSegments(): HasMany
+    {
+        return $this->hasMany(ScheduleSegment::class)->orderBy('from_round_number');
+    }
+
+    /**
      * @return HasMany<Document, $this>
      */
     public function documents(): HasMany
@@ -93,6 +102,14 @@ class Event extends Model
     public function participants(): HasMany
     {
         return $this->hasMany(Participant::class);
+    }
+
+    /**
+     * @return HasMany<Standing, $this>
+     */
+    public function standings(): HasMany
+    {
+        return $this->hasMany(Standing::class)->orderBy('rank')->orderBy('bib_number');
     }
 
     public function confirmedParticipantsCount(): int
@@ -121,6 +138,7 @@ class Event extends Model
         return [
             'status' => EventStatus::class,
             'first_start_at' => UtcDateTime::class,
+            'finished_at' => UtcDateTime::class,
             'lap_distance_meters' => 'integer',
             'lap_duration_minutes' => 'integer',
             'latitude' => 'float',

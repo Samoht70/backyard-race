@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Epic** | 2 — Moteur de course |
-| **Statut** | À faire |
+| **Statut** | ✅ Terminé |
 | **Estimation** | 8 pts |
 | **Dépend de** | BR-08 |
 
@@ -39,7 +39,7 @@ l'appui.
 - L'heure de fin est **l'heure du serveur** au moment de la requête. Elle n'est ni transmise
   par le client ni modifiable.
 - La boucle validée est celle du **tour courant**, déterminé par le serveur.
-- `durée = heure de validation − heure théorique de départ`.
+- `durée = heure de validation − heure théorique de départ`, lue sur la ligne du tour.
 - `vitesse moyenne = distance de la boucle définie sur l'événement ÷ durée`, exprimée en km/h.
   Elle est informative et n'entre jamais dans le classement.
 - Une boucle déjà `validated` ne peut pas être revalidée : la seconde tentative ne modifie rien.
@@ -56,8 +56,8 @@ Et qu'il est 17:47:32 côté serveur
 Lorsque le gérant valide cette boucle
 Alors la boucle passe au statut "validated"
 Et l'heure de validation enregistrée est 17:47:32
-Et la durée enregistrée est 47 minutes et 32 secondes
-Et la vitesse moyenne enregistrée est 7,57 km/h
+Et la durée restituée est 47 minutes et 32 secondes
+Et la vitesse moyenne restituée est 7,57 km/h
 
 Étant donné une boucle déjà au statut "validated"
 Lorsque le gérant la valide de nouveau
@@ -93,10 +93,30 @@ Le calcul du temps est la donnée que personne ne pourra recontester après la c
 a pas de trace papier. L'heure serveur est donc la seule référence acceptable, et le double
 appui ne doit jamais produire deux temps différents pour une même boucle.
 
+## Ce que la livraison a changé
+
+**« Enregistrée » se lit « restituée ».** D-73 avait refusé les colonnes `duration` et
+`average_speed` avant que cette story ne soit prise : la durée est une soustraction entre l'heure de
+validation et le départ du tour, la vitesse une division par la distance unique de l'événement, et
+les deux se recalculent à chaque affichage. Aucun critère ne change de valeur ; c'est le verbe qui
+change, et le cas limite « distance non renseignée » reste le même contrôle.
+
+**Le tableau du tour courant est arrivé avec le bouton.** Un bouton par coureur actif suppose une
+liste, donc l'écran de pilotage reçoit les boucles du tour courant. Il est volontairement pauvre :
+pas de filtre, pas de pagination, pas de compte d'effectifs — BR-13 et BR-14 gardent leur périmètre.
+
+**Le double appui est gardé par un verrou.** Deux requêtes séparées par 200 ms peuvent lire la même
+boucle vide et écrire deux heures différentes. La validation s'exécute donc dans une transaction avec
+`lockForUpdate`, et la seconde tentative rend la première heure sans erreur, comme demandé.
+
+[D-75](../DECISIONS.md) porte le détail — la limite inclusive, le refus qui nomme BR-12, la policy
+qui porte l'état de course, et la lecture en lot du statut de course qui ferme le « reste ouvert » de
+D-74.
+
 ## Tâches
 
-- [ ] **T1** — Action de validation d'une boucle : heure serveur, durée, vitesse `3 pts`
-- [ ] **T2** — Garde-fous : permission, boucle déjà validée, délai dépassé, division par zéro `2 pts`
-- [ ] **T3** — Contrôleur de validation et Policy associée `1 pt`
-- [ ] **T4** — Retour immédiat du résultat au gérant après l'appui `1 pt`
-- [ ] **T5** — Tests : calculs, double validation, refus participant, heure client ignorée, limite exacte `3 pts`
+- [x] **T1** — Action de validation d'une boucle : heure serveur, durée, vitesse `3 pts`
+- [x] **T2** — Garde-fous : permission, boucle déjà validée, délai dépassé, division par zéro `2 pts`
+- [x] **T3** — Contrôleur de validation et Policy associée `1 pt`
+- [x] **T4** — Retour immédiat du résultat au gérant après l'appui `1 pt`
+- [x] **T5** — Tests : calculs, double validation, refus participant, heure client ignorée, limite exacte `3 pts`

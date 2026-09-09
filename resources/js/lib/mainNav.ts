@@ -5,20 +5,31 @@ import { can } from '@/lib/permissions';
 import { dashboard, home, login } from '@/routes';
 import { create as createAccount } from '@/routes/account';
 import { show as briefing } from '@/routes/briefing';
-import { index as documents } from '@/routes/documents';
 import { index as manage } from '@/routes/manage';
 import { show as registration } from '@/routes/registration';
+import { index as standings } from '@/routes/standings';
 import type { NavItem } from '@/types';
 
 export function mainNavItems(): NavItem[] {
     return isAuthenticated() ? memberNavItems() : guestNavItems();
 }
 
-function guestNavItems(): NavItem[] {
-    const entries: NavItem[] = [{ title: t('ui.nav.event'), href: home() }];
+function homeEntry(): NavItem {
+    return {
+        title: canReach('results') ? t('ui.nav.results') : t('ui.nav.event'),
+        href: home(),
+    };
+}
 
-    if (canReach('documents')) {
-        entries.push({ title: t('ui.nav.documents'), href: documents() });
+function guestNavItems(): NavItem[] {
+    const entries: NavItem[] = [homeEntry()];
+
+    if (canReach('event')) {
+        entries.push({ title: t('ui.nav.briefing'), href: briefing() });
+    }
+
+    if (canReach('standings')) {
+        entries.push({ title: t('ui.nav.standings'), href: standings() });
     }
 
     entries.push({ title: t('ui.nav.registration'), href: login() });
@@ -45,12 +56,12 @@ function memberNavItems(): NavItem[] {
         entries.push({ title: t('ui.nav.briefing'), href: briefing() });
     }
 
-    if (canReach('documents')) {
-        entries.push({ title: t('ui.nav.documents'), href: documents() });
+    if (canReach('standings')) {
+        entries.push({ title: t('ui.nav.standings'), href: standings() });
     }
 
     if (canReach('event')) {
-        entries.push({ title: t('ui.nav.event'), href: home() });
+        entries.push(homeEntry());
     }
 
     return entries;

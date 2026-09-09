@@ -1,21 +1,12 @@
-import {
-    ArrowDownToLine,
-    CircleArrowRight,
-    TimerOff,
-    Trophy,
-} from '@lucide/vue';
+import { CircleArrowRight, Skull, TimerOff, Trophy } from '@lucide/vue';
 import type { LucideIcon } from '@lucide/vue';
 import { cva } from 'class-variance-authority';
 import type { RunnerStatus } from '@/types/race';
 
-/**
- * Icons are structurally distinct silhouettes, not four coloured circles: the
- * pictogram has to carry the status on its own in greyscale.
- */
 export const runnerStatusIcons = {
     running: CircleArrowRight,
     eliminated: TimerOff,
-    withdrawn: ArrowDownToLine,
+    withdrawn: Skull,
     finished: Trophy,
 } satisfies Record<RunnerStatus, LucideIcon>;
 

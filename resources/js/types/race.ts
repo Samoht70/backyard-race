@@ -12,3 +12,98 @@ export type CurrentRound = {
     starts_at: string;
     deadline_at: string;
 };
+
+export type RunnerTally = {
+    running: number;
+    out: number;
+};
+
+export type NextRound = {
+    number: number;
+    starts_at: string;
+    lap_duration_minutes: number;
+};
+
+export const LAP_STATUSES = ['pending', 'validated', 'eliminated'] as const;
+
+export type LapStatus = (typeof LAP_STATUSES)[number];
+
+export type RoundRunner = {
+    runner_id: number;
+    lap_id: number;
+    lap_status: LapStatus;
+    corrected: boolean;
+    bib_label: string | null;
+    first_name: string;
+    last_name: string;
+    status: RunnerStatus;
+    validated_laps: number;
+    covered_meters: number | null;
+    validated_at: string | null;
+    duration_seconds: number | null;
+    distance_meters: number | null;
+    speed_kmh: number | null;
+};
+
+export type RunnerLap = {
+    round_number: number;
+    corrected: boolean;
+    duration_seconds: number | null;
+    distance_meters: number | null;
+    speed_kmh: number | null;
+};
+
+export type RunnerSearchResult = {
+    runner_id: number;
+    bib_label: string | null;
+    first_name: string;
+    last_name: string;
+    status: RunnerStatus;
+    validated_laps: number;
+    covered_meters: number | null;
+    last_validated_round: number | null;
+    exited_at: string | null;
+    pending_lap_id: number | null;
+    laps: RunnerLap[];
+};
+
+export type Standing = {
+    rank: number;
+    bib_label: string | null;
+    first_name: string;
+    last_name: string;
+    status: RunnerStatus;
+    validated_laps: number;
+    covered_meters: number | null;
+};
+
+export type EventTotals = {
+    participants: number;
+    validated_laps: number;
+    covered_meters: number | null;
+    duration_seconds: number | null;
+};
+
+export type RoundOutcome = {
+    number: number;
+    runners: number;
+    completed_laps: number;
+    withdrawals: number;
+    timeouts: number;
+};
+
+export type CorrectableLap = {
+    lap_id: number;
+    lap_status: LapStatus;
+    corrected: boolean;
+    validated_at: string | null;
+    round_number: number;
+    round_starts_at: string;
+    round_deadline_at: string;
+    runner_id: number;
+    bib_label: string | null;
+    first_name: string;
+    last_name: string;
+    status: RunnerStatus;
+    validated_laps: number;
+};

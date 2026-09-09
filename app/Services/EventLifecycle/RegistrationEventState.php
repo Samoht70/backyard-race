@@ -77,6 +77,8 @@ final class RegistrationEventState implements EventLifecycleState
         return new DraftEventState;
     }
 
+    public function enter(Event $event): void {}
+
     public function allowsRegistration(): bool
     {
         return true;
@@ -95,6 +97,16 @@ final class RegistrationEventState implements EventLifecycleState
     public function isRacing(): bool
     {
         return false;
+    }
+
+    public function isOver(): bool
+    {
+        return false;
+    }
+
+    public function announcesNextRound(): bool
+    {
+        return true;
     }
 
     public function frozenAttributes(): array

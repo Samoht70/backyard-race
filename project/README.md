@@ -222,20 +222,21 @@ par BR-33. Elle reste avec les écrans de course, dont elle dépend.
 
 | ID | Story | Pts | Statut |
 |----|-------|-----|--------|
-| [BR-08](stories/BR-08-tours-et-laps.md) | Tours de course et boucles des participants | 8 | À faire |
-| [BR-09](stories/BR-09-validation-tour.md) | Validation d'une boucle par le gérant | 8 | À faire |
-| [BR-10](stories/BR-10-abandon.md) | Abandon volontaire déclaré par le gérant | 5 | À faire |
-| [BR-11](stories/BR-11-elimination-automatique.md) | Élimination automatique à expiration du tour | 8 | À faire |
-| [BR-12](stories/BR-12-correction-tour.md) | Correction exceptionnelle d'une boucle | 5 | À faire |
+| [BR-08](stories/BR-08-tours-et-laps.md) | Tours de course et boucles des participants | 8 | ✅ Terminé |
+| [BR-44](stories/BR-44-duree-du-prochain-tour.md) | Changer la durée du prochain tour avant qu'il parte | 5 | ✅ Terminé |
+| [BR-09](stories/BR-09-validation-tour.md) | Validation d'une boucle par le gérant | 8 | ✅ Terminé |
+| [BR-10](stories/BR-10-abandon.md) | Abandon volontaire déclaré par le gérant | 5 | ✅ Terminé |
+| [BR-11](stories/BR-11-elimination-automatique.md) | Élimination automatique à expiration du tour | 8 | ✅ Terminé |
+| [BR-12](stories/BR-12-correction-tour.md) | Correction exceptionnelle d'une boucle | 5 | ✅ Terminé |
 
 ### EPIC 3 — Interface de course
 
 | ID | Story | Pts | Statut |
 |----|-------|-----|--------|
-| [BR-13](stories/BR-13-dashboard-gerant.md) | Dashboard gérant mobile-first | 13 | À faire |
-| [BR-14](stories/BR-14-tableau-coureurs.md) | Tableau des coureurs et filtres | 8 | À faire |
-| [BR-15](stories/BR-15-polling.md) | Rafraîchissement léger de l'état de course | 2 | À faire |
-| [BR-16](stories/BR-16-detail-participant.md) | Détail d'un coureur, déplié dans le tableau | 2 | À faire |
+| [BR-13](stories/BR-13-dashboard-gerant.md) | Dashboard gérant mobile-first | 13 | ✅ Terminé |
+| [BR-14](stories/BR-14-tableau-coureurs.md) | Recherche d'un coureur | 6 | ✅ Terminé |
+| [BR-15](stories/BR-15-polling.md) | Rafraîchissement léger de l'état de course | 2 | ✅ Terminé |
+| [BR-16](stories/BR-16-detail-participant.md) | Détail d'un coureur, déplié dans ses résultats | 3 | ✅ Terminé |
 
 ### EPIC 4 — Informations événement
 
@@ -249,17 +250,17 @@ par BR-33. Elle reste avec les écrans de course, dont elle dépend.
 
 | ID | Story | Pts | Statut |
 |----|-------|-----|--------|
-| [BR-20](stories/BR-20-fin-evenement-classement.md) | Fin de l'événement et classement final | 8 | À faire |
+| [BR-20](stories/BR-20-fin-evenement-classement.md) | Fin de l'événement et classement final | 8 | ✅ Terminé |
 | [BR-21](stories/BR-21-statistiques.md) | ~~Statistiques de l'événement~~ | — | ⛔ Abandonné |
 | [BR-22](stories/BR-22-galerie-photos.md) | ~~Galerie photos~~ | — | ⛔ Abandonné |
-| [BR-23](stories/BR-23-page-resultats.md) | Page de résultats et chiffres de l'événement | 8 | À faire |
+| [BR-23](stories/BR-23-page-resultats.md) | Page de résultats et chiffres de l'événement | 8 | ✅ Terminé |
 
 ### EPIC 6 — Expérience participant
 
 | ID | Story | Pts | Statut |
 |----|-------|-----|--------|
 | [BR-33](stories/BR-33-acces-parcours-coureur.md) | Accès du coureur à son inscription | 5 | ✅ Terminé |
-| [BR-24](stories/BR-24-dashboard-participant.md) | Dashboard participant | 8 | À faire |
+| [BR-24](stories/BR-24-dashboard-participant.md) | Dashboard participant | 8 | ✅ Terminé |
 | [BR-36](stories/BR-36-gabarit-de-mail.md) | Habiller les mails aux couleurs de la course | 3 | ✅ Terminé |
 | [BR-25](stories/BR-25-mon-dossard.md) | ~~Dossard imprimable~~ | — | ⛔ Abandonné |
 
@@ -277,7 +278,7 @@ par BR-33. Elle reste avec les écrans de course, dont elle dépend.
 | [BR-35](stories/BR-35-compte-organisateur-en-commande.md) | Créer le compte organisateur en une commande | 3 | ✅ Terminé |
 | [BR-37](stories/BR-37-purge-des-inscriptions.md) | Purger les inscriptions et les comptes coureurs | 5 | ✅ Terminé |
 
-Les quatre stories `En cours` sont en production et il leur manque une ou deux tâches, nommées dans
+Les trois stories `En cours` sont en production et il leur manque une ou deux tâches, nommées dans
 leur fichier sous « Ce qui reste au 2026-08-22 » et récapitulées dans le lot 2. Leurs points ne
 comptent pas encore comme livrés : une story qui sert sans se signaler quand elle tombe n'est pas
 finie.
@@ -296,8 +297,11 @@ pas de fichier de story : c'est la décision qui les porte, et elles prennent un
 | R-05 | Course publique : l'accueil porte l'événement, les documents s'ouvrent aux invités | 5 | ✅ Livrée | [D-60](DECISIONS.md) |
 | R-06 | Charte de l’instrument, et primitives reka-ui à la place du starter kit | 5 | ✅ Livrée | [D-61](DECISIONS.md) |
 | R-07 | Adresse de l'organisateur en configuration, en plus du rôle `manager` | 2 | ✅ Livrée | [D-65](DECISIONS.md) |
+| R-08 | Recherche de coureur déplacée sur l'accueil, réservée au gérant ; le coureur y voit sa course | 3 | ✅ Livrée | [D-80](DECISIONS.md) |
+| R-09 | Gestion en barre de sous-menus, section Course à part, bandeaux du tour échangés avec l'accueil | 5 | ✅ Livrée | [D-84](DECISIONS.md) |
+| R-10 | Briefing et documents fondus en un seul onglet, ouvert aux invités | 3 | ✅ Livrée | [D-88](DECISIONS.md) |
 
-**Total : 38 stories actives + 7 reprises · 262 pts · 163 pts livrés (62 %)**
+**Total : 39 stories actives + 10 reprises · 280 pts · 267 pts livrés (95 %)**
 
 **Hors périmètre : 4 stories abandonnées, 32 pts non engagés** — voir [D-47](DECISIONS.md).
 
@@ -324,10 +328,58 @@ français, et le mode développement garde son écran de diagnostic.
 parce qu'une file qui cesse d'être consommée coûtait des coureurs dès aujourd'hui ; la version exposée
 et le garde-fou de gel, eux, ne coûtent que la nuit de course, et il reste du temps.
 
-**Ensuite, le moteur et les écrans de course** — BR-08 → BR-09 → BR-10 → BR-11 → BR-12 → BR-13 →
-BR-14 → BR-15 → BR-16 → BR-24 → BR-20 → BR-23
+**Ensuite, le moteur et les écrans de course** — BR-08 → BR-44 → BR-09 → BR-10 → BR-11 → BR-12 →
+BR-13 → BR-14 → BR-15 → BR-16 → BR-24 → BR-20 → BR-23
 
-Dix remarques sur cet ordre :
+**BR-23 ferme l'epic 5 et le backlog des écrans le 2026-09-07.** L'accueil public bascule sur les
+résultats dès que la course est close : le vainqueur — tous les vainqueurs en cas d'ex æquo —, les
+quatre chiffres de la soirée et le tableau tour par tour, chacun agrégé en base et jamais parcouru en
+PHP ([D-87](DECISIONS.md)). C'est `/` qui bascule et non l'écran du coureur, décision du propriétaire
+sur la logique de D-60 : le lien qu'on partage doit montrer la course, pas une inscription fermée. Le
+renvoi vers les résultats que D-85 avait laissé en attente arrive du même coup, et l'entrée de
+navigation « Événement » devient « Résultats ». **Le lien vers l'album photos sort du périmètre** — il
+demandait une colonne que le gel de D-86 aurait rendue inutilisable, les photos arrivant après la
+clôture.
+
+**R-10 fond le briefing et les documents le 2026-09-07.** Le briefing se terminait par deux lignes
+renvoyant à l'onglet Documents : les deux onglets n'en font plus qu'un, sur `/briefing`, le texte à
+gauche et les fichiers en section à droite au bureau ([D-88](DECISIONS.md)). **Le briefing s'ouvre
+aux invités**, ce que D-60 avait refusé sur une raison que son contenu contredit — principe, infos
+clés et esprit sont ce qui décide de venir. Les deux pages posaient déjà le même prédicat de
+visibilité : `/documents` quitte le routage avec son contrôleur, `DocumentPolicy::viewAny` avec ses
+deux appelants, et `access.documents` avec eux. Le côté gérant garde ses deux bureaux.
+
+**BR-24 ferme le côté coureur le 2026-09-07.** L'accueil que D-80 avait ouvert en attendant devient
+sa vue de course : il s'ouvre à la confirmation de l'inscription et non plus au départ du premier
+tour, annonce le prochain départ tant que le coureur est en course, et pose ses boucles en tableau —
+tour, temps, kilomètres, vitesse — dans le même encart que ses chiffres ([D-85](DECISIONS.md)). Deux
+points de son périmètre ne sont pas livrés : les raccourcis vers le briefing et les documents, que la
+navigation porte depuis BR-33, et le renvoi vers les résultats d'un événement terminé, que BR-23 a
+branché le même jour.
+
+**BR-20 clôt la course le 2026-09-07.** Le geste existait déjà : la barre de gestion faisait passer
+l'événement à l'étape suivante, et `finish-event` gardait la dernière. Ce que la story ajoute, c'est
+ce qui se produit à l'entrée dans l'état terminé — l'heure de clôture est enregistrée, et le
+classement est recopié dans sa propre table, rang, boucles, motif de sortie, nom et dossard compris,
+dans la transaction de la transition ([D-86](DECISIONS.md)). Il se lit sur `/standings`, ouvert à
+tous, annoncé dans la navigation dès que la course est close. **BR-23 a suivi le même jour**, et
+lit la tête de ce classement figé pour annoncer le vainqueur.
+
+**L'epic 3 est ouvert le 2026-09-01 par BR-13.** Le moteur décidait juste sans se regarder ; il se
+regarde maintenant sur l'écran que le gérant tiendra quinze heures — entête de tour et effectifs
+collés en haut, liste des seuls coureurs encore en course, et une phrase à la place du vide quand la
+course n'a pas commencé. Deux tests de l'epic 2 ont été réécrits en la prenant : le coureur sorti
+quitte le tableau et passe dans le compteur ([D-79](DECISIONS.md)). La suite est **BR-14**, qui ne
+rendra pas la liste complète que BR-13 vient de restreindre : elle répond « où en est Untel » par une
+recherche sur le nom et le dossard, et l'effectif reste un compteur.
+
+**L'epic 2 est clos le 2026-08-31.** Les six entrées du moteur sont livrées dans cet ordre : les
+boucles s'ouvrent avec leur tour, la durée du prochain tour se change, le gérant valide d'un appui,
+déclare un abandon, le chronomètre élimine seul, et BR-12 rattrape ce que les cinq premières
+n'auraient pas su défaire. La suite a commencé à **BR-13**, qui a remplacé le tableau pauvre posé par
+BR-09 par l'écran que le gérant tient pendant la course.
+
+Onze remarques sur cet ordre :
 
 - Les deux premiers lots livrent un produit **incomplet mais utile**, et il est en ligne : un coureur
   s'inscrit, lit le briefing, télécharge le règlement et déclare son numéro PPS. Rien de la nuit de
@@ -338,14 +390,21 @@ Dix remarques sur cet ordre :
   dans une décision (D-50, mise en œuvre par D-54) et dans le tableau des reprises, comme R-01 à
   R-03. R-05 suit la même règle : elle rouvre la navigation de BR-33 et les documents de BR-18, et
   c'est D-60 qui la porte. R-06 aussi : elle révoque le parti monochrome de D-46 et retire la couche
-  `components/ui/`, portée par D-61.
+  `components/ui/`, portée par D-61. R-10 ferme la boucle sur R-05 : elle fond en un onglet le
+  briefing de BR-17 et les documents de BR-18, et ouvre aux invités la moitié que D-60 avait gardée
+  fermée (D-88).
 - BR-24 sort de la fin du backlog pour rejoindre les écrans de course : elle dépend de BR-08 et
   reprend l'accueil que BR-33 a livré.
 - BR-09 et BR-11 restent le cœur métier — c'est là que les tests comptent le plus.
-- BR-13 reste le porteur naturel de **Q-04**, l'écart de cible tactile relevé en D-46 : le bouton de
-  validation a perdu un tiers de sa hauteur. **Q-02**, en revanche, ne l'attend plus : la page
-  d'erreur est devenue publique le jour où l'adresse a circulé, et elle est sortie en story propre
-  dans le lot 4 ([D-66](DECISIONS.md)).
+- BR-44 s'insère après BR-08 et avant BR-11, et cette place est le seul point de son ordre qui
+  compte. Elle ne touche pas aux boucles, donc BR-08 n'a pas à l'attendre ; mais BR-11 est le
+  consommateur dont la justesse dépend de l'heure limite, et ses tests vont encoder une grille.
+  Autant qu'ils encodent la bonne du premier coup, plutôt que de retoucher après coup le seul
+  mécanisme du produit qui décide sans qu'un humain appuie sur un bouton ([D-72](DECISIONS.md)).
+- BR-13 devait porter **Q-04**, l'écart de cible tactile relevé en D-46, et ne l'a pas eue à porter :
+  D-76 avait déjà tranché en sens inverse, le gérant ayant jugé le bouton trop gros en situation.
+  **Q-02** ne l'attendait plus non plus : la page d'erreur est devenue publique le jour où l'adresse
+  a circulé, et elle est sortie en story propre dans le lot 4 ([D-66](DECISIONS.md)).
 - BR-35 a perdu son urgence sans rien perdre de sa valeur : le compte organisateur a été créé à la
   main le 2026-08-22, donc elle ne barre plus la porte d'entrée. Elle reprend la tête du lot 3 pour
   une autre raison — BR-37 supprime des comptes, et on lance mieux un balai quand on sait recoller

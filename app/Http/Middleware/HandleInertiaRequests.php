@@ -4,7 +4,6 @@ namespace App\Http\Middleware;
 
 use App\Enums\Permission;
 use App\Http\Resources\BoardResource;
-use App\Models\Document;
 use App\Models\Event;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -64,13 +63,15 @@ class HandleInertiaRequests extends Middleware
     private function access(?User $user): array
     {
         $event = $this->event();
-        $gate = Gate::forUser($user);
+        $isEventVisible = $event !== null && Gate::forUser($user)->allows('view', $event);
+        $isRaceOver = $event !== null && $event->lifecycle()->isOver();
 
         return [
-            'event' => $event !== null && $gate->allows('view', $event),
-            'documents' => $event !== null && $gate->allows('viewAny', [Document::class, $event]),
+            'event' => $isEventVisible,
             'registration' => $user?->participant()->exists() === true,
             'register' => $user === null && $event !== null && $event->acceptsRegistrations(),
+            'standings' => $isRaceOver,
+            'results' => $isEventVisible && $isRaceOver,
         ];
     }
 
